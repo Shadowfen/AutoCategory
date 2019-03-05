@@ -1,12 +1,46 @@
---Integration with Inventory Grid View
+--[[
+ Integration with Inventory Grid View 
 
------------copied from original file------------
+ UPDATED & Improved By : Provision (watch the update : https://github.com/GuimDev/AutoCategory/commits/master/AutoCategory_Integrations_Inventory_Grid_View.lua )
 
+ FOR UPDATE THIS FILE, HELP YOU OF WITH : IGV diff changes on github (GuimDev/IVG-versioning).
+
+ --------
+
+ Changelog for util.lua & adapter.lua with date : https://github.com/GuimDev/IVG-versioning/wiki
+
+ CHANGE v7 :
+  - v7 : Update modif with IGV 2.0.9 files (2.0.5 -> 2.0.9) :
+     - Fix traitInfo (2.0.9)
+     - icon position (2.0.6&2.0.9)
+     - prefere "disable status' mouse" fix (2.0.6) of the upstream (IGV)
+     - forgotten declaration `ANIMATE_INSTANTLY` (in v1)
+  - v6 : Fix last line (remove : "1 -" udapter.lua#215)
+  - v5 : Add settings
+  - v4 : Comment StatValue (2.0.8)
+  - v3 : Improve IntegrateInventoryGridView Controller
+  - v2: Add util.lua
+  - v1: First version
+
+
+ CHANGE DETAILS :
+  - b7 : https://github.com/GuimDev/AutoCategory/commits/UpdateIVGwithHelper/IVG-integr-versioning-helper
+  - v1-6 : https://github.com/GuimDev/AutoCategory/commits/IVGintVersHelper/IVG-integr-versioning-helper
+
+ ------------------
+
+ This file is copied from original file with some changes :      This file is copied from original file with some changes :
+  - adapter.lua       - adapter.lua
+  - util.lua          - util.lua
+  --]]
 local IGV = InventoryGridView
 local util
 local settings
 local adapter
 local LEFT_PADDING = 25
+
+local MAX_FADE_VALUE = 64
+local ANIMATE_INSTANTLY = true
 
 local function UpdateScrollFade(useFadeGradient, scroll, slider, sliderValue)
     if(useFadeGradient) then
@@ -14,13 +48,13 @@ local function UpdateScrollFade(useFadeGradient, scroll, slider, sliderValue)
         sliderValue = sliderValue or slider:GetValue()
 
         if(sliderValue > sliderMin) then
-            scroll:SetFadeGradient(1, 0, 1, zo_min(sliderValue - sliderMin, 64))
+            scroll:SetFadeGradient(1, 0, 1, zo_min(sliderValue - sliderMin, MAX_FADE_VALUE))
         else
             scroll:SetFadeGradient(1, 0, 0, 0)
         end
 
         if(sliderValue < sliderMax) then
-            scroll:SetFadeGradient(2, 0, -1, zo_min(sliderMax - sliderValue, 64))
+            scroll:SetFadeGradient(2, 0, -1, zo_min(sliderMax - sliderValue, MAX_FADE_VALUE))
         else
             scroll:SetFadeGradient(2, 0, 0, 0);
         end
@@ -31,8 +65,12 @@ local function UpdateScrollFade(useFadeGradient, scroll, slider, sliderValue)
 end
 
 local function AreSelectionsEnabled(self)
-    return self.selectionTemplate or self.selectionCallback
-end
+    if self.selectionTemplate or self.selectionCallback then
+         return true
+     else
+         return false
+     end
+ end   
 
 local function RemoveAnimationOnControl(control, animationFieldName, animateInstantly)
     if control[animationFieldName] then
@@ -415,6 +453,7 @@ local function ReshapeSlot(control, isGrid, width, height)
         local button = control:GetNamedChild("Button")
         local name = control:GetNamedChild("Name")
         local sell = control:GetNamedChild("SellPrice")
+        local traitInfo = control:GetNamedChild("TraitInfo")
         --local stat = control:GetNamedChild("StatValue")
 
         --make sure sell price label stays shown/hidden
@@ -448,9 +487,16 @@ local function ReshapeSlot(control, isGrid, width, height)
 
         if new then new:ClearAnchors() end
 		
-		--disable status' mouse callback
-		new:SetMouseEnabled(false)
-		new:GetNamedChild("Texture"):SetMouseEnabled(false)
+        if isGrid and traitInfo ~= nil then
+            traitInfo:ClearAnchors()
+            traitInfo:SetDimensions(25, 25)
+             traitInfo:SetAnchor(TOPRIGHT, control, TOPRIGHT)
+             traitInfo:SetDrawTier(DT_HIGH)
+         elseif traitInfo ~= nil then
+             traitInfo:ClearAnchors()
+             traitInfo:SetDimensions(32, 32)
+             traitInfo:SetAnchor(RIGHT, sell, LEFT, -5)
+         end
 
         control:SetDimensions(width, height)
 
@@ -458,8 +504,14 @@ local function ReshapeSlot(control, isGrid, width, height)
             button:SetAnchor(CENTER, control, CENTER)
 
             new:SetAnchor(TOPLEFT, button:GetNamedChild("Icon"), TOPLEFT, 0, 0)
-            new:SetDrawTier(2)
+            new:SetDimensions(25, 25)
+            new:SetAnchor(TOPLEFT, button:GetNamedChild("Icon"), TOPLEFT, -5, -5)
+            new:SetDrawTier(DT_HIGH)
 
+            --disable mouse events on status controls
+            new:SetMouseEnabled(false)
+            new:GetNamedChild("Texture"):SetMouseEnabled(false)
+ 
             name:SetHidden(true)
             --stat:SetHidden(true)
 
@@ -481,9 +533,16 @@ local function ReshapeSlot(control, isGrid, width, height)
             local LIST_SLOT_BACKGROUND = "EsoUI/Art/Miscellaneous/listItem_backdrop.dds"
             local LIST_SLOT_HOVER = "EsoUI/Art/Miscellaneous/listitem_highlight.dds"
 
-            if button then button:SetAnchor(CENTER, control, TOPLEFT, 47, 26) end
+            if button then button:SetAnchor(CENTER, control, TOPLEFT, 70, 26) end
 
-            if new then new:SetAnchor(CENTER, control, TOPLEFT, 20, 27) end
+            if new then
+                 new:SetDimensions(32, 32)
+                 new:SetAnchor(CENTER, control, TOPLEFT, 20, 27)
+
+                  --enable mouse events on status controls
+                 new:SetMouseEnabled(true)
+                 new:GetNamedChild("Texture"):SetMouseEnabled(true)
+            end
 
             if name then name:SetHidden(false) end
             --if stat then stat:SetHidden(false) end
