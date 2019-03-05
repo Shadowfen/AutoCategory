@@ -16,6 +16,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			bag_type_id = AC_BAG_TYPE_CRAFTBAG
 		elseif bagId == BAG_GUILDBANK then
 			bag_type_id = AC_BAG_TYPE_GUILDBANK
+ 		elseif bagId == BAG_HOUSE_BANK_ONE or bagId == BAG_HOUSE_BANK_TWO or bagId == BAG_HOUSE_BANK_THREE or bagId == BAG_HOUSE_BANK_FOUR or bagId == BAG_HOUSE_BANK_FIVE or bagId == BAG_HOUSE_BANK_SIX or bagId == BAG_HOUSE_BANK_SEVEN or bagId == BAG_HOUSE_BANK_EIGHT then
+			bag_type_id = AC_BAG_TYPE_HOUSEBANK
 		end
 	end
 	if not bag_type_id then
@@ -31,7 +33,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			if rule.rule == nil then
 				return false, "", 0, bag_type_id, entry.isHidden
 			end
-			local ruleCode, res = zo_loadstring( "return(" .. rule.rule ..")" )
+			local ruleCode = AutoCategory.compiledRules[entry.name]
+			--local ruleCode, res = zo_loadstring( "return(" .. rule.rule ..")" )
 			if not ruleCode then
 				d("Error1: " .. res)
 				rule.damaged = true 

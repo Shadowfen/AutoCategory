@@ -11,16 +11,33 @@ local LAM2 = LibStub:GetLibrary("LibAddonMenu-2.0");
 
 local L = AutoCategory.localizefunc
 
+AutoCategory.compiledRules = {}
+
 AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
+
+function AutoCategory.RecompileRules(ruleset)
+  local compiled = {}
+  for j = 1, #ruleset do
+    local n = ruleset[j].name
+    compiled[n],err = zo_loadstring("return("..ruleset[j].rule..")")
+    if not compiled[n] then
+      d("Error1: " .. res)
+      ruleset[j].damaged = true 
+    end
+  end
+  AutoCategory.compiledRules = compiled
+end
 
 function AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.curSavedVars= {}
 	if not AutoCategory.charSavedVariables.accountWideSetting  then
 		AutoCategory.curSavedVars.rules = AutoCategory.acctSavedVariables.rules
+		AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
 		AutoCategory.curSavedVars.bags = AutoCategory.charSavedVariables.bags 
 		AutoCategory.curSavedVars.collapses = AutoCategory.charSavedVariables.collapses 
 	else 
 		AutoCategory.curSavedVars.rules = AutoCategory.acctSavedVariables.rules
+    AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
 		AutoCategory.curSavedVars.bags = AutoCategory.acctSavedVariables.bags  
 		AutoCategory.curSavedVars.collapses = AutoCategory.acctSavedVariables.collapses 
 	end
@@ -42,6 +59,7 @@ function AutoCategory.ResetCollapse()
 		[AC_BAG_TYPE_GUILDBANK] = {},
 		[AC_BAG_TYPE_CRAFTBAG] = {},
 		[AC_BAG_TYPE_CRAFTSTATION] = {},
+		[AC_BAG_TYPE_HOUSEBANK] = {},
 	}
 end
 
@@ -68,14 +86,15 @@ local function CheckVersionCompatible()
 			setting.bags[bagId] = defaultSetting.bags[bagId]
 		end
 	end
-	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSetting, AC_BAG_TYPE_GUILDBANK)
-	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSetting, AC_BAG_TYPE_CRAFTBAG)
-	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSetting, AC_BAG_TYPE_CRAFTSTATION)
+	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSettings, AC_BAG_TYPE_GUILDBANK)
+	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSettings, AC_BAG_TYPE_CRAFTBAG)
+	RebuildBagSettingIfNeeded(AutoCategory.charSavedVariables, AutoCategory.defaultSettings, AC_BAG_TYPE_CRAFTSTATION)
 	
 	RebuildBagSettingIfNeeded(AutoCategory.acctSavedVariables, AutoCategory.defaultAcctSettings, AC_BAG_TYPE_GUILDBANK)
 	RebuildBagSettingIfNeeded(AutoCategory.acctSavedVariables, AutoCategory.defaultAcctSettings, AC_BAG_TYPE_CRAFTBAG)
 	RebuildBagSettingIfNeeded(AutoCategory.acctSavedVariables, AutoCategory.defaultAcctSettings, AC_BAG_TYPE_CRAFTSTATION)
 	--v1.12
+	
 	
 	--v1.15, added some options to modify headers appearance, and general settings
 	if not AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"] then
@@ -154,12 +173,35 @@ local function CheckVersionCompatible()
 				[AC_BAG_TYPE_GUILDBANK] = {},
 				[AC_BAG_TYPE_CRAFTBAG] = {},
 				[AC_BAG_TYPE_CRAFTSTATION] = {},
+				[AC_BAG_TYPE_HOUSEBANK] = {},
 			}
 		end
 	end
 	addCollapseIfPossible(AutoCategory.charSavedVariables)
 	addCollapseIfPossible(AutoCategory.acctSavedVariables)
 	--v1.19
+	
+	--v1.22
+	--add variables for home storage chests	
+	if not AutoCategory.charSavedVariables.bags[AC_BAG_TYPE_HOUSEBANK] then
+		AutoCategory.charSavedVariables.bags[AC_BAG_TYPE_HOUSEBANK] = AutoCategory.charSavedVariables.bags[AC_BAG_TYPE_BANK]
+	end	
+	
+	if not AutoCategory.acctSavedVariables.bags[AC_BAG_TYPE_HOUSEBANK] then
+		AutoCategory.acctSavedVariables.bags[AC_BAG_TYPE_HOUSEBANK] = AutoCategory.acctSavedVariables.bags[AC_BAG_TYPE_BANK]
+	end
+	
+	if AutoCategory.charSavedVariables.collapses[AC_BAG_TYPE_HOUSEBANK] == nil then 
+		AutoCategory.charSavedVariables.collapses[AC_BAG_TYPE_HOUSEBANK] = {}
+	end
+	
+	if AutoCategory.acctSavedVariables.collapses[AC_BAG_TYPE_HOUSEBANK] == nil then 
+		AutoCategory.acctSavedVariables.collapses[AC_BAG_TYPE_HOUSEBANK] = {}
+	end
+	--v1.22
+	
+	
+		
 end
 
 function AutoCategory.LazyInit()
@@ -254,6 +296,8 @@ function AutoCategory.RefreshCurrentList()
 		RefreshList(INVENTORY_CRAFT_BAG)
 	elseif not ZO_GuildBank:IsHidden() then
 		RefreshList(INVENTORY_GUILD_BANK)
+	elseif not ZO_HouseBank:IsHidden() then
+		RefreshList(INVENTORY_HOUSE_BANK)
 	elseif not ZO_PlayerBank:IsHidden() then
 		RefreshList(INVENTORY_BANK)
 	elseif not SMITHING.deconstructionPanel.control:IsHidden() then
