@@ -12,10 +12,10 @@ AutoCategory.Inited = false
 AutoCategory.Enabled = true
 
 AutoCategory.name = "AutoCategory";
-AutoCategory.version = "1.34";
+AutoCategory.version = "1.35";
 AutoCategory.settingName = "Auto Category"
 AutoCategory.settingDisplayName = "RockingDice's AutoCategory"
-AutoCategory.author = "RockingDice"
+AutoCategory.author = "RockingDice, crafty35, Shadowfen"
 AutoCategory.localizefunc = function ( loc_key ) 
 	return GetString( loc_key )
 end

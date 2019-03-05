@@ -1,27 +1,13 @@
 ## Title: AutoCategory
-## APIVersion: 100025
+## APIVersion: 100026
 ## Author: RockingDice
 ## Description: Type "/ac" 
-## Version: 1.34
+## Version: 1.35
 ## SavedVariables: AutoCategorySavedVars
-## OptionalDependsOn: LibAddonMenu-2.0 InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver
+## DependsOn: LibStub LibAddonMenu-2.0
+## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver
 
-Libs/LibStub/LibStub.lua
 Libs/LibMediaProvider-1.0/LibMediaProvider-1.0.lua
-Libs/LibAddonMenu-2.0/LibAddonMenu-2.0.lua
-Libs/LibAddonMenu-2.0/controls/panel.lua
-Libs/LibAddonMenu-2.0/controls/submenu.lua
-Libs/LibAddonMenu-2.0/controls/button.lua
-Libs/LibAddonMenu-2.0/controls/checkbox.lua
-Libs/LibAddonMenu-2.0/controls/colorpicker.lua
-Libs/LibAddonMenu-2.0/controls/custom.lua
-Libs/LibAddonMenu-2.0/controls/description.lua
-Libs/LibAddonMenu-2.0/controls/dropdown.lua
-Libs/LibAddonMenu-2.0/controls/editbox.lua
-Libs/LibAddonMenu-2.0/controls/header.lua
-Libs/LibAddonMenu-2.0/controls/slider.lua
-Libs/LibAddonMenu-2.0/controls/texture.lua
-Libs/LibAddonMenu-2.0/controls/iconpicker.lua
 
 lang/all.lua
 lang/$(language).lua

@@ -21,7 +21,7 @@ function AutoCategory.RecompileRules(ruleset)
     local n = ruleset[j].name
     compiled[n],err = zo_loadstring("return("..ruleset[j].rule..")")
     if not compiled[n] then
-      d("Error1: " .. res)
+      d("Error1: " .. err)
       ruleset[j].damaged = true 
     end
   end
