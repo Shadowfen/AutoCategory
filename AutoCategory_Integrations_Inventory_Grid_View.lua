@@ -503,7 +503,6 @@ local function ReshapeSlot(control, isGrid, width, height)
         if isGrid == true and new ~= nil then
             button:SetAnchor(CENTER, control, CENTER)
 
-            new:SetAnchor(TOPLEFT, button:GetNamedChild("Icon"), TOPLEFT, 0, 0)
             new:SetDimensions(25, 25)
             new:SetAnchor(TOPLEFT, button:GetNamedChild("Icon"), TOPLEFT, -5, -5)
             new:SetDrawTier(DT_HIGH)
@@ -536,12 +535,12 @@ local function ReshapeSlot(control, isGrid, width, height)
             if button then button:SetAnchor(CENTER, control, TOPLEFT, 70, 26) end
 
             if new then
-                 new:SetDimensions(32, 32)
-                 new:SetAnchor(CENTER, control, TOPLEFT, 20, 27)
+                new:SetDimensions(32, 32)
+                new:SetAnchor(CENTER, control, TOPLEFT, 20, 27)
 
-                  --enable mouse events on status controls
-                 new:SetMouseEnabled(true)
-                 new:GetNamedChild("Texture"):SetMouseEnabled(true)
+                --enable mouse events on status controls
+                new:SetMouseEnabled(true)
+                new:GetNamedChild("Texture"):SetMouseEnabled(true)
             end
 
             if name then name:SetHidden(false) end
