@@ -22,6 +22,7 @@ local sortKeys =
     age = { tiebreaker = "name", tieBreakerSortOrder = ZO_SORT_ORDER_UP, isNumeric = true},
     statValue = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
     traitInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
+    sellInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
 }
 
 local function AutoCategory_ItemSortComparator(left, right)
@@ -73,6 +74,7 @@ function AutoCategory.HookKeyboardMode()
 	ZO_ScrollList_AddDataType(ZO_CraftBagList, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(ZO_PlayerBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(ZO_GuildBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
+	ZO_ScrollList_AddDataType(ZO_HouseBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(ZO_PlayerInventoryQuest, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_QUEST_ITEM].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset) 
     ZO_ScrollList_AddDataType(SMITHING.deconstructionPanel.inventory.list, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, nil, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(SMITHING.improvementPanel.inventory.list, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, nil, nil, ZO_InventorySlot_OnPoolReset)
@@ -108,6 +110,8 @@ function AutoCategory.HookKeyboardMode()
 	        inventory = self.inventories[INVENTORY_GUILD_BANK]
 	    elseif inventoryType == INVENTORY_CRAFT_BAG then
 	        inventory = self.inventories[INVENTORY_CRAFT_BAG]
+	    elseif inventoryType == INVENTORY_HOUSE_BANK then
+	        inventory = self.inventories[INVENTORY_HOUSE_BANK]
 	    else
 	        -- Use normal inventory by default (instead of the quest item inventory for example)
 	        inventory = self.inventories[self.selectedTabType]

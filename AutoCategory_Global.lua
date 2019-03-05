@@ -3,6 +3,7 @@ AC_BAG_TYPE_BANK = 2
 AC_BAG_TYPE_GUILDBANK = 3
 AC_BAG_TYPE_CRAFTBAG = 4
 AC_BAG_TYPE_CRAFTSTATION = 5
+AC_BAG_TYPE_HOUSEBANK = 6
  
 AutoCategory = {}
 
@@ -11,7 +12,7 @@ AutoCategory.Inited = false
 AutoCategory.Enabled = true
 
 AutoCategory.name = "AutoCategory";
-AutoCategory.version = "1.19";
+AutoCategory.version = "1.34";
 AutoCategory.settingName = "Auto Category"
 AutoCategory.settingDisplayName = "RockingDice's AutoCategory"
 AutoCategory.author = "RockingDice"
