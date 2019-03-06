@@ -1,0 +1,292 @@
+[COLOR="DeepSkyBlue"]sf-1.35[/COLOR] Changes:
+[LIST]
+[*]Bumped API version for Wrathstone
+[*]LibStub and LibAddonMenu-2.0 must now be installed separately from AutoCategory.
+[*]Added support for FCOIS dynamics 11-30.
+[*]Merged in Provisioner's integration fixes for IGV.
+[*]Added jewelry crafting materials, raw materials and boosters for the sptype() check
+[*]Fixed a crash when a rule could not compile.
+[/LIST]
+
+1.34 Changes:
+[LIST]
+[*]Added itemname() to match items by name. Returns true if the item name contains any of the provided strings (case insensitive), e.g. itemname("Maelstrom", "Alkosh")
+[/LIST]
+
+
+1.33 Changes:
+[LIST]
+[*]Bumped API version for Murkmire.
+[/LIST]
+
+
+1.32 Changes:
+[LIST]
+[*]More huge performance improvements! Thanks again to Shadowfen who did all the work here. (Pre-compile rules as they are changed)
+[*]Replaced Set Tracker support function GetSetTrackerState() with IsTracked(). If you used the old function, you will need to update your rule (sorry). This was done to bring the usage inline with the way the other similar functions work. Usage, e.g.: IsTracked("Sell/Decon", "Collecting")
+[/LIST]
+
+
+1.31 Changes:
+[LIST]
+[*]Big performance increase (2x or better for me), thank you to Shadowfen for the code change suggestion!
+[*]Updated libraries
+[/LIST]
+
+
+1.30 Changes:
+[LIST]
+[*]Added French translation. Big thanks to Hasgaad!
+[/LIST]
+
+
+1.29 Changes:
+[LIST]
+[*]HOTFIX - resolve errors at merchant due to Wolfhunter API changes.
+[/LIST]
+
+
+1.28 Changes:
+[LIST]
+[*]Bumped API version for Wolfhunter.
+[/LIST]
+
+
+1.27 Changes:
+[LIST]
+[*]Bumped API version for Summerset.
+[*]Added support for jewelry crafting ingredients. Note: you will need to either create a new rule yourself, or reset AutoCategory to default settings to grab the new default rule.
+        To create your own rule, use
+        Lua Code:
+
+            filtertype("jewelrycrafting")
+
+        To reset to default settings: In the Auto Category add-on menu, use the Defaults button. Then use the /reloadui command. Important: this will remove any custom rules/settings you have defined.
+[*]New API function "IsMarkedIS()" - use to test whether an item is marked with Item Saver. Note that FCO ItemSaver users should continue to use "IsMarked()"
+[/LIST]
+
+
+1.26 Changes:
+[LIST]
+[*]New API function "islocked()" - use to test whether an item has been locked.
+[/LIST]
+
+
+1.24 Changes:
+[LIST]
+[*]Resolve circular dependency issue with DoItAll (requires matching update to DoItAll).
+[/LIST]
+
+
+
+1.23 Changes:
+[LIST]
+[*]Added Set Tracker support! Use "getsettrackerstate()" to retrieve the name of the Set Tracker category, if an item is tracked.
+[*]Added charlevel() and charcp() to pull current character level and CP. Can be used to compare item level to your character level with a custom rule. (Thanks to VulcanTourist)
+[/LIST]
+
+
+1.22 Changes:
+[LIST]
+[*]You can now define separate settings for your home storage chests (they will take their initial settings from your bank settings, but can be customized at will).
+[/LIST]
+
+
+1.21 Changes:
+[LIST]
+[*]Added support for home storage chests (big thanks to raj72616a). Currently, they will use the settings selected for your bank (no custom settings for home chests yet).
+[*]Bumped API version for Dragon Bones.
+[*]New maintainer (crafty35a).
+[/LIST]
+
+
+
+1.19 Changes:
+[LIST]
+[*]Fixed Localization.
+[*]New Feature: Collapsed/Expanded status can be saved now. You can turn it on in the general setting menu.
+[/LIST]
+
+
+1.18 Changes:
+[LIST]
+[*]Fixed Bug: IGV will show the last category correctly.
+[*]Fixed Bug: Items Count can be turned off permanently.
+[*]Fixed Bug: Quest Panel will not complain about lua error.
+[/LIST]
+
+
+1.17 Changes:
+[LIST]
+[*]Removed debug logs in destruct/improvement panel
+[/LIST]
+
+
+1.16 Changes:
+[LIST]
+[*]New Feature: Collapsible Category. You can now click the header to fold all items inside. Get an overall view of your inventory! Context Menu is available, you can collapse/expand all headers with one click.
+[*]New Feature: Hide-able Category. You can hide some categories to focus on the items you need to deal with. Also you can hide the items that are not matched in the 'Other' category. Can be set in bag setting menu.
+[*]New Feature: Items Count. You can get a total number about how many items inside the category. This can be turned off in the general setting menu.
+[*]Account Wide setting changed: You can switch account wide/character wide for each of your characters. (* Need to select again if you use character setting before, don't affect the bag settings)
+[*]Fixed bug: Removed duplicated rules in bag setting.
+[*]Fixed bug: German set names should be able to be matched now.
+[*]Changed api:keepresearch()
+[*]After a lot of tests, the api is not working fine. So I decided to make the api work more simple: It will match all the items can be researched. If you want better result, please use it with other api together. This is a basic idea to filter the item that is not part of a set and can be researched:
+    Lua Code:
+
+        keepresearch() and not isset()
+
+[*]New api:isset() api:ismonsterset()
+[/LIST]
+
+
+1.15 Changes:
+[LIST]
+[*]New feature: Category header's height is customizable!
+[*]New feature: You can change the name of ungrouped Category.
+[*]New feature: Added a message in chat when toggling the add-on's function, and a switch for it to turn on/off.
+[*]Fixed bug: Toggling in Inventory Grid View should not result a bad layout.
+[*]Fixed bug: Removed tag should not to be restored after relog.
+[*]New Add-ons Integrated!
+    Do It All: You can now use it with AC together.
+    Alpha Gear: Added a new api:alphagear
+    Master Merchant: Added a new api:getpricemm
+    Tamriel Trade Centre: Added a new api:getpricettc
+[*]New api:isinbank
+[/LIST]
+
+
+1.14 Changes:
+[LIST]
+[*]CwC is supported!
+[*]Fixed integration for Inventory Grid View(3.2).
+[/LIST]
+
+
+1.13 Changes:
+[LIST]
+[*]Fixed Bug: Setting for Craft Station is not working.
+[*]Added API:
+    Code:
+
+    getquality
+
+    please see api:getquality
+[*]Updated localization for Chinese.
+[/LIST]
+
+
+1.12 Changes:
+[LIST]
+[*]New Function: Export to all bag settings. You can now replace all bag settings by one of them.
+    Added API:
+    Code:
+
+    quality
+
+    please see api:quality
+[*]Fixed Bug: Import from bag setting will incorrectly make settings be linked together.
+[/LIST]
+
+
+1.11 Changes:
+[LIST]
+[*]New bags supported: Guild Bank / Craft Bag / Craft Station for both keyboard and gamepad mode.
+[*]New function: Import from bag setting: you can import from a bag setting to replace current one. No need to create it from the beginning. Make backups by copying your AutoCategory.lua in SavedVariables folder!
+[*]New add-on supported: Quick Menu you can toggle Auto Category by Quick Menu to save a key binding, check it out!
+[*]Added API:
+    Code:
+
+    sellprice
+    islearnable
+
+    please see api:sellprice and api:islearnable for more info.
+[/LIST]
+
+
+1.10 Changes:
+[LIST]
+[*]Added custom names from FCO Item Saver
+[*]Added API:
+    Code:
+
+    armortype
+    weapontype
+
+    please see api:armortype and api:weapontype for more info.
+[*]Added deconstruct & improvement support for keyboard mode.
+[/LIST]
+
+
+1.09 Changes:
+[LIST]
+[*]Integrated FCO Item Saver
+    Added API:
+    Code:
+
+    ismarked
+
+    please see api reference and tutorial and examples for more info.
+    Added Keybinding to toggle on/off.
+[/LIST]
+
+
+1.08 Changes:
+[LIST]
+[*]Fixed Category 'Trait/Style Gems' (If not changed, please try to restore to defaults)
+[*]Added Localization support.
+[/LIST]
+
+
+1.07 Changes:
+[LIST]
+[*]Fixed a rare issue of IGV integration.
+[/LIST]
+
+
+1.06 Changes:
+[LIST]
+[*]Fixed Quest tab issue.
+[*]Adjusted the height of header to the same as item row.
+[*]Added custom appearance of header text. You can set up them in the setting menu (or type /ac)
+[/LIST]
+
+
+1.05 Changes:
+[LIST]
+[*]Fixed multiple add-on compatible issue.
+[*]Fixed auto set name in different languages.
+[*]Added API:
+    Code:
+
+    iscrafted
+
+    please see api reference and tutorial for more info.
+[/LIST]
+
+
+1.04 Changes:
+[LIST]
+[*]Added gamepad trade inventory support. Thanks @catsith105 for testing!
+[/LIST]
+
+
+1.03 Changes:
+[LIST]
+[*]Integrated with 'Inventory Grid View'
+[*]Added a tutorial button.
+[*]Added a wiki home page and tutorial page.
+[/LIST]
+
+
+1.02 Changes:
+[LIST]
+[*]Fixed banking issue with deposit/withdraw items.
+[/LIST]
+
+
+1.01 Changes:
+[LIST]
+[*]Updated lib: LibAddonMenu to r24
+[*]Refined Addon Setting Menu
+[/LIST]
