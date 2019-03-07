@@ -3,7 +3,7 @@
 [*]Bumped API version for Wrathstone
 [*]LibStub and LibAddonMenu-2.0 must now be installed separately from AutoCategory.
 [*]Added support for FCOIS dynamics 11-30.
-[*]Merged in Provisioner's integration fixes for IGV.
+[*]Merged in Provision's integration fixes for IGV.
 [*]Added jewelry crafting materials, raw materials and boosters for the sptype() check
 [*]Fixed a crash when a rule could not compile.
 [/LIST]
