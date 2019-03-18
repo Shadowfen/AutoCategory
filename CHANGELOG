@@ -1,4 +1,37 @@
-[COLOR="DeepSkyBlue"]sf-1.35[/COLOR] Changes:
+[COLOR="DeepSkyBlue"]1.36[/COLOR] Changes:
+Released by Shadowfen
+[LIST]
+[*] Updated the item types, specialized types, filter types, and trait types lists with the latest values from Wrathstone. This adds:
+    Item Types (type):
+     o jewelry_booster
+     o jewelry_material
+     o jewelry_raw_booster
+     o jewelry_raw_material
+     o jewelry_raw_trait
+     o jewelry_trait
+     o recall_stone
+    Specialized Item Types (sptype):
+     o furnishing_attunable_crafting_station
+     o furnishing_material_jewelry
+     o recall_stone_keep
+     o recipes_jewelry_sketch_furnishing
+     o trophy_collectible_fragment
+     o trophy_upgade_fragment
+     o weapon
+    Filter Types (filtertype):
+     o jewelry
+    Trait Types (traittype):
+     o jewelry_bloodthirsty
+     o jewelry_harmony
+     o jewelry_infused
+     o jewelry_intricate
+     o jewelry_protective
+     o jewelry_swift
+     o jewelry_triune
+[/LIST]
+
+[COLOR="DeepSkyBlue"]1.35[/COLOR] Changes:
+Released by Shadowfen
 [LIST]
 [*]Bumped API version for Wrathstone
 [*]LibStub and LibAddonMenu-2.0 must now be installed separately from AutoCategory.
