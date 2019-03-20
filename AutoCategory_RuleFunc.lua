@@ -135,6 +135,12 @@ local specializedItemTypeMap = {
 	["woodworking_material"] = SPECIALIZED_ITEMTYPE_WOODWORKING_MATERIAL,
 	["woodworking_raw_material"] = SPECIALIZED_ITEMTYPE_WOODWORKING_RAW_MATERIAL,
 }
+-- add in convenience specialized combos
+specializedItemTypeMap.glyph = { 
+    [SPECIALIZED_ITEMTYPE_GLYPH_ARMOR] = true, 
+    [SPECIALIZED_ITEMTYPE_GLYPH_JEWELRY] = true, 
+    [SPECIALIZED_ITEMTYPE_GLYPH_WEAPON] = true, 
+}
 
 local itemTypeMap = {
 	["additive"] = ITEMTYPE_ADDITIVE,
@@ -207,6 +213,16 @@ local itemTypeMap = {
 	["woodworking_booster"] = ITEMTYPE_WOODWORKING_BOOSTER,
 	["woodworking_material"] = ITEMTYPE_WOODWORKING_MATERIAL,
 	["woodworking_raw_material"] = ITEMTYPE_WOODWORKING_RAW_MATERIAL,
+}
+itemTypeMap.enchanting_rune = {
+    ITEMTYPE_ENCHANTING_RUNE_ASPECT,
+    ITEMTYPE_ENCHANTING_RUNE_ESSENCE,
+    ITEMTYPE_ENCHANTING_RUNE_POTENCY,
+}
+itemTypeMap.glyph = { 
+    [ITEMTYPE_GLYPH_ARMOR] = true, 
+    [ITEMTYPE_GLYPH_JEWELRY] = true, 
+    [ITEMTYPE_GLYPH_WEAPON] = true, 
 }
 
 local filterTypeMap = {
@@ -389,6 +405,33 @@ local markedTypeMap = {
 }
 
 --============Rule Function==============--
+-- compare arg to key, looking up the arg in a map
+-- if necessary (and provided)
+-- return true if equal/found
+local function isKnown(arg, typekey, fn, map)
+    if type( arg ) == "number" then
+        if arg == typekey then
+            return true
+        end
+        
+    elseif map and type( arg ) == "string" then
+        local v = map[string.lower( arg )]
+        if type ( val ) == "table" then
+            if val[typekey] then
+                return true
+            end
+        else
+            if val and val == typekey then
+                return true
+            end
+        end
+    else
+        error( string.format("error: %s(): argument is error." , fn ) )
+    end
+    
+    -- no match
+    return false
+end
  
 local L = AutoCategory.localizefunc
 function AutoCategory.RuleFunc.SpecializedItemType( ... )
@@ -408,18 +451,7 @@ function AutoCategory.RuleFunc.SpecializedItemType( ... )
 		
 		local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 		local _, sptype = GetItemLinkItemType(itemLink)
-		if type( arg ) == "number" then
-			if arg == sptype then
-				return true
-			end
-		elseif type( arg ) == "string" then
-			local v = specializedItemTypeMap[string.lower( arg )]
-			if v and v == sptype then
-				return true
-			end
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
+        return isKnown(arg, sptype, fn, specializedItemTypeMap)
 		
 	end
 	
@@ -443,19 +475,7 @@ function AutoCategory.RuleFunc.ItemType( ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		
-		if type( arg ) == "number" then
-			if arg == itemType then
-				return true
-			end
-		elseif type( arg ) == "string" then			
-			local v = itemTypeMap[string.lower( arg )]
-			if v and v == itemType then
-				return true
-			end
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
+		return isKnown(arg, itemType, fn, itemTypeMap)
 		
 	end
 	
@@ -479,19 +499,7 @@ function AutoCategory.RuleFunc.EquipType( ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		
-		if type( arg ) == "number" then
-			if arg == equipType then
-				return true
-			end
-		elseif type( arg ) == "string" then
-			local v = equipTypeMap[string.lower( arg )]
-			if v and v == equipType then
-				return true
-			end
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
+		return isKnown(arg, equipType, fn, equipTypeMap)
 		
 	end
 	
@@ -529,6 +537,10 @@ end
 function AutoCategory.RuleFunc.IsCrafted( ... )
 	local fn = "iscrafted"
 	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local itemType = GetItemLinkItemType(itemLink)
+    if (itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) then
+        return select(24, ZO_LinkHandler_ParseLink(itemLink)) ~= "0"
+    end
 	local result = IsItemLinkCrafted(itemLink)
 	return result
 end

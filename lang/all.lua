@@ -1,6 +1,6 @@
 --All the texts that need a translation
 --base language is english, so the file en.lua shuld be kept empty!
-local langStrings = {
+local localization_strings = {
  SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Backpack",
  SI_AC_BAGTYPE_SHOWNAME_BANK = "Bank",
  SI_AC_BAGTYPE_SHOWNAME_GUILDBANK = "Guild Bank",
@@ -39,6 +39,7 @@ local langStrings = {
  SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP = "Edit selected category in the category setting.",
  SI_AC_MENU_BS_BUTTON_REMOVE = "Remove",
  SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP = "Remove selected category from bag",
+ 
  SI_AC_MENU_HEADER_ADD_CATEGORY = "Add Category",
  SI_AC_MENU_AC_DROPDOWN_TAG = "Tag",
  SI_AC_MENU_AC_DROPDOWN_CATEGORY = "Category",
@@ -47,11 +48,13 @@ local langStrings = {
  SI_AC_MENU_AC_BUTTON_ADD = "Add",
  SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP = "Add selected category to the bag",
  SI_AC_MENU_AC_BUTTON_NEED_HELP = "Need Help?",
+ 
  SI_AC_MENU_HEADER_IMPORT_BAG_SETTING = "Import Bag Setting",
  SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG = "Import From Bag",
  SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP = "Select a bag setting to import from.",
  SI_AC_MENU_IBS_BUTTON_IMPORT = "Import",
  SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP = "Import will overwrite current bag setting.",
+ 
  SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS = "Unify All Bag Settings",
  SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS = "Export to all bags",
  SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP = "Will replace all the bag settings with current bag setting!",
@@ -60,6 +63,7 @@ local langStrings = {
  SI_AC_MENU_CS_DROPDOWN_TAG = "Tag",
  SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP = "Tag the category and make them organized.",
  SI_AC_MENU_CS_DROPDOWN_CATEGORY = "Category",
+ 
  SI_AC_MENU_HEADER_EDIT_CATEGORY = "Edit Category",
  SI_AC_MENU_EC_EDITBOX_NAME = "Name",
  SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP = "Name cannot be duplicated.",
@@ -76,6 +80,7 @@ local langStrings = {
  SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP = "Make a new copy of selected category",
  SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY = "Delete",
  SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP = "Delete selected category",
+ 
  SI_AC_MENU_SUBMENU_APPEARANCE_SETTING = "|c0066FF[Appearance Setting]|r",
  SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP = "Change the header text's appearance. Do not need to reload ui, you can just swap tabs to refresh them. *ONLY work in keyboard mode*",
  SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT = "Category Text Font",
@@ -87,6 +92,7 @@ local langStrings = {
  SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP = "If no category is matched, the item will be put in this category.",
  SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT = "Category Header Height",
  SI_AC_MENU_EC_BUTTON_RELOAD_UI = "Reload UI",
+ 
  SI_AC_MENU_SUBMENU_GENERAL_SETTING = "|c0066FF[General Setting]|r",
  SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE = "Show Message When Toggle",
  SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP = "Will show a message in chat when toggling this add-on.",
@@ -94,6 +100,7 @@ local langStrings = {
  SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP = "Add a number to show how many items in the category after the category's name", 
  SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS = "Save Category Collapse Status",
  SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP = "Will keep the categories collapsed/expanded as they are after quit/log out.",
+ 
  SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
  SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
  SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN = "Hide Category",
@@ -106,6 +113,7 @@ local langStrings = {
  SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "General Items",
  SI_AC_DEFAULT_TAG_IAKONI_GEAR_CHANGER= "Iakoni's Gear Changer",
  SI_AC_DEFAULT_TAG_MATERIALS= "Materials",
+ 
  SI_AC_DEFAULT_CATEGORY_ARMOR= "Armor",
  SI_AC_DEFAULT_CATEGORY_BOE= "BoE",
  SI_AC_DEFAULT_CATEGORY_BOE_DESC= "BoE gears for selling",
@@ -208,6 +216,46 @@ local langStrings = {
  SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9_DESC= "",
  SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10= "Dynamic 10",
  SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11= "Dynamic 11",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12= "Dynamic 12",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13= "Dynamic 13",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14= "Dynamic 14",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15= "Dynamic 15",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16= "Dynamic 16",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17= "Dynamic 17",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18= "Dynamic 18",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19= "Dynamic 19",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20= "Dynamic 20",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21= "Dynamic 21",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22= "Dynamic 22",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23= "Dynamic 23",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24= "Dynamic 24",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25= "Dynamic 25",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26= "Dynamic 26",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27= "Dynamic 27",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28= "Dynamic 28",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29= "Dynamic 29",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29_DESC= "",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30= "Dynamic 30",
+ SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30_DESC= "",
  SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1= "Gear 1",
  SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1_DESC= "",
  SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2= "Gear 2",
@@ -245,7 +293,7 @@ local langStrings = {
 --Loop over all texts that need to be translated, add them as ZOs translated text so the function GetString() can read them
 --and build a safe version that can be overwritten with translated strings by using function "SafeAddString" then
 --in the other files, like de.lua, or fr.lua
-for stringId, stringValue in pairs(langStrings) do
+for stringId, stringValue in pairs(localization_strings) do
     ZO_CreateStringId(stringId, stringValue)
     SafeAddVersion(stringId, 1)
 end
