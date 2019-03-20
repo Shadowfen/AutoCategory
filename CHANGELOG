@@ -1,3 +1,17 @@
+[COLOR="DeepSkyBlue"]1.37[/COLOR] Changes:
+Released by Shadowfen
+[LIST]
+[*] New filter function: getmaxtraits()
+    When used with posions and potions, such as this rule:
+    [COLOR="MediumSeaGreen"]type("poison","potion") and getmaxtraits() <=2[/COLOR]
+    it can tell you which are crafted (i.e. having more than one trait).
+    This new feature is courtesy of Tonyleila.
+[*] Updated the specialized item types. This adds:
+    Specialized Item Types (sptype):
+    o trophy_toy
+    o holiday_writ
+[/LIST]
+
 [COLOR="DeepSkyBlue"]1.36[/COLOR] Changes:
 Released by Shadowfen
 [LIST]

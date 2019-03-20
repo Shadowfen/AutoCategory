@@ -57,6 +57,7 @@ local specializedItemTypeMap = {
 	["glyph_armor"] = SPECIALIZED_ITEMTYPE_GLYPH_ARMOR,
 	["glyph_jewelry"] = SPECIALIZED_ITEMTYPE_GLYPH_JEWELRY,
 	["glyph_weapon"] = SPECIALIZED_ITEMTYPE_GLYPH_WEAPON,
+    ["holiday_writ"] = SPECIALIZED_ITEMTYPE_HOLIDAY_WRIT,
 	["ingredient_alcohol"] = SPECIALIZED_ITEMTYPE_INGREDIENT_ALCOHOL,
 	["ingredient_drink_additive"] = SPECIALIZED_ITEMTYPE_INGREDIENT_DRINK_ADDITIVE,
 	["ingredient_food_additive"] = SPECIALIZED_ITEMTYPE_INGREDIENT_FOOD_ADDITIVE,
@@ -124,6 +125,7 @@ local specializedItemTypeMap = {
 	["trophy_runebox_fragment"] = SPECIALIZED_ITEMTYPE_TROPHY_RUNEBOX_FRAGMENT,
 	["trophy_scroll"] = SPECIALIZED_ITEMTYPE_TROPHY_SCROLL,
 	["trophy_survey_report"] = SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT,
+	["trophy_toy"] = SPECIALIZED_ITEMTYPE_TROPHY_TOY,
 	["trophy_treasure_map"] = SPECIALIZED_ITEMTYPE_TROPHY_TREASURE_MAP,
     ["trophy_upgrade_fragment"] = SPECIALIZED_ITEMTYPE_TROPHY_UPGRADE_FRAGMENT,	
     ["weapon"] = SPECIALIZED_ITEMTYPE_WEAPON,
@@ -1290,6 +1292,32 @@ function AutoCategory.RuleFunc.IsTracked( ... )
   return false  
 end
 
+-- code donated by Tonyleila
+local function IsCraftedPotion(itemLink)
+    local itemType = GetItemLinkItemType(itemLink)
+    return (itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) and (select(24, ZO_LinkHandler_ParseLink(itemLink)) ~= "0")
+end
+ 
+-- code donated by Tonyleila
+function AutoCategory.RuleFunc.GetMaxTraits( ... )
+    local fn = "getmaxtraits"
+    local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    if IsCraftedPotion(itemLink) then
+        local quality = ITEM_QUALITY_NORMAL
+        for i = 1, GetMaxTraits() do
+            local hasTraitAbility = GetItemLinkTraitOnUseAbilityInfo(itemLink, i)
+ 
+            if hasTraitAbility then
+                quality = quality + 1
+            end
+        end
+        return quality
+    else
+        local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        return quality
+    end
+end
+
 AutoCategory.Environment = {
 	-- rule functions
 	
@@ -1359,7 +1387,10 @@ AutoCategory.Environment = {
 	 
 	keepresearch = AutoCategory.RuleFunc.KeepForResearch,
 
-	-- Iakoni's Gear Changer
+    -- Potion/Poison Traits
+    getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
+
+    -- Iakoni's Gear Changer
 	setindex = AutoCategory.RuleFunc.SetIndex,
 
 	inset = AutoCategory.RuleFunc.InSet,

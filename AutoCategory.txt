@@ -2,7 +2,7 @@
 ## APIVersion: 100026
 ## Author: RockingDice, crafty35a, Shadowfen
 ## Description: Type "/ac" 
-## Version: 1.36
+## Version: 1.37
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibStub LibAddonMenu-2.0
 ## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver
