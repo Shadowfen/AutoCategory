@@ -12,10 +12,10 @@ AutoCategory.Inited = false
 AutoCategory.Enabled = true
 
 AutoCategory.name = "AutoCategory";
-AutoCategory.version = "1.37";
+AutoCategory.version = "2.0";
 AutoCategory.settingName = "Auto Category"
 AutoCategory.settingDisplayName = "AutoCategory - Wrathstone"
-AutoCategory.author = "RockingDice, crafty35, Shadowfen"
+AutoCategory.author = "Shadowfen, crafty35, RockingDice"
 AutoCategory.localizefunc = function ( loc_key ) 
 	return GetString( loc_key )
 end

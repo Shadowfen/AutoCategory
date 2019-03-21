@@ -27,25 +27,32 @@ local localization_strings = {
  SI_AC_WARNING_CATEGORY_NAME_DUPLICATED = "Name '%s' is duplicated, you can try '%s'.",
  SI_AC_WARNING_NEED_RELOAD_UI = "Need Reload UI",
 
- SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Bag Setting]|r",
  SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
  SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP = "Use account-wide setting instead of character setting",
+
+ SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Bag Setting]|r",
  SI_AC_MENU_BS_DROPDOWN_BAG = "Bag",
  SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP = "Select a bag to modify categories that are being used",
+ SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN = "Hide Ungrouped Items",
+ SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Check this will hide your ungrouped items, you cannot find them in current bag setting!",
+ 
  SI_AC_MENU_BS_DROPDOWN_CATEGORIES = "Categories",
- SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY = "Category Priority",
- SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP = "Category Priority determines the order of the category in the bag, higher means more ahead position.",
- SI_AC_MENU_BS_BUTTON_EDIT = "Edit",
+ SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY = "Priority",
+ SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP = "Priority determines the order of the category in the bag, higher means more ahead position.",
+ SI_AC_MENU_BS_BUTTON_EDIT = "Edit Category",
  SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP = "Edit selected category in the category setting.",
- SI_AC_MENU_BS_BUTTON_REMOVE = "Remove",
+ SI_AC_MENU_BS_BUTTON_REMOVE = "Remove from Bag",
  SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP = "Remove selected category from bag",
  
+ SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN = "Hide Category",
+ SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP = "Selected category and all items within the category will not appear in your bag if checked.",
+
  SI_AC_MENU_HEADER_ADD_CATEGORY = "Add Category",
  SI_AC_MENU_AC_DROPDOWN_TAG = "Tag",
  SI_AC_MENU_AC_DROPDOWN_CATEGORY = "Category",
- SI_AC_MENU_AC_BUTTON_EDIT = "Edit",
+ SI_AC_MENU_AC_BUTTON_EDIT = "Edit Category",
  SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP = "Edit selected category in the category setting.",
- SI_AC_MENU_AC_BUTTON_ADD = "Add",
+ SI_AC_MENU_AC_BUTTON_ADD = "Add To Bag",
  SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP = "Add selected category to the bag",
  SI_AC_MENU_AC_BUTTON_NEED_HELP = "Need Help?",
  
@@ -103,10 +110,6 @@ local localization_strings = {
  
  SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
  SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
- SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN = "Hide Category",
- SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP = "Selected category and all items within the category will not appear in your bag if checked.",
- SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN = "Hide Ungrouped Category",
- SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Check this will hide your ungrouped items, you cannot find them in current bag setting!",
 
   
  SI_AC_DEFAULT_TAG_GEARS= "Gears",

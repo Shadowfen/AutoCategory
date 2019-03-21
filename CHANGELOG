@@ -1,6 +1,8 @@
-[COLOR="DeepSkyBlue"]1.38[/COLOR] Changes:
+[COLOR="DeepSkyBlue"]2.0[/COLOR] Changes:
 Released by Shadowfen
 [LIST]
+[*] [COLOR="DarkOrange"]Now requires the library LibSFUtils to be installed separately.[/COLOR]
+
 [*] Modified iscrafted() so that it will return true for crafted potions or poisons so you can:
     [COLOR="MediumSeaGreen"]type("poison","potion") and iscrafted()[/COLOR]
 [*] Added the base ability to use some convenience items that are actually combinations of several base game items. 
@@ -8,8 +10,11 @@ Released by Shadowfen
     Item Types (type):
     o enchanting_rune -  this will match against enchanting_rune_aspect, enchanting_rune_essence, or enchanting_rune_potency
     Specialized Item Types (sptype):
-    o glyph - this will match against glyph_armor, glyph_weapon, or glyph_jewelry
-
+    o glyph - this will match against glyph_armor, glyph_weapon, or glyph_jewelry 
+[*] Added predefined rules for FCOIS dynamics 11-30 for when you are starting AutoCategory without preexisting saved variables.
+[*] Revise Auto Category setting page to try to make it easier to understand/use.
+    
+[*] Removed the alternative language files which were still in English. When we get translations, we can add them back with appropriate values.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]1.37[/COLOR] Changes:

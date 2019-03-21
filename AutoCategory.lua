@@ -37,7 +37,7 @@ function AutoCategory.UpdateCurrentSavedVars()
 		AutoCategory.curSavedVars.collapses = AutoCategory.charSavedVariables.collapses 
 	else 
 		AutoCategory.curSavedVars.rules = AutoCategory.acctSavedVariables.rules
-    AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
+        AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
 		AutoCategory.curSavedVars.bags = AutoCategory.acctSavedVariables.bags  
 		AutoCategory.curSavedVars.collapses = AutoCategory.acctSavedVariables.collapses 
 	end
@@ -67,9 +67,11 @@ function AutoCategory.ResetToDefaults()
 	AutoCategory.acctSavedVariables.rules = AutoCategory.defaultAcctSettings.rules
 	AutoCategory.acctSavedVariables.bags = AutoCategory.defaultAcctSettings.bags
 	AutoCategory.acctSavedVariables.appearance = AutoCategory.defaultAcctSettings.appearance
+    
 	AutoCategory.charSavedVariables.rules = AutoCategory.defaultSettings.rules
 	AutoCategory.charSavedVariables.bags = AutoCategory.defaultSettings.bags
 	AutoCategory.charSavedVariables.accountWideSetting = AutoCategory.defaultSettings.accountWideSetting
+    
 	AutoCategory.ResetCollapse()
 end
 

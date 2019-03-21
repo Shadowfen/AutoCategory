@@ -465,40 +465,44 @@ function AutoCategory.AddonMenuInit()
 	}
 	
 	local optionsTable = { 
+        -- Account Wide
+		{
+			type = "checkbox",
+			name = SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING,
+			tooltip = SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP,
+            getFunc = function() return AutoCategory.charSavedVariables.accountWideSetting end,
+            setFunc = function(value) AutoCategory.charSavedVariables.accountWideSetting = value
+                AutoCategory.UpdateCurrentSavedVars()
+                RefreshCache() 
+                
+                SelectDropDownItem("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK)
+                SelectDropDownItem("AC_DROPDOWN_EDITBAG_RULE", "")
+                SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", "")
+                SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
+                SelectDropDownItem("AC_DROPDOWN_EDITRULE_TAG", "")
+                SelectDropDownItem("AC_DROPDOWN_EDITRULE_RULE", "")
+                
+                RefreshDropdownData()
+                
+                UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_BAG")
+                UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_RULE")
+                UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_TAG")
+                UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
+                UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_TAG")
+                UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
+            end,
+			default = true,
+		},
+        {
+            type = "divider",
+        },
+        -- Bag Settings
 		{
 			type = "submenu",
-		    name = L(SI_AC_MENU_SUBMENU_BAG_SETTING), -- or string id or function returning a string
+		    name = SI_AC_MENU_SUBMENU_BAG_SETTING,
 			reference = "AC_SUBMENU_BAG_SETTING",
 		    controls = {
-				{
-					type = "checkbox",
-					name = L(SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING),
-					tooltip = L(SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP),
-					getFunc = function() return AutoCategory.charSavedVariables.accountWideSetting end,
-					setFunc = function(value) AutoCategory.charSavedVariables.accountWideSetting = value
-						AutoCategory.UpdateCurrentSavedVars()
-						RefreshCache() 
-						
-						SelectDropDownItem("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK)
-						SelectDropDownItem("AC_DROPDOWN_EDITBAG_RULE", "")
-						SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", "")
-						SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
-						SelectDropDownItem("AC_DROPDOWN_EDITRULE_TAG", "")
-						SelectDropDownItem("AC_DROPDOWN_EDITRULE_RULE", "")
-						
-						RefreshDropdownData()
-						
-						UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_BAG")
-						UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_RULE")
-						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_TAG")
-						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
-						UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_TAG")
-						UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
-					end,
-				},			
-				{
-					type = "divider",
-				},
+                -- Bag
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_BS_DROPDOWN_BAG),
@@ -524,6 +528,25 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_DROPDOWN_EDITBAG_BAG"
 				},
+                -- Hide ungrouped in bag
+				{
+					type = "checkbox",
+					name = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN),
+					tooltip = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP),
+					getFunc = function()					
+						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
+						return AutoCategory.curSavedVars.bags[bag].isUngroupedHidden
+					end,
+					setFunc = function(value)  
+						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
+						AutoCategory.curSavedVars.bags[bag].isUngroupedHidden = value
+					end,
+                    width = "half",
+                },			
+                {
+                    type = "divider",
+                },
+                -- Categories
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_BS_DROPDOWN_CATEGORIES),
@@ -542,6 +565,7 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_DROPDOWN_EDITBAG_RULE"
 				},
+                -- Priority
 				{
 					type = "slider",
 					name = L(SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY),
@@ -575,8 +599,9 @@ function AutoCategory.AddonMenuInit()
 						end
 						return false
 					end,
-					width = "full",
+					width = "half",
 				},
+                -- Hide Category
 				{
 					type = "checkbox",
 					name = L(SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN),
@@ -608,7 +633,8 @@ function AutoCategory.AddonMenuInit()
 						end
 						return false
 					end,
-				},	
+				},
+                -- Edit Category Button
 				{
 					type = "button",
 					name = L(SI_AC_MENU_BS_BUTTON_EDIT),
@@ -626,8 +652,9 @@ function AutoCategory.AddonMenuInit()
 						end
 					end,
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues == 0 end,
-					width = "full",
+					width = "half",
 				},
+                -- Remove Category Button
 				{
 					type = "button",
 					name = L(SI_AC_MENU_BS_BUTTON_REMOVE),
@@ -650,13 +677,15 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 					end,
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues == 0 end,
-					width = "full",
+					width = "half",
 				},
+                -- Add Category to Bag Section
 				{
 					type = "header",
 					name = L(SI_AC_MENU_HEADER_ADD_CATEGORY),
 					width = "full",
 				},
+                -- Tag Dropdown
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_AC_DROPDOWN_TAG),
@@ -678,6 +707,7 @@ function AutoCategory.AddonMenuInit()
 					disabled = function() return #dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesValues == 0 end,
 					reference = "AC_DROPDOWN_ADDCATEGORY_TAG"
 				},
+                -- Categories unused dropdown
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_AC_DROPDOWN_CATEGORY),
@@ -696,6 +726,7 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_DROPDOWN_ADDCATEGORY_RULE"
 				},
+                -- Edit Category Button
 				{
 					type = "button",
 					name = L(SI_AC_MENU_AC_BUTTON_EDIT),
@@ -713,8 +744,9 @@ function AutoCategory.AddonMenuInit()
 						end
 					end,
 					disabled = function() return #dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues == 0 end,
-					width = "full",
+					width = "half",
 				},
+                -- Add to Bag Button
 				{
 					type = "button",
 					name = L(SI_AC_MENU_AC_BUTTON_ADD),
@@ -735,24 +767,11 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 					end,
 					disabled = function() return #dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues == 0 end,
-					width = "full",
+					width = "half",
 				}, 
 				{
 					type = "divider",
 				}, 
-				{
-					type = "checkbox",
-					name = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN),
-					tooltip = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP),
-					getFunc = function()					
-						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
-						return AutoCategory.curSavedVars.bags[bag].isUngroupedHidden
-					end,
-					setFunc = function(value)  
-						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
-						AutoCategory.curSavedVars.bags[bag].isUngroupedHidden = value
-					end,
-				},			
 				{
 					type = "submenu",
 					name = L(SI_AC_MENU_SUBMENU_IMPORT_EXPORT),
@@ -843,6 +862,7 @@ function AutoCategory.AddonMenuInit()
 				},
 		    },
 		},
+        -- Category Settings
 		{
 			type = "submenu",
 		    name = L(SI_AC_MENU_SUBMENU_CATEGORY_SETTING),
@@ -1159,6 +1179,48 @@ function AutoCategory.AddonMenuInit()
 		    },
 			
 		},
+        {
+            type = "divider",
+        },
+		-- General Settings
+        {
+            type = "submenu",
+            name = L(SI_AC_MENU_SUBMENU_GENERAL_SETTING),
+            reference = "AC_MENU_SUBMENU_GENERAL_SETTING",
+            controls = { 					
+                {
+                    type = "checkbox",
+                    name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE),
+                    tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP),
+                    getFunc = function() return AutoCategory.acctSavedVariables.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
+                    setFunc = function(value) AutoCategory.acctSavedVariables.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value
+                        
+                    end,
+                },			
+                {
+                    type = "checkbox",
+                    name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT),
+                    tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP),
+                    getFunc = function() return AutoCategory.acctSavedVariables.general["SHOW_CATEGORY_ITEM_COUNT"] end,
+                    setFunc = function(value) AutoCategory.acctSavedVariables.general["SHOW_CATEGORY_ITEM_COUNT"] = value
+                        
+                    end,
+                },	
+                {
+                    type = "checkbox",
+                    name = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS),
+                    tooltip = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP),
+                    getFunc = function() return AutoCategory.acctSavedVariables.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
+                    setFunc = function(value) AutoCategory.acctSavedVariables.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
+                        
+                    end,
+                },
+            }
+        },
+        {
+            type = "divider",
+        },
+        -- Appearance Settings
 		{
 				type = "submenu",
 				name = L(SI_AC_MENU_SUBMENU_APPEARANCE_SETTING),
@@ -1272,40 +1334,6 @@ function AutoCategory.AddonMenuInit()
 					},
 				},
 			}, 
-			{
-				type = "submenu",
-				name = L(SI_AC_MENU_SUBMENU_GENERAL_SETTING),
-				reference = "AC_MENU_SUBMENU_GENERAL_SETTING",
-				controls = { 					
-					{
-						type = "checkbox",
-						name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE),
-						tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP),
-						getFunc = function() return AutoCategory.acctSavedVariables.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
-						setFunc = function(value) AutoCategory.acctSavedVariables.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value
-							
-						end,
-					},			
-					{
-						type = "checkbox",
-						name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT),
-						tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP),
-						getFunc = function() return AutoCategory.acctSavedVariables.general["SHOW_CATEGORY_ITEM_COUNT"] end,
-						setFunc = function(value) AutoCategory.acctSavedVariables.general["SHOW_CATEGORY_ITEM_COUNT"] = value
-							
-						end,
-					},	
-					{
-						type = "checkbox",
-						name = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS),
-						tooltip = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP),
-						getFunc = function() return AutoCategory.acctSavedVariables.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-						setFunc = function(value) AutoCategory.acctSavedVariables.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
-							
-						end,
-					},
-				}
-			},
 	}
 	LAM:RegisterAddonPanel("AC_CATEGORY_SETTINGS", panelData)
 	LAM:RegisterOptionControls("AC_CATEGORY_SETTINGS", optionsTable)
