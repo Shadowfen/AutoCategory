@@ -215,68 +215,116 @@ local function RefreshCache()
 	
 end 
 
+local function RefreshDropdown_EditBag()
+	local dataCurrentRules_EditBag = {
+        showNames = {},
+        values = {},
+        tooltips = {},
+    }
 
-local function RefreshDropdownData()
-	--d("|cFF8888RefreshDropdownData|r")
-	local dataCurrentRules_AddCategory = {}
-	dataCurrentRules_AddCategory.showNames = {}
-	dataCurrentRules_AddCategory.values = {}
-	dataCurrentRules_AddCategory.tooltips = {}
-	local dataCurrentRules_EditRule = {}
-	dataCurrentRules_EditRule.showNames = {}
-	dataCurrentRules_EditRule.values = {}
-	dataCurrentRules_EditRule.tooltips = {}
-	local dataCurrentRules_EditBag = {}
-	dataCurrentRules_EditBag.showNames = {}
-	dataCurrentRules_EditBag.values = {}
-	dataCurrentRules_EditBag.tooltips = {}
-	 
-	--update tag & bag selection first
-	if GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG") == "" and #cacheTags > 0 then
-		SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", cacheTags[1])
-	end
-	if GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG") == "" and #cacheTags > 0 then
-		SelectDropDownItem("AC_DROPDOWN_EDITRULE_TAG", cacheTags[1])
-	end
 	if GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") == "" and #cacheBags.values > 0 then
 		SelectDropDownItem("AC_DROPDOWN_EDITBAG_BAG", cacheBags.values[1])
 	end
 
-	--refresh current dropdown rules
-	if cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")] then 
-		dataCurrentRules_EditRule.showNames = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")].showNames
-		dataCurrentRules_EditRule.values = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")].values
-		dataCurrentRules_EditRule.tooltips = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")].tooltips
+    local editRuleBagCache = cacheRulesByBag[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")]
+	if editRuleBagCache then 
+		dataCurrentRules_EditBag.showNames = editRuleBagCache.showNames
+		dataCurrentRules_EditBag.values = editRuleBagCache.values
+		dataCurrentRules_EditBag.tooltips = editRuleBagCache.tooltips
 	end
 
-	if cacheRulesByBag[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")] then 
-		dataCurrentRules_EditBag.showNames = cacheRulesByBag[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")].showNames
-		dataCurrentRules_EditBag.values =cacheRulesByBag[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")].values
-		dataCurrentRules_EditBag.tooltips = cacheRulesByBag[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")].tooltips
-	end
-
-	if cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")] then 
-		--remove the rules alreadly in bag
-		for i = 1, #cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")].values do
-			local value = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")].values[i]
-			if cacheBagEntriesByName[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")][value] == nil then
-				--add the rule if not in bag
-				table.insert(dataCurrentRules_AddCategory.showNames, cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")].showNames[i])
-				table.insert(dataCurrentRules_AddCategory.values, cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")].values[i])
-				table.insert(dataCurrentRules_AddCategory.tooltips, cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")].tooltips[i])
-			end
-		end
-	end
-	
 	--update rules selection base on current dropdown data
 	if GetDropDownSelection("AC_DROPDOWN_EDITBAG_RULE") == "" and #dataCurrentRules_EditBag.values > 0 then
 		SelectDropDownItem("AC_DROPDOWN_EDITBAG_RULE", dataCurrentRules_EditBag.values[1])
 	end
-	if GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE") == "" and #dataCurrentRules_EditRule.values > 0 then
-		SelectDropDownItem("AC_DROPDOWN_EDITRULE_RULE", dataCurrentRules_EditRule.values[1])
+	 
+	--update data indices
+	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choices = dataCurrentRules_EditBag.showNames
+	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues = dataCurrentRules_EditBag.values
+	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesTooltips = dataCurrentRules_EditBag.tooltips
+
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choices = cacheBags.showNames
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues = cacheBags.values
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips = cacheBags.tooltips	 
+end
+
+local function RefreshDropdown_AddCategory()
+	local dataCurrentRules_AddCategory = {
+        showNames = {},
+        values = {},
+        tooltips = {},
+    }
+    
+	--update tag & bag selection first
+	if GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG") == "" and #cacheTags > 0 then
+		SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", cacheTags[1])
 	end
+    
+    local addRuleTagCache = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG")]
+    local addRuleBagCache = cacheBagEntriesByName[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")]
+	if addRuleTagCache then 
+		--remove the rules already in bag
+		for i = 1, #addRuleTagCache.values do
+			local value = addRuleTagCache.values[i]
+			if addRuleBagCache[value] == nil then
+				--add the rule if not in bag
+				table.insert(dataCurrentRules_AddCategory.showNames, addRuleTagCache.showNames[i])
+				table.insert(dataCurrentRules_AddCategory.values, addRuleTagCache.values[i])
+				table.insert(dataCurrentRules_AddCategory.tooltips, addRuleTagCache.tooltips[i])
+			end
+		end
+	end
+    
+	--update rules selection base on current dropdown data
 	if GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_RULE") == "" and #dataCurrentRules_AddCategory.values > 0 then
 		SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", dataCurrentRules_AddCategory.values[1])
+	end
+	
+	--update data indices
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choices = cacheTags
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesValues = cacheTags
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesTooltips = cacheTags
+
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choices = dataCurrentRules_AddCategory.showNames
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues = dataCurrentRules_AddCategory.values
+	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesTooltips = dataCurrentRules_AddCategory.tooltips
+	
+end
+
+local function RefreshDropdown_Import()
+	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choices = cacheBags.showNames
+	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesValues = cacheBags.values
+	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesTooltips = cacheBags.tooltips
+end
+
+local function RefreshDropdownData()
+	--d("|cFF8888RefreshDropdownData|r")
+    RefreshDropdown_EditBag()
+    RefreshDropdown_AddCategory()
+    RefreshDropdown_Import()
+    
+	local dataCurrentRules_EditRule = {
+        showNames = {},
+        values = {},
+        tooltips = {},
+    }
+    
+	--update tag & bag selection first
+	if GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG") == "" and #cacheTags > 0 then
+		SelectDropDownItem("AC_DROPDOWN_EDITRULE_TAG", cacheTags[1])
+	end
+
+	--refresh current dropdown rules
+    local editRuleTagCache = cacheRulesByTag[GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")]
+	if editRuleTagCache then 
+		dataCurrentRules_EditRule.showNames = editRuleTagCache.showNames
+		dataCurrentRules_EditRule.values = editRuleTagCache.values
+		dataCurrentRules_EditRule.tooltips = editRuleTagCache.tooltips
+	end
+	
+	--update rules selection base on current dropdown data
+	if GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE") == "" and #dataCurrentRules_EditRule.values > 0 then
+		SelectDropDownItem("AC_DROPDOWN_EDITRULE_RULE", dataCurrentRules_EditRule.values[1])
 	end
 	
 	--update data indices
@@ -284,18 +332,6 @@ local function RefreshDropdownData()
 	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues = cacheBags.values
 	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips = cacheBags.tooltips
 	 
-	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choices = dataCurrentRules_EditBag.showNames
-	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues = dataCurrentRules_EditBag.values
-	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesTooltips = dataCurrentRules_EditBag.tooltips
-	
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choices = cacheTags
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesValues = cacheTags
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesTooltips = cacheTags
-	
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choices = dataCurrentRules_AddCategory.showNames
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues = dataCurrentRules_AddCategory.values
-	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesTooltips = dataCurrentRules_AddCategory.tooltips
-	
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choices = cacheTags
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues = cacheTags
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesTooltips = cacheTags
@@ -303,10 +339,6 @@ local function RefreshDropdownData()
 	dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choices = dataCurrentRules_EditRule.showNames
 	dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues = dataCurrentRules_EditRule.values
 	dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesTooltips = dataCurrentRules_EditRule.tooltips
-	
-	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choices = cacheBags.showNames
-	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesValues = cacheBags.values
-	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesTooltips = cacheBags.tooltips
 end
  
 local function UpdateDropDownMenu(name)
@@ -638,7 +670,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					setFunc = function(value) 			
 						SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", value)
-						SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
+						--SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
 						RefreshDropdownData() 
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 					end, 
