@@ -9,8 +9,9 @@
 
 Libs/LibMediaProvider-1.0/LibMediaProvider-1.0.lua
 
-lang/all.lua
+lang/strings.lua
 lang/$(language).lua
+
 AutoCategory_Global.lua
 AutoCategory_Defaults.lua
 AutoCategory.xml
