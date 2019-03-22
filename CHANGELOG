@@ -15,6 +15,9 @@ Released by Shadowfen
 [*] Revise Auto Category setting page to try to make it easier to understand/use.
     
 [*] Removed the alternative language files which were still in English. When we get translations, we can add them back with appropriate values.
+
+[*] Moved ItemSaver integration into an included plugin file.
+[*] Moved GearChangerByIakoni integration into an included plugin file.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]1.37[/COLOR] Changes:

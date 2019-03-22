@@ -983,68 +983,6 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	return false
 end
 
-local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
-	local result = {}
-	if GearChangerByIakoni and GearChangerByIakoni.savedVariables then
-		local itemType = GetItemType(bagId, slotIndex)
-		if itemType == ITEMTYPE_ARMOR or itemType == ITEMTYPE_WEAPON then
-			local a=GearChangerByIakoni.savedVariables.ArraySet
-			local b=GearChangerByIakoni.savedVariables.ArraySetSavedFlag
-			local itemID = Id64ToString(GetItemUniqueId(bagId, slotIndex))
-			for i=1, 10 do
-				if b[i] == 1 then --check only if the set is saved
-					for _,u in pairs(GearChangerByIakoni.WornArray) do
-						if itemID==a[i][u] then
-							--find gear in set i
-							table.insert(result, i)
-						end
-					end
-				end
-			end	
-		end
-	end
-	return result
-end
-
-function AutoCategory.RuleFunc.SetIndex( ... )
-	local fn = "setindex"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-	local setIndices = IokaniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax = 1, ac do
-		
-		local arg = select( ax, ... )
-		local comIndex = -1
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		if type( arg ) == "number" then
-			comIndex = arg
-		elseif type( arg ) == "string" then
-			comIndex = tonumber(arg)
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		for i=1, #setIndices do
-			local index = setIndices[i]
-			if comIndex == index then
-				return true
-			end
-		end 
-	end
-	
-	return false 
-end
-
-function AutoCategory.RuleFunc.InSet( ... )
-	local fn = "inset"
-	
-	local setIndices = IokaniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	return #setIndices ~= 0
-end
 
 function AutoCategory.RuleFunc.AlphaGear( ... ) 
 	if not AG then
@@ -1198,35 +1136,6 @@ function AutoCategory.RuleFunc.IsMarked( ... )
 	end
 end
 
-function AutoCategory.RuleFunc.IsMarkedIS( ... )
-	local fn = "ismarkedis"
-	if ItemSaver == nil then
-		return false
-	end
-	local ac = select( '#', ... ) 
-	local checkSets = {}
-	for ax = 1, ac do
-		
-		local arg = select( ax, ... )
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		checkSets[arg]=true
-	end
-	local ismarked, setname = ItemSaver_IsItemSaved(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	if ismarked == true then
-		if ac > 0 then
-			if checkSets[setname] ~= nil then
-				return true
-			end
-			return false
-		else
-			return true
-		end
-	end
-	return ismarked	
-end
-
 function AutoCategory.RuleFunc.IsEquipping( ... )
 	local fn = "isequipping"
 	return AutoCategory.checkingItemBagId == BAG_WORN
@@ -1351,6 +1260,10 @@ function AutoCategory.RuleFunc.GetMaxTraits( ... )
     end
 end
 
+function AutoCategory.AddRuleFunc(name, func)
+    AutoCategory.Environment[name] = func
+end
+
 AutoCategory.Environment = {
 	-- rule functions
 	
@@ -1423,19 +1336,11 @@ AutoCategory.Environment = {
     -- Potion/Poison Traits
     getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
 
-    -- Iakoni's Gear Changer
-	setindex = AutoCategory.RuleFunc.SetIndex,
-
-	inset = AutoCategory.RuleFunc.InSet,
-	
 	-- Alpha Gear
 	alphagear = AutoCategory.RuleFunc.AlphaGear,
 	
 	-- FCO Item Saver
 	ismarked = AutoCategory.RuleFunc.IsMarked,
-	
-	-- Item Saver
-	ismarkedis = AutoCategory.RuleFunc.IsMarkedIS,
 	
 	-- Tamriel Trade Centre
 	getpricettc = AutoCategory.RuleFunc.GetPriceTTC,

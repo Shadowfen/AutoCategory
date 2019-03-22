@@ -8,6 +8,7 @@ AC_BAG_TYPE_HOUSEBANK = 6
 AutoCategory = {}
 
 AutoCategory.RuleFunc = {}
+AutoCategory.Plugins = {}
 AutoCategory.Inited = false
 AutoCategory.Enabled = true
 

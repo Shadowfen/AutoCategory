@@ -1,7 +1,7 @@
 ## Title: AutoCategory
-## APIVersion: 100026
+## APIVersion: 100026 100027
 ## Author: Shadowfen, crafty35a, RockingDice 
-## Description: Type "/ac" 
+## Description: Type "/ac" for settings
 ## Version: 2.0
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibStub LibAddonMenu-2.0 LibSFUtils
@@ -20,7 +20,10 @@ AutoCategory.lua
 AddonMenu.lua
 AutoCategory_RuleFunc.lua
 AutoCategory_API.lua
-AutoCategory_Integrations_Iakoni_Gear_Changer.lua
+
+ItemSaver_Plugin.lua
+Iakoni_GearChanger_Plugin.lua
+
 AutoCategory_Integrations_Inventory_Grid_View.lua
 AutoCategory_Integrations_QuickMenu.lua
 AutoCategory_Integrations_DoItAll.lua

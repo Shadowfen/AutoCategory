@@ -1,15 +1,8 @@
-------------------
---LOAD LIBRARIES--
-------------------
-
---load LibAddonsMenu-2.0
-local LAM2 = LibStub:GetLibrary("LibAddonMenu-2.0");
-
 ----------------------
 --INITIATE VARIABLES--
 ---------------------- 
 
-local L = AutoCategory.localizefunc
+local L = GetString
 
 AutoCategory.compiledRules = {}
 
@@ -201,9 +194,6 @@ local function CheckVersionCompatible()
 		AutoCategory.acctSavedVariables.collapses[AC_BAG_TYPE_HOUSEBANK] = {}
 	end
 	--v1.22
-	
-	
-		
 end
 
 function AutoCategory.LazyInit()
@@ -212,6 +202,13 @@ function AutoCategory.LazyInit()
 		AutoCategory.charSavedVariables = ZO_SavedVars:New('AutoCategorySavedVars', 1.1, nil, nil)
 		AutoCategory.acctSavedVariables = ZO_SavedVars:NewAccountWide('AutoCategorySavedVars', 1.1, nil, nil)
 		 
+		--capabilities with other add-ons
+        for name, initfunc in pairs(AutoCategory.Plugins) do
+            if initfunc then
+                initfunc()
+            end
+        end
+
 		local function isTableEmpty(table)
 			if next(table) == nil then
 				return true
@@ -245,7 +242,7 @@ function AutoCategory.LazyInit()
 		AutoCategory.HookKeyboardMode()
 		
 		--capabilities with other add-ons
-		IntegrateIakoniGearChanger()
+		--IntegrateIakoniGearChanger()
 		IntegrateInventoryGridView()
 		IntegrateQuickMenu()
 		IntegrateDoItAll()
@@ -254,33 +251,28 @@ function AutoCategory.LazyInit()
 	end
 end
 
+function AutoCategory.RegisterPlugin(name, initfunc)
+    AutoCategory_Plugin = AutoCategory.Plugins or {}
+    AutoCategory.Plugins[name] = initfunc
+end
+
+function AutoCategory.AddPredefinedRules( ruletable )
+    if #ruletable == 0 then 
+        return
+    end
+    for i=1,#ruletable do
+        AutoCategory.defaultSettings.rules[#AutoCategory.defaultSettings.rules+1] = ruletable[i]
+        AutoCategory.defaultAcctSettings.rules[#AutoCategory.defaultAcctSettings.rules+1] = ruletable[i]
+    end
+end
+
 function AutoCategory.Initialize(event, addon)
     -- filter for just BUI addon event as EVENT_ADD_ON_LOADED is addon-blind
 	if addon ~= AutoCategory.name then return end
 
-    SLASH_COMMANDS["/ac"] = AutoCategory.cmd
 	AutoCategory.LazyInit()
 end
 
-
---== Slash command ==--
-function AutoCategory.cmd( text )
-	if text == nil then text = true end
-    LAM2:OpenToPanel(AC_CATEGORY_SETTINGS) 
-	local addons = LAM2.addonList:GetChild(1)
-	if addons:GetNumChildren() ~= 0 then
-		for a=1,addons:GetNumChildren(),1 do 
-			if addons:GetChild(a):GetText() == AutoCategory.settingName then
-				addons:GetChild(a):SetSelected(true)
-				break
-			end	
-		end
-	end	
-	--Second time's the charm
-	if text then
-		zo_callLater(function()AutoCategory.cmd(false)end,500)
-	end
-end
 -- register our event handler function to be called to do initialization
 EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_ADD_ON_LOADED, function(...) AutoCategory.Initialize(...) end)
 

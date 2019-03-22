@@ -396,10 +396,10 @@ end
 
 local function CreateNewRule(name, tag)
 	local rule = {
+		tag = tag,
 		name = name,
 		description = "",
 		rule = "true",
-		tag = tag,
 	}
 	return rule
 end
@@ -462,6 +462,7 @@ function AutoCategory.AddonMenuInit()
 			UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_TAG")
 			UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
 		end,
+	    slashCommand = "/ac",
 	}
 	
 	local optionsTable = { 

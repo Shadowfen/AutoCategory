@@ -36,7 +36,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			local ruleCode = AutoCategory.compiledRules[entry.name]
 			--local ruleCode, res = zo_loadstring( "return(" .. rule.rule ..")" )
 			if not ruleCode then
-				d("Error1: " .. res)
+				--d("Error1: " .. res)
 				rule.damaged = true 
 			else 
 				setfenv( ruleCode, AutoCategory.Environment )
