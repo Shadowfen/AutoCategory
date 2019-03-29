@@ -434,7 +434,7 @@ local function isKnown(arg, typekey, fn, map)
     return false
 end
  
-local L = AutoCategory.localizefunc
+local L = GetString
 function AutoCategory.RuleFunc.SpecializedItemType( ... )
 	local fn = "type"
 	local ac = select( '#', ... )

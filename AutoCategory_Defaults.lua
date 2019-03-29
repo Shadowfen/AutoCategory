@@ -441,7 +441,6 @@ AutoCategory.predefinedRules =  {
     },
 }
 
-local L = AutoCategory.localizefunc
 AutoCategory.defaultSettings = {
 	rules = AutoCategory.predefinedRules,
 	bags = {

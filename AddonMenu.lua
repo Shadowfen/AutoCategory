@@ -2,7 +2,7 @@ local _
 local LAM = LibStub:GetLibrary("LibAddonMenu-2.0")
 local LMP = LibStub:GetLibrary("LibMediaProvider-1.0")
   
-local L = AutoCategory.localizefunc
+local L = GetString
 
 local needReloadUI = false
 --cache data for dropdown: 
@@ -10,27 +10,30 @@ local cacheTags = {}
 cacheTags = {}
  
 local cacheBags = {}
-cacheBags.showNames = { [AC_BAG_TYPE_BACKPACK] = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
-						[AC_BAG_TYPE_BANK] = L(SI_AC_BAGTYPE_SHOWNAME_BANK),
-						[AC_BAG_TYPE_GUILDBANK] = L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
-						[AC_BAG_TYPE_CRAFTBAG] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
-						[AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION), 
-						[AC_BAG_TYPE_HOUSEBANK] = L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
-						}
-cacheBags.values = {	AC_BAG_TYPE_BACKPACK, 
-						AC_BAG_TYPE_BANK, 
-						AC_BAG_TYPE_GUILDBANK, 
-						AC_BAG_TYPE_CRAFTBAG, 
-						AC_BAG_TYPE_CRAFTSTATION,
-						AC_BAG_TYPE_HOUSEBANK,
-						}
-cacheBags.tooltips = {  L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK), 
-						L(SI_AC_BAGTYPE_TOOLTIP_BANK),
-						L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
-						L(SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG),
-						L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
-						L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
-						}
+cacheBags.showNames = { 
+    [AC_BAG_TYPE_BACKPACK] = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
+    [AC_BAG_TYPE_BANK] = L(SI_AC_BAGTYPE_SHOWNAME_BANK),
+    [AC_BAG_TYPE_GUILDBANK] = L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
+    [AC_BAG_TYPE_CRAFTBAG] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
+    [AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION), 
+    [AC_BAG_TYPE_HOUSEBANK] = L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
+}
+cacheBags.values = {	
+    AC_BAG_TYPE_BACKPACK, 
+    AC_BAG_TYPE_BANK, 
+    AC_BAG_TYPE_GUILDBANK, 
+    AC_BAG_TYPE_CRAFTBAG, 
+    AC_BAG_TYPE_CRAFTSTATION,
+    AC_BAG_TYPE_HOUSEBANK,
+}
+cacheBags.tooltips = {  
+    L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK), 
+    L(SI_AC_BAGTYPE_TOOLTIP_BANK),
+    L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
+    L(SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG),
+    L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
+    L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
+}
 
 local cacheRulesByTag = {}
 local cacheRulesByBag = {}
@@ -48,12 +51,13 @@ local dropdownData = {
 	["AC_DROPDOWN_EDITRULE_TAG"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITRULE_RULE"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_IMPORTBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
-	
 }
 
 local dropdownFontStyle	= {'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'}
 local dropdownFontAlignment = {}
-dropdownFontAlignment.showNames = {L(SI_AC_ALIGNMENT_LEFT), L(SI_AC_ALIGNMENT_CENTER), L(SI_AC_ALIGNMENT_RIGHT)}
+dropdownFontAlignment.showNames = {
+    L(SI_AC_ALIGNMENT_LEFT), L(SI_AC_ALIGNMENT_CENTER), L(SI_AC_ALIGNMENT_RIGHT)
+}
 dropdownFontAlignment.values = {0, 1, 2} 
 
 
@@ -547,7 +551,7 @@ function AutoCategory.AddonMenuInit()
                 {
                     type = "divider",
                 },
-                -- Categories
+                -- Add Categories
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_BS_DROPDOWN_CATEGORIES),
@@ -772,7 +776,8 @@ function AutoCategory.AddonMenuInit()
 				}, 
 				{
 					type = "divider",
-				}, 
+				},
+                -- Import/Export Bag Settings
 				{
 					type = "submenu",
 					name = L(SI_AC_MENU_SUBMENU_IMPORT_EXPORT),
@@ -855,6 +860,7 @@ function AutoCategory.AddonMenuInit()
 				{
 					type = "divider",
 				}, 
+                -- Need Help button
 				{			
 					type = "button",
 					name = L(SI_AC_MENU_AC_BUTTON_NEED_HELP),
@@ -869,6 +875,7 @@ function AutoCategory.AddonMenuInit()
 		    name = L(SI_AC_MENU_SUBMENU_CATEGORY_SETTING),
 			reference = "AC_SUBMENU_CATEGORY_SETTING",
 		    controls = {
+                -- Tags
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_CS_DROPDOWN_TAG),
@@ -891,6 +898,7 @@ function AutoCategory.AddonMenuInit()
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
 					reference = "AC_DROPDOWN_EDITRULE_TAG"
 				},
+                -- Categories
 				{		
 					type = "dropdown",
 					name = L(SI_AC_MENU_CS_DROPDOWN_CATEGORY), 
@@ -909,11 +917,13 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_DROPDOWN_EDITRULE_RULE"
 				},
+                -- Edit Category Title
 				{
 					type = "header",
 					name = L(SI_AC_MENU_HEADER_EDIT_CATEGORY),
 					width = "full",
 				},
+                -- Name
 				{
 					type = "editbox",
 					name = L(SI_AC_MENU_EC_EDITBOX_NAME),
@@ -975,6 +985,7 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_EDITBOX_EDITRULE_NAME",
 				},
+                -- Tag
 				{
 					type = "editbox",
 					name = L(SI_AC_MENU_EC_EDITBOX_TAG),
@@ -1026,8 +1037,9 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 					reference = "AC_EDITBOX_EDITRULE_TAG",
 				},
+                --Description 
 				{
-					type = "editbox",
+                    type = "editbox",
 					name = L(SI_AC_MENU_EC_EDITBOX_DESCRIPTION),
 					tooltip = L(SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP),
 					getFunc = function() 
@@ -1050,6 +1062,7 @@ function AutoCategory.AddonMenuInit()
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
 					width = "full",
 				},
+                -- Rule
 				{
 					type = "editbox",
 					name = L(SI_AC_MENU_EC_EDITBOX_RULE),
@@ -1062,13 +1075,40 @@ function AutoCategory.AddonMenuInit()
 						return "" 
 					end, 
 					setFunc = function(value) 
-					   cacheRulesByName[GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")].rule = value 
-					   AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
-					   end,
+						local ruleName = GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")
+					    cacheRulesByName[ruleName].rule = value 
+					    AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
+					    end,
 					isMultiline = true,
 					isExtraWide = true,
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
 					width = "full",
+				},
+                {
+                    type = "description",
+                    text = " ", -- or string id or function returning a string
+                    title = " ", -- or string id or function returning a string (optional)
+                    width = "half", --or "half" (optional)
+                    reference = "AutoCategoryCheckText" -- unique global reference to control (optional)
+                },
+				{			
+					type = "button",
+					name = "Check",
+					func = function()
+                        WINDOW_MANAGER:GetControlByName("AutoCategoryCheckText").data.text = ""
+						local ruleName = GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")
+                        local func,err = zo_loadstring("return("..cacheRulesByName[ruleName].rule..")")
+                        if not func then
+                            d("Rule Error: " .. err)
+                            WINDOW_MANAGER:GetControlByName("AutoCategoryCheckText").data.title = "Error in rule"
+                            WINDOW_MANAGER:GetControlByName("AutoCategoryCheckText").data.text = err
+                          cacheRulesByName[ruleName].damaged = true 
+                        else
+                            WINDOW_MANAGER:GetControlByName("AutoCategoryCheckText").data.title = "Good"
+                            WINDOW_MANAGER:GetControlByName("AutoCategoryCheckText").data.text = " "
+                        end
+                    end,
+					width = "half",
 				},
 				{			
 					type = "button",
@@ -1131,7 +1171,7 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_TAG")
-            AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
+                        AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
 					end,
 					width = "full",
 				},
@@ -1172,7 +1212,7 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 						--rule is missing
 						UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_RULE")
-            AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
+                        AutoCategory.RecompileRules(AutoCategory.curSavedVars.rules)
 					end,
 					width = "full",
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues	== 0 end,

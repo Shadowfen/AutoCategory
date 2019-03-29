@@ -242,7 +242,6 @@ function AutoCategory.LazyInit()
 		AutoCategory.HookKeyboardMode()
 		
 		--capabilities with other add-ons
-		--IntegrateIakoniGearChanger()
 		IntegrateInventoryGridView()
 		IntegrateQuickMenu()
 		IntegrateDoItAll()

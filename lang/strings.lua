@@ -81,6 +81,7 @@ local localization_strings = {
  SI_AC_MENU_EC_EDITBOX_RULE = "Rule",
  SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP = "Rules will be applied to bags to categorize items",
  SI_AC_MENU_EC_BUTTON_LEARN_RULES = "Learn Rules",
+ SI_AC_MENU_EC_BUTTON_LEARN_RULES_TOOLTIP = "Open on-line rule Help URL",
  SI_AC_MENU_EC_BUTTON_NEW_CATEGORY = "New",
  SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP = "Create a new category with selected tag",
  SI_AC_MENU_EC_BUTTON_COPY_CATEGORY = "Copy",

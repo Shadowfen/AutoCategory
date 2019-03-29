@@ -70,6 +70,7 @@ SafeAddString(SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP,"Pour décrire l'usage d
 SafeAddString(SI_AC_MENU_EC_EDITBOX_RULE,"Règles", 1)
 SafeAddString(SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,"Les règles seront appliquées aux sacs pour classer les articles.", 1)
 SafeAddString(SI_AC_MENU_EC_BUTTON_LEARN_RULES,"Apprendre des règles", 1)
+SafeAddString(SI_AC_MENU_EC_BUTTON_LEARN_RULES_TOOLTIP,"Apprendre des règles", 1)
 SafeAddString(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,"Créer", 1)
 SafeAddString(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,"Créer une nouvelle catégorie avec l'étiquette sélectionnée.", 1)
 SafeAddString(SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,"Dupliquer", 1)
