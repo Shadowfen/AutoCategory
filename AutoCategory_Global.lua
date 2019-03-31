@@ -15,7 +15,7 @@ AutoCategory.Enabled = true
 AutoCategory.name = "AutoCategory";
 AutoCategory.version = "2.0";
 AutoCategory.settingName = "Auto Category"
-AutoCategory.settingDisplayName = "AutoCategory - Wrathstone"
+AutoCategory.settingDisplayName = "AutoCategory - Revised"
 AutoCategory.author = "Shadowfen, crafty35, RockingDice"
 
 LibSFUtils.LoadLanguage(AutoCategory_localization_strings)
