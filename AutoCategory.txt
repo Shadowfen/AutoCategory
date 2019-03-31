@@ -14,6 +14,7 @@ lang/$(language).lua
 
 AutoCategory_Global.lua
 AutoCategory_Defaults.lua
+Plugin_API.lua
 AutoCategory.xml
 AutoCategory_Hooks.lua
 AutoCategory.lua

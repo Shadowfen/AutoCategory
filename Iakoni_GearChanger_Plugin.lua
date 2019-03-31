@@ -237,7 +237,7 @@ function AutoCategory_Iakoni.Initialize()
     end
     
     -- initialize strings
-    LoadLanguage()
+    AutoCategory.LoadLanguage(localization_strings,"en")
     
     -- load predefinedRules
     AutoCategory.AddPredefinedRules(AutoCategory_Iakoni.predefinedRules)

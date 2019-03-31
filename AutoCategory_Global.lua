@@ -5,18 +5,18 @@ AC_BAG_TYPE_CRAFTBAG = 4
 AC_BAG_TYPE_CRAFTSTATION = 5
 AC_BAG_TYPE_HOUSEBANK = 6
  
-AutoCategory = {}
+AutoCategory = {
+    name = "AutoCategory",
+    version = "2.0",
+    settingName = "Auto Category",
+    settingDisplayName = "AutoCategory - Revised",
+    author = "Shadowfen, crafty35, RockingDice",
+}
 
 AutoCategory.RuleFunc = {}
 AutoCategory.Plugins = {}
 AutoCategory.Inited = false
 AutoCategory.Enabled = true
-
-AutoCategory.name = "AutoCategory";
-AutoCategory.version = "2.0";
-AutoCategory.settingName = "Auto Category"
-AutoCategory.settingDisplayName = "AutoCategory - Revised"
-AutoCategory.author = "Shadowfen, crafty35, RockingDice"
 
 LibSFUtils.LoadLanguage(AutoCategory_localization_strings)
 
