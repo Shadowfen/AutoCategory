@@ -467,8 +467,8 @@ function AutoCategory.RuleFunc.ItemType( ... )
 		error( string.format("error: %s(): require arguments." , fn))
 	end
 	
-  local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-  local itemType = GetItemLinkItemType(itemLink)
+    local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local itemType = GetItemLinkItemType(itemLink)
 	for ax = 1, ac do
 		
 		local arg = select( ax, ... )
@@ -527,6 +527,17 @@ function AutoCategory.RuleFunc.IsStolen( ... )
 	local fn = "isstolen"
 	
 	return IsItemStolen(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+end
+
+function AutoCategory.RuleFunc.IsLockpick( ... )
+	local fn = "islockpick"
+	
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local itemType = GetItemLinkItemType(itemLink)
+    if itemType == ITEMTYPE_LOCKPICK or itemType == ITEMTYPE_TOOL then
+        return true
+    end
+    return false
 end
 
 function AutoCategory.RuleFunc.IsBoPTradeable( ... )

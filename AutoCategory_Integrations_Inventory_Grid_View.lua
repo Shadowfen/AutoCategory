@@ -233,7 +233,7 @@ local function IGV_ScrollList_UpdateScroll_Grid(self)
     local itemsPerRow = zo_floor(contentsWidthMinusPadding / gridIconSize)
     local gridSpacing = .5
 	local totalControlWidth = gridIconSize + gridSpacing
-	local headerRowHeight = AutoCategory.acctSavedVariables.appearance["CATEGORY_HEADER_HEIGHT"]
+	local headerRowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 	for i = 1,#self.data do
 		local currentData = self.data[i]
 		if currentData.isHeader then

@@ -441,6 +441,15 @@ AutoCategory.predefinedRules =  {
     },
 }
 
+AutoCategory.defaultCollapses = {
+        [AC_BAG_TYPE_BACKPACK] = {},
+        [AC_BAG_TYPE_BANK] = {},
+        [AC_BAG_TYPE_GUILDBANK] = {},
+        [AC_BAG_TYPE_CRAFTBAG] = {},
+        [AC_BAG_TYPE_CRAFTSTATION] = {},
+        [AC_BAG_TYPE_HOUSEBANK] = {},
+    }
+
 AutoCategory.defaultSettings = {
 	rules = AutoCategory.predefinedRules,
 	bags = {
@@ -463,7 +472,8 @@ AutoCategory.defaultSettings = {
 			rules = {},
 		},
 	}, 
-	accountWideSetting = true,
+    collapses = AutoCategory.defaultCollapses,
+	accountWide = true,
 }
  
 AutoCategory.defaultAcctSettings = {
@@ -1121,5 +1131,6 @@ AutoCategory.defaultAcctSettings = {
 		["SHOW_CATEGORY_ITEM_COUNT"] = true, 
 		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
 	},
+    collapses = AutoCategory.defaultCollapses,
 }
 

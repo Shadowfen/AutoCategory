@@ -45,12 +45,12 @@ function AutoCategory.HookKeyboardMode()
 	local function AC_Setup_InventoryRowWithHeader(rowControl, slot, overrideOptions)
 		--set header
 		local headerLabel = rowControl:GetNamedChild("HeaderName")
-		if AutoCategory.acctSavedVariables.general["SHOW_CATEGORY_ITEM_COUNT"] then
+		if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
 			headerLabel:SetText(string.format('%s |cFFE690[%d]|r', slot.bestItemTypeName, slot.dataEntry.num))
 		else
 			headerLabel:SetText(slot.bestItemTypeName)
 		end
-		local appearance = AutoCategory.acctSavedVariables.appearance
+		local appearance = AutoCategory.acctSaved.appearance
 		headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
 		headerLabel:SetFont(string.format('%s|%d|%s', LMP:Fetch('font', appearance["CATEGORY_FONT_NAME"]), appearance["CATEGORY_FONT_SIZE"], appearance["CATEGORY_FONT_STYLE"]))
 		headerLabel:SetColor(appearance["CATEGORY_FONT_COLOR"][1], appearance["CATEGORY_FONT_COLOR"][2], appearance["CATEGORY_FONT_COLOR"][3], appearance["CATEGORY_FONT_COLOR"][4])
@@ -65,11 +65,11 @@ function AutoCategory.HookKeyboardMode()
 			marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
 		end
 		
-		rowControl:SetHeight(AutoCategory.acctSavedVariables.appearance["CATEGORY_HEADER_HEIGHT"])
+		rowControl:SetHeight(AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
 		rowControl.slot = slot
 	end
 	--Add a new data type: row with header
-	local rowHeight = AutoCategory.acctSavedVariables.appearance["CATEGORY_HEADER_HEIGHT"]
+	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 	ZO_ScrollList_AddDataType(ZO_PlayerInventoryList, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(ZO_CraftBagList, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
 	ZO_ScrollList_AddDataType(ZO_PlayerBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
@@ -147,13 +147,13 @@ function AutoCategory.HookKeyboardMode()
 				local slotData = entry.data
 				local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
 				if not matched or not AutoCategory.Enabled then
-					entry.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"] 
+					entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
 					entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 					entry.bagTypeId = bagTypeId 
 					if not AutoCategory.Enabled or bagTypeId == nil then
 						entry.isHidden = false
 					else
-						entry.isHidden = AutoCategory.curSavedVars.bags[bagTypeId].isUngroupedHidden
+						entry.isHidden = AutoCategory.saved.bags[bagTypeId].isUngroupedHidden
 					end
 				else
 					entry.bestItemTypeName = categoryName 
@@ -250,13 +250,13 @@ function AutoCategory.HookKeyboardMode()
 			local slotData = entry.data
 			local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex, AC_BAG_TYPE_CRAFTSTATION)
 			if not matched or not AutoCategory.Enabled then
-				entry.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"] 
+				entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
 				entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 				entry.bagTypeId = bagTypeId
 				if not AutoCategory.Enabled then
 					entry.isHidden = false
 				else
-					entry.isHidden = AutoCategory.curSavedVars.bags[bagTypeId].isUngroupedHidden
+					entry.isHidden = AutoCategory.saved.bags[bagTypeId].isUngroupedHidden
 				end
 			else
 				entry.bestItemTypeName = categoryName 
@@ -349,8 +349,8 @@ function AutoCategory.HookGamepadInventory()
 			local itemData = slotData
 			local matched, categoryName, categoryPriority = AutoCategory:MatchCategoryRules(itemData.bagId, itemData.slotIndex)
 			if not matched then
-	            itemData.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
-	            itemData.bestGamepadItemCategoryName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
+	            itemData.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+	            itemData.bestGamepadItemCategoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 	            itemData.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 			else
 				itemData.bestItemTypeName = categoryName
@@ -396,8 +396,8 @@ function AutoCategory.HookGamepadCraftStation()
 		if slotData then
 			local matched, categoryName, categoryPriority = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex, AC_BAG_TYPE_CRAFTSTATION)
 			if not matched then
-				newData.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
-				newData.bestItemCategoryName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
+				newData.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+				newData.bestItemCategoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 				newData.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 			else
 				newData.bestItemTypeName = categoryName
@@ -433,8 +433,8 @@ function AutoCategory.HookGamepadTradeInventory()
 				 
 				local matched, categoryName, categoryPriority = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
 				if not matched then
-					slotData.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
-					slotData.bestGamepadItemCategoryName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
+					slotData.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+					slotData.bestGamepadItemCategoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 					slotData.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 				else
 					slotData.bestItemTypeName = categoryName
@@ -469,8 +469,8 @@ function AutoCategory.HookGamepadStore(list)
 
 			local matched, categoryName, categoryPriority = AutoCategory:MatchCategoryRules(itemData.bagId, itemData.slotIndex)
 			if not matched then
-	            itemData.bestItemTypeName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
-	            itemData.bestGamepadItemCategoryName = AutoCategory.acctSavedVariables.appearance["CATEGORY_OTHER_TEXT"]
+	            itemData.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+	            itemData.bestGamepadItemCategoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 	            itemData.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
 			else
 				itemData.bestItemTypeName = categoryName

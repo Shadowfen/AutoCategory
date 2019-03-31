@@ -24,7 +24,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		return false, "", 0, nil, nil
 	end
 	local needCheck = false
-	local bag = AutoCategory.curSavedVars.bags[bag_type_id]
+	local bag = AutoCategory.saved.bags[bag_type_id]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
 		local rule = AutoCategory.GetRuleByName(entry.name)
