@@ -1,5 +1,5 @@
 --German translations
-local localization_strings = {
+AutoCategory_localization_strings["de"] = {
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Inventar",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "Bank",
     SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Backpack",
@@ -175,7 +175,3 @@ local localization_strings = {
     SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK = "All Marks",
     SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC = "", 
 }
-
-for stringId, stringValue in pairs(localization_strings) do
-    SafeAddString(stringId, stringValue, 1)
-end

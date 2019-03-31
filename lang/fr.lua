@@ -1,231 +1,272 @@
 
+AutoCategory_localization_strings["fr"] = {
+    SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Sac",
+    SI_AC_BAGTYPE_SHOWNAME_BANK = "Banque",
+    SI_AC_BAGTYPE_SHOWNAME_GUILDBANK = "Banque de guilde",
+    SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG = "Sac d'artisanat",
+    SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Atelier d'artisanat",
+    SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Coffres de rangement",
+    SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Sac à dos",
+    SI_AC_BAGTYPE_TOOLTIP_BANK = "Banque",
+    SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Banque de guilde",
+    SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG = "Sac d'artisanat",
+    SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION = "Démonter/Améliorer à l'atelier d'artisanat", 
+    SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK = "Coffres de rangement à domicile", 
 
+    SI_AC_ALIGNMENT_LEFT = "À gauche",
+    SI_AC_ALIGNMENT_CENTER = "Centré",
+    SI_AC_ALIGNMENT_RIGHT = "À droite",
 
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_BACKPACK,"Sac", 1)
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_BANK,"Banque", 1)
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK,"Banque de guilde", 1)
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG,"Sac d'artisanat", 1)
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION,"Atelier d'artisanat", 1)
-SafeAddString(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK,"Coffres de rangement", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_BACKPACK,"Sac à dos", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_BANK,"Banque", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK,"Banque de guilde", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG,"Sac d'artisanat", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION,"Démonter/Améliorer à l'atelier d'artisanat", 1)
-SafeAddString(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK,"Coffres de rangement à domicile", 1)
+    SI_AC_DEFAULT_NAME_EMPTY_TAG = "<vide>",
+    SI_AC_DEFAULT_NAME_CATEGORY_OTHER = "Non classés",
+    SI_AC_DEFAULT_NAME_NEW_CATEGORY = "Nouvelle catégorie",
 
-SafeAddString(SI_AC_ALIGNMENT_LEFT,"À gauche", 1)
-SafeAddString(SI_AC_ALIGNMENT_CENTER,"Centré", 1)
-SafeAddString(SI_AC_ALIGNMENT_RIGHT,"À droite", 1)
+    SI_AC_WARNING_CATEGORY_MISSING = "Cette catégorie n'existe pas, assurez-vous qu'une catégorie avec ce nom a été créée.",
+    SI_AC_WARNING_CATEGORY_NAME_EMPTY = "Le nom de la catégorie doit être renseigné.",
+    SI_AC_WARNING_CATEGORY_NAME_DUPLICATED = "Le nom '%s' existe déjà, vous pouvez utiliser '%s'.",
+    SI_AC_WARNING_NEED_RELOAD_UI = "Il est nécessaire de recharger l'interface",
 
-SafeAddString(SI_AC_DEFAULT_NAME_EMPTY_TAG,"<vide>", 1)
-SafeAddString(SI_AC_DEFAULT_NAME_CATEGORY_OTHER,"Non classés", 1)
-SafeAddString(SI_AC_DEFAULT_NAME_NEW_CATEGORY,"Nouvelle catégorie", 1)
+    SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Réglages du compte",
+    SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP = "Utiliser les réglages du compte plutôt que les réglages du personnage",
 
-SafeAddString(SI_AC_WARNING_CATEGORY_MISSING,"Cette catégorie n'existe pas, assurez-vous qu'une catégorie avec ce nom a été créée.", 1)
-SafeAddString(SI_AC_WARNING_CATEGORY_NAME_EMPTY,"Le nom de la catégorie doit être renseigné.", 1)
-SafeAddString(SI_AC_WARNING_CATEGORY_NAME_DUPLICATED,"Le nom '%s' existe déjà, vous pouvez utiliser '%s'.", 1)
-SafeAddString(SI_AC_WARNING_NEED_RELOAD_UI,"Il est nécessaire de recharger l'interface", 1)
+    SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Bag Setting]|r",
+    SI_AC_MENU_BS_DROPDOWN_BAG = "Sac",
+    SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP = "Sélectionnez un sac pour modifier les catégories utilisées",
+    SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN = "Masquer la catégorie non classée",
+    SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Cochez cette case pour cacher vos éléments non classés ; vous ne pourrez pas les trouver dans le sac !",
+    
+    SI_AC_MENU_BS_DROPDOWN_CATEGORIES = "Catégories",
+    SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY = "Priorité de catégorie",
+    SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP = "La priorité détermine l'ordre de la catégorie dans le sac. Plus la priorité est haute, plus la catégorie sera affichée en premier.",
+    SI_AC_MENU_BS_BUTTON_EDIT = "Modifier",
+    SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP = "Modifier la catégorie sélectionnée.",
+    SI_AC_MENU_BS_BUTTON_REMOVE = "Supprimer",
+    SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP = "Supprimer la catégorie sélectionnée du sac.",
 
-SafeAddString(SI_AC_MENU_SUBMENU_BAG_SETTING,"|c0066FF[Bag Setting]|r", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING,"Réglages du compte", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP,"Utiliser les réglages du compte plutôt que les réglages du personnage", 1)
-SafeAddString(SI_AC_MENU_BS_DROPDOWN_BAG,"Sac", 1)
-SafeAddString(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP,"Sélectionnez un sac pour modifier les catégories utilisées", 1)
-SafeAddString(SI_AC_MENU_BS_DROPDOWN_CATEGORIES,"Catégories", 1)
-SafeAddString(SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY,"Priorité de catégorie", 1)
-SafeAddString(SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP,"La priorité détermine l'ordre de la catégorie dans le sac. Plus la priorité est haute, plus la catégorie sera affichée en premier.", 1)
-SafeAddString(SI_AC_MENU_BS_BUTTON_EDIT,"Modifier", 1)
-SafeAddString(SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP,"Modifier la catégorie sélectionnée.", 1)
-SafeAddString(SI_AC_MENU_BS_BUTTON_REMOVE,"Supprimer", 1)
-SafeAddString(SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP,"Supprimer la catégorie sélectionnée du sac.", 1)
-SafeAddString(SI_AC_MENU_HEADER_ADD_CATEGORY,"Ajouter", 1)
-SafeAddString(SI_AC_MENU_AC_DROPDOWN_TAG,"Étiquette", 1)
-SafeAddString(SI_AC_MENU_AC_DROPDOWN_CATEGORY,"Catégorie", 1)
-SafeAddString(SI_AC_MENU_AC_BUTTON_EDIT,"Modifier", 1)
-SafeAddString(SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP,"Modifier la catégorie sélectionnée.", 1)
-SafeAddString(SI_AC_MENU_AC_BUTTON_ADD,"Ajouter", 1)
-SafeAddString(SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP,"Ajouter la catégorie sélectionnée au sac.", 1)
-SafeAddString(SI_AC_MENU_AC_BUTTON_NEED_HELP,"Besoin d'aide ?", 1)
-SafeAddString(SI_AC_MENU_HEADER_IMPORT_BAG_SETTING,"Importer des réglages", 1)
-SafeAddString(SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG,"Importer d'un sac", 1)
-SafeAddString(SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP,"Sélectionnez les réglages de sac à importer.", 1)
-SafeAddString(SI_AC_MENU_IBS_BUTTON_IMPORT,"Importer", 1)
-SafeAddString(SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP,"L'importation écrasera les réglages actuels du sac.", 1)
-SafeAddString(SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS,"Unifier tous les réglages de sac", 1)
-SafeAddString(SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS,"Exporter les réglages", 1)
-SafeAddString(SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP,"Remplacera tous les réglages de sac avec les réglages actuels !", 1)
+    SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN = "Cacher la catégorie",
+    SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP = "La catégorie sélectionnée et tous ses éléments n'apparaîtront pas dans votre sac.",
 
-SafeAddString(SI_AC_MENU_SUBMENU_CATEGORY_SETTING,"|c0066FF[Category Setting]|r", 1)
-SafeAddString(SI_AC_MENU_CS_DROPDOWN_TAG,"Étiquette", 1)
-SafeAddString(SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP,"Étiquetter la catégorie pour le classement.", 1)
-SafeAddString(SI_AC_MENU_CS_DROPDOWN_CATEGORY,"Catégorie", 1)
-SafeAddString(SI_AC_MENU_HEADER_EDIT_CATEGORY,"Modifier la catégorie", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_NAME,"Nom", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP,"Le nom doit être unique.", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_TAG,"Étiquette", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP,"La catégorie est visible uniquement lorsque vous sélectionnez son étiquette ; <vide> sera affiché si vous ne la renseignez pas.", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_DESCRIPTION,"Description", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP,"Pour décrire l'usage de la catégorie.", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_RULE,"Règles", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,"Les règles seront appliquées aux sacs pour classer les articles.", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_LEARN_RULES,"Apprendre des règles", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_LEARN_RULES_TOOLTIP,"Apprendre des règles", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,"Créer", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,"Créer une nouvelle catégorie avec l'étiquette sélectionnée.", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,"Dupliquer", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,"Faire une copie de la catégorie sélectionnée.", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,"Supprimer", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,"Supprimer la catégorie sélectionnée.", 1)
-SafeAddString(SI_AC_MENU_SUBMENU_APPEARANCE_SETTING,"|c0066FF[Appearance Setting]|r", 1)
-SafeAddString(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP,"Modifiez l'apparence du texte de l'en-tête. Vous n'avez pas besoin de recharger l'interface, vous pouvez simplement échanger les onglets pour les actualiser. * UNIQUEMENT en mode clavier *", 1)
-SafeAddString(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT,"Police", 1)
-SafeAddString(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE,"Style", 1)
-SafeAddString(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT,"Alignement", 1)
-SafeAddString(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR,"Couleur", 1)
-SafeAddString(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE,"Taille", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE,"Nom de catégorie non classée", 1)
-SafeAddString(SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP,"Si aucune catégorie ne correspond, l'élément sera mis dans cette catégorie.", 1)
-SafeAddString(SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT,"Hauteur d'en-tête de la catégorie", 1)
-SafeAddString(SI_AC_MENU_EC_BUTTON_RELOAD_UI,"Recharger l'interface", 1)
-SafeAddString(SI_AC_MENU_SUBMENU_GENERAL_SETTING,"|c0066FF[General Setting]|r", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,"Afficher le message sur activation", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP,"Affiche un message dans le chat lors de l'activation de cet add-on.", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,"Afficher le nombre d'éléments dans la catégorie", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,"Ajouter un numéro après le nom de la catégorie pour montrer combien il y a d'éléments inclus.", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,"Enregistrer l'état de réduction de la catégorie", 1)
-SafeAddString(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,"Gardera les catégories réduites ou développées après leur usage.", 1)
-SafeAddString(SI_AC_MENU_SUBMENU_IMPORT_EXPORT,"|c0066FF[Import & Export]|r", 1)
-SafeAddString(SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING,"Réglages du compte", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN,"Cacher la catégorie", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP,"La catégorie sélectionnée et tous ses éléments n'apparaîtront pas dans votre sac.", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN,"Masquer la catégorie non classée", 1)
-SafeAddString(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP,"Cochez cette case pour cacher vos éléments non classés ; vous ne pourrez pas les trouver dans le sac !", 1)
+    SI_AC_MENU_HEADER_ADD_CATEGORY = "Ajouter",
+    SI_AC_MENU_AC_DROPDOWN_TAG = "Étiquette",
+    SI_AC_MENU_AC_DROPDOWN_CATEGORY = "Catégorie",
+    SI_AC_MENU_AC_BUTTON_EDIT = "Modifier",
+    SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP = "Modifier la catégorie sélectionnée.",
+    SI_AC_MENU_AC_BUTTON_ADD = "Ajouter",
+    SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP = "Ajouter la catégorie sélectionnée au sac.",
+    SI_AC_MENU_AC_BUTTON_NEED_HELP = "Besoin d'aide ?",
 
+    SI_AC_MENU_HEADER_IMPORT_BAG_SETTING = "Importer des réglages",
+    SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG = "Importer d'un sac",
+    SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP = "Sélectionnez les réglages de sac à importer.",
+    SI_AC_MENU_IBS_BUTTON_IMPORT = "Importer",
+    SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP = "L'importation écrasera les réglages actuels du sac.",
 
-SafeAddString(SI_AC_DEFAULT_TAG_GEARS,"Équipements", 1)
-SafeAddString(SI_AC_DEFAULT_TAG_GENERAL_ITEMS,"Éléments généraux", 1)
-SafeAddString(SI_AC_DEFAULT_TAG_MATERIALS,"Matériaux", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_ARMOR,"Armure", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BOE,"LQE", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BOE_DESC,"LQE pour la vente", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE,"LQR négociables", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE_DESC,"Les équipements sont échangeables dans un délai limité", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT,"Démontage", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_EQUIPPING,"Équipements", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_EQUIPPING_DESC,"Équipements actuels (Gamepad uniquement)", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_LOW_LEVEL,"Niveau inférieur", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_LOW_LEVEL_DESC,"Équipements inférieurs à CP/160", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_NECKLACE,"Pendentifs", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_NECKLACE_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE,"Recherche possible", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE_DESC,"Les équipements conservés à des fins de recherche ne concernent que les moins bons.", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RING,"Bagues", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_SET,"Équipement", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_SET_DESC,"Classement automatique des équipements", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_WEAPON,"Armes", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_WEAPON_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CONSUMABLES,"Consommables", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CONSUMABLES_DESC,"Nourriture, boisson, potion", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CONTAINER,"Conteneurs", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CONTAINER_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FURNISHING,"Meubles", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FURNISHING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS,"Glyphes et gemmes", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_NEW,"Nouveau", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_NEW_DESC,"Éléments récents", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_POISON,"Poisons", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_POISON_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_QUICKSLOTS,"Raccourcis", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_QUICKSLOTS_DESC,"Accessibles en raccourcis", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS,"Recettes et motifs", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS_DESC,"Toutes les recettes, les motifs et les fragments de recette.", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_SELLING,"Vente", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_SELLING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_STOLEN,"Volés", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_STOLEN_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS,"Cartes au trésor", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS_DESC,"Cartes au trésor et rapports d'enquête", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_ALCHEMY,"Alchimie", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_ALCHEMY_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BLACKSMITHING,"Forge", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_BLACKSMITHING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CLOTHING,"Couture", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_CLOTHING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_ENCHANTING,"Enchantement", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_ENCHANTING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING,"Joaillerie", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_PROVISIONING,"Cuisine", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_PROVISIONING_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS,"Gemmes", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_WOODWORKING,"Travail du bois", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC,"", 1)
+    SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS = "Unifier tous les réglages de sac",
+    SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS = "Exporter les réglages",
+    SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP = "Remplacera tous les réglages de sac avec les réglages actuels !",
 
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DECONSTRUCTION_MARK,"Marqueur de démontage", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DECONSTRUCTION_MARK_DESC,"Démontage", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1,"Dynamique 1", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2,"Dynamique 2", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3,"Dynamique 3", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4,"Dynamique 4", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5,"Dynamique 5", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6,"Dynamique 6", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7,"Dynamique 7", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8,"Dynamique 8", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9,"Dynamique 9", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10,"Dynamique 10", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1,"Équipement 1", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2,"Équipement 2", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3,"Équipement 3", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4,"Équipement 4", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5,"Équipement 5", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK,"Marqueur d'amélioration", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK,"Marqueur complexe", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK,"Marqueur de verrouillage", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK,"Marqueur de recherche", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK,"Marqueur de vente à la boutique de guilde", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK,"Marqueur de vente", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK_DESC,"", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK,"Tous les marqueurs", 1)
-SafeAddString(SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC,"", 1)
+    SI_AC_MENU_SUBMENU_CATEGORY_SETTING = "|c0066FF[Category Setting]|r",
+    SI_AC_MENU_CS_DROPDOWN_TAG = "Étiquette",
+    SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP = "Étiquetter la catégorie pour le classement.",
+    SI_AC_MENU_CS_DROPDOWN_CATEGORY = "Catégorie",
 
-SafeAddString(SI_AC_MENU_BINDINGS_TOGGLE_AUTO_CATEGORY,"Activer Auto Category", 1)
-SafeAddString(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON,"Auto Category : ON", 1)
-SafeAddString(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF,"Auto Category : OFF", 1)
-SafeAddString(SI_CONTEXT_MENU_EXPAND,"Développer", 1)
-SafeAddString(SI_CONTEXT_MENU_COLLAPSE,"Réduire", 1)
-SafeAddString(SI_CONTEXT_MENU_EXPAND_ALL,"Développer tout", 1)
-SafeAddString(SI_CONTEXT_MENU_COLLAPSE_ALL,"Réduire tout", 1)
+    SI_AC_MENU_HEADER_EDIT_CATEGORY = "Modifier la catégorie",
+    SI_AC_MENU_EC_EDITBOX_NAME = "Nom",
+    SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP = "Le nom doit être unique.",
+    SI_AC_MENU_EC_EDITBOX_TAG = "Étiquette",
+    SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP = "La catégorie est visible uniquement lorsque vous sélectionnez son étiquette ; <vide> sera affiché si vous ne la renseignez pas.",
+    SI_AC_MENU_EC_EDITBOX_DESCRIPTION = "Description",
+    SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP = "Pour décrire l'usage de la catégorie.",
+    SI_AC_MENU_EC_EDITBOX_RULE = "Règles",
+    SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP = "Les règles seront appliquées aux sacs pour classer les articles.",
+    SI_AC_MENU_EC_BUTTON_LEARN_RULES = "Apprendre des règles",
+    SI_AC_MENU_EC_BUTTON_LEARN_RULES_TOOLTIP = "Apprendre des règles",
+    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY = "Créer",
+    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP = "Créer une nouvelle catégorie avec l'étiquette sélectionnée.",
+    SI_AC_MENU_EC_BUTTON_COPY_CATEGORY = "Dupliquer",
+    SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP = "Faire une copie de la catégorie sélectionnée.",
+    SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY = "Supprimer",
+    SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP = "Supprimer la catégorie sélectionnée.",
 
+    SI_AC_MENU_SUBMENU_APPEARANCE_SETTING = "|c0066FF[Appearance Setting]|r",
+    SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP = "Modifiez l'apparence du texte de l'en-tête. Vous n'avez pas besoin de recharger l'interface, vous pouvez simplement échanger les onglets pour les actualiser. * UNIQUEMENT en mode clavier *",
+    SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT = "Police",
+    SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE = "Style",
+    SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT = "Alignement",
+    SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR = "Couleur",
+    SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE = "Taille",
+    SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE = "Nom de catégorie non classée",
+    SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP = "Si aucune catégorie ne correspond, l'élément sera mis dans cette catégorie.",
+    SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT = "Hauteur d'en-tête de la catégorie",
+    SI_AC_MENU_EC_BUTTON_RELOAD_UI = "Recharger l'interface",
 
+    SI_AC_MENU_SUBMENU_GENERAL_SETTING = "|c0066FF[General Setting]|r",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE = "Afficher le message sur activation",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP = "Affiche un message dans le chat lors de l'activation de cet add-on.",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT = "Afficher le nombre d'éléments dans la catégorie",
+    SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP = "Ajouter un numéro après le nom de la catégorie pour montrer combien il y a d'éléments inclus.", 
+    SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS = "Enregistrer l'état de réduction de la catégorie",
+    SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP = "Gardera les catégories réduites ou développées après leur usage.",
 
+    SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
+    SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Réglages du compte",
 
+    SI_AC_DEFAULT_TAG_GEARS= "Équipements",
+    SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "Éléments généraux",
+    SI_AC_DEFAULT_TAG_MATERIALS= "Matériaux",
 
+    SI_AC_DEFAULT_CATEGORY_ARMOR= "Armure",
+    SI_AC_DEFAULT_CATEGORY_BOE= "LQE",
+    SI_AC_DEFAULT_CATEGORY_BOE_DESC= "LQE pour la vente",
+    SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE= "LQR négociables",
+    SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE_DESC= "Les équipements sont échangeables dans un délai limité",
+    SI_AC_DEFAULT_CATEGORY_DECONSTRUCT= "Démontage",
+    SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_EQUIPPING= "Équipements",
+    SI_AC_DEFAULT_CATEGORY_EQUIPPING_DESC= "Équipements actuels (Gamepad uniquement)",
+    SI_AC_DEFAULT_CATEGORY_LOW_LEVEL= "Niveau inférieur",
+    SI_AC_DEFAULT_CATEGORY_LOW_LEVEL_DESC= "Équipements inférieurs à CP/160",
+    SI_AC_DEFAULT_CATEGORY_NECKLACE= "Pendentifs",
+    SI_AC_DEFAULT_CATEGORY_NECKLACE_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_RESEARCHABLE= "Recherche possible",
+    SI_AC_DEFAULT_CATEGORY_RESEARCHABLE_DESC= "Les équipements conservés à des fins de recherche ne concernent que les moins bons.",
+    SI_AC_DEFAULT_CATEGORY_RING= "Bagues",
+    SI_AC_DEFAULT_CATEGORY_RING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_SET= "Équipement",
+    SI_AC_DEFAULT_CATEGORY_SET_DESC= "Classement automatique des équipements",
+    SI_AC_DEFAULT_CATEGORY_WEAPON= "Armes",
+    SI_AC_DEFAULT_CATEGORY_WEAPON_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_CONSUMABLES= "Consommables",
+    SI_AC_DEFAULT_CATEGORY_CONSUMABLES_DESC= "Nourriture, boisson, potion",
+    SI_AC_DEFAULT_CATEGORY_CONTAINER= "Conteneurs",
+    SI_AC_DEFAULT_CATEGORY_CONTAINER_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FURNISHING= "Meubles",
+    SI_AC_DEFAULT_CATEGORY_FURNISHING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS= "Glyphes et gemmes",
+    SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_NEW= "Nouveau",
+    SI_AC_DEFAULT_CATEGORY_NEW_DESC= "Éléments récents",
+    SI_AC_DEFAULT_CATEGORY_POISON= "Poisons",
+    SI_AC_DEFAULT_CATEGORY_POISON_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_QUICKSLOTS= "Raccourcis",
+    SI_AC_DEFAULT_CATEGORY_QUICKSLOTS_DESC= "Accessibles en raccourcis",
+    SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS= "Recettes et motifs",
+    SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS_DESC= "Toutes les recettes, les motifs et les fragments de recette.",
+    SI_AC_DEFAULT_CATEGORY_SELLING= "Vente",
+    SI_AC_DEFAULT_CATEGORY_SELLING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_STOLEN= "Volés",
+    SI_AC_DEFAULT_CATEGORY_STOLEN_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS= "Cartes au trésor",
+    SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS_DESC= "Cartes au trésor et rapports d'enquête",
+    SI_AC_DEFAULT_CATEGORY_ALCHEMY= "Alchimie",
+    SI_AC_DEFAULT_CATEGORY_ALCHEMY_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_BLACKSMITHING= "Forge",
+    SI_AC_DEFAULT_CATEGORY_BLACKSMITHING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_CLOTHING= "Couture",
+    SI_AC_DEFAULT_CATEGORY_CLOTHING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_ENCHANTING= "Enchantement",
+    SI_AC_DEFAULT_CATEGORY_ENCHANTING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING= "Joaillerie",
+    SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_PROVISIONING= "Cuisine",
+    SI_AC_DEFAULT_CATEGORY_PROVISIONING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS= "Gemmes",
+    SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_WOODWORKING= "Travail du bois",
+    SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC= "",
 
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DECONSTRUCTION_MARK= "Marqueur de démontage",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DECONSTRUCTION_MARK_DESC= "Démontage",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1= "Dynamique 1",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2= "Dynamique 2",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3= "Dynamique 3",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4= "Dynamique 4",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5= "Dynamique 5",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6= "Dynamique 6",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7= "Dynamique 7",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8= "Dynamique 8",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9= "Dynamique 9",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10= "Dynamique 10",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11= "Dynamique 11",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12= "Dynamique 12",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13= "Dynamique 13",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14= "Dynamique 14",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15= "Dynamique 15",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16= "Dynamique 16",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17= "Dynamique 17",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18= "Dynamique 18",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19= "Dynamique 19",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20= "Dynamique 20",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21= "Dynamique 21",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22= "Dynamique 22",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23= "Dynamique 23",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24= "Dynamique 24",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25= "Dynamique 25",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26= "Dynamique 26",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27= "Dynamique 27",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28= "Dynamique 28",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29= "Dynamique 29",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30= "Dynamique 30",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1= "Équipement 1",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2= "Équipement 2",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3= "Équipement 3",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4= "Équipement 4",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5= "Équipement 5",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK= "Marqueur d'amélioration",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK= "Marqueur complexe",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK= "Marqueur de verrouillage",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK= "Marqueur de recherche",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK= "Marqueur de vente à la boutique de guilde",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK= "Marqueur de vente",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK= "Tous les marqueurs",
+    SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC= "",
 
-
-
+    SI_BINDING_NAME_TOGGLE_AUTO_CATEGORY= "Activer Auto Category",
+    SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON="Auto Category: ON",
+    SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF="Auto Category: OFF",
+    SI_CONTEXT_MENU_EXPAND = "Développer",
+    SI_CONTEXT_MENU_COLLAPSE = "Réduire",
+    SI_CONTEXT_MENU_EXPAND_ALL = "Développer tout",
+    SI_CONTEXT_MENU_COLLAPSE_ALL = "Réduire tout",
+}

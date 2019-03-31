@@ -17,6 +17,6 @@ AutoCategory.version = "2.0";
 AutoCategory.settingName = "Auto Category"
 AutoCategory.settingDisplayName = "AutoCategory - Wrathstone"
 AutoCategory.author = "Shadowfen, crafty35, RockingDice"
-AutoCategory.localizefunc = function ( loc_key ) 
-	return GetString( loc_key )
-end
+
+LibSFUtils.LoadLanguage(AutoCategory_localization_strings)
+
