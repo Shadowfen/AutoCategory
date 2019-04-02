@@ -2,7 +2,7 @@ local L = GetString
 
 AutoCategory.predefinedRules =  {
     {
-        ["rule"] = "type(\"armor\") and not equiptype(\"neck\") and not equiptype(\"ring\")",
+        ["rule"] = "type(\"armor\") and not equiptype(\"neck\",\"ring\")",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GEARS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_ARMOR),
         ["description"] = "",
@@ -32,7 +32,7 @@ AutoCategory.predefinedRules =  {
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_EQUIPPING_DESC),
     },
     {
-        ["rule"] = "cp() < 160 and type(\"armor\", \"weapon\")",
+        ["rule"] = "level() > 1 and cp() < 160 and type(\"armor\", \"weapon\")",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GEARS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_LOW_LEVEL),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_LOW_LEVEL_DESC),

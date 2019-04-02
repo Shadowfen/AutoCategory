@@ -1,5 +1,7 @@
 local LMP = LibStub:GetLibrary("LibMediaProvider-1.0")
 
+local CATEGORY_HEADER = 998
+
 local CUSTOM_GAMEPAD_ITEM_SORT =
 {
 	sortPriorityName  = { tiebreaker = "bestItemTypeName" },
@@ -70,20 +72,33 @@ function AutoCategory.HookKeyboardMode()
 	end
 	--Add a new data type: row with header
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
-	ZO_ScrollList_AddDataType(ZO_PlayerInventoryList, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(ZO_CraftBagList, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(ZO_PlayerBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(ZO_GuildBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(ZO_HouseBankBackpack, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_BACKPACK].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(ZO_PlayerInventoryQuest, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, PLAYER_INVENTORY.inventories[INVENTORY_QUEST_ITEM].listHiddenCallback, nil, ZO_InventorySlot_OnPoolReset) 
-    ZO_ScrollList_AddDataType(SMITHING.deconstructionPanel.inventory.list, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, nil, nil, ZO_InventorySlot_OnPoolReset)
-	ZO_ScrollList_AddDataType(SMITHING.improvementPanel.inventory.list, 998, "AC_InventoryItemRowHeader", rowHeight, AC_Setup_InventoryRowWithHeader, nil, nil, ZO_InventorySlot_OnPoolReset)
+    local function AddTypeToList(datalist, inven_ndx) 
+        local cb
+        if inven_ndx then
+            cb = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
+        else
+            cb = nil
+        end
+        ZO_ScrollList_AddDataType(datalist, CATEGORY_HEADER, "AC_InventoryItemRowHeader", 
+            rowHeight, AC_Setup_InventoryRowWithHeader, cb, nil, 
+            ZO_InventorySlot_OnPoolReset)
+    end
+    AddTypeToList(ZO_PlayerInventoryList, INVENTORY_BACKPACK)
+    AddTypeToList(ZO_CraftBagList, INVENTORY_BACKPACK)
+    AddTypeToList(ZO_PlayerBankBackpack, INVENTORY_BACKPACK)
+    AddTypeToList(ZO_GuildBankBackpack, INVENTORY_BACKPACK)
+    AddTypeToList(ZO_HouseBankBackpack, INVENTORY_BACKPACK)
+    AddTypeToList(ZO_PlayerInventoryQuest, INVENTORY_QUEST_ITEM)
+    AddTypeToList(SMITHING.deconstructionPanel.inventory.list, nil)
+	AddTypeToList(SMITHING.improvementPanel.inventory.list, nil)
+	
 	local function resetCount(bagTypeId, name)
 		if AutoCategory.dataCount[bagTypeId] == nil then
 			AutoCategory.dataCount[bagTypeId] = {}
 		end
 		AutoCategory.dataCount[bagTypeId][name] = 0 
 	end
+    
 	local function addCount(bagTypeId, name)
 		if AutoCategory.dataCount[bagTypeId] == nil then
 			AutoCategory.dataCount[bagTypeId] = {}
@@ -93,6 +108,7 @@ function AutoCategory.HookKeyboardMode()
 		end
 		AutoCategory.dataCount[bagTypeId][name] = AutoCategory.dataCount[bagTypeId][name] + 1
 	end
+    
 	local function getCount(bagTypeId, name)
 		if AutoCategory.dataCount[bagTypeId] == nil then
 			AutoCategory.dataCount[bagTypeId] = {}
@@ -102,6 +118,7 @@ function AutoCategory.HookKeyboardMode()
 		end
 		return AutoCategory.dataCount[bagTypeId][name]
 	end
+    
 	local function prehookSort(self, inventoryType) 
 		local inventory
 	    if inventoryType == INVENTORY_BANK then

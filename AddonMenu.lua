@@ -11,6 +11,8 @@ local needReloadUI = false
 local cacheTags = {}
 cacheTags = {}
  
+-- ----------------------------------------------
+-- The cacheBags tables only change when Zenimax changes bags
 local cacheBags = {}
 cacheBags.showNames = { 
     [AC_BAG_TYPE_BACKPACK] = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
@@ -36,6 +38,7 @@ cacheBags.tooltips = {
     L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
     L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
 }
+-- ----------------------------------------------
 
 local cacheRulesByTag = {}
 local cacheRulesByBag = {}
@@ -46,13 +49,13 @@ local cacheBagEntriesByName = {}
 
 --dropdown data for index
 local dropdownData = {
+	["AC_DROPDOWN_IMPORTBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITBAG_RULE"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_ADDCATEGORY_TAG"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_ADDCATEGORY_RULE"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITRULE_TAG"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITRULE_RULE"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
-	["AC_DROPDOWN_IMPORTBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
 }
 
 local fontStyle	= {'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'}
@@ -84,10 +87,10 @@ end
 local function RuleDataSortingFunction(a, b)
 	local result = false
 	if a.tag ~= b.tag then
-		result = a.tag <b.tag
+		result = a.tag < b.tag
 	else
 		--alphabetical sort, cannot have same name rules
-		result = a.name <b.name
+		result = a.name < b.name
 	end
 	
 	return result
@@ -200,6 +203,7 @@ local function RefreshCache()
 				end
 				
 			else
+                -- missing rule
 				table.insert(cacheRulesByBag[bagId].showNames, string.format("|cFF4444(!)|r %s (%d)", ruleName, priority))				
 				table.insert(cacheRulesByBag[bagId].values, ruleName)
 				table.insert(cacheRulesByBag[bagId].tooltips, L(SI_AC_WARNING_CATEGORY_MISSING))
@@ -236,10 +240,6 @@ local function RefreshDropdown_EditBag()
 	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choices = dataCurrentRules_EditBag.showNames
 	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues = dataCurrentRules_EditBag.values
 	dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesTooltips = dataCurrentRules_EditBag.tooltips
-
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choices = cacheBags.showNames
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues = cacheBags.values
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips = cacheBags.tooltips	 
 end
 
 local function RefreshDropdown_AddCategory()
@@ -285,17 +285,27 @@ local function RefreshDropdown_AddCategory()
 	
 end
 
+-- This refreshes the AC_DROPDOWN_IMPORTBAG_BAG from the static cacheBags table
+-- This only needs to be done once because cacheBags does not change once initialized
 local function RefreshDropdown_Import()
 	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choices = cacheBags.showNames
 	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesValues = cacheBags.values
 	dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesTooltips = cacheBags.tooltips
 end
 
+-- This refreshes the AC_DROPDOWN_EDITBAG_BAG from the static cacheBags table
+-- This only needs to be done once because cacheBags does not change once initialized
+local function RefreshDropdown_EditBag_Bag()
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choices = cacheBags.showNames
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues = cacheBags.values
+	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips = cacheBags.tooltips
+end
+
+-- This is run multiple times
 local function RefreshDropdownData()
 	--d("|cFF8888RefreshDropdownData|r")
     RefreshDropdown_EditBag()
     RefreshDropdown_AddCategory()
-    RefreshDropdown_Import()
     
 	local dataCurrentRules_EditRule = {
         showNames = {},
@@ -322,10 +332,6 @@ local function RefreshDropdownData()
 	end
 	
 	--update data indices
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choices = cacheBags.showNames
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues = cacheBags.values
-	dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips = cacheBags.tooltips
-	 
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choices = cacheTags
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues = cacheTags
 	dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesTooltips = cacheTags
@@ -335,16 +341,18 @@ local function RefreshDropdownData()
 	dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesTooltips = dataCurrentRules_EditRule.tooltips
 end
  
+ -- inform the drop down control to update itself because its values have changed
 local function UpdateDropDownMenu(name)
-
-	--d("|cFFCCCCUpdateDropDownMenu|r")
 	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(name)
 	local data = dropdownData[name]
 
 	dropdownCtrl:UpdateChoices(data.choices, data.choicesValues, data.choicesTooltips)  
 end
 
-local function RemoveDropDownItem(typeString, dataArray, removeItem, emptyCallback)
+-- Remove a particular item from the specified dropdown control values
+-- optionally provide a callback to execute if the dropdown control becomes empty
+local function RemoveDropDownItem(typeString, removeItem, emptyCallback)
+    local dataArray = dropdownData[typeString].choicesValues
 	local removeIndex = -1
 	local num = #dataArray
 	for i = 1, num do
@@ -393,7 +401,7 @@ local function CreateNewRule(name, tag)
 		tag = tag,
 		name = name,
 		description = "",
-		rule = "true",
+		rule = "false",
 	}
 	return rule
 end
@@ -435,7 +443,9 @@ end
 function AutoCategory.AddonMenuInit()
 	RefreshCache()  
 	RefreshDropdownData() 
- 
+    RefreshDropdown_Import()
+    RefreshDropdown_EditBag_Bag() 
+    
 	local panelData =  {
 		type = "panel",
 		name = AutoCategory.settingName,
@@ -672,7 +682,7 @@ function AutoCategory.AddonMenuInit()
 								break
 							end
 						end
-						RemoveDropDownItem("AC_DROPDOWN_EDITBAG_RULE", dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues, ruleName)
+						RemoveDropDownItem("AC_DROPDOWN_EDITBAG_RULE", ruleName)
 						
 						RefreshCache()
 						RefreshDropdownData()
@@ -761,7 +771,7 @@ function AutoCategory.AddonMenuInit()
 						local entry = CreateNewBagRuleEntry(ruleName)
 						table.insert(AutoCategory.saved.bags[bagId].rules, entry) 
 						SelectDropDownItem("AC_DROPDOWN_EDITBAG_RULE", ruleName) 
-						RemoveDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues, ruleName)
+						RemoveDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", ruleName)
 						 
 						RefreshCache()
 						RefreshDropdownData()
@@ -1012,7 +1022,7 @@ function AutoCategory.AddonMenuInit()
 						AC.GetRuleByName(GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")).tag = value
 						
 						
-						RemoveDropDownItem("AC_DROPDOWN_EDITRULE_RULE", dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues, ruleName, function(typeString)
+						RemoveDropDownItem("AC_DROPDOWN_EDITRULE_RULE", ruleName, function(typeString)
 							--try to remove this rule from the tag, if tag needs delete, reselect it in add rule tab		
 							SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", "")		
 							SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
@@ -1163,13 +1173,13 @@ function AutoCategory.AddonMenuInit()
 							SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
 						end
 						
-						RemoveDropDownItem("AC_DROPDOWN_EDITRULE_RULE", dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues, oldRuleName, function(typeString)
+						RemoveDropDownItem("AC_DROPDOWN_EDITRULE_RULE", oldRuleName, function(typeString)
 							--if tag has no rules, will remove it.
 							if oldTagName == GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_TAG") then
 								--tag removed, clean tag selection in add rule menu if selected
 								SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_TAG", "")
 							end
-							RemoveDropDownItem("AC_DROPDOWN_EDITRULE_TAG", dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues, oldTagName)
+							RemoveDropDownItem("AC_DROPDOWN_EDITRULE_TAG", oldTagName)
 						end)
  
 						RefreshCache()   
