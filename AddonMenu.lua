@@ -47,7 +47,15 @@ local cacheRulesByBag = {}
 local cacheRulesByName = {}
 local cacheBagEntriesByName = {}
 
+local fontStyle	= {'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'}
+local fontAlignment = {
+    showNames = {L(SI_AC_ALIGNMENT_LEFT), L(SI_AC_ALIGNMENT_CENTER), L(SI_AC_ALIGNMENT_RIGHT)},
+    values = {0, 1, 2} 
+}
+
+
 --dropdown data for index
+-- the keys to this table are the reference names (global) for the dropdown controls
 local dropdownData = {
 	["AC_DROPDOWN_IMPORTBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
 	["AC_DROPDOWN_EDITBAG_BAG"] = {indexValue = AC_BAG_TYPE_BACKPACK, choices = {}, choicesValues = {}, choicesTooltips = {}},
@@ -58,11 +66,15 @@ local dropdownData = {
 	["AC_DROPDOWN_EDITRULE_RULE"] = {indexValue = "", choices = {}, choicesValues = {}, choicesTooltips = {}},
 }
 
-local fontStyle	= {'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'}
-local fontAlignment = {
-    showNames = {L(SI_AC_ALIGNMENT_LEFT), L(SI_AC_ALIGNMENT_CENTER), L(SI_AC_ALIGNMENT_RIGHT)},
-    values = {0, 1, 2} 
-}
+-- setting the selected value in the specified dropdown data table
+local function SelectDropDownItem(typeString, item)
+	dropdownData[typeString].indexValue = item
+end
+
+-- return the item that was selected in the specified dropdown data table
+local function GetDropDownSelection(typeString)
+	return dropdownData[typeString].indexValue
+end
 
 
 --warning message
@@ -84,6 +96,8 @@ local function RefreshPanel()
 	warningDuplicatedName.warningMessage = nil	
 end 
 
+-- for sorting rules by tag and name
+-- returns true if the a should come before b
 local function RuleDataSortingFunction(a, b)
 	local result = false
 	if a.tag ~= b.tag then
@@ -96,6 +110,8 @@ local function RuleDataSortingFunction(a, b)
 	return result
 end
 
+-- for sorting bagged rules by priority and name
+-- returns true if the a should come before b
 local function BagDataSortingFunction(a, b)
 	local result = false
 	if a.priority ~= b.priority then
@@ -105,14 +121,6 @@ local function BagDataSortingFunction(a, b)
 	end
 	return result
 end 
-
-local function SelectDropDownItem(typeString, item)
-	dropdownData[typeString].indexValue = item
-end
-
-local function GetDropDownSelection(typeString)
-	return dropdownData[typeString].indexValue
-end
 
 local function ToggleSubmenu(typeString, open)
 	local control = WINDOW_MANAGER:GetControlByName(typeString)
@@ -134,7 +142,7 @@ local function RefreshCache()
 	cacheRulesByTag = {}
 	cacheRulesByBag = {}
 
-	table.sort(AutoCategory.saved.rules, function(a, b) return RuleDataSortingFunction(a, b) end )
+	table.sort(AutoCategory.saved.rules, RuleDataSortingFunction )
 	for ndx = 1, #AutoCategory.saved.rules do
 		local rule = AutoCategory.saved.rules[ndx]
 		local tag = rule.tag
@@ -163,7 +171,7 @@ local function RefreshCache()
 
 	for i = 1, #AutoCategory.saved.bags do
 		local bag = AutoCategory.saved.bags[i]
-		table.sort(bag.rules, function(a, b) return BagDataSortingFunction(a, b) end )
+		table.sort(bag.rules, BagDataSortingFunction )
 		--update data for showing in the dropdown menu
 		local bagId = i
 		if not cacheRulesByBag[bagId] then
@@ -282,7 +290,6 @@ local function RefreshDropdown_AddCategory()
 	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choices = dataCurrentRules_AddCategory.showNames
 	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues = dataCurrentRules_AddCategory.values
 	dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesTooltips = dataCurrentRules_AddCategory.tooltips
-	
 end
 
 -- This refreshes the AC_DROPDOWN_IMPORTBAG_BAG from the static cacheBags table
@@ -396,6 +403,10 @@ local function GetUsableRuleName(name)
 	return testName
 end
 
+-- ----------------------------------------------------
+-- Category/Rule Entry and List functions
+
+-- never used
 local function CreateNewRule(name, tag)
 	local rule = {
 		tag = tag,
@@ -405,6 +416,9 @@ local function CreateNewRule(name, tag)
 	}
 	return rule
 end
+
+-- ----------------------------------------------------
+-- Bag Rule Entry and List functions
 
 local function CreateNewBagRuleEntry(name)
 	local entry = {
@@ -522,6 +536,8 @@ function AutoCategory.AddonMenuInit()
 					name = L(SI_AC_MENU_BS_DROPDOWN_BAG),
 					scrollable = false,
 					tooltip = L(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP),
+                width = "half",
+                reference = "AC_DROPDOWN_EDITBAG_BAG",
 					choices = dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choices,
 					choicesValues = dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesValues,
 					choicesTooltips = dropdownData["AC_DROPDOWN_EDITBAG_BAG"].choicesTooltips,
@@ -529,8 +545,11 @@ function AutoCategory.AddonMenuInit()
 					getFunc = function()  
 						return GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")
 					end,
+                
 					setFunc = function(value) 	
 						SelectDropDownItem("AC_DROPDOWN_EDITBAG_BAG", value)
+                    -- change other drop down lists based on the value selected from
+                    -- this one
 						SelectDropDownItem("AC_DROPDOWN_EDITBAG_RULE", "")
 						--reset add rule's selection, since all data will be changed.
 						SelectDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", "")
@@ -539,14 +558,13 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_RULE")
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 					end, 
-					width = "half",
-					reference = "AC_DROPDOWN_EDITBAG_BAG"
 				},
                 -- Hide ungrouped in bag
 				{
 					type = "checkbox",
-					name = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN),
-					tooltip = L(SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP),
+                    name = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN,
+                    tooltip = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP,
+                    width = "half",
 					getFunc = function()					
 						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
 						return AutoCategory.saved.bags[bag].isUngroupedHidden
@@ -555,15 +573,15 @@ function AutoCategory.AddonMenuInit()
 						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG") 
 						AutoCategory.saved.bags[bag].isUngroupedHidden = value
 					end,
-                    width = "half",
                 },			
                 {
                     type = "divider",
                 },
-                -- Add Categories
+                -- Add Rules to bags
+                -- Rule name
 				{		
 					type = "dropdown",
-					name = L(SI_AC_MENU_BS_DROPDOWN_CATEGORIES),
+                    name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
 					scrollable = true,
 					choices = dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choices,
 					choicesValues = dropdownData["AC_DROPDOWN_EDITBAG_RULE"].choicesValues,
@@ -582,10 +600,11 @@ function AutoCategory.AddonMenuInit()
                 -- Priority
 				{
 					type = "slider",
-					name = L(SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY),
-					tooltip = L(SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP),
+                    name = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY,
+                    tooltip = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP,
 					min = 0,
 					max = 100,
+                width = "half",
 					getFunc = function() 
 						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")
 						local rule = GetDropDownSelection("AC_DROPDOWN_EDITBAG_RULE")
@@ -613,13 +632,12 @@ function AutoCategory.AddonMenuInit()
 						end
 						return false
 					end,
-					width = "half",
 				},
                 -- Hide Category
 				{
 					type = "checkbox",
-					name = L(SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN),
-					tooltip = L(SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP),
+                    name = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN,
+                    tooltip = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP,
 					getFunc = function()					
 						local bag = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")
 						local rule = GetDropDownSelection("AC_DROPDOWN_EDITBAG_RULE")
@@ -651,8 +669,8 @@ function AutoCategory.AddonMenuInit()
                 -- Edit Category Button
 				{
 					type = "button",
-					name = L(SI_AC_MENU_BS_BUTTON_EDIT),
-					tooltip = L(SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP),
+                    name = SI_AC_MENU_BS_BUTTON_EDIT,
+                    tooltip = SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP,
 					func = function()
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITBAG_RULE")
 						if rule then
@@ -670,8 +688,8 @@ function AutoCategory.AddonMenuInit()
                 -- Remove Category Button
 				{
 					type = "button",
-					name = L(SI_AC_MENU_BS_BUTTON_REMOVE),
-					tooltip = L(SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP),
+                    name = SI_AC_MENU_BS_BUTTON_REMOVE,
+                    tooltip = SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP,
 					func = function()  
 						local bagId = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")
 						local ruleName = GetDropDownSelection("AC_DROPDOWN_EDITBAG_RULE")
@@ -695,13 +713,13 @@ function AutoCategory.AddonMenuInit()
                 -- Add Category to Bag Section
 				{
 					type = "header",
-					name = L(SI_AC_MENU_HEADER_ADD_CATEGORY),
+                    name = SI_AC_MENU_HEADER_ADD_CATEGORY,
 					width = "full",
 				},
                 -- Tag Dropdown
 				{		
 					type = "dropdown",
-					name = L(SI_AC_MENU_AC_DROPDOWN_TAG),
+                    name = SI_AC_MENU_AC_DROPDOWN_TAG,
 					scrollable = true,
 					choices = dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choices, 
 					choicesValues = dropdownData["AC_DROPDOWN_ADDCATEGORY_TAG"].choicesValues,
@@ -723,7 +741,7 @@ function AutoCategory.AddonMenuInit()
                 -- Categories unused dropdown
 				{		
 					type = "dropdown",
-					name = L(SI_AC_MENU_AC_DROPDOWN_CATEGORY),
+                    name = SI_AC_MENU_AC_DROPDOWN_CATEGORY,
 					scrollable = true,
 					choices = dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choices, 
 					choicesValues = dropdownData["AC_DROPDOWN_ADDCATEGORY_RULE"].choicesValues,
@@ -742,8 +760,8 @@ function AutoCategory.AddonMenuInit()
                 -- Edit Category Button
 				{
 					type = "button",
-					name = L(SI_AC_MENU_AC_BUTTON_EDIT),
-					tooltip = L(SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP),
+                    name = SI_AC_MENU_AC_BUTTON_EDIT,
+                    tooltip = SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP,
 					func = function()
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_ADDCATEGORY_RULE")
 						if rule then
@@ -761,8 +779,8 @@ function AutoCategory.AddonMenuInit()
                 -- Add to Bag Button
 				{
 					type = "button",
-					name = L(SI_AC_MENU_AC_BUTTON_ADD),
-					tooltip = L(SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP),
+                    name = SI_AC_MENU_AC_BUTTON_ADD,
+                    tooltip = SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP,
 					func = function()  
 						local bagId = GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")
 						local ruleName = GetDropDownSelection("AC_DROPDOWN_ADDCATEGORY_RULE")
@@ -787,18 +805,18 @@ function AutoCategory.AddonMenuInit()
                 -- Import/Export Bag Settings
 				{
 					type = "submenu",
-					name = L(SI_AC_MENU_SUBMENU_IMPORT_EXPORT),
+                    name = SI_AC_MENU_SUBMENU_IMPORT_EXPORT,
 					reference = "SI_AC_MENU_SUBMENU_IMPORT_EXPORT",
 					controls = {
 						{
 							type = "header",
-							name = L(SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS),
+                            name = SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS,
 							width = "full",
 						},
 						{
 							type = "button",
-							name = L(SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS),
-							tooltip = L(SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP),
+                            name = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS,
+                            tooltip = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP,
 							func = function() 
 								local selectedBag = AutoCategory.saved.bags[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")]
 								for i = 1, 5 do
@@ -819,14 +837,14 @@ function AutoCategory.AddonMenuInit()
 						
 						{
 							type = "header",
-							name = L(SI_AC_MENU_HEADER_IMPORT_BAG_SETTING),
+                            name = SI_AC_MENU_HEADER_IMPORT_BAG_SETTING,
 							width = "full",
 						},
 						{
 							type = "dropdown",
-							name = L(SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG),
+                            name = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG,
 							scrollable = false,
-							tooltip = L(SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP),
+                            tooltip = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP,
 							choices = dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choices,
 							choicesValues = dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesValues,
 							choicesTooltips = dropdownData["AC_DROPDOWN_IMPORTBAG_BAG"].choicesTooltips,
@@ -842,8 +860,8 @@ function AutoCategory.AddonMenuInit()
 						},
 						{
 							type = "button",
-							name = L(SI_AC_MENU_IBS_BUTTON_IMPORT),
-							tooltip = L(SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP),
+                            name = SI_AC_MENU_IBS_BUTTON_IMPORT,
+                            tooltip = SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP,
 							func = function() 
 
 								AutoCategory.saved.bags[GetDropDownSelection("AC_DROPDOWN_EDITBAG_BAG")] = SF.deepCopy( AutoCategory.saved.bags[GetDropDownSelection("AC_DROPDOWN_IMPORTBAG_BAG")] )
@@ -870,7 +888,7 @@ function AutoCategory.AddonMenuInit()
                 -- Need Help button
 				{			
 					type = "button",
-					name = L(SI_AC_MENU_AC_BUTTON_NEED_HELP),
+                    name = SI_AC_MENU_AC_BUTTON_NEED_HELP,
 					func = function() RequestOpenUnsafeURL("https://github.com/rockingdice/AutoCategory/wiki/Become-veteran!") end,
 					width = "full",
 				},
@@ -879,15 +897,15 @@ function AutoCategory.AddonMenuInit()
         -- Category Settings
 		{
 			type = "submenu",
-		    name = L(SI_AC_MENU_SUBMENU_CATEGORY_SETTING),
+		    name = SI_AC_MENU_SUBMENU_CATEGORY_SETTING,
 			reference = "AC_SUBMENU_CATEGORY_SETTING",
 		    controls = {
                 -- Tags
 				{		
 					type = "dropdown",
-					name = L(SI_AC_MENU_CS_DROPDOWN_TAG),
+					name = SI_AC_MENU_CS_DROPDOWN_TAG,
 					scrollable = true,
-					tooltip = L(SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP),
+					tooltip = SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP,
 					choices = dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choices, 
 					choicesValues = dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues, 
 					choicesTooltips = dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesTooltips, 
@@ -908,7 +926,7 @@ function AutoCategory.AddonMenuInit()
                 -- Categories
 				{		
 					type = "dropdown",
-					name = L(SI_AC_MENU_CS_DROPDOWN_CATEGORY), 
+					name = SI_AC_MENU_CS_DROPDOWN_CATEGORY, 
 					scrollable = true,
 					choices = dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choices, 
 					choicesValues =  dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues, 
@@ -927,20 +945,20 @@ function AutoCategory.AddonMenuInit()
                 -- Edit Category Title
 				{
 					type = "header",
-					name = L(SI_AC_MENU_HEADER_EDIT_CATEGORY),
+					name = SI_AC_MENU_HEADER_EDIT_CATEGORY,
 					width = "full",
 				},
 				{			
 					type = "button",
-					name = L(SI_AC_MENU_EC_BUTTON_LEARN_RULES),
+					name = SI_AC_MENU_EC_BUTTON_LEARN_RULES,
 					func = function() RequestOpenUnsafeURL("https://github.com/rockingdice/AutoCategory/wiki/Rule-Index-Page") end,
 					width = "full",
 				},
                 -- Name
 				{
 					type = "editbox",
-					name = L(SI_AC_MENU_EC_EDITBOX_NAME),
-					tooltip = L(SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP),
+					name = SI_AC_MENU_EC_EDITBOX_NAME,
+					tooltip = SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP,
 					getFunc = function()  
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						if rule then
@@ -1001,8 +1019,12 @@ function AutoCategory.AddonMenuInit()
                 -- Tag
 				{
 					type = "editbox",
-					name = L(SI_AC_MENU_EC_EDITBOX_TAG),
-					tooltip = L(SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP),
+					name = SI_AC_MENU_EC_EDITBOX_TAG,
+					tooltip = SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP,
+					isMultiline = false,
+					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
+					width = "half",
+					reference = "AC_EDITBOX_EDITRULE_TAG",
 					getFunc = function()  
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						if rule then
@@ -1045,16 +1067,16 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
 					 
 					end,
-					isMultiline = false,
-					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
-					width = "half",
-					reference = "AC_EDITBOX_EDITRULE_TAG",
 				},
                 --Description 
 				{
                     type = "editbox",
-					name = L(SI_AC_MENU_EC_EDITBOX_DESCRIPTION),
-					tooltip = L(SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP),
+					name = SI_AC_MENU_EC_EDITBOX_DESCRIPTION,
+					tooltip = SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP,
+					isMultiline = false,
+					isExtraWide = true,
+					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
+					width = "full",
 					getFunc = function() 
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						if rule then
@@ -1070,16 +1092,12 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_EDITRULE_RULE")
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_RULE")
 					end,
-					isMultiline = false,
-					isExtraWide = true,
-					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_TAG"].choicesValues == 0 end,
-					width = "full",
 				},
                 -- Rule
 				{
 					type = "editbox",
-					name = L(SI_AC_MENU_EC_EDITBOX_RULE),
-					tooltip = L(SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP),
+					name = SI_AC_MENU_EC_EDITBOX_RULE,
+					tooltip = SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,
 					getFunc = function() 
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						if rule then
@@ -1113,7 +1131,7 @@ function AutoCategory.AddonMenuInit()
 						local ruleName = GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")
                         local func,err = zo_loadstring("return("..AC.GetRuleByName(ruleName).rule..")")
                         if not func then
-                            d("Rule Error: " .. err)
+                            --d("Rule Error: " .. err)
                             control.data.title = L(SI_AC_MENU_EC_BUTTON_CHECK_RESULT_ERROR)
                             control.data.text = err
                             AC.GetRuleByName(ruleName).damaged = true 
@@ -1129,8 +1147,9 @@ function AutoCategory.AddonMenuInit()
 				},
 				{
 					type = "button",
-					name = L(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY),
-					tooltip = L(SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP),
+					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
+					width = "half",
 					func = function() 
 						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
 						local tag = GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")
@@ -1151,12 +1170,12 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_TAG")
 						AutoCategory.RecompileRules(AutoCategory.saved.rules)
 					end,
-					width = "half",
 				},
 				{
 					type = "button",
-					name = L(SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY),
-					tooltip = L(SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP),
+					name = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,
+					width = "half",
 					func = function()  
 						local oldRuleName = GetDropDownSelection("AC_DROPDOWN_EDITRULE_RULE")
 						local oldTagName = GetDropDownSelection("AC_DROPDOWN_EDITRULE_TAG")
@@ -1192,13 +1211,13 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_EDITBAG_RULE")
                         AutoCategory.RecompileRules(AutoCategory.saved.rules)
 					end,
-					width = "half",
 					disabled = function() return #dropdownData["AC_DROPDOWN_EDITRULE_RULE"].choicesValues	== 0 end,
 				},
 				{
 					type = "button",
-					name = L(SI_AC_MENU_EC_BUTTON_COPY_CATEGORY),
-					tooltip = L(SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP),
+					name = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
+					width = "half",
 					func = function() 
 						local rule = AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						local newName = GetUsableRuleName(rule.name)
@@ -1222,7 +1241,6 @@ function AutoCategory.AddonMenuInit()
 						UpdateDropDownMenu("AC_DROPDOWN_ADDCATEGORY_TAG")
                         AutoCategory.RecompileRules(AutoCategory.saved.rules)
 					end,
-					width = "half",
 				},
 		    },
 			
@@ -1233,12 +1251,12 @@ function AutoCategory.AddonMenuInit()
 		-- General Settings
         {
             type = "submenu",
-            name = L(SI_AC_MENU_SUBMENU_GENERAL_SETTING),
+            name = SI_AC_MENU_SUBMENU_GENERAL_SETTING,
             reference = "AC_MENU_SUBMENU_GENERAL_SETTING",
             controls = { 					
                 {
                     type = "checkbox",
-                    name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE),
+                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,
                     tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP),
                     getFunc = function() return AutoCategory.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
                     setFunc = function(value) AutoCategory.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value
@@ -1247,8 +1265,8 @@ function AutoCategory.AddonMenuInit()
                 },			
                 {
                     type = "checkbox",
-                    name = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT),
-                    tooltip = L(SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP),
+                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,
+                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
                     getFunc = function() return AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] end,
                     setFunc = function(value) AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
                         
@@ -1256,11 +1274,13 @@ function AutoCategory.AddonMenuInit()
                 },	
                 {
                     type = "checkbox",
-                    name = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS),
-                    tooltip = L(SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP),
-                    getFunc = function() return AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-                    setFunc = function(value) AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
-                        
+                    name = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,
+                    tooltip = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,
+                    getFunc = function() 
+                        return AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] 
+                    end,
+                    setFunc = function(value) 
+                        AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
                     end,
                 },
             }
@@ -1271,19 +1291,19 @@ function AutoCategory.AddonMenuInit()
         -- Appearance Settings
 		{
 				type = "submenu",
-				name = L(SI_AC_MENU_SUBMENU_APPEARANCE_SETTING),
+            name = SI_AC_MENU_SUBMENU_APPEARANCE_SETTING,
 				reference = "AC_SUBMENU_APPEARANCE_SETTING",
 				controls = { 
 					{
 						type = "description",
-						text = L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), -- or string id or function returning a string						
+                    text = SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP, -- or string id or function returning a string						
 					},
 					{
 						type = "divider",
 					},
 					{
 						type = 'dropdown',
-						name = L(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT),
+                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT,
 						choices = LMP:List('font'),
 						getFunc = function()
 							return AutoCategory.acctSaved.appearance["CATEGORY_FONT_NAME"]
@@ -1295,7 +1315,7 @@ function AutoCategory.AddonMenuInit()
 					},
 					{
 						type = 'dropdown',
-						name = L(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE),
+                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE,
 						choices = fontStyle,
 						getFunc = function()
 							return AutoCategory.acctSaved.appearance["CATEGORY_FONT_STYLE"]
@@ -1307,7 +1327,7 @@ function AutoCategory.AddonMenuInit()
 					},
 					{
 						type = 'dropdown',
-						name = L(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT),
+                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT,
 						choices = fontAlignment.showNames,
 						choicesValues = fontAlignment.values,
 						getFunc = function()
@@ -1320,7 +1340,7 @@ function AutoCategory.AddonMenuInit()
 					},
 					{
 						type = 'colorpicker',
-						name = L(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR),
+                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR,
 						getFunc = function()
 							return unpack(AutoCategory.acctSaved.appearance["CATEGORY_FONT_COLOR"])
 						end,
@@ -1335,7 +1355,7 @@ function AutoCategory.AddonMenuInit()
 					},
 					{
 						type = 'slider',
-						name = L(SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE),
+                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE,
 						min = 8,
 						max = 32,
 						getFunc = function()
@@ -1347,19 +1367,21 @@ function AutoCategory.AddonMenuInit()
 					},
 					{
 						type = "editbox",
-						name = L(SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE),
-						tooltip = L(SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP),
+						name = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE,
+						tooltip = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP,
+                    width = "full",
 						getFunc = function() 
 							return AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 						end, 
 						setFunc = function(value) AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] = value end,  
-						width = "full",
 					},
 					{
 						type = 'slider',
-						name = L(SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT),
+                    name = SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT,
 						min = 1,
 						max = 100,
+                        warning = L(SI_AC_WARNING_NEED_RELOAD_UI),
+                        requiresReload = true,
 						getFunc = function()
 							return AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 						end,
@@ -1367,18 +1389,17 @@ function AutoCategory.AddonMenuInit()
 							AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"] = v
 							needReloadUI = true
 						end,
-						warning = L(SI_AC_WARNING_NEED_RELOAD_UI),
 					},
 					{
 						type = "button",
-						name = L(SI_AC_MENU_EC_BUTTON_RELOAD_UI),
+						name = SI_AC_MENU_EC_BUTTON_RELOAD_UI,
+                    width = "full",
 						disabled = function() 
 							return not needReloadUI
 						end,
 						func = function()
 							ReloadUI()
 						end,
-						width = "full",
 					},
 				},
 			}, 

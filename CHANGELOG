@@ -1,6 +1,8 @@
 [COLOR="DeepSkyBlue"]2.0[/COLOR] Changes:
 [LIST]
 [*] [COLOR="DarkOrange"]Now requires the library LibSFUtils to be installed separately.[/COLOR]
+
+[*] Fixed error that prevented AutoCategory from working with the Quality Sort addon. (Thanks to Silvereyes for the corrected code.)
 [*] Changed the AutoCategory settings page to try to make it easier to understand and use.
 [*] NEW: Added a "Check" button to the Add Category section so that you can test to see that your rule will compile properly when you write it. If it does not compile correctly, the area to the left of the Check button will show an error message to try to tell you what was wrong with it.
 
@@ -12,16 +14,20 @@
     o [COLOR="MediumSeaGreen"]enchanting_rune[/COLOR] -  this will match against enchanting_rune_aspect, enchanting_rune_essence, or enchanting_rune_potency
     Specialized Item Types (sptype):
     o [COLOR="MediumSeaGreen"]glyph[/COLOR] - this will match against glyph_armor, glyph_weapon, or glyph_jewelry 
-[*] Added predefined rules for FCOIS dynamics 11-30 for when you are starting AutoCategory without preexisting saved variables.
-[*] Revise Auto Category setting page to try to make it easier to understand/use.
 [*] Added an [COLOR="MediumSeaGreen"]islockpick()[/COLOR] to detect lockpicks in inventory since, due to a Zenimax bug, lockpicks do not belong to [COLOR="MediumSeaGreen"]type("lockpick")[/COLOR].
+[*] Changed saved variable storage to handle multiple servers.   
     
 [*] Removed the alternative language files which were still in English. When we get translations, we can add them back with appropriate values.
-[*] Expanded the remaining alternative language files to include strings for the FCOIS dynamics 11-30.
 [*] Converted the way that language strings are defined to use the new LibSFUtils.LoadLanguage() function to load the particular language required (or the specified default if the client language is not available).
+[*] Changed the way that predefined rules are loaded so that predefined rules for addon integrations such as FCOIS and Iakoni Gear Changer are only loaded when you have those particular addons installed.
+
+[*] Expanded the remaining alternative language files to include strings for the FCOIS dynamics 11-30.
+[*] Added predefined rules for FCOIS dynamics 11-30 for when you are starting AutoCategory without preexisting saved variables.
+[*] Moved FCOIS integration into an included plugin file.
 
 [*] Moved ItemSaver integration into an included plugin file.
 [*] Moved GearChangerByIakoni integration into an included plugin file. Moved the GearChanger language strings into the plugin and load them separately using the AutoCategory.LoadLanguage() to supplement the existing string tables. While not strictly necessary, it acts as both a proof-of-concept and an example for how external plugins to AutoCategory can work.
+
 [*] Adopted by Shadowfen after prolonged lack of response from the previous authors. Renamed to "AutoCategory - Revised".
 [/LIST]
 

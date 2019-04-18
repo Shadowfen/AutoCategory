@@ -22,10 +22,14 @@ AddonMenu.lua
 AutoCategory_RuleFunc.lua
 AutoCategory_API.lua
 
+; new style addon plugin files
 ItemSaver_Plugin.lua
+FCOIS_Plugin.lua
 Iakoni_GearChanger_Plugin.lua
 
+; old integration with other addons files
 AutoCategory_Integrations_Inventory_Grid_View.lua
 AutoCategory_Integrations_QuickMenu.lua
 AutoCategory_Integrations_DoItAll.lua
+
 Bindings.xml

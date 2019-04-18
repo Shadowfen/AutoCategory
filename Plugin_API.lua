@@ -4,13 +4,28 @@
 local SF = LibSFUtils       -- We're using the library's LoadLanguage function
 local AC = AutoCategory
 
+-- A dummy rule function available for use with dummying out a RuleFunc name
+-- so that it can still be "available" (used in user-defined rules when the 
+-- associated addon was not loaded.
+-- Now automatically used by AddRuleFunc() if another function was not provided.
+function AutoCategory.dummyRuleFunc()
+    return false
+end
+
+
 -- Add a operation for rules to evaluate
 --
 -- Parameters: name - (string) the name of the function to use in a rule
---             func - (function) the actual lua function to execute when this
---                      operation is found in a rule
+--             func - (function) (optional) the actual lua function to execute when this
+--                      operation is found in a rule.
+--                      If you do not provide this, it will be set to a function that
+--                      ALWAYS returns false. 
 function AutoCategory.AddRuleFunc(name, func)
-    AutoCategory.Environment[name] = func
+    if func == nil then
+        AutoCategory.Environment[name] = AutoCategory.dummyRuleFunc
+    else
+        AutoCategory.Environment[name] = func
+    end
 end
 
 -- Load in localization strings for a plugin
@@ -39,28 +54,28 @@ function AutoCategory.AddPredefinedRules( ruletable )
         --make sure rule is well-formed
         local badrule = false
         if( not ruletable[i].name or type(ruletable[i].name) ~= "string" or ruletable[i].name == ""  ) then
-            d("AddPredefinedRules: name is required")
+            --d("AddPredefinedRules: name is required")
             badrule = true  -- name is required
         end
         if( not ruletable[i].rule or type(ruletable[i].rule) ~= "string" or ruletable[i].rule == ""  ) then
-            d("AddPredefinedRules: rule text is required")
+            --d("AddPredefinedRules: rule text is required")
             badrule = true  -- rule text is required
         end
         if ruletable.description then   -- description is optional
             if( type(ruletable[i].description) ~= "string" ) then
-                d("AddPredefinedRules: description is not a string")
+                --d("AddPredefinedRules: description is not a string")
                 badrule = true  -- but if provided, must be a string
             end
         end
         if ruletable.tag then   -- tag is optional
             if( type(ruletable[i].tag) ~= "string" ) then
-                d("AddPredefinedRules: tag is not a string")
+                --d("AddPredefinedRules: tag is not a string")
                 badrule = true  -- but if provided, must be a string
             end
         end
         if ruletable.compiled then   -- compiled is optional
             if( type(ruletable[i].compiled) ~= "function" ) then
-                d("AddPredefinedRules: compiled is not a function")
+                --d("AddPredefinedRules: compiled is not a function")
                 badrule = true  -- but if provided, must be a lua function
             end
         end

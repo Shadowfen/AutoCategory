@@ -110,22 +110,6 @@ local localization_strings = {
     },
 }
 
-local function LoadLanguage()
-    local lang = GetCVar("language.2")
-
-    --check for supported languages
-    local chosen = lang
-    if localization_strings[lang] == nil then
-        chosen = "en"
-    end
-
-    local localstr = localization_strings[chosen]
-    for stringId, stringValue in pairs(localstr) do
-        ZO_CreateStringId(stringId, stringValue)
-        SafeAddVersion(stringId, 1)
-    end
-end
-
 AutoCategory_Iakoni.predefinedRules = {
     {
         ["rule"] = "setindex(1)",
@@ -233,6 +217,8 @@ end
 --Initialize plugin for Auto Category - Iakoni's Gear Changer
 function AutoCategory_Iakoni.Initialize()
 	if not GearChangerByIakoni then
+        AutoCategory.AddRuleFunc("setindex")
+        AutoCategory.AddRuleFunc("inset")
         return
     end
     
@@ -273,6 +259,7 @@ local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
 	return result
 end
 
+-- Implement the GearChanger setindex() check function for rules
 function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 	if not GearChangerByIakoni then return false end
     
@@ -308,8 +295,10 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 	return false 
 end
 
+-- Implement the GearChanger inset() check function for rules
 function AutoCategory_Iakoni.RuleFunc.InSet( ... )
 	local fn = "inset"
+	if not GearChangerByIakoni then return false end
 	
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return #setIndices ~= 0

@@ -29,7 +29,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		local entry = bag.rules[i] 
 		local rule = AutoCategory.GetRuleByName(entry.name)
 		if rule then
-			rule.damaged = false
+			rule.damaged = nil
 			if rule.rule == nil then
 				return false, "", 0, bag_type_id, entry.isHidden
 			end
@@ -47,7 +47,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						return true, rule.name .. AutoCategory.AdditionCategoryName, entry.priority, bag_type_id, entry.isHidden
 					end 
 				else
-					d("Error2: " .. res)
+					--d("Error2: " .. res)
 					rule.damaged = true 
 				end
 			end

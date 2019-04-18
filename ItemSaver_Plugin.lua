@@ -10,6 +10,7 @@ AutoCategory_ItemSaver = {
 --Initialize plugin for Auto Category - Item Saver
 function AutoCategory_ItemSaver.Initialize()
 	if not ItemSaver then
+        AutoCategory.AddRuleFunc("ismarkedis")
         return
     end
     
@@ -18,6 +19,7 @@ function AutoCategory_ItemSaver.Initialize()
     
 end
 
+-- Implement ismarkedis() check function for Item Saver
 function AutoCategory_ItemSaver.RuleFunc.IsMarkedIS( ... )
 	local fn = "ismarkedis"
 	if ItemSaver == nil then
