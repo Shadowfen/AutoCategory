@@ -745,7 +745,7 @@ function AutoCategory.AddonMenuInit()
 					name = L(SI_AC_MENU_AC_BUTTON_EDIT),
 					tooltip = L(SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP),
 					func = function()
-						local rule = GetRuleBySelection("AC_DROPDOWN_ADDCATEGORY_RULE")
+						local rule = AC.GetRuleBySelection("AC_DROPDOWN_ADDCATEGORY_RULE")
 						if rule then
 							SelectDropDownItem("AC_DROPDOWN_EDITRULE_TAG", rule.tag)
 							SelectDropDownItem("AC_DROPDOWN_EDITRULE_RULE", rule.name) 
@@ -952,7 +952,7 @@ function AutoCategory.AddonMenuInit()
 						return warningDuplicatedName.warningMessage
 					end,
 					setFunc = function(value) 
-						local rule =  GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
+						local rule =  AC.GetRuleBySelection("AC_DROPDOWN_EDITRULE_RULE")
 						local oldName = rule.name
 						if oldName == value then 
 							return
