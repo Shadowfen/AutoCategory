@@ -70,6 +70,7 @@ function AutoCategory.HookKeyboardMode()
 		rowControl:SetHeight(AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
 		rowControl.slot = slot
 	end
+    
 	--Add a new data type: row with header
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
     local function AddTypeToList(datalist, inven_ndx) 
@@ -83,6 +84,7 @@ function AutoCategory.HookKeyboardMode()
             rowHeight, AC_Setup_InventoryRowWithHeader, cb, nil, 
             ZO_InventorySlot_OnPoolReset)
     end
+    
     AddTypeToList(ZO_PlayerInventoryList, INVENTORY_BACKPACK)
     AddTypeToList(ZO_CraftBagList, INVENTORY_BACKPACK)
     AddTypeToList(ZO_PlayerBankBackpack, INVENTORY_BACKPACK)
@@ -143,17 +145,17 @@ function AutoCategory.HookKeyboardMode()
 				if right.isHeader ~= left.isHeader then
 					return NilOrLessThan(right.isHeader, left.isHeader)
 				end
-				--compatible with quality sort
-				if type(inventory.currentSortKey) == "function" then 
-					if inventory.currentSortOrder == ZO_SORT_ORDER_UP then
-						return inventory.currentSortKey(left.data, right.data)
-					else
-						return inventory.currentSortKey(right.data, left.data)
-					end
-				end
-			end
+            end
+            --compatible with quality sort
+            if type(inventory.currentSortKey) == "function" then 
+                if inventory.currentSortOrder == ZO_SORT_ORDER_UP then
+                    return inventory.currentSortKey(left.data, right.data)
+                else
+                    return inventory.currentSortKey(right.data, left.data)
+                end
+            end
 			return ZO_TableOrderingFunction(left.data, right.data, inventory.currentSortKey, sortKeys, inventory.currentSortOrder)
-		end
+        end
 
 	    local list = inventory.listView 
 	    local scrollData = ZO_ScrollList_GetDataList(list) 
