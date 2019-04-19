@@ -10,6 +10,21 @@ AC.compiledRules = {}
 
 AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
+function AutoCategory.CompileRule(rule)
+  if rule == nil then return end
+  
+    local n = rule.name
+    local compiled = rule.compiled
+    if not rule.compiled then
+        compiled,err = zo_loadstring("return("..rule.rule..")")
+        if not compiled then
+          --d("Error1: " .. err)
+          rule.damaged = true 
+        end
+    end
+    AC.compiled[n] = compiled
+end
+
 function AutoCategory.RecompileRules(ruleset)
   local compiled = {}
   if ruleset == nil then return end
@@ -46,6 +61,8 @@ function AutoCategory.UpdateCurrentSavedVars()
 	end
 end 
 
+-- -----------------------------------------------------------
+-- Manage collapses
 function AutoCategory.LoadCollapse()
 	if not AutoCategory.saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
 		--init
@@ -65,6 +82,16 @@ function AutoCategory.ResetCollapse(vars)
     vars.collapses = collapses
 end
 
+function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
+    AC.saved.collapses[bagTypeId][categoryName] = SF.nilDefault(AC.saved.collapses[bagTypeId][categoryName],false)
+	return AC.saved.collapses[bagTypeId][categoryName]
+end
+
+function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
+	AutoCategory.saved.collapses[bagTypeId][categoryName] = collapsed 
+end
+-- -----------------------------------------------------------
+ 
 function AutoCategory.ResetToDefaults()
 	AutoCategory.acctSaved.rules = AutoCategory.defaultAcctSettings.rules
 	AutoCategory.acctSaved.bags = AutoCategory.defaultAcctSettings.bags
@@ -211,15 +238,6 @@ function AC_ItemRowHeader_OnMouseExit(header)
 	markerBG:SetHidden(true)
 end
 
-function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
-    AC.saved.collapses[bagTypeId][categoryName] = SF.nilDefault(AC.saved.collapses[bagTypeId][categoryName],false)
-	return AC.saved.collapses[bagTypeId][categoryName]
-end
-
-function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
-	AutoCategory.saved.collapses[bagTypeId][categoryName] = collapsed 
-end
- 
 function AC_ItemRowHeader_OnMouseClicked(header)
 	local cateName = header.slot.dataEntry.bestItemTypeName
 	local bagTypeId = header.slot.dataEntry.bagTypeId
