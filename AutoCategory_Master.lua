@@ -30,6 +30,7 @@ function ACM:New()
     o.nameLookup = {}   -- table keyed by rule name with value of index into "rules" list, rule names are unique
     o.tags = {}         -- table keyed by tag name with value of list of rule names belonging to that tag
                         -- a rule may belong to only one tag
+    return o
 end
 
 function ACM:GetRule(name)
