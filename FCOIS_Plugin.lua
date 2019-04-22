@@ -52,8 +52,8 @@ local localization_strings = {
         SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK = "Verkauf",
         SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK_DESC = "",
 
-        SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK = "All Marks",
-        SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC = "", 
+        SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK = "Alle Markierungen",
+        SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC = "",
     },
     
     en = {
