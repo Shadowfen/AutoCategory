@@ -30,6 +30,5 @@ Iakoni_GearChanger_Plugin.lua
 ; old integration with other addons files
 AutoCategory_Integrations_Inventory_Grid_View.lua
 AutoCategory_Integrations_QuickMenu.lua
-AutoCategory_Integrations_DoItAll.lua
 
 Bindings.xml

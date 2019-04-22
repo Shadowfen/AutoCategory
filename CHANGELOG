@@ -28,6 +28,9 @@
 [*] Moved ItemSaver integration into an included plugin file.
 [*] Moved GearChangerByIakoni integration into an included plugin file. Moved the GearChanger language strings into the plugin and load them separately using the AutoCategory.LoadLanguage() to supplement the existing string tables. While not strictly necessary, it acts as both a proof-of-concept and an example for how external plugins to AutoCategory can work.
 
+[*] Removed specific integration code for DoItAll addon as that integration was moved to the DoItAll addon instead of residing in AutoCategory.
+[*] Added additional localization strings for German from Baertram's git pull request.
+
 [*] Adopted by Shadowfen after prolonged lack of response from the previous authors. Renamed to "AutoCategory - Revised".
 [/LIST]
 

@@ -169,7 +169,6 @@ function AutoCategory.LazyInit()
 		--capabilities with other add-ons
 		IntegrateInventoryGridView()
 		IntegrateQuickMenu()
-		IntegrateDoItAll()
 
 		AutoCategory.Inited = true
 	end
