@@ -1,4 +1,4 @@
 # AutoCategory
 
 Wiki:
-https://github.com/rockingdice/AutoCategory/wiki
+https://github.com/Shadowfen/AutoCategory/wiki
