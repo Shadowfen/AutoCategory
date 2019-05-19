@@ -181,7 +181,7 @@ local itemTypeMap = {
     ["jewelry_raw_booster"] = ITEMTYPE_JEWELRYCRAFTING_RAW_BOOSTER,
     ["jewelry_raw_material"] = ITEMTYPE_JEWELRYCRAFTING_RAW_MATERIAL,
     ["jewelry_raw_trait"] = ITEMTYPE_JEWELRY_RAW_TRAIT,
-    ["jewelry_triat"] = ITEMTYPE_JEWELRY_TRAIT,
+    ["jewelry_trait"] = ITEMTYPE_JEWELRY_TRAIT,
 	["lockpick"] = ITEMTYPE_LOCKPICK,
 	["lure"] = ITEMTYPE_LURE,
 	["master_writ"] = ITEMTYPE_MASTER_WRIT,
@@ -222,7 +222,6 @@ itemTypeMap.enchanting_rune = {
 itemTypeMap.glyph = { 
     [ITEMTYPE_GLYPH_ARMOR] = true, 
     [ITEMTYPE_GLYPH_JEWELRY] = true, 
-    [ITEMTYPE_GLYPH_WEAPON] = true, 
     [ITEMTYPE_GLYPH_WEAPON] = true, 
 }
 
@@ -335,6 +334,28 @@ local traitMap = {
 	["weapon_training"] = ITEM_TRAIT_TYPE_WEAPON_TRAINING,
 }
 
+traitMap.intricate = { 
+    [ITEM_TRAIT_TYPE_ARMOR_INTRICATE] = true, 
+    [ITEM_TRAIT_TYPE_JEWELRY_INTRICATE] = true, 
+    [ITEM_TRAIT_TYPE_WEAPON_INTRICATE] = true, 
+}
+traitMap.divines = ITEM_TRAIT_TYPE_ARMOR_DIVINES
+traitMap.infused =  { 
+    [ITEM_TRAIT_TYPE_ARMOR_INFUSED] = true, 
+    [ITEM_TRAIT_TYPE_JEWELRY_INFUSED] = true, 
+    [ITEM_TRAIT_TYPE_WEAPON_INFUSED] = true, 
+}
+traitMap.ornate =  { 
+    [ITEM_TRAIT_TYPE_ARMOR_ORNATE] = true, 
+    [ITEM_TRAIT_TYPE_JEWELRY_ORNATE] = true, 
+    [ITEM_TRAIT_TYPE_WEAPON_ORNATE] = true, 
+}
+traitMap.nirhoned =  { 
+    [ITEM_TRAIT_TYPE_ARMOR_NIRNHONED] = true, 
+    [ITEM_TRAIT_TYPE_WEAPON_NIRNHONED] = true, 
+}
+
+
 local weaponTypeMap = { 
 	["axe"] = WEAPONTYPE_AXE,
 	["bow"] = WEAPONTYPE_BOW,
@@ -360,7 +381,23 @@ local armorTypeMap = {
 	["none"] = ARMORTYPE_NONE,
 }
 
-
+AutoCategory.dictionary = {
+    { 
+        ["or"] = true,
+        ["and"] = true,
+        ["not"] = true,
+    },
+    specializedItemTypeMap,
+    itemTypeMap,
+    filterTypeMap,
+    equipTypeMap,
+    qualityMap,
+    boundTypeMap,
+    traitMap,
+    weaponTypeMap,
+    armorTypeMap,
+    AutoCategory.Environment,
+}
 --============Rule Function==============--
 -- compare arg to key, looking up the arg in a map
 -- if necessary (and provided)

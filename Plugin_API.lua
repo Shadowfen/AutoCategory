@@ -41,49 +41,33 @@ function AutoCategory.LoadLanguage(stringtable, default_language)
     SF.LoadLanguage(stringtable, default_language)
 end
 
--- Add predefined rules specific to the plugin to the master list
+-- Add predefined rules to the saved list. Will not overwrite a rule that
+-- already exists in the saved variables rules list.
 --
 -- Parameters: ruletable - (table) a table of rule entries, each rule entry being a table
 --                   containing a name, tag, rule, description, and (optional) lua function
 --                   to execute to evaluate the rule. Do NOT use zo_LoadString here!
 function AutoCategory.AddPredefinedRules( ruletable )
+    local added = 0
     if ruletable == nil or #ruletable == 0 then 
-        return
+        return 0, {"rule table was nil or empty"}
     end
+    local errtbl = {}
     for i=1,#ruletable do
-        --make sure rule is well-formed
-        local badrule = false
-        if( not ruletable[i].name or type(ruletable[i].name) ~= "string" or ruletable[i].name == ""  ) then
-            --d("AddPredefinedRules: name is required")
-            badrule = true  -- name is required
-        end
-        if( not ruletable[i].rule or type(ruletable[i].rule) ~= "string" or ruletable[i].rule == ""  ) then
-            --d("AddPredefinedRules: rule text is required")
-            badrule = true  -- rule text is required
-        end
-        if ruletable.description then   -- description is optional
-            if( type(ruletable[i].description) ~= "string" ) then
-                --d("AddPredefinedRules: description is not a string")
-                badrule = true  -- but if provided, must be a string
+        local ruledef = ruletable[i]
+        local rslt, err = AC.isValidRule(ruledef)
+        if rslt then
+            local err = AutoCategory.cache.AddRule({name=ruledef.name, tag=ruledef.tag, rule=ruledef.rule, description=ruledef.description})
+            if err then
+                table.insert(errtbl,err)
+            else
+                added = added + 1
             end
-        end
-        if ruletable.tag then   -- tag is optional
-            if( type(ruletable[i].tag) ~= "string" ) then
-                --d("AddPredefinedRules: tag is not a string")
-                badrule = true  -- but if provided, must be a string
-            end
-        end
-        if ruletable.compiled then   -- compiled is optional
-            if( type(ruletable[i].compiled) ~= "function" ) then
-                --d("AddPredefinedRules: compiled is not a function")
-                badrule = true  -- but if provided, must be a lua function
-            end
-        end
-
-        if badrule ~= false then
-            AutoCategory.masterRules:AddRule(ruletable[i].name, ruletable[i].tag, ruletable[i].rule, ruletable[i].description, "predef")
+        else
+            table.insert(errtbl,"Rule was invalid. ("..err..")")
         end
     end
+    return added,errtbl
 end
 
 -- Register the plugin with AutoCategory so that it will be initialized along with

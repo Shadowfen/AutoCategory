@@ -10,7 +10,7 @@ AutoCategory_ItemSaver = {
 --Initialize plugin for Auto Category - Item Saver
 function AutoCategory_ItemSaver.Initialize()
 	if not ItemSaver then
-        AutoCategory.AddRuleFunc("ismarkedis")
+        AutoCategory.AddRuleFunc("ismarkedis", AutoCategory.dummyRuleFunc)
         return
     end
     

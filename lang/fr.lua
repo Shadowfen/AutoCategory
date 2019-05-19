@@ -1,4 +1,6 @@
 
+AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
+
 AutoCategory_localization_strings["fr"] = {
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Sac",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "Banque",

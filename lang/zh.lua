@@ -1,4 +1,6 @@
 
+AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
+
 AutoCategory_localization_strings["zh"] = {
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "随身背包",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "银行",

@@ -10,7 +10,7 @@ local SF = LibSFUtils
 AutoCategory = {
     name = "AutoCategory",
     version = "2.0",
-    settingName = "Auto Category",
+    settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice",
 }
@@ -23,5 +23,5 @@ AutoCategory.Plugins = {}
 AutoCategory.Inited = false
 AutoCategory.Enabled = true
 
-SF.LoadLanguage(AutoCategory_localization_strings)
+SF.LoadLanguage(AutoCategory_localization_strings, "en")
 

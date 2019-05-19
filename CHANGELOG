@@ -1,6 +1,6 @@
 [COLOR="DeepSkyBlue"]2.0[/COLOR] Changes:
 [LIST]
-[*] [COLOR="DarkOrange"]Now requires the library LibSFUtils to be installed separately.[/COLOR]
+[*] [COLOR="DarkOrange"]Now requires the libraries LibSFUtils, LibAddonMenu-2.0, and LibMediaProvider-1.0 to be installed separately.[/COLOR]
 
 [*] Fixed error that prevented AutoCategory from working with the Quality Sort addon. (Thanks to Silvereyes for the corrected code.)
 [*] Changed the AutoCategory settings page to try to make it easier to understand and use.

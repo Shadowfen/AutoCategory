@@ -10,7 +10,8 @@ AutoCategory_Iakoni = {
 local L = GetString
 
 -- language strings
--- Each language set of strings must contain ALL of the string definitions for the plugin.
+-- The default language set of strings must contain ALL of the string definitions for the plugin.
+-- For other language sets here, if a string is not defined then the english version is used
 -- For any language that is not supported (i.e. not here), "en" is used.
 local localization_strings = {
     de = {
@@ -109,6 +110,7 @@ local localization_strings = {
         AC_IAKONI_CATEGORY_SET_10_DESC= "#10 号装备配置 Iakoni's Gear Changer",
     },
 }
+AutoCategory.LoadLanguage(localization_strings,"en") -- initialize strings before use in rules
 
 AutoCategory_Iakoni.predefinedRules = {
     {
@@ -215,14 +217,23 @@ local function GearChangerByIakoni_DoRefresh(list)
 end
 
 --Initialize plugin for Auto Category - Iakoni's Gear Changer
+
+-- separated out to allow for offline testing since localization_strings is local
+function AutoCategory_Iakoni.LoadLanguage(defaultlang)
+    if defaultlang == nil then defaultlang = "en" end
+    
+    -- initialize strings
+    AutoCategory.LoadLanguage(localization_strings,"en")
+end
+
 function AutoCategory_Iakoni.Initialize()
 	if not GearChangerByIakoni then
-        AutoCategory.AddRuleFunc("setindex")
-        AutoCategory.AddRuleFunc("inset")
+        AutoCategory.AddRuleFunc("setindex", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("inset", AutoCategory.dummyRuleFunc)
         return
     end
     
-    -- initialize strings
+    -- reinitialize strings
     AutoCategory.LoadLanguage(localization_strings,"en")
     
     -- load predefinedRules

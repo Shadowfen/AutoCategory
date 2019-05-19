@@ -4,10 +4,8 @@
 ## Description: Type "/ac" for settings
 ## Version: 2.0
 ## SavedVariables: AutoCategorySavedVars
-## DependsOn: LibStub LibAddonMenu-2.0 LibSFUtils
+## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0
 ## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver
-
-Libs/LibMediaProvider-1.0/LibMediaProvider-1.0.lua
 
 lang/strings.lua
 lang/$(language).lua

@@ -1,4 +1,6 @@
 --German translations
+AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
+
 AutoCategory_localization_strings["de"] = {
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Inventar",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "Bank",

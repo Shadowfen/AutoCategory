@@ -1,7 +1,9 @@
---All the texts that need a translation
+-- All the texts that need a translation. As this is being used as the
+-- default (fallback) language, all strings that the addon uses MUST
+-- be defined here.
 
 --base language is english, so the file en.lua shuld be kept empty!
-AutoCategory_localization_strings = {}
+AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
 
 AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Backpack",
@@ -30,7 +32,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_WARNING_CATEGORY_NAME_DUPLICATED = "Name '%s' is duplicated, you can try '%s'.",
     SI_AC_WARNING_NEED_RELOAD_UI = "Need Reload UI",
 
-    SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
+    SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Account-wide Setting",
     SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP = "Use account-wide setting instead of character setting",
 
     SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Bag Setting]|r",
@@ -88,8 +90,9 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_EC_BUTTON_NEW_CATEGORY = "New",
     SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP = "Create a new category with selected tag",
     SI_AC_MENU_EC_BUTTON_CHECK_RULE = "Check",
-    SI_AC_MENU_EC_BUTTON_CHECK_RESULT_GOOD = "Good",
-    SI_AC_MENU_EC_BUTTON_CHECK_RESULT_ERROR = "Error in rule",
+    SI_AC_MENU_EC_BUTTON_CHECK_RESULT_GOOD = "|c2DC50EGood|r",
+    SI_AC_MENU_EC_BUTTON_CHECK_RESULT_ERROR = "|cFF0000Error in rule|r",
+    SI_AC_MENU_EC_BUTTON_CHECK_RESULT_WARNING = "|cEECA00Warning - Unrecognized:|r",
     SI_AC_MENU_EC_BUTTON_CHECK_RULE_TOOLTIP = "Check if the rule has errors",
     SI_AC_MENU_EC_BUTTON_COPY_CATEGORY = "Copy",
     SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP = "Make a new copy of selected category",

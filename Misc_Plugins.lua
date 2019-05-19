@@ -17,14 +17,14 @@ function AutoCategory_MiscAddons.Initialize()
     
     -- AlphaGear
     if not AG then
-        AutoCategory.AddRuleFunc("alphagear")   -- always return false
+        AutoCategory.AddRuleFunc("alphagear", AutoCategory.dummyRuleFunc)   -- always return false
     else
         AutoCategory.AddRuleFunc("alphagear", AutoCategory_MiscAddons.RuleFunc.AlphaGear)
     end
     
     -- SetTracker
     if not SetTrack then
-        AutoCategory.AddRuleFunc("istracked")    -- always return false
+        AutoCategory.AddRuleFunc("istracked", AutoCategory.dummyRuleFunc)    -- always return false
     else
         AutoCategory.AddRuleFunc("istracked", AutoCategory_MiscAddons.RuleFunc.IsTracked)
     end

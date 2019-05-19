@@ -3,7 +3,8 @@ AutoCategory_FCOIS = {
 }
 
 -- language strings
--- Each language set of strings must contain ALL of the string definitions for the plugin.
+-- The default language set of strings must contain ALL of the string definitions for the plugin.
+-- For other language sets here, if a string is not defined then the english version is used
 -- For any language that is not supported (i.e. not here), "en" is used.
 local localization_strings = {
     de = {
@@ -323,6 +324,8 @@ local localization_strings = {
         SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC= "",
     },
 }
+-- must load strings before we define the rules that use them
+AutoCategory.LoadLanguage(localization_strings,"en")
 
 local L = GetString
 
@@ -587,15 +590,23 @@ AutoCategory_FCOIS.predefinedRules = {
     },
 }
 
+-- separated out to allow for offline testing since localization_strings is local
+function AutoCategory_FCOIS.LoadLanguage(defaultlang)
+    if defaultlang == nil then defaultlang = "en" end
+    
+    -- initialize strings
+    AutoCategory.LoadLanguage(localization_strings,"en")
+end
+
 --Initialize plugin for Auto Category - FCOIS
 function AutoCategory_FCOIS.Initialize()
-	if not FCOIS then
-        AutoCategory.AddRuleFunc("ismarked")
+	if FCOIS == nil then
+        AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
         return
     end
     
     -- initialize strings
-    AutoCategory.LoadLanguage(localization_strings,"en")
+    AutoCategory_FCOIS.LoadLanguage("en")
     
     -- load predefinedRules
     AutoCategory.AddPredefinedRules(AutoCategory_FCOIS.predefinedRules)
@@ -710,7 +721,7 @@ end
 -- Implement ismarked() check function for FCOIS
 function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	local fn = "ismarked"
-	if FCOIS == nil or not AutoCategory.saved.integration["FCOIS_ENABLE"] then
+	if FCOIS == nil then --or not AutoCategory.saved.integration["FCOIS_ENABLE"] then
 		return false
 	end
 	local ac = select( '#', ... ) 
