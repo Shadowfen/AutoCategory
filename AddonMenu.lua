@@ -752,7 +752,7 @@ function AutoCategory.AddonMenuInit()
 								--reset add rule's selection, since all data will be changed.
 								fieldData.addCatRule.indexValue = ""
 								 
-								RefreshCache()
+								--RefreshCache()
 								RefreshDropdownData() 
 							end, 
 							width = "full",
