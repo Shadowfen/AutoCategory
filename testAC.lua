@@ -160,48 +160,67 @@ TK.assertNil(rcs.good, "badrule is not good")
 d("err[1] = "..(rcs.err or "nil"))
 
 
-
---[[
-local function stripParen(s)
-    --s:find("\(")
-    return s
-end
-
-local result = {}
-local ins = function(a) table.insert(result,a) end
-
-local function getKeywords(str)
-    if not str then return {} end
-   --local result = {}
-   local regex = "(%S)+" --([^ ]+)"
-   for each,_ in str:gsub(regex, ins) do
-      --table.insert(result, each)
-   end
-   return result
-end
-
-local function checkCurrentRule()
-    if fieldData.currentRule == nil then
-        ruleCheckStatus.err = nil
-        ruleCheckStatus.good = nil
-        return
+local spmap = {
+    ["entry1"] = true,
+    ["entry2"] = 2,
+}
+local function isKnown(arg, typekey, fn, map)
+    if type( arg ) == "number" then
+        if arg == typekey then
+            return true
+        end
+        
+    elseif map and type( arg ) == "string" then
+        local val = map[string.lower( arg )]
+        if type ( val ) == "table" then
+            if val[typekey] then
+                return true
+            end
+        else
+            if val and val == typekey then
+                return true
+            end
+        end
+    else
+        error( string.format("error: %s(): argument is error." , fn ) )
     end
     
-    local func,err = zo_loadstring("return("..fieldData.currentRule.rule..")")
-    if not func then
-        ruleCheckStatus.err = err
-        ruleCheckStatus.good = nil
-        fieldData.currentRule.damaged = true 
-    else
-        ctbl = getKeywords(fieldData.currentRule.rule)
-        ruleCheckStatus.err = nil
-        ruleCheckStatus.good = true
-        fieldData.currentRule.damaged = nil
-    end
+    -- no match
+    return false
 end
 
-local ctbl = getKeywords(rule)
-TR.printTable(ctbl)
---]]
+TK.assertTrue(isKnown(15,15,"fifteen",nil),"isKnown 15 == 15")
+TK.assertFalse(isKnown(15,16,"fifteen-sixteen",nil),"isKnown 15 ~= 16")
+TK.assertTrue(isKnown("entry1", true, "entry1",spmap),"isKnown entry1 is true")
+TK.assertTrue(isKnown("entry2", 2, "entry2",spmap),"isKnown entry2 is 2")
+TK.assertFalse(isKnown("entry3", 3, "entry3",spmap),"isKnown entry3 does not exist")
+
+
+function AutoCategory.RuleFunc.SpecializedItemType( ... )
+	local fn = "type"
+	local ac = select( '#', ... )
+    if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+	
+	for ax = 1, ac do
+		local arg = select( ax, ... )
+		
+		if not arg then
+			error( string.format("error: %s():  argument is nil." , fn))
+		end
+		--local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+		--local _, sptype = GetItemLinkItemType(itemLink)
+        --local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
+        local rslt = isKnown(arg, spmap[arg], fn, spmap)
+        if rslt then return rslt end
+	end
+	
+	return false
+	
+end
+
+TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry1","entry2"),"sit matches first")
+TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry3","entry2"),"sit matches second")
 TK.showResult()
  

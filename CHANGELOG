@@ -1,6 +1,7 @@
 [COLOR="DeepSkyBlue"]2.0.2[/COLOR] Changes:
 [LIST]
 [*] Fixed minor bug in Bag Export.
+[*] Fixed bug in type() and sptype() where it was ignoring any arguments after the first one.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.0.1[/COLOR] Changes:

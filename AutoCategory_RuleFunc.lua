@@ -445,7 +445,8 @@ function AutoCategory.RuleFunc.SpecializedItemType( ... )
 		
 		local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 		local _, sptype = GetItemLinkItemType(itemLink)
-        return isKnown(arg, sptype, fn, specializedItemTypeMap)
+        local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
+        if rslt then return rslt end
 		
 	end
 	
@@ -469,7 +470,8 @@ function AutoCategory.RuleFunc.ItemType( ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		return isKnown(arg, itemType, fn, itemTypeMap)
+		local rslt = isKnown(arg, itemType, fn, itemTypeMap)
+        if rslt then return rslt end
 		
 	end
 	
@@ -493,7 +495,8 @@ function AutoCategory.RuleFunc.EquipType( ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		return isKnown(arg, equipType, fn, equipTypeMap)
+		local rslt = isKnown(arg, equipType, fn, equipTypeMap)
+        if rslt then return rslt end
 		
 	end
 	
