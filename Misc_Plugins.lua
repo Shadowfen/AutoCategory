@@ -39,7 +39,7 @@ end
 -- Implement getpricemm() check function for Master Merchant
 function AutoCategory_MiscAddons.RuleFunc.GetPriceMM( ... )
 	local fn = "getpricemm"
-	if MasterMerchant and AutoCategory.saved.integration["MASTERMERCHANT_ENABLE"] then
+	if MasterMerchant then
 		local itemLink = getCurrentItemLink()
 		local mmData = MasterMerchant:itemStats(itemLink, false)
         if (mmData.avgPrice ~= nil) then
@@ -52,7 +52,7 @@ end
 -- Implement getpricettc() check function for Tamriel Trade Center
 function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
 	local fn = "getpricettc"
-	if TamrielTradeCentre and AutoCategory.saved.integration["TTC_ENABLE"] then
+	if TamrielTradeCentre then
 		local itemLink = getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then 
@@ -89,7 +89,7 @@ end
 
 -- Implement alphagear() check function for Alpha Gear
 function AutoCategory_MiscAddons.RuleFunc.AlphaGear( ... ) 
-	if not (AG and AutoCategory.saved.integration["ALPHAGEAR_ENABLE"]) then
+	if not (AG ) then
 		return false
 	end
 	local fn = "alphagear"
@@ -134,7 +134,7 @@ end
 -- Implement istracked() check function for Set Tracker
 function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
   local fn = "istracked"
-  if SetTrack == nil or not AutoCategory.saved.integration["ALPHAGEAR_ENABLE"] then
+  if SetTrack == nil then
     return false
   end
   local ac = select( '#', ... ) 

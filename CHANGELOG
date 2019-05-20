@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.0.1[/COLOR] Changes:
+[LIST]
+[*] Fixed loading bug in integration for SetTracker, TTC, and Master Merchant.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.0[/COLOR] Changes:
 [COLOR="MediumSlateBlue"]Breaking Changes[/COLOR]
 [LIST]
