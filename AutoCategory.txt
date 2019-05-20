@@ -19,6 +19,7 @@ AutoCategory.lua
 AddonMenu.lua
 AutoCategory_RuleFunc.lua
 AutoCategory_API.lua
+Misc_Plugins.lua
 
 ; new style addon plugin files
 ItemSaver_Plugin.lua

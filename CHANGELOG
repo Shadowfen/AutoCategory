@@ -1,10 +1,22 @@
 [COLOR="DeepSkyBlue"]2.0[/COLOR] Changes:
+[COLOR="MediumSlateBlue"]Breaking Changes[/COLOR]
 [LIST]
 [*] [COLOR="DarkOrange"]Now requires the libraries LibSFUtils, LibAddonMenu-2.0, and LibMediaProvider-1.0 to be installed separately.[/COLOR]
+[*] The SavedVariables for version 2.0 have changed formats from 1.37 in order to support multiple servers and character name changing. [COLOR="DarkOrange"]This means that 2.0 will not be able to read in your 1.37 category definitions.[/COLOR] I recommend that you move your live\SavedVariables\AutoCategory.lua somewhere else (or print it) so that you can refer to your old rules to enter them back into the new AutoCategory.
+[/LIST]
 
+[COLOR="MediumSlateBlue"]Bug Fixes[/COLOR]
+[LIST]
 [*] Fixed error that prevented AutoCategory from working with the Quality Sort addon. (Thanks to Silvereyes for the corrected code.)
+[*] Included in the patch for Inventory Grid View integration by Provision to properly display the default icons for Ornate, Intricate, Research, etc. on the grid cells instead of next to them.
+[/LIST]
+
+[COLOR="MediumSlateBlue"]Enhancements[/COLOR]
+[LIST]
+[*] Elsweyr support.
 [*] Changed the AutoCategory settings page to try to make it easier to understand and use.
 [*] NEW: Added a "Check" button to the Add Category section so that you can test to see that your rule will compile properly when you write it. If it does not compile correctly, the area to the left of the Check button will show an error message to try to tell you what was wrong with it.
+[*] Added a "Hide ungrouped items" option to the Bag Settings which will turn on/off the display of inventory items which do not match any of the Categories which you have assigned to that particular bag. These are the items that are typically listed in "Other" (unless you've changed the name in the Appearance Setttings).
 
 [*] Modified iscrafted() so that it will return true for crafted potions or poisons so you can:
     [COLOR="MediumSeaGreen"]type("poison","potion") and iscrafted()[/COLOR]
@@ -15,21 +27,37 @@
     Specialized Item Types (sptype):
     o [COLOR="MediumSeaGreen"]glyph[/COLOR] - this will match against glyph_armor, glyph_weapon, or glyph_jewelry 
 [*] Added an [COLOR="MediumSeaGreen"]islockpick()[/COLOR] to detect lockpicks in inventory since, due to a Zenimax bug, lockpicks do not belong to [COLOR="MediumSeaGreen"]type("lockpick")[/COLOR].
-[*] Changed saved variable storage to handle multiple servers.   
-    
+[*] Added some convenience values to traittype() that combines existing values:
+    o [COLOR="MediumSeaGreen"]intricate[/COLOR] -  this will match against armor_intricate, jewelry_intricate, or weapon_intricate
+    o [COLOR="MediumSeaGreen"]divines[/COLOR] -  this will match against armor_divines
+    o [COLOR="MediumSeaGreen"]infused[/COLOR] -  this will match against armor_infused, jewelry_infused, or weapon_infused
+    o [COLOR="MediumSeaGreen"]ornate[/COLOR] -  this will match against armor_ornate, jewelry_ornate, or weapon_ornate
+    o [COLOR="MediumSeaGreen"]nirnhoned[/COLOR] -  this will match against armor_nirnhoned, or weapon_nirnhoned
+[*] Added support for the development of addon integrations to AutoCategory as separate plugins. Rewrote three of the internally provided integrations (FCOIS, Iakoni, and ItemSaver) in the form that standalone plugin integrations would take to demonstrate how to register the plugin with AutoCategory, provide additional rule functions, predefined rules, and localization strings where necessary.
+[/LIST]
+  
+[COLOR="MediumSlateBlue"]Predefined Rules[/COLOR]
+[LIST]
+[*] Changed the way that predefined rules are loaded so that they are always loaded first and then your customizations are loaded afterwards. This allows you to get new predefined rules automatically added as they come out with addon or plugin updates. It also means that if you accidentally delete a predefined rule, you can get it back by simply reloading ui.
+[*] Changed the way that predefined rules are loaded so that predefined rules for addon integrations such as FCOIS and Iakoni Gear Changer are only loaded when you have those particular addons installed. (Note that this applies when the addons are first installed - once the predefines get loaded once, they will get saved to your saved variables. Rules in SavedVariables are always loaded after that until they are deleted. A planned enhancement that did not make this version is to only save customized categories that are actually customized, since now predefines always get loaded.)
+[*] Added predefined rules for FCOIS dynamics 11-30 for when you are starting AutoCategory without preexisting saved variables.
+[/LIST]
+
+[COLOR="MediumSlateBlue"]Localization[/COLOR]
+[LIST]
+[*] Expanded the remaining alternative language files to include strings for the FCOIS dynamics 11-30.
+[*] Added additional localization strings for German from Baertram's git pull request.
 [*] Removed the alternative language files which were still in English. When we get translations, we can add them back with appropriate values.
 [*] Converted the way that language strings are defined to use the new LibSFUtils.LoadLanguage() function to load the particular language required (or the specified default if the client language is not available).
-[*] Changed the way that predefined rules are loaded so that predefined rules for addon integrations such as FCOIS and Iakoni Gear Changer are only loaded when you have those particular addons installed.
+[/LIST]
 
-[*] Expanded the remaining alternative language files to include strings for the FCOIS dynamics 11-30.
-[*] Added predefined rules for FCOIS dynamics 11-30 for when you are starting AutoCategory without preexisting saved variables.
+[COLOR="MediumSlateBlue"]Internal (non-visible) Changes[/COLOR]
+[LIST]
 [*] Moved FCOIS integration into an included plugin file.
-
 [*] Moved ItemSaver integration into an included plugin file.
 [*] Moved GearChangerByIakoni integration into an included plugin file. Moved the GearChanger language strings into the plugin and load them separately using the AutoCategory.LoadLanguage() to supplement the existing string tables. While not strictly necessary, it acts as both a proof-of-concept and an example for how external plugins to AutoCategory can work.
 
-[*] Removed specific integration code for DoItAll addon as that integration was moved to the DoItAll addon instead of residing in AutoCategory.
-[*] Added additional localization strings for German from Baertram's git pull request.
+[*] Removed specific integration code for DoItAll addon as that integration was moved to the DoItAll addon instead of residing in AutoCategory (Baertram's pull request).
 
 [*] Adopted by Shadowfen after prolonged lack of response from the previous authors. Renamed to "AutoCategory - Revised".
 [/LIST]

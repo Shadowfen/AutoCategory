@@ -858,6 +858,7 @@ function AutoCategory.AddonMenuInit()
                     sort = "name-up",
 					
 					getFunc = function() 
+                        fieldData.currentRule = AC.GetRuleByName(fieldData.editRuleCat.indexValue)
 						return fieldData.editRuleCat.indexValue 
 					end,
 					setFunc = function(value)
@@ -1100,7 +1101,7 @@ function AutoCategory.AddonMenuInit()
 					tooltip = SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,
 					getFunc = function() 
                         if fieldData.currentRule then
-                        return fieldData.currentRule.rule
+                            return fieldData.currentRule.rule
                         end
                         ruleCheckStatus.err = nil
                         ruleCheckStatus.good = nil
