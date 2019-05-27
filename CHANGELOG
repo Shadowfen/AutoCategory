@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.0.3[/COLOR] Changes:
+[LIST]
+[*] Fixed bug that was causing getpricettc() (reported by Ivo_ESO), getpricemm(), and alphagear() to not work in rules.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.0.2[/COLOR] Changes:
 [LIST]
 [*] Fixed minor bug in Bag Export.

@@ -74,7 +74,6 @@ TK.assertNotNil(AutoCategory.saved.rules, "testUpdateCurrentSavedVars - saved.ru
 TK.assertNotNil(AutoCategory.compiledRules, "testUpdateCurrentSavedVars - compiled rules has entries")
 TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "testUpdateCurrentSavedVars - #saved.rules == #compiledRules")
 
-
 require "AutoCategory.test.PluginsAPI_test"
 Plugins_runTests()
 
@@ -86,6 +85,9 @@ Iakoni_runTests()
 
 require "AutoCategory.test.ACCache_test"
 Cache_runTests()
+
+require "AutoCategory.test.Misc_test"
+Misc_runTests()
 
 --require "AutoCategory.AutoCategory_RuleFunc"
 AutoCategory.dictionary = {

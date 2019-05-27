@@ -119,9 +119,10 @@ local function Plugins_testRegisterPlugin()
     AutoCategory.RegisterPlugin("HAHA", function() AutoCategory.AddRuleFunc("hahaismarked") end)
     AutoCategory.Plugins["HAHA"]()
     TK.assertNotNil(AutoCategory.Environment["hahaismarked"], "hahaismarked function found in Environment")
-    AutoCategory.RegisterPlugin("HeeHee", function() AutoCategory.AddRuleFunc("heeheismarked", function () return true end) end)
+    local tempfunc = function () return true end
+    AutoCategory.RegisterPlugin("HeeHee", function() AutoCategory.AddRuleFunc("heeheismarked", tempfunc) end)
     AutoCategory.Plugins["HeeHee"]()
-    TK.assertNotNil(AutoCategory.Environment["heheismarked"], "heheismarked function found in Environment")
+    TK.assertNotNil(AutoCategory.Environment["heeheismarked"], "heheismarked function found in Environment")
 end
 
 

@@ -1,3 +1,5 @@
+local AC = AutoCategory
+
 -- A very simple plugin for several one-liner addons which only have
 -- a single rule function to register.
 --
@@ -52,7 +54,7 @@ end
 -- Implement getpricettc() check function for Tamriel Trade Center
 function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
 	local fn = "getpricettc"
-	if TamrielTradeCentre then
+	if TamrielTradeCentre and TamrielTradeCentrePrice then
 		local itemLink = getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then 
