@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.0.4[/COLOR] Changes:
+[LIST]
+[*] Fixed bug that was causing bag categories that had been changed in priority or removed from the bag to be replaced or duplicated (with the original priority) if they were part of the default set. (reported by rhaeven)
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.0.3[/COLOR] Changes:
 [LIST]
 [*] Fixed bug that was causing getpricettc() (reported by Ivo_ESO), getpricemm(), and alphagear() to not work in rules.

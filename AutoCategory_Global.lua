@@ -9,7 +9,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "2.0.3",
+    version = "2.0.4",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice",

@@ -2,7 +2,7 @@
 ## APIVersion: 100026 100027
 ## Author: Shadowfen, crafty35a, RockingDice 
 ## Description: Type "/ac" for settings
-## Version: 2.0.3
+## Version: 2.0.4
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0
 ## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver

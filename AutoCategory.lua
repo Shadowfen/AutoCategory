@@ -321,19 +321,19 @@ function AutoCategory.cacheInitialize()
 	ZO_ClearTable(cache.entriesByBag)
     -- load in the bagged rules (sorted by priority high-to-low)
     for bagId = 1, #saved.bags do
-		local ibag = saved.bags[bagId] or {}
         cache.entriesByBag[bagId] = cache.entriesByBag[bagId] or {showNames = {}, values = {}, tooltips = {}}
         local ebag = cache.entriesByBag[bagId]
+        
         cache.entriesByName[bagId] = cache.entriesByName[bagId] or {}
         local ename = cache.entriesByName[bagId]
         
+		local ibag = saved.bags[bagId] or {}
 		table.sort(ibag.rules, BagDataSortingFunction )
         for entry = 1, #ibag.rules do
 			local data = ibag.rules[entry] -- data equals {name, priority}
             
 			local ruleName = data.name
 			ename[ruleName] = data
-            
             table.insert(ebag.values, AC.BagRuleEntry.formatValue(data))
 			
             local rule = AC.GetRuleByName(ruleName)
@@ -544,6 +544,19 @@ function AutoCategory.onLoad(event, addon)
     
     -- load our saved variables
     AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars", 1.1, AC.defaultAcctSettings, AC.defaultSettings)
+    
+    -- init bag category table only when the bag is missing
+    for k,v in pairs(AC.defaultAcctBagSettings.bags) do
+        if AC.acctSaved.bags[k] then
+            if not AC.acctSaved.bags[k].rules or #AC.acctSaved.bags[k].rules == 0 then
+                AC.acctSaved.bags[k] = v
+            end
+        else
+            AC.acctSaved.bags[k] = v
+        end
+	end
+    
+
     AutoCategory.UpdateCurrentSavedVars()
     AutoCategory.LoadCollapse()
     

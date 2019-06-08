@@ -69,6 +69,19 @@ AC.charSaved = SF.deepCopy(AC.defaultSettings)
 TK.assertTrue(#AutoCategory.acctSaved.rules > 0, "prep - has "..#AutoCategory.acctSaved.rules.." rules")
 TK.assertTrue(AC.charSaved.accountWide,"Settings are account-wide")
 
+AC.acctSaved.bags[1] = AC.defaultSettings.bags[1]
+    -- init bag category table only when the bag is missing
+    for k,v in pairs(AC.defaultAcctBagSettings.bags) do
+        d(k)
+        d(AC.listcount(v.rules))
+		if AC.acctSaved.bags[k] == nil or AC.acctSaved.bags[k].default then 
+			AC.acctSaved.bags[k].default = nil
+			AC.acctSaved.bags[k].rules = AC.defaultAcctBagSettings.bags[k].rules
+		end
+	end
+TK.assertTrue(AC.listcount(AC.acctSaved.bags[k]) == 0, "bag 1 has no rules")
+
+
 AutoCategory.UpdateCurrentSavedVars()
 TK.assertNotNil(AutoCategory.saved.rules, "testUpdateCurrentSavedVars - saved.rules has entries")
 TK.assertNotNil(AutoCategory.compiledRules, "testUpdateCurrentSavedVars - compiled rules has entries")
