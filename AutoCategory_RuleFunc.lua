@@ -398,6 +398,23 @@ AutoCategory.dictionary = {
     armorTypeMap,
     AutoCategory.Environment,
 }
+
+function AutoCategory.getItemStyles()
+	local is = {}
+	local style
+	for k = 1,200,1 do
+		style = GetItemStyleName(k)
+		if style and style ~= "" and style ~= "use me" and style ~= "witches festival 2019" then
+			style = zo_strlower(style)
+			table.insert(is,style)
+		end
+	end
+	--d(is)
+	table.insert(AutoCategory.dictionary, is)
+end
+
+AutoCategory.getItemStyles()
+
 --============Rule Function==============--
 -- compare arg to key, looking up the arg in a map
 -- if necessary (and provided)
@@ -504,6 +521,32 @@ function AutoCategory.RuleFunc.EquipType( ... )
 	
 end
 
+function AutoCategory.RuleFunc.ItemStyle( ... )
+	local fn = "itemstyle"
+	local ac = select( '#', ... )
+	if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+	
+  local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+
+	for ax = 1, ac do
+		
+		local arg = select( ax, ... )
+		
+		if not arg then
+			error( string.format("error: %s():  argument is nil." , fn))
+		end
+		if zo_strlower(GetItemStyleName(itemstyle)) == zo_strlower(arg) then
+			return true
+		end
+		
+	end
+	
+	return false
+	
+end
+
 function AutoCategory.RuleFunc.IsLocked( ... )
 	local fn = "islocked"
 	
@@ -519,6 +562,18 @@ function AutoCategory.RuleFunc.IsBound( ... )
 	return isBound
 end
 
+function AutoCategory.RuleFunc.IsCharBound( ... )
+	local fn = "ischarbound"
+    
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local bindType = GetItemLinkBindType(itemLink)
+    local isBound = IsItemLinkBound(itemLink)
+    if isBound and bindType == BIND_TYPE_ON_PICKUP_BACKPACK then
+        return true
+    end
+    return false
+end
+
 function AutoCategory.RuleFunc.IsStolen( ... )
 	local fn = "isstolen"
 	
@@ -531,6 +586,8 @@ function AutoCategory.RuleFunc.IsLockpick( ... )
 	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     local itemType = GetItemLinkItemType(itemLink)
     if itemType == ITEMTYPE_LOCKPICK or itemType == ITEMTYPE_TOOL then
+        local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        if quality > 1 then return false end
         return true
     end
     return false
@@ -1152,11 +1209,49 @@ function AutoCategory.RuleFunc.GetMaxTraits( ... )
                 quality = quality + 1
             end
         end
-        return quality
+        return quality - 1
     else
         local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
         return quality
     end
+end
+
+function AutoCategory.RuleFunc.CharName(...)
+    local fn = "charname" 
+    -- zo_strformat(SI_UNIT_NAME, GetUnitName("player")) 
+    --   gives you charname@player
+    -- GetUnitName("player"))
+    --   gives you charname
+    local pn = string.lower(GetUnitName("player"))
+    local ac = select( '#', ... )
+	if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+	for ax = 1, ac do
+		
+		local arg = select( ax, ... )
+		
+		if not arg then
+			error( string.format("error: %s():  argument is nil." , fn))
+		end
+		
+		local findString
+		if type( arg ) == "number" then
+			findString = tostring(arg)
+		elseif type( arg ) == "string" then
+			findString = arg
+		else
+			error( string.format("error: %s(): argument is error." , fn ) )
+		end
+		--fix german language issue
+		findString = string.gsub(findString , "%^.*", "")
+		findString = string.lower(findString)
+		if string.find(pn, findString, 1 ,true) then
+			return true
+		end
+	end
+	
+	return false
 end
 
 function AutoCategory.AddRuleFunc(name, func)
@@ -1174,6 +1269,8 @@ AutoCategory.Environment = {
 
 	filtertype = AutoCategory.RuleFunc.FilterType,
 	
+	itemstyle = AutoCategory.RuleFunc.ItemStyle,
+
 	traittype = AutoCategory.RuleFunc.TraitType,
 	
 	armortype = AutoCategory.RuleFunc.ArmorType,
@@ -1185,8 +1282,12 @@ AutoCategory.Environment = {
 	islocked = AutoCategory.RuleFunc.IsLocked,
 	
 	isbound = AutoCategory.RuleFunc.IsBound,
+    
+    ischarbound = AutoCategory.RuleFunc.IsCharBound,
 	
 	isstolen = AutoCategory.RuleFunc.IsStolen,
+    
+	islockpick = AutoCategory.RuleFunc.IsLockpick,
 	
 	isboptradeable = AutoCategory.RuleFunc.IsBoPTradeable,
 	
@@ -1208,6 +1309,8 @@ AutoCategory.Environment = {
 	
 	charcp = AutoCategory.RuleFunc.CharCP,
 	
+    charname = AutoCategory.RuleFunc.CharName,
+
 	sellprice = AutoCategory.RuleFunc.SellPrice,
 	
 	stacksize = AutoCategory.RuleFunc.StackSize,
@@ -1231,7 +1334,7 @@ AutoCategory.Environment = {
 	isinquickslot = AutoCategory.RuleFunc.IsInQuickslot,
 	 
 	keepresearch = AutoCategory.RuleFunc.KeepForResearch,
-
+    
     -- Potion/Poison Traits
     getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
 

@@ -1,3 +1,55 @@
+[COLOR="DeepSkyBlue"]2.3.1[/COLOR]:
+[COLOR="MediumSlateBlue"]Breaking Change[/COLOR]
+[LIST]
+[*] [COLOR="DarkOrange"]Now requires the library LibDebugLogger in addition to the libraries LibSFUtils, LibAddonMenu-2.0, and LibMediaProvider-1.0 to be installed separately.[/COLOR]
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.3[/COLOR] Changes:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] Added an [COLOR="MediumSeaGreen"]itemstyle()[/COLOR] with one or more strings that are the names of motifs. This function will return true if the style of the item matches one of the names in the parameter list of [COLOR="MediumSeaGreen"]itemstyle(...)[/COLOR]. Capitalization is ignored, but spelling of the motif name must be correct - to include spaces and punctuations marks - for instance "dro-m'athra" must include both the "-" and the "'", and "dark brotherhood" is two words separated by a space. (Note that with multi-word motif names, the rule checker will probably warn that it does not recognize the words after the first word of the name.)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.2.2[/COLOR] Changes:
+[LIST]
+[*] Added sort key conflict resolution by request of Mladen90.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.2.1[/COLOR] Changes:
+[LIST]
+[*] Fix version to prevent being listed as "Out of Date".
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.2[/COLOR] Changes:
+COLOR="MediumSlateBlue"]Enhancements[/COLOR]
+[LIST]
+[*] Added an [COLOR="MediumSeaGreen"]charname()[/COLOR] with one or more strings that are the names of your characters. This function will return true if the current character name matches one of the names in the parameter list of [COLOR="MediumSeaGreen"]charname(...)[/COLOR]. This will allow you to write rules which apply to specific characters only.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.1.1[/COLOR] Changes:
+[LIST]
+[*] API bump
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.1[/COLOR] Changes:
+[COLOR="MediumSlateBlue"]Bug Fixes[/COLOR]
+[LIST]
+[*] Fixed problem with islockpick() not being recognized as a function. (reported by Amber1019)
+[/LIST]
+
+[COLOR="MediumSlateBlue"]Enhancements[/COLOR]
+[LIST]
+[*] Modified islockpick() so that it only gets lockpicks (lockpick tools) instead of lockpicks and repair kits (the "other" tools).
+[*] Added an [COLOR="MediumSeaGreen"]ischarbound()[/COLOR] to items that are marked as "Character Bound" in inventory. Note that items that match [COLOR="MediumSeaGreen"]ischarbound()[/COLOR] will also match [COLOR="MediumSeaGreen"]isbound()[/COLOR] since character bound is a type of binding. If you want bound that are not also character bound, you will need to specify "~ischarbound() and isbound()" for account bound items only.
+
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.0.5[/COLOR] Changes:
+[LIST]
+[*] Fixed problem with getmaxtraits() returning one more than the number of traits on a crafted potion. (reported by TheMikrobe)
+[*] API bump
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.0.4[/COLOR] Changes:
 [LIST]
 [*] Fixed bug that was causing bag categories that had been changed in priority or removed from the bag to be replaced or duplicated (with the original priority) if they were part of the default set. (reported by rhaeven)

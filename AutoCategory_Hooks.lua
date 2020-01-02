@@ -25,6 +25,7 @@ local sortKeys =
     statValue = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
     traitInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
     sellInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
+	ptValue = { tiebreaker = "name", isNumeric = true },
 }
 
 local function AutoCategory_ItemSortComparator(left, right)
