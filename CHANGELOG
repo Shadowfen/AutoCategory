@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.3.2[/COLOR]:
+[LIST]
+[*] Now checks dependent library versions (where possible) and will write error messages to LibDebugLogger to indicate when a dependent library is out-dated for the current version of AutoCategory. Messages can be viewed with the DebugLogViewer (recommended addon).
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.3.1[/COLOR]:
 [COLOR="MediumSlateBlue"]Breaking Change[/COLOR]
 [LIST]

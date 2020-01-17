@@ -536,42 +536,12 @@ function AutoCategory.LazyInit()
 	end
 end
 
--- check versions of dependency libraries and post message in
--- debug if a library is outdated.
-function AutoCategory.checkLibraries()
-    local logger = LibDebugLogger("AutoCategory")
-    
-    -- check the libraries that still support LibStub
-    -- because there we can get versions through a standard 
-    -- mechanism.
-    if LibStub then 
-        local function checkLS(name, expected)
-            local lib, ver
-            lib, ver = LibStub:GetLibrary(name)
-            if not ver or ver < expected then
-                logger:Error("Outdated version of %s detected (%d) - possibly embedded in another older addon.", name, ver or -1) 
-            end
-        end
-
-        checkLS("LibAddonMenu-2.0", 30)
-        checkLS("LibMediaProvider-1.0", 12)
-    end
-    
-    -- check libraries that do not use LibStub
-    ver = LibSFUtils.LibVersion or -1
-    if ver < 20 then
-        logger:Error("Outdated version of %s detected (%d) - possibly embedded in another older addon.", "LibSFUtils", ver) 
-    end
-    
-    logger:Info("Library %s does not provide version information", "LibDebugLogger")
-end
-
 function AutoCategory.onLoad(event, addon)
 	if addon ~= AutoCategory.name then return end
     
     EVENT_MANAGER:UnregisterForEvent(AutoCategory.name, EVENT_ADD_ON_LOADED)
     
-    AutoCategory.checkLibraries()
+    AutoCategory.checkLibraryVersions()  
     
     -- load our saved variables
     AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars", 1.1, AC.defaultAcctSettings, AC.defaultSettings)
