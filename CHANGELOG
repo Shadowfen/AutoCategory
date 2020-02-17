@@ -1,9 +1,31 @@
-[COLOR="DeepSkyBlue"]2.3.2[/COLOR]:
+[COLOR="DeepSkyBlue"]2.4.2 (23)[/COLOR]:
 [LIST]
+[*] Remove annoying debug printout.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.4.1 (22)[/COLOR]:
+[LIST]
+[*] Fix problem with isunknown() returning false where none of the toons knew the item.
+[*] Fix addon version.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.4 (21)[/COLOR]:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] Now integrated with the Unknown Tracker Addon to allow you to write rules about if a recipe, motif, style page, furnishing recipes, or runeboxes are unknown to your character(s). [I] Requires version 0.63 of the addon "Unknown Tracker" to be installed for this to work. [/I] (Thanks to kadeer for modifications to "Unknown Tracker" to allow this to work!)
+[*] New function [COLOR="MediumSeaGreen"]isunknown()[/COLOR] with zero or more strings to match knowledge of the recipe to the named characters (names are case sensitive). If you use [COLOR="MediumSeaGreen"]isunknown()[/COLOR] without any parameters, it will return true if the learnable item (recipe, etc) is unknown to ANY of your toons. If you use [COLOR="MediumSeaGreen"]isunknown("me")[/COLOR] with the special parameter "me" then it will return true if the learnable item is unknown to the toon that you are currently logged in on. Finally you can specify specific toon names as parameters so you can tell if the learnable item is unknown to your specific "crafter" toons. (Note that the options for Unknown Tracker to turn off displaying for specific types of items will also turn off AutoCategory's ability to detect them with this rule.)
+[*] New function [COLOR="MediumSeaGreen"]isrecipeunknown()[/COLOR] which does the same thing as [COLOR="MediumSeaGreen"]isunknown()[/COLOR] except only for food and drink provisioning recipes.
+[*] New function [COLOR="MediumSeaGreen"]isfurnishingunknown()[/COLOR] which does the same thing as [COLOR="MediumSeaGreen"]isunknown()[/COLOR] except only for furnishing recipes.
+[*] New function [COLOR="MediumSeaGreen"]ismotifunknown()[/COLOR] which does the same thing as [COLOR="MediumSeaGreen"]isunknown()[/COLOR] except only for motifs.
+[/LIST]
+For those of you who are new to the Unknown Tracker addon, it will add lists of characters to the inventory item information boxes (tooltips) with colors distinguishing the toons who know if from the toons that do not know it. That cannot be turned off at this time. If you have another addon also doing that, it might be possible that the other addon will allow you to turn those off. In particular, ESO Master Recipe List will add character lists to the Recipes, and TraitBuddy will add them to motifs - and both can be turned off.
+
+[COLOR="DeepSkyBlue"]2.3.1 (20)[/COLOR]:
+[LIST]
+[*] Set AddonVersion in manifest file.
 [*] Now checks dependent library versions (where possible) and will write error messages to LibDebugLogger to indicate when a dependent library is out-dated for the current version of AutoCategory. Messages can be viewed with the DebugLogViewer (recommended addon).
 [/LIST]
 
-[COLOR="DeepSkyBlue"]2.3.1[/COLOR]:
 [COLOR="MediumSlateBlue"]Breaking Change[/COLOR]
 [LIST]
 [*] [COLOR="DarkOrange"]Now requires the library LibDebugLogger in addition to the libraries LibSFUtils, LibAddonMenu-2.0, and LibMediaProvider-1.0 to be installed separately.[/COLOR]

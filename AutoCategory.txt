@@ -2,10 +2,11 @@
 ## APIVersion: 100030 100029
 ## Author: Shadowfen, crafty35a, RockingDice 
 ## Description: Type "/ac" for settings
-## Version: 2.3.2
+## Version: 2.4.2
+## AddOnVersion: 23
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0 LibDebugLogger
-## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver
+## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver UnknownTracker
 
 lang/strings.lua
 lang/$(language).lua
@@ -25,6 +26,7 @@ Misc_Plugins.lua
 ItemSaver_Plugin.lua
 FCOIS_Plugin.lua
 Iakoni_GearChanger_Plugin.lua
+UnknownTracker_Plugin.lua
 
 ; old integration with other addons files
 AutoCategory_Integrations_Inventory_Grid_View.lua
