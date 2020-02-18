@@ -89,6 +89,9 @@ function AutoCategory_UnknownTracker.Initialize()
         return
     end
     
+    -- load predefinedRules
+    AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
+
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("isunknown", AutoCategory_UnknownTracker.RuleFunc.IsUnknown)
     AutoCategory.AddRuleFunc("isrecipeunknown", AutoCategory_UnknownTracker.RuleFunc.IsRecipeUnknown)

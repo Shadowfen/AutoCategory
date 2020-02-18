@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.4.3 (24)[/COLOR]:
+[LIST]
+[*] Add in predefined rules for UnknownTracker integration plugin.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.4.2 (23)[/COLOR]:
 [LIST]
 [*] Remove annoying debug printout.
