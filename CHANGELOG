@@ -1,3 +1,10 @@
+[COLOR="DeepSkyBlue"]2.4.4 (25)[/COLOR]:
+[LIST]
+[*] Set up the character default settings to the same as the account-wide default settings.
+[*] Add in minimum version checking for UnknownTracker.
+[*] Removed version checking for a library that we don't even use.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.4.3 (24)[/COLOR]:
 [LIST]
 [*] Add in predefined rules for UnknownTracker integration plugin.

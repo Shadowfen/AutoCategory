@@ -544,7 +544,7 @@ function AutoCategory.onLoad(event, addon)
     AutoCategory.checkLibraryVersions()  
     
     -- load our saved variables
-    AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars", 1.1, AC.defaultAcctSettings, AC.defaultSettings)
+    AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars", 1.1, AC.defaultAcctSettings)
     
     -- init bag category table only when the bag is missing
     for k,v in pairs(AC.defaultAcctBagSettings.bags) do
