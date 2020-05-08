@@ -13,28 +13,30 @@ local internal = {
 }
 
 --------------------------------------------------
-_G["d"] = print
+_G["d"] = function(...)
+    local argv 
+    for i=1,#arg do
+        argv= select(1,...)
+        if type(argv) == "number" then
+            print tostring(argv)
+        elseif type(argv) == "boolean" then
+            print tostring(argv)
+        elseif type(argv) == "string" then
+            print argv
+        elseif type(argv) == "table" then
+        end
+    end
+end
 
 ZOS ={}
 
 -- localization functions
 EsoStrings = {}
-EsoStringNames = {}
 EsoStringVersions = {}
 ZOS.nextCustomId = 1
 
-function testZO_ResetStringTables()
-    for k,v in pairs(EsoStringNames) do
-        _G[k] = nil
-    end
-    EsoStrings = {}
-    EsoStringVersions = {}
-    ZOS.nextCustomId = 1
-end
-
-function ZO_CreateStringId(stringName, stringToAdd)
-    _G[stringName] = ZOS.nextCustomId
-    EsoStringNames[stringName] = ZOS.nextCustomId
+function ZO_CreateStringId(stringId, stringToAdd)
+    _G[stringId] = ZOS.nextCustomId
     EsoStrings[ZOS.nextCustomId] = stringToAdd
     ZOS.nextCustomId = ZOS.nextCustomId + 1
 end
@@ -59,31 +61,9 @@ function GetString(id)
 end
 -- end localization functions
 
-function zo_strformat(...)
-    local nargs = select('#',...)
-    local arg = {}
-
-    for i = 1,nargs do
-        local v = select(i,...)
-        local t = type(v)
-        if(v == nil) then
-            arg[#arg+1] = "nil"
-        else
-            arg[#arg+1] = tostring(v)
-        end
-    end
-    return table.concat(arg," ")
+function GetTimeStamp()
+    return os.time()
 end
-
-
-function GetCVar(var)
-    if var == "language.2" then
-        return "en"
-    end
-    return nil
-end
-
-zo_loadstring = loadstring
 
 function GetDisplayName()
   return internal.atname
@@ -145,9 +125,63 @@ function ZO_ClearTable(t)
     end
 end
 
+function ZO_ShallowTableCopy(source, dest)
+    dest = dest or {}
+    
+    for k, v in pairs(source) do
+        dest[k] = v
+    end
+    
+    return dest
+end
+
+function ZO_DeepTableCopy(source, dest)
+    dest = dest or {}
+     setmetatable (dest, getmetatable(source))
+    
+    for k, v in pairs(source) do
+        if type(v) == "table" then
+            dest[k] = ZO_DeepTableCopy(v)
+        else
+            dest[k] = v
+        end
+    end
+    
+    return dest
+end
+
+function zo_strformat( fmt, ... )
+    print(fmt, ...)
+end
+
+function zo_loadstring(...)
+    return loadstring(...)
+end
+
+function GetCVar(var)
+    if var == "language.2" then
+        return "en"
+    end
+    return nil
+end
+
 EVENT_MANAGER = {}
 function EVENT_MANAGER:UnregisterForEvent()
 end
 function EVENT_MANAGER:RegisterForEvent()
 end
 
+ZO_Object = {}
+
+function ZO_Object:New(template)
+    template = template or self
+    local newObject = setmetatable ({}, template)
+    local mt = getmetatable (newObject)
+    mt.__index = template
+    
+    return newObject
+end
+
+function ZO_Object:Subclass()
+    return setmetatable({}, {__index = self})
+end
