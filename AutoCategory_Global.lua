@@ -9,7 +9,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "2.4.6",
+    version = "2.5",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice",
@@ -24,7 +24,7 @@ AutoCategory.Inited = false
 AutoCategory.Enabled = true
 
 -- load in localization strings
-SF.LoadLanguage(AutoCategory_localization_strings, "en")
+SF.LoadLanguage(AutoCategory_localization_strings, "de")
 
 
 -- checks the versions of libraries (where possible) and warn in

@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]2.5 (27)[/COLOR]:
+[LIST]
+[*] Updated the ITEM_QUALITY_ values to correspond to the change to ITEM_DISPLAY_QUALITY_ values that was brought in by Greymoor.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.4.6 (27)[/COLOR]:
 [LIST]
 [*] API bump.

@@ -2,13 +2,14 @@
 ## APIVersion: 100030 100031
 ## Author: Shadowfen, crafty35a, RockingDice 
 ## Description: Type "/ac" for settings
-## Version: 2.4.6
-## AddOnVersion: 27
+## Version: 2.5
+## AddOnVersion: 28
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0 LibDebugLogger
 ## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver UnknownTracker
 
 lang/strings.lua
+lang/de.lua
 lang/$(language).lua
 
 AutoCategory_Global.lua

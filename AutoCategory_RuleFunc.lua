@@ -273,19 +273,19 @@ local equipTypeMap = {
 }
 
 local qualityMap = {
-	["arcane"] = ITEM_QUALITY_ARCANE,
-	["artifact"] = ITEM_QUALITY_ARTIFACT,
-	["legendary"] = ITEM_QUALITY_LEGENDARY,
-	["magic"] = ITEM_QUALITY_MAGIC,
-	["normal"] = ITEM_QUALITY_NORMAL,
-	["trash"] = ITEM_QUALITY_TRASH,
+	["arcane"] = ITEM_DISPLAY_QUALITY_ARCANE,
+	["artifact"] = ITEM_DISPLAY_QUALITY_ARTIFACT,
+	["legendary"] = ITEM_DISPLAY_QUALITY_LEGENDARY,
+	["magic"] = ITEM_DISPLAY_QUALITY_MAGIC,
+	["normal"] = ITEM_DISPLAY_QUALITY_NORMAL,
+	["trash"] = ITEM_DISPLAY_QUALITY_TRASH,
 					
-	["blue"] = ITEM_QUALITY_ARCANE,
-	["purple"] = ITEM_QUALITY_ARTIFACT,
-	["gold"] = ITEM_QUALITY_LEGENDARY,
-	["green"] = ITEM_QUALITY_MAGIC,
-	["white"] = ITEM_QUALITY_NORMAL,
-	["grey"] = ITEM_QUALITY_TRASH,
+	["blue"] = ITEM_DISPLAY_QUALITY_ARCANE,
+	["purple"] = ITEM_DISPLAY_QUALITY_ARTIFACT,
+	["gold"] = ITEM_DISPLAY_QUALITY_LEGENDARY,
+	["green"] = ITEM_DISPLAY_QUALITY_MAGIC,
+	["white"] = ITEM_DISPLAY_QUALITY_NORMAL,
+	["grey"] = ITEM_DISPLAY_QUALITY_TRASH,
 }
 
 local boundTypeMap = {
@@ -1201,7 +1201,7 @@ function AutoCategory.RuleFunc.GetMaxTraits( ... )
     local fn = "getmaxtraits"
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if IsCraftedPotion(itemLink) then
-        local quality = ITEM_QUALITY_NORMAL
+        local quality = ITEM_DISPLAY_QUALITY_NORMAL
         for i = 1, GetMaxTraits() do
             local hasTraitAbility = GetItemLinkTraitOnUseAbilityInfo(itemLink, i)
  
