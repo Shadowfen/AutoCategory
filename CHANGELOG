@@ -1,4 +1,10 @@
-[COLOR="DeepSkyBlue"]2.5 (27)[/COLOR]:
+[COLOR="DeepSkyBlue"]2.6 (29)[/COLOR]:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]istreasure()[/COLOR] allows you to check if items are considered Treasure (i.e. random junk that you can sell for good money). 
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.5 (28)[/COLOR]:
 [LIST]
 [*] Updated the ITEM_QUALITY_ values to correspond to the change to ITEM_DISPLAY_QUALITY_ values that was brought in by Greymoor.
 [/LIST]

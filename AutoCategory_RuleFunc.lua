@@ -1047,6 +1047,31 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	return false
 end
 
+function AutoCategory.RuleFunc.IsTreasure( ... )
+	local fn = "istreasure"
+	
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	
+	-- declared as item type = treasure
+    local itemType = GetItemLinkItemType(itemLink)
+	if itemType == ITEMTYPE_TREASURE then return true end
+	
+	-- declared as specialized item type = treasure
+	local _, sptype = GetItemLinkItemType(itemLink)
+	if sptype == SPECIALIZED_ITEMTYPE_TREASURE then return true end
+	
+	-- declared as description = treasure
+	local description, itemTag = GetItemLinkItemTagInfo(itemLink, index)
+	local itemName = string.lower(GetItemLinkName(itemLink))
+	if itemTag == TAG_CATEGORY_TREASURE_TYPE then
+		local ldesc = string.lower(description)
+		if string.find(ldesc, "treasure", 1 ,true) then
+			return true
+		end
+	end
+	
+	return false
+end
 
 function AutoCategory.RuleFunc.AlphaGear( ... ) 
 	if not AG then
@@ -1334,6 +1359,8 @@ AutoCategory.Environment = {
 	isinquickslot = AutoCategory.RuleFunc.IsInQuickslot,
 	 
 	keepresearch = AutoCategory.RuleFunc.KeepForResearch,
+	
+	istreasure = AutoCategory.RuleFunc.IsTreasure,
     
     -- Potion/Poison Traits
     getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
