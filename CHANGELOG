@@ -1,3 +1,14 @@
+[COLOR="DeepSkyBlue"]2.7.1 (31)[/COLOR]:
+[LIST]
+[*] Parameter values "mythic" or "orange" for the function [COLOR="MediumSeaGreen"]quality()[/COLOR] now really does allow you to check if items are mythic quality. (Finally got a mythic item to test with!)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.7 (30)[/COLOR]:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] New parameter values "mythic" or "orange" for the function [COLOR="MediumSeaGreen"]quality()[/COLOR] allows you to check if items are mythic quality. 
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.6 (29)[/COLOR]:
 COLOR="MediumSlateBlue"]Enhancement[/COLOR]
 [LIST]

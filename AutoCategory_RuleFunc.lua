@@ -276,6 +276,7 @@ local qualityMap = {
 	["arcane"] = ITEM_DISPLAY_QUALITY_ARCANE,
 	["artifact"] = ITEM_DISPLAY_QUALITY_ARTIFACT,
 	["legendary"] = ITEM_DISPLAY_QUALITY_LEGENDARY,
+	["mythic"] = ITEM_DISPLAY_QUALITY_MYTHIC_OVERRIDE,
 	["magic"] = ITEM_DISPLAY_QUALITY_MAGIC,
 	["normal"] = ITEM_DISPLAY_QUALITY_NORMAL,
 	["trash"] = ITEM_DISPLAY_QUALITY_TRASH,
@@ -283,6 +284,7 @@ local qualityMap = {
 	["blue"] = ITEM_DISPLAY_QUALITY_ARCANE,
 	["purple"] = ITEM_DISPLAY_QUALITY_ARTIFACT,
 	["gold"] = ITEM_DISPLAY_QUALITY_LEGENDARY,
+	["orange"] = ITEM_DISPLAY_QUALITY_MYTHIC_OVERRIDE,
 	["green"] = ITEM_DISPLAY_QUALITY_MAGIC,
 	["white"] = ITEM_DISPLAY_QUALITY_NORMAL,
 	["grey"] = ITEM_DISPLAY_QUALITY_TRASH,
@@ -631,6 +633,8 @@ function AutoCategory.RuleFunc.Quality( ... )
 	end
 	
 	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local displayquality = GetItemLinkDisplayQuality(itemLink)
 	
 	for ax = 1, ac do
 		
@@ -647,7 +651,7 @@ function AutoCategory.RuleFunc.Quality( ... )
 		elseif type( arg ) == "string" then
 
 			local v = qualityMap[string.lower( arg )]
-			if v and v == quality then
+			if v and v == displayquality then
 				return true
 			end
 		else
