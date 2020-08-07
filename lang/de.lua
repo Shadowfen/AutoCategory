@@ -9,6 +9,7 @@ AutoCategory_localization_strings["de"] = {
     SI_AC_BAGTYPE_SHOWNAME_GUILDBANK ="Gilden Bank",
     SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG = "Handwerksbeutel",
     SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Handwerksstation",
+    SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Lagertruhen",
     SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Gilden Bank",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG = "Craft Bag",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION, "Verwerten/Verbessern an Handwerksstationen",
