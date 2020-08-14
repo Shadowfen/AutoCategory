@@ -1,3 +1,12 @@
+[COLOR="DeepSkyBlue"]2.8 (33)[/COLOR]:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]isinbackpack()[/COLOR] allows you to check if items is in your backpack or is currently being worn. Requested by AlbertVonMoosseedorf. An example of use for this new function could be a "deconstruct inventory" to list thing that you want to decon that ignores the items in the bank. For instance:
+[CODE]
+isinbackpack() and not ismonsterset() and traitstring("intricate","invigorating","training") and ((type("armor","weapon") and not isset()) or equiptype("head","shoulders"))
+[/CODE]
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.7.2 (32)[/COLOR]:
 [LIST]
 [*] Corrected the text for Home Storage Chests in German thanks to report by AlbertVonMoosseedorf.

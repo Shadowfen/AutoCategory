@@ -1130,6 +1130,10 @@ function AutoCategory.RuleFunc.IsInBank( ... )
 	return AutoCategory.checkingItemBagId == BAG_BANK or AutoCategory.checkingItemBagId == BAG_SUBSCRIBER_BANK
 end
 
+function AutoCategory.RuleFunc.IsInBackpack( ... )
+	return AutoCategory.checkingItemBagId == BAG_BACKPACK or AutoCategory.checkingItemBagId == BAG_WORN
+end
+
 function AutoCategory.RuleFunc.IsInQuickslot( ... )
 	local fn = "isinquickslot"
 	local slotIndex = GetItemCurrentActionBarSlot(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
@@ -1359,6 +1363,7 @@ AutoCategory.Environment = {
 	isequipping = AutoCategory.RuleFunc.IsEquipping,
 	
 	isinbank = AutoCategory.RuleFunc.IsInBank,
+	isinbackpack = AutoCategory.RuleFunc.IsInBackpack,
 
 	isinquickslot = AutoCategory.RuleFunc.IsInQuickslot,
 	 
