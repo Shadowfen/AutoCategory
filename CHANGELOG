@@ -1,3 +1,15 @@
+[COLOR="DeepSkyBlue"]2.10 (36)[/COLOR]:
+[LIST]
+[*] API bump.
+[*] Zenimax compatibility enum and function updates.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.9 (35)[/COLOR]:
+COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] New value added for [CODE]type()[/CODE]: [COLOR="MediumSeaGreen"]"container_currency"[/COLOR] allows you to identify a container of transmute crystals. Requested (and code provided) by Drakhyr.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.8 (33)[/COLOR]:
 COLOR="MediumSlateBlue"]Enhancement[/COLOR]
 [LIST]

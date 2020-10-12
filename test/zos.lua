@@ -18,11 +18,11 @@ _G["d"] = function(...)
     for i=1,#arg do
         argv= select(1,...)
         if type(argv) == "number" then
-            print tostring(argv)
+            print( tostring(argv))
         elseif type(argv) == "boolean" then
-            print tostring(argv)
+            print(tostring(argv))
         elseif type(argv) == "string" then
-            print argv
+            print(argv)
         elseif type(argv) == "table" then
         end
     end

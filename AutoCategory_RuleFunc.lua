@@ -156,6 +156,7 @@ local itemTypeMap = {
 	["clothier_raw_material"] = ITEMTYPE_CLOTHIER_RAW_MATERIAL,
 	["collectible"] = ITEMTYPE_COLLECTIBLE,
 	["container"] = ITEMTYPE_CONTAINER,
+	["container_currency"] = ITEMTYPE_CONTAINER_CURRENCY,
 	["costume"] = ITEMTYPE_COSTUME,
 	["crown_item"] = ITEMTYPE_CROWN_ITEM,
 	["crown_repair"] = ITEMTYPE_CROWN_REPAIR,
@@ -1136,7 +1137,7 @@ end
 
 function AutoCategory.RuleFunc.IsInQuickslot( ... )
 	local fn = "isinquickslot"
-	local slotIndex = GetItemCurrentActionBarSlot(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local slotIndex = FindActionSlotMatchingItem(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return slotIndex ~= nil
 end
 
