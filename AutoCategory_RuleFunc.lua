@@ -577,6 +577,31 @@ function AutoCategory.RuleFunc.IsCharBound( ... )
     return false
 end
 
+function AutoCategory.RuleFunc.IsCollected( ... )
+	local fn = "iscollected"
+	
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local itemId = GetItemLinkItemId(itemLink)
+	local hasSet, setName = GetItemLinkSetInfo(itemLink)
+	if hasSet == false then return false end
+	local isCollected = IsItemSetCollectionPieceUnlocked(itemId)
+	return isCollected
+end
+
+function AutoCategory.RuleFunc.IsNotCollected( ... )
+	local fn = "iscollected"
+	
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local itemId = GetItemLinkItemId(itemLink)
+	local hasSet, setName = GetItemLinkSetInfo(itemLink)
+	if hasSet == false then return false end
+    local itemType = GetItemLinkItemType(itemLink)
+	if IsItemLinkCrafted(itemLink) == true then return false end
+	local isCollected = IsItemSetCollectionPieceUnlocked(itemId)
+	if isCollected == false then return true end
+	return false
+end
+
 function AutoCategory.RuleFunc.IsStolen( ... )
 	local fn = "isstolen"
 	
@@ -1316,6 +1341,9 @@ AutoCategory.Environment = {
 	islocked = AutoCategory.RuleFunc.IsLocked,
 	
 	isbound = AutoCategory.RuleFunc.IsBound,
+	
+	iscollected = AutoCategory.RuleFunc.IsCollected,
+	isnotcollected = AutoCategory.RuleFunc.IsNotCollected,
     
     ischarbound = AutoCategory.RuleFunc.IsCharBound,
 	

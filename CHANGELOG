@@ -1,17 +1,28 @@
+[COLOR="DeepSkyBlue"]2.11.1 (38)[/COLOR]:
+[*] Modified function [COLOR="MediumSeaGreen"]isnotcollected()[/COLOR] so that it returns true if the gear is [COLOR="MediumSeaGreen"]non-crafted set[/COLOR] gear that is not collected. Returns false if the gear is not set get or it has already been collected.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.11 (37)[/COLOR]:
+[COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]iscollected()[/COLOR] allows you to select set gear that you have already collected. Returns true if the gear is set gear that is collected. Returns false if the gear is not set get or it has not yet been collected.
+[*] New function [COLOR="MediumSeaGreen"]isnotcollected()[/COLOR] allows you to select set gear that you have not yet collected. Returns true if the gear is set gear that is not collected. Returns false if the gear is not set get or it has already been collected.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.10 (36)[/COLOR]:
 [LIST]
-[*] API bump.
+[*] API bump (Markarth).
 [*] Zenimax compatibility enum and function updates.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.9 (35)[/COLOR]:
-COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[COLOR="MediumSlateBlue"]Enhancement[/COLOR]
 [LIST]
 [*] New value added for [CODE]type()[/CODE]: [COLOR="MediumSeaGreen"]"container_currency"[/COLOR] allows you to identify a container of transmute crystals. Requested (and code provided) by Drakhyr.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.8 (33)[/COLOR]:
-COLOR="MediumSlateBlue"]Enhancement[/COLOR]
+[COLOR="MediumSlateBlue"]Enhancement[/COLOR]
 [LIST]
 [*] New function [COLOR="MediumSeaGreen"]isinbackpack()[/COLOR] allows you to check if items is in your backpack or is currently being worn. Requested by AlbertVonMoosseedorf. An example of use for this new function could be a "deconstruct inventory" to list thing that you want to decon that ignores the items in the bank. For instance:
 [CODE]
