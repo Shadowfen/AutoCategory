@@ -5,3 +5,6 @@ AutoCategory/
 ._*
 *.bak
 test_run.lua
+.buildpath
+.project
+.settings
