@@ -1,3 +1,7 @@
+[COLOR="DeepSkyBlue"]2.12 (39)[/COLOR]:
+[*] New gamepad support. Code provided by [COLOR="Gold"]Friday-the13-rus.[/COLOR] I do not have a gamepad to be able to test with, so I have no idea how well it will work for you.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.11.1 (38)[/COLOR]:
 [*] Modified function [COLOR="MediumSeaGreen"]isnotcollected()[/COLOR] so that it returns true if the gear is [COLOR="MediumSeaGreen"]non-crafted set[/COLOR] gear that is not collected. Returns false if the gear is not set get or it has already been collected.
 [/LIST]
