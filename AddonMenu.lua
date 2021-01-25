@@ -1304,6 +1304,31 @@ function AutoCategory.AddonMenuInit()
                 },
             },
         }, 
+		-- Gamepad settings
+		{
+            type = "submenu",
+            name = SI_AC_MENU_SUBMENU_GAMEPAD_SETTING,
+            reference = "AC_SUBMENU_GAMEPAD_SETTING",
+            controls = { 
+                {
+                    type = "description",
+                    text = L(SI_AC_MENU_GMS_DESCRIPTION_TIP),
+                },
+                {
+                    type = "divider",
+                },
+                {
+                    type = "checkbox",
+                    name = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD,
+                    tooltip = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP,
+                    requiresReload = true,
+                    getFunc = function() return saved.general["ENABLE_GAMEPAD"] end,
+                    setFunc = function(value) saved.general["ENABLE_GAMEPAD"] = value
+                        
+                    end,
+                },
+			},
+		},
 	}
     if not LAM then return end
 	LAM:RegisterAddonPanel("AC_CATEGORY_SETTINGS", panelData)
