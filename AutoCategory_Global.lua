@@ -9,10 +9,10 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "2.13",
+    version = "2.14",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
-    author = "Shadowfen, crafty35, RockingDice",
+    author = "Shadowfen, crafty35, RockingDice, Friday_the13_rus",
 }
 AutoCategory.settingDisplayName = SF.GetIconized(AutoCategory.settingDisplayName, SF.colors.gold.hex)
 AutoCategory.version = SF.GetIconized(AutoCategory.version, SF.colors.gold.hex)

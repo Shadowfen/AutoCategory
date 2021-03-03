@@ -1,6 +1,26 @@
+[COLOR="DeepSkyBlue"]2.14 (41)[/COLOR]:
+From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes, and Russian language updates:
+[*] Fixed error when opening container if it on the first place
+[*] Fixed error when equipping poisons
+[*] Fixed situation when all items shown in poisons category
+[*] Added compare mode to "Extended" Supplies category (can compare current and equipped item). 
+[*] Fixed sorting for bank
+[*] The addon categories are applying to all gamepad inventory categories
+[*] Added option to disable "Extended" Supplies category
+[*] Updated RU translation
+
+[COLOR="Teal"]About the gamepad "Extended Supplies":[/COLOR]
+"Extended" Supplies category is Supplies category that contains all items from inventory.
+The gamepad settings for the addon contains 2 options: "Enable inventory support" and "Enable extended Supplies category".
+If the first option disabled, the addon is not affect gamepad inventory at all.
+If the first option enabled, the addon categories are applying to whole gamepad inventory.
+If the second option disabled, gamepad inventory contains all default categories (Materials, Furnishings and Slottable items) and default Supplies category.
+If the second option enabled, Supplies category transforms to "Extended" Supplies category. Materials, Furnishings and Slottable items categories are hiding.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.13 (40)[/COLOR]:
 [*] Added a setting to Enable the new gamepad support introduced by 2.12. (The setting is OFF/DISABLED by default.)
-[*] Separated the gamepad and the keyboard hooks code into separate files.
+[*] Separated the gamepad and the keyboard hooks into separate files.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.12 (39)[/COLOR]:

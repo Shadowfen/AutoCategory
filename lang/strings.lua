@@ -124,8 +124,10 @@ AutoCategory_localization_strings["en"] = {
 
     SI_AC_MENU_SUBMENU_GAMEPAD_SETTING = "|c0066FF[Gamepad Settings]|r",
     SI_AC_MENU_GMS_DESCRIPTION_TIP = "Only works in gamepad mode",
-	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD = "Enable new gamepad support",
-	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP = "Enable new gamepad mode support",
+	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD = "Enable inventory support",
+	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP = "Categories and rules will be applied to gamepad inventory.",
+    SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES = "Enable extended Supplies category",
+    SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP = "Supplies category will contain all items from inventory. Default Materials, Furnishings and Slottable items categories will be hidden.",
 
     SI_AC_DEFAULT_TAG_GEARS= "Gears",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "General Items",

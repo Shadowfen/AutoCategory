@@ -81,31 +81,81 @@ function AutoCategory.HookGamepadInventory()
 
 	-- Hide existing Quickslot, Crafting and Furnishing categories
 	ZO_PreHook(GAMEPAD_INVENTORY, "AddFilteredBackpackCategoryIfPopulated", function (self, filterType, iconFile)
+		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
 		if filterType == ITEMFILTERTYPE_CRAFTING or filterType == ITEMFILTERTYPE_FURNISHING or filterType == ITEMFILTERTYPE_QUICKSLOT then
 			return true
 		end
 	end)
 
+	local function IsSuppliesCategory(category)
+		return category.filterType == nil and not category.isCurrencyEntry and not category.equipSlot
+	end
+
 	-- Update new items indicator for Supplies category (because of not it contains all inventory items)
 	ZO_PostHook(GAMEPAD_INVENTORY, "RefreshCategoryList", function(self)
+		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
 		for i = 1, self.categoryList:GetNumEntries() do
 			local category = self.categoryList:GetEntryData(i)
-			if category.filterType == nil and not category.isCurrencyEntry then
+			if IsSuppliesCategory(category) then
 				local hasAnyNewItems = SHARED_INVENTORY:AreAnyItemsNew(nil, nil, BAG_BACKPACK)
 				category:SetNew(hasAnyNewItems)
 			end
 		end
 	end)
 
+	local function GetItemDataFilterComparator(filteredEquipSlot, nonEquipableFilterType)
+		return function(itemData)
+			if filteredEquipSlot then
+				return ZO_Character_DoesEquipSlotUseEquipType(filteredEquipSlot, itemData.equipType)
+			end
+	
+			if nonEquipableFilterType then
+				return ZO_InventoryUtils_DoesNewItemMatchFilterType(itemData, nonEquipableFilterType)
+			end
+			
+			return ZO_InventoryUtils_DoesNewItemMatchSupplies(itemData)
+		end
+	end
+
+	local function GetBestQuestItemCategoryDescription(questItemData)
+		local questItemCategory = GAMEPAD_QUEST_ITEM_CATEGORY_NOT_SLOTTABLE
+		if CanQuickslotQuestItemById(questItemData.questItemId) then
+			questItemCategory = GAMEPAD_QUEST_ITEM_CATEGORY_SLOTTABLE
+		end
+	
+		return GetString("SI_GAMEPADQUESTITEMCATEGORY", questItemCategory)
+	end
+
 	-- Replase content in Supplies category by all items from inventory (like in keyboard inventory)
 	-- Supplies category is targetCategoryData.filterType == nil
 	ZO_PreHook(GAMEPAD_INVENTORY, "RefreshItemList", function (self)
-		local targetCategoryData = self.categoryList:GetTargetData()
-		if targetCategoryData.filterType == nil then
-			self.itemList:Clear()
-			if self.categoryList:IsEmpty() then return true end
+		self.itemList:Clear()
+		if self.categoryList:IsEmpty() then return true end
 
-			local filteredDataTable = SHARED_INVENTORY:GenerateFullSlotData(nil, BAG_BACKPACK)
+		local targetCategoryData = self.categoryList:GetTargetData()
+		local filteredEquipSlot = targetCategoryData.equipSlot
+		local nonEquipableFilterType = targetCategoryData.filterType
+		local filteredDataTable
+
+		local isQuestItemFilter = nonEquipableFilterType == ITEMFILTERTYPE_QUEST
+		--special case for quest items
+		if isQuestItemFilter then
+			filteredDataTable = {}
+			local questCache = SHARED_INVENTORY:GenerateFullQuestCache()
+			for _, questItems in pairs(questCache) do
+				for _, questItem in pairs(questItems) do
+					table.insert(filteredDataTable, questItem)
+					questItem.bestItemCategoryName = zo_strformat(SI_INVENTORY_HEADER, GetBestQuestItemCategoryDescription(questItem))
+				end
+			end
+			table.sort(filteredDataTable, ZO_GamepadInventory_QuestItemSortComparator)
+		else
+			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+				filteredDataTable = SHARED_INVENTORY:GenerateFullSlotData(nil, BAG_BACKPACK)
+			else
+				local comparator = GetItemDataFilterComparator(filteredEquipSlot, nonEquipableFilterType)
+				filteredDataTable = SHARED_INVENTORY:GenerateFullSlotData(comparator, BAG_BACKPACK, BAG_WORN)
+			end
 			for _, slotData in pairs(filteredDataTable) do
 				local matched, categoryName, categoryPriority = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
 				if not matched then
@@ -119,65 +169,136 @@ function AutoCategory.HookGamepadInventory()
 				end
 			end
 			table.sort(filteredDataTable, AutoCategory_ItemSortComparator)
+		end
 
-			local lastBestItemCategoryName
-			for i, itemData in ipairs(filteredDataTable) do
-				local entryData = ZO_GamepadEntryData:New(itemData.name, itemData.iconFile)
-				entryData:InitializeInventoryVisualData(itemData)
+		local lastBestItemCategoryName
+		for i, itemData in ipairs(filteredDataTable) do
+			local entryData = ZO_GamepadEntryData:New(itemData.name, itemData.iconFile)
+			entryData:InitializeInventoryVisualData(itemData)
 
-				ZO_InventorySlot_SetType(entryData, SLOT_TYPE_GAMEPAD_INVENTORY_ITEM)
+			if itemData.bagId == BAG_WORN then
+				entryData.isEquippedInCurrentCategory = itemData.slotIndex == filteredEquipSlot
+				entryData.isEquippedInAnotherCategory = itemData.slotIndex ~= filteredEquipSlot
 
-				local remaining, duration = GetItemCooldownInfo(itemData.bagId, itemData.slotIndex)
-				if remaining > 0 and duration > 0 then
-					entryData:SetCooldown(remaining, duration)
-				end
-
-				if itemData.bestItemCategoryName ~= lastBestItemCategoryName then
-					lastBestItemCategoryName = itemData.bestItemCategoryName
-		
-					entryData:SetHeader(lastBestItemCategoryName)
-					self.itemList:AddEntry("ZO_GamepadItemSubEntryTemplateWithHeader", entryData)
-				else
-					self.itemList:AddEntry("ZO_GamepadItemSubEntryTemplate", entryData)
-				end
+				entryData.isHiddenByWardrobe = WouldEquipmentBeHidden(itemData.slotIndex or EQUIP_SLOT_NONE)
+			elseif isQuestItemFilter then
+				local slotIndex = FindActionSlotMatchingSimpleAction(ACTION_TYPE_QUEST_ITEM, itemData.questItemId)
+				entryData.isEquippedInCurrentCategory = slotIndex ~= nil
+			else
+				local slotIndex = FindActionSlotMatchingItem(itemData.bagId, itemData.slotIndex)
+				entryData.isEquippedInCurrentCategory = slotIndex ~= nil
 			end
 
-			self.itemList:Commit()
+			local remaining, duration
+			if isQuestItemFilter then
+				if itemData.toolIndex then
+					remaining, duration = GetQuestToolCooldownInfo(itemData.questIndex, itemData.toolIndex)
+				elseif itemData.stepIndex and itemData.conditionIndex then
+					remaining, duration = GetQuestItemCooldownInfo(itemData.questIndex, itemData.stepIndex, itemData.conditionIndex)
+				end
+
+				ZO_InventorySlot_SetType(entryData, SLOT_TYPE_QUEST_ITEM)
+			else
+				remaining, duration = GetItemCooldownInfo(itemData.bagId, itemData.slotIndex)
+
+				ZO_InventorySlot_SetType(entryData, SLOT_TYPE_GAMEPAD_INVENTORY_ITEM)
+			end
+			if remaining > 0 and duration > 0 then
+				entryData:SetCooldown(remaining, duration)
+			end
+
+			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true or not IsSuppliesCategory(targetCategoryData) then
+				entryData:SetIgnoreTraitInformation(true)
+			end
+
+			if itemData.bestItemCategoryName ~= lastBestItemCategoryName then
+				lastBestItemCategoryName = itemData.bestItemCategoryName
+
+				entryData:SetHeader(lastBestItemCategoryName)
+				self.itemList:AddEntry("ZO_GamepadItemSubEntryTemplateWithHeader", entryData)
+			else
+				self.itemList:AddEntry("ZO_GamepadItemSubEntryTemplate", entryData)
+			end
+		end
+
+		self.itemList:Commit()
+		return true
+	end)
+
+	-- Allow to equip items from Supplies category
+	ZO_PreHook(GAMEPAD_INVENTORY, "TryEquipItem", function (self, inventorySlot)
+		local sourceBag, sourceSlot = ZO_Inventory_GetBagAndIndex(inventorySlot)
+		local function DoEquip()
+			EquipItem(sourceBag, sourceSlot, self.selectedEquipSlot)
+		end
+
+		if ZO_InventorySlot_WillItemBecomeBoundOnEquip(sourceBag, sourceSlot) then
+			local itemDisplayQuality = GetItemDisplayQuality(sourceBag, sourceSlot)
+			local itemDisplayQualityColor = GetItemQualityColor(itemDisplayQuality)
+			ZO_Dialogs_ShowPlatformDialog("CONFIRM_EQUIP_ITEM", { onAcceptCallback = DoEquip }, { mainTextParams = { itemDisplayQualityColor:Colorize(GetItemName(sourceBag, sourceSlot)) } })
+		else
+			DoEquip()
+		end
+		return true
+	end)
+
+	-- Show change compare mode button in Supplies
+	SecurePostHook(GAMEPAD_INVENTORY, "InitializeKeybindStrip", function (self)
+		local oldVisible = self.toggleCompareModeKeybindStripDescriptor.visible
+		self.toggleCompareModeKeybindStripDescriptor.visible = function ()
+			local targetCategoryData = self.categoryList:GetTargetData()
+			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+				local selectedItemData = self.currentlySelectedData
+				local equipSlot = ZO_Character_GetEquipSlotForEquipType(selectedItemData.equipType)
+				if equipSlot then
+					return true
+				else
+					return false
+				end
+			end
+			return oldVisible()
+		end
+	end)
+
+	-- Show right tooltip for equipable items in Supplies
+	ZO_PreHook(GAMEPAD_INVENTORY, "UpdateRightTooltip", function (self)
+		local targetCategoryData = self.categoryList:GetTargetData()
+		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData)then
+			local selectedItemData = self.currentlySelectedData
+			local equipSlot = ZO_Character_GetEquipSlotForEquipType(selectedItemData.equipType)
+			if not equipSlot then
+				GAMEPAD_TOOLTIPS:Reset(GAMEPAD_RIGHT_TOOLTIP)
+				return true
+			end
+			local equipSlotHasItem = select(2, GetEquippedItemInfo(equipSlot))
+			if selectedItemData and (not equipSlotHasItem or self.savedVars.useStatComparisonTooltip) then
+				GAMEPAD_TOOLTIPS:LayoutItemStatComparison(GAMEPAD_RIGHT_TOOLTIP, selectedItemData.bagId, selectedItemData.slotIndex, equipSlot)
+				GAMEPAD_TOOLTIPS:SetStatusLabelText(GAMEPAD_RIGHT_TOOLTIP, GetString(SI_GAMEPAD_INVENTORY_ITEM_COMPARE_TOOLTIP_TITLE))
+			elseif GAMEPAD_TOOLTIPS:LayoutBagItem(GAMEPAD_RIGHT_TOOLTIP, BAG_WORN, equipSlot) then
+				self:UpdateTooltipEquippedIndicatorText(GAMEPAD_RIGHT_TOOLTIP, equipSlot)
+			end
 			return true
 		end
 		return false
 	end)
 
-	-- Allow to equip items from Supplies category
-	SecurePostHook(GAMEPAD_INVENTORY, "TryEquipItem", function (self, inventorySlot)
-		if not self.selectedEquipSlot then
-			local sourceBag, sourceSlot = ZO_Inventory_GetBagAndIndex(inventorySlot)
-			local function DoEquip()
-				EquipItem(sourceBag, sourceSlot)
-			end
-
-			if ZO_InventorySlot_WillItemBecomeBoundOnEquip(sourceBag, sourceSlot) then
-				local itemDisplayQuality = GetItemDisplayQuality(sourceBag, sourceSlot)
-				local itemDisplayQualityColor = GetItemQualityColor(itemDisplayQuality)
-				ZO_Dialogs_ShowPlatformDialog("CONFIRM_EQUIP_ITEM", { onAcceptCallback = DoEquip }, { mainTextParams = { itemDisplayQualityColor:Colorize(GetItemName(sourceBag, sourceSlot)) } })
-			else
-				DoEquip()
-			end
-		end
-	end)
-
 	-- Allow to quickslot items from Supplies category
-	ZO_PostHook(GAMEPAD_INVENTORY, "SwitchActiveList", function (self, listDescriptor)
-		if listDescriptor == "itemList" and self.selectedItemFilterType == nil then
+	SecurePostHook(GAMEPAD_INVENTORY, "SetCurrentList", function (self, list)
+		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+		if list == self.itemList and IsSuppliesCategory(self.categoryList:GetTargetData()) then
 			KEYBIND_STRIP:AddKeybindButton(self.quickslotAssignKeybindStripDescriptor)
+			KEYBIND_STRIP:AddKeybindButton(self.toggleCompareModeKeybindStripDescriptor)
 			self:RefreshItemActions()
 			self:RefreshActiveKeybinds()
 		end
 	end)
 
 	-- Fix an issue, when set to quickslot action does not hide after selecting item that cannot be quickslotted
-	ZO_PostHook(GAMEPAD_INVENTORY, "RefreshActiveKeybinds", function (self)
-		KEYBIND_STRIP:UpdateKeybindButton(self.quickslotAssignKeybindStripDescriptor)
+	SecurePostHook(GAMEPAD_INVENTORY, "RefreshActiveKeybinds", function (self)
+		if self:GetCurrentList() == self.itemList and IsSuppliesCategory(self.categoryList:GetTargetData()) then
+			KEYBIND_STRIP:UpdateKeybindButton(self.quickslotAssignKeybindStripDescriptor)
+		    KEYBIND_STRIP:UpdateKeybindButton(self.toggleCompareModeKeybindStripDescriptor)
+		end
 	end)
 end
 
@@ -277,10 +398,22 @@ function AutoCategory.HookGamepadStore(list)
 	list.sortFunc = AutoCategory_ItemSortComparator
 end
 
+function AutoCategory.HookGamepadBanking()
+	local oldSortParamsFunction = ZO_GamepadBanking.GetCurrentSortParams
+	ZO_GamepadBanking.GetCurrentSortParams = function (...)
+		local sortKey, sortOptions, sortOrder = oldSortParamsFunction(...)
+		if sortKey == "bestGamepadItemCategoryName" then
+			sortKey = "sortPriorityName"
+		end
+		return sortKey, CUSTOM_GAMEPAD_ITEM_SORT, sortOrder
+	end
+end
+
 function AutoCategory.HookGamepadMode() 
   	AutoCategory.HookGamepadInventory()
   	AutoCategory.HookGamepadCraftStation()
   	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_SELL].list)
   	AutoCategory.HookGamepadStore(STORE_WINDOW_GAMEPAD.components[ZO_MODE_STORE_BUY_BACK].list)
-  	AutoCategory.HookGamepadTradeInventory() 
+  	AutoCategory.HookGamepadTradeInventory()
+	AutoCategory.HookGamepadBanking()
 end

@@ -1,9 +1,9 @@
 ## Title: AutoCategory
-## APIVersion: 100032 100033
-## Author: Shadowfen, crafty35a, RockingDice 
+## APIVersion: 100034 100033
+## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Type "/ac" for settings
-## Version: 2.13
-## AddOnVersion: 40
+## Version: 2.14
+## AddOnVersion: 41
 ## SavedVariables: AutoCategorySavedVars
 ## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0 LibDebugLogger
 ## OptionalDependsOn: InventoryGridView GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver UnknownTracker
