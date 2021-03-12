@@ -1,3 +1,10 @@
+[COLOR="DeepSkyBlue"]2.15 (42)[/COLOR]:
+From [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[*] Update 29 compatibility
+[*] Added gamepad Fence (sell and launder)
+[*] Fixed gamepad Buy back
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.14 (41)[/COLOR]:
 From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes, and Russian language updates:
 [*] Fixed error when opening container if it on the first place
@@ -8,6 +15,7 @@ From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes
 [*] The addon categories are applying to all gamepad inventory categories
 [*] Added option to disable "Extended" Supplies category
 [*] Updated RU translation
+[/LIST]
 
 [COLOR="Teal"]About the gamepad "Extended Supplies":[/COLOR]
 "Extended" Supplies category is Supplies category that contains all items from inventory.
