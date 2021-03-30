@@ -1,5 +1,13 @@
+[COLOR="DeepSkyBlue"]2.16 (43)[/COLOR]:
+[LIST]
+[*]  New function [COLOR="MediumSeaGreen"]isreconstructed()[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]istransmuted()[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]isunbound()[/COLOR]
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.15 (42)[/COLOR]:
 From [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[LIST]
 [*] Update 29 compatibility
 [*] Added gamepad Fence (sell and launder)
 [*] Fixed gamepad Buy back
@@ -7,6 +15,7 @@ From [COLOR="Gold"]Friday-the13-rus.[/COLOR]
 
 [COLOR="DeepSkyBlue"]2.14 (41)[/COLOR]:
 From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes, and Russian language updates:
+[LIST]
 [*] Fixed error when opening container if it on the first place
 [*] Fixed error when equipping poisons
 [*] Fixed situation when all items shown in poisons category
@@ -18,8 +27,9 @@ From [COLOR="Gold"]Friday-the13-rus.[/COLOR] New gamepad functionality and fixes
 [/LIST]
 
 [COLOR="Teal"]About the gamepad "Extended Supplies":[/COLOR]
-"Extended" Supplies category is Supplies category that contains all items from inventory.
-The gamepad settings for the addon contains 2 options: "Enable inventory support" and "Enable extended Supplies category".
+[LIST]
+[*] "Extended" Supplies category is Supplies category that contains all items from inventory.
+[*] The gamepad settings for the addon contains 2 options: "Enable inventory support" and "Enable extended Supplies category".
 If the first option disabled, the addon is not affect gamepad inventory at all.
 If the first option enabled, the addon categories are applying to whole gamepad inventory.
 If the second option disabled, gamepad inventory contains all default categories (Materials, Furnishings and Slottable items) and default Supplies category.
@@ -27,15 +37,18 @@ If the second option enabled, Supplies category transforms to "Extended" Supplie
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.13 (40)[/COLOR]:
+[LIST]
 [*] Added a setting to Enable the new gamepad support introduced by 2.12. (The setting is OFF/DISABLED by default.)
 [*] Separated the gamepad and the keyboard hooks into separate files.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.12 (39)[/COLOR]:
+[LIST]
 [*] New gamepad support. Code provided by [COLOR="Gold"]Friday-the13-rus.[/COLOR] I do not have a gamepad to be able to test with, so I have no idea how well it will work for you.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.11.1 (38)[/COLOR]:
+[LIST]
 [*] Modified function [COLOR="MediumSeaGreen"]isnotcollected()[/COLOR] so that it returns true if the gear is [COLOR="MediumSeaGreen"]non-crafted set[/COLOR] gear that is not collected. Returns false if the gear is not set get or it has already been collected.
 [/LIST]
 

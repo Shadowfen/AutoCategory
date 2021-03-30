@@ -641,7 +641,7 @@ function IntegrateInventoryGridView()
 	end, 10) 
 end 
 
-EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_PLAYER_ACTIVATED, IntegrateInventoryGridView)
+EVENT_MANAGER:RegisterForEvent(AutoCategory.name.."_IGV", EVENT_PLAYER_ACTIVATED, IntegrateInventoryGridView)
 
 		
 ------------------------modified end--------------------------

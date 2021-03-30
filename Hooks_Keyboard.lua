@@ -144,7 +144,7 @@ local function prehookSort(self, inventoryType)
 		--only match items(not headers)
 		if entry.typeId ~= CATEGORY_HEADER then
 			local slotData = entry.data
-			local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
+			local matched, categoryName, categoryPriority, bagTypeId, isHidden = 	AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
 			if not matched or not AutoCategory.Enabled then
 				entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
 				entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 

@@ -260,14 +260,6 @@ function AutoCategory.ResetToDefaults()
     end
     ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.appearance, AutoCategory.acctSaved.appearance)
     
-    --[[ currently no char-level rules
-    if AutoCategory.charSaved.rules then 
-        ZO_ClearTable(AutoCategory.charSaved.rules)
-    else
-        AutoCategory.charSaved.rules = {}
-    end
-	ZO_ShallowTableCopy(AutoCategory.defaultSettings.rules, AutoCategory.charSaved.rules)
-	--]]
     if AutoCategory.charSaved.bags then 
         ZO_ClearTable(AutoCategory.charSaved.bags)
     else
@@ -572,8 +564,10 @@ EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_ADD_ON_LOADED, AutoCateg
 --== Interface ==-- 
 function AutoCategory.RefreshCurrentList()
 	local function RefreshList(inventoryType) 
-		PLAYER_INVENTORY:UpdateList(inventoryType)
+		local UPDATE_IF_NOT_HIDDEN = false
+		PLAYER_INVENTORY:UpdateList(inventoryType, UPDATE_IF_NOT_HIDDEN)
 	end
+	
 	if not ZO_PlayerInventory:IsHidden() then
 		RefreshList(INVENTORY_BACKPACK)
 		RefreshList(INVENTORY_QUEST_ITEM)
