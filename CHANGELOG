@@ -1,8 +1,12 @@
 [COLOR="DeepSkyBlue"]2.16 (43)[/COLOR]:
 [LIST]
-[*]  New function [COLOR="MediumSeaGreen"]isreconstructed()[/COLOR]
-[*]  New function [COLOR="MediumSeaGreen"]istransmuted()[/COLOR]
-[*]  New function [COLOR="MediumSeaGreen"]isunbound()[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]isreconstructed() allows you to select gear that has been reconstructed using the transmute station.[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]istransmuted() allows you to select gear that has had the trait changed using the transmute station.[/COLOR]
+[*]  New function [COLOR="MediumSeaGreen"]isunbound() is a convenience function which is essentially equivalent to [CODE]not isbound()[/CODE].[/COLOR]
+[/LIST]
+Gamepad changes from [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[LIST]
+[*] Fixed assigning and removing item to quickslot using Extended Supplies Category.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]2.15 (42)[/COLOR]:

@@ -225,6 +225,9 @@ function AutoCategory.HookGamepadInventory()
 		return true
 	end)
 
+	if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+	-- The following code related only to Extendes Supplies category
+
 	-- Allow to equip items from Supplies category
 	ZO_PreHook(GAMEPAD_INVENTORY, "TryEquipItem", function (self, inventorySlot)
 		local sourceBag, sourceSlot = ZO_Inventory_GetBagAndIndex(inventorySlot)
@@ -317,7 +320,7 @@ function AutoCategory.HookGamepadInventory()
             end,
             callback = function()
                 if IsQuickSlotEnabled() then
-                    self:ShowQuickslot()
+					self:ShowQuickslot()
                 elseif IsCompareModeEnabled() then
                     self.savedVars.useStatComparisonTooltip = not self.savedVars.useStatComparisonTooltip
                     self:UpdateRightTooltip()
@@ -326,6 +329,69 @@ function AutoCategory.HookGamepadInventory()
         }
 
 		self.itemFilterKeybindStripDescriptor[1] = multiactionKeybind
+	end)
+
+	local QUICKSLOT_ASSIGNMENT_TYPE_ITEM = 1
+	local QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE = 2
+	local QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM = 3
+
+	ZO_PreHook(GAMEPAD_QUICKSLOT, "TryAssignItemToSlot", function (self)
+		local selectedData = self.radialMenu.selectedEntry
+		if selectedData then
+			if self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE then
+				if self.collectibleToSlotId then
+					CallSecureProtected("SelectSlotSimpleAction", ACTION_TYPE_COLLECTIBLE, self.collectibleToSlotId, selectedData.data)
+					self.collectibleToSlotId = nil
+				end
+			elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_ITEM then
+				if self.itemToSlotId and self.itemToSlotIndex then
+					CallSecureProtected("SelectSlotItem", self.itemToSlotId, self.itemToSlotIndex, selectedData.data)
+					self.itemToSlotId = nil
+					self.itemToSlotIndex = nil
+				end
+			elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM then
+				if self.questItemToSlotId then
+					CallSecureProtected("SelectSlotSimpleAction", ACTION_TYPE_QUEST_ITEM, self.questItemToSlotId, selectedData.data)
+					self.questItemToSlotId = nil
+				end
+			end
+
+			self.radialMenu.activeIcon:SetHidden(true)
+			self.activeIcon = nil
+			self.slotIndexForAnim = selectedData.data
+		end
+		self.enteringMenuUnslottedItem = false  --in case the player tries to assign the slotted item that is currently being unassigned so that the scene will properly hide
+		return true
+	end)
+
+	ZO_PreHook(GAMEPAD_QUICKSLOT, "ShowQuickslotMenu", function (self)
+		self.radialMenu:Clear()
+		self:PopulateMenu()
+		self.radialMenu:Show()
+
+		--special entrance case, unslot selected item
+		local slotNum
+		if self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_ITEM then
+			if self.itemToSlotId and self.itemToSlotIndex then
+				slotNum = FindActionSlotMatchingItem(self.itemToSlotId, self.itemToSlotIndex)
+			end
+		elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_COLLECTIBLE then
+			if self.collectibleToSlotId then
+				slotNum = FindActionSlotMatchingSimpleAction(ACTION_TYPE_COLLECTIBLE, self.collectibleToSlotId)
+			end
+		elseif self.assignmentType == QUICKSLOT_ASSIGNMENT_TYPE_QUEST_ITEM then
+			if self.questItemToSlotId then
+				slotNum = FindActionSlotMatchingSimpleAction(ACTION_TYPE_QUEST_ITEM, self.questItemToSlotId)
+			end
+		end
+
+		if slotNum then
+			self.enteringMenuUnslottedItem = true
+			CallSecureProtected("ClearSlot", slotNum)
+			self.slotIndexForAnim = slotNum
+			self.radialMenu.activeIcon:SetHidden(true)
+		end
+		return true
 	end)
 
 	-- Show right tooltip for equipable items in Supplies
