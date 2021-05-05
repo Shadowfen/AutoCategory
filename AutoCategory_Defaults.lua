@@ -44,7 +44,7 @@ AutoCategory.predefinedRules =  {
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_NECKLACE_DESC),
     },
     {
-        ["rule"] = "keepresearch()",
+        ["rule"] = "keepresearch() and not (autoset() and isbound())",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GEARS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE_DESC),
@@ -296,15 +296,15 @@ AutoCategory.defaultAcctBagSettings = {
 				},
 				{
 					["priority"] = 60,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
+				},
+				{
+					["priority"] = 55,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
 				},
 				{
 					["priority"] = 50,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_EQUIPPING),
-				},
-				{
-					["priority"] = 49,
-					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
 				},
 				{
 					["priority"] = 48,
@@ -411,11 +411,11 @@ AutoCategory.defaultAcctBagSettings = {
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT),
 				},
 				{
-					["priority"] = 70,
-					["name"] = L(SI_AC_DEFAULT_CATEGORY_BOE),
+					["priority"] = 60,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
 				},
 				{
-					["priority"] = 60,
+					["priority"] = 55,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
 				},
 				{
@@ -501,6 +501,10 @@ AutoCategory.defaultAcctBagSettings = {
 				{
 					["priority"] = 10,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING),
+				},
+				{
+					["priority"] = 10,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING),
 				},
 			},
 		},
@@ -536,15 +540,15 @@ AutoCategory.defaultAcctBagSettings = {
 				},
 				{
 					["priority"] = 60,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
+				},
+				{
+					["priority"] = 55,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
 				},
 				{
 					["priority"] = 50,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_EQUIPPING),
-				},
-				{
-					["priority"] = 49,
-					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
 				},
 				{
 					["priority"] = 48,
@@ -622,6 +626,10 @@ AutoCategory.defaultAcctBagSettings = {
 					["priority"] = 10,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING),
 				},
+				{
+					["priority"] = 10,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING),
+				},
 			},
 		},
 		[AC_BAG_TYPE_CRAFTBAG] = {
@@ -653,6 +661,10 @@ AutoCategory.defaultAcctBagSettings = {
 				{
 					["priority"] = 10,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS),
+				},
+				{
+					["priority"] = 10,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING),
 				},
 			},
 		},
@@ -688,15 +700,15 @@ AutoCategory.defaultAcctBagSettings = {
 				},
 				{
 					["priority"] = 60,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
+				},
+				{
+					["priority"] = 55,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
 				},
 				{
 					["priority"] = 50,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_EQUIPPING),
-				},
-				{
-					["priority"] = 49,
-					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
 				},
 				{
 					["priority"] = 48,
@@ -773,6 +785,10 @@ AutoCategory.defaultAcctBagSettings = {
 				{
 					["priority"] = 10,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING),
+				},
+				{
+					["priority"] = 10,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING),
 				},
 			},
 		},
@@ -808,15 +824,15 @@ AutoCategory.defaultAcctBagSettings = {
 				},
 				{
 					["priority"] = 60,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
+				},
+				{
+					["priority"] = 55,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_RESEARCHABLE),
 				},
 				{
 					["priority"] = 50,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_EQUIPPING),
-				},
-				{
-					["priority"] = 49,
-					["name"] = L(SI_AC_DEFAULT_CATEGORY_SET),
 				},
 				{
 					["priority"] = 48,
@@ -893,6 +909,10 @@ AutoCategory.defaultAcctBagSettings = {
 				{
 					["priority"] = 10,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING),
+				},
+				{
+					["priority"] = 10,
+					["name"] = L(SI_AC_DEFAULT_CATEGORY_JEWELRYCRAFTING),
 				},
 			},
 		},
