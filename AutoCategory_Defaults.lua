@@ -116,7 +116,7 @@ AutoCategory.predefinedRules =  {
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS_DESC),
     },
     {
-        ["rule"] = "traitstring(\"ornate\") or sptype(\"collectible_monster_trophy\") or type(\"trash\")",
+        ["rule"] = "traitstring(\"ornate\") or sptype(\"collectible_monster_trophy\") or type(\"trash\") or istreasure()",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GENERAL_ITEMS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_SELLING),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_SELLING_DESC),
