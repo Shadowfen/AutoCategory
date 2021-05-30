@@ -1,3 +1,15 @@
+[COLOR="DeepSkyBlue"]2.18 (45)[/COLOR]:
+[LIST]
+[*] Reworked rule matching to continue matching against other rules after a rule errors out. Previously it would stop trying to match and just toss everything after that item into "Others".
+[*] Fixed problem reported by RufusRedBeard that turning of a AutoCategory plugin addon would cause errors when the plugin-reliant rule was tried to be evaluated anyway.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.17 (44)[/COLOR]:
+[LIST]
+[*] Reworked the inventory sorting to avoid errors with new Blackwood chapter.
+[*] API bump (Blackwood)
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.16 (43)[/COLOR]:
 [LIST]
 [*]  New function [COLOR="MediumSeaGreen"]isreconstructed() allows you to select gear that has been reconstructed using the transmute station.[/COLOR]

@@ -1,5 +1,6 @@
 
 local LMP = LibMediaProvider
+local SF = LibSFUtils
 
 AutoCategory.dataCount = {}
 
@@ -19,6 +20,10 @@ local sortKeys = {
 
 local CATEGORY_HEADER = 998
 
+-- convenience function
+-- given a (supposed) table variable
+-- either return the table variable
+-- or return an empty table if the table variable was nil
 local function validTable(tbl)
     if tbl == nil then
         tbl = {}
@@ -26,6 +31,7 @@ local function validTable(tbl)
     return tbl
 end
 
+-- convenience function
 local function NilOrLessThan(value1, value2)
     if value1 == nil then
         return true
@@ -39,21 +45,26 @@ end
 local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	--set header
 	local headerLabel = rowControl:GetNamedChild("HeaderName")
+	-- Add count to category name if selected in options
 	if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
 		headerLabel:SetText(string.format('%s |cFFE690[%d]|r', slot.bestItemTypeName, slot.dataEntry.num))
 	else
 		headerLabel:SetText(slot.bestItemTypeName)
 	end
+	
 	local appearance = AutoCategory.acctSaved.appearance
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
-	headerLabel:SetFont(string.format('%s|%d|%s', LMP:Fetch('font', appearance["CATEGORY_FONT_NAME"]), 
-						appearance["CATEGORY_FONT_SIZE"], appearance["CATEGORY_FONT_STYLE"]))
+	headerLabel:SetFont(string.format('%s|%d|%s', 
+			LMP:Fetch('font', appearance["CATEGORY_FONT_NAME"]), 
+			appearance["CATEGORY_FONT_SIZE"], appearance["CATEGORY_FONT_STYLE"]))
 	headerLabel:SetColor(appearance["CATEGORY_FONT_COLOR"][1], appearance["CATEGORY_FONT_COLOR"][2], 
 						 appearance["CATEGORY_FONT_COLOR"][3], appearance["CATEGORY_FONT_COLOR"][4])
 
 	local marker = rowControl:GetNamedChild("CollapseMarker")
 	local cateName = slot.dataEntry.bestItemTypeName
 	local bagTypeId = slot.dataEntry.bagTypeId 
+	
+	-- set the collapse marker
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName) 
 	if collapsed then
 		marker:SetTexture("EsoUI/Art/Buttons/plus_up.dds")
@@ -66,15 +77,19 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 end
 
 local function AddTypeToList(rowHeight, datalist, inven_ndx) 
-	local cb
+	if datalist == nil then return end
+	
+	local templateName = "AC_InventoryItemRowHeader"
+	local setupFunc = setup_InventoryItemRowHeader
+	local resetCB = ZO_InventorySlot_OnPoolReset
+	local hiddenCB
 	if inven_ndx then
-		cb = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
+		hiddenCB = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
 	else
-		cb = nil
+		hiddenCB = nil
 	end
-	ZO_ScrollList_AddDataType(datalist, CATEGORY_HEADER, "AC_InventoryItemRowHeader", 
-	    rowHeight, setup_InventoryItemRowHeader, cb, nil, 
-	    ZO_InventorySlot_OnPoolReset)
+	ZO_ScrollList_AddDataType(datalist, CATEGORY_HEADER, templateName, 
+	    rowHeight, setupFunc, hiddenCB, nil, resetCB)
 end
   
 local function resetCount(bagTypeId, name)
@@ -97,26 +112,50 @@ local function getCount(bagTypeId, name)
 	end
 	return AutoCategory.dataCount[bagTypeId][name]
 end
+
+local function createHeaderEntry(entry, num)
+	local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, 
+			{bestItemTypeName = entry.bestItemTypeName, 
+			 stackLaunderPrice = 0})
+	headerEntry.sortPriorityName = entry.sortPriorityName
+	headerEntry.isHeader = true
+	headerEntry.bestItemTypeName = entry.bestItemTypeName
+	headerEntry.bagTypeId = entry.bagTypeId
+	local num = getCount(entry.bagTypeId, entry.bestItemTypeName) 
+	headerEntry.num = num
+	return headerEntry
+end
+
+local function sortInventoryFn(inven, left, right) 
+	if AutoCategory.Enabled then
+		if right.sortPriorityName ~= left.sortPriorityName then
+			return NilOrLessThan(left.sortPriorityName, right.sortPriorityName)
+		end
+		if right.isHeader ~= left.isHeader then
+			return NilOrLessThan(right.isHeader, left.isHeader)
+		end
+	end
+	--compatible with quality sort
+	if type(inven.sortKey) == "function" then 
+		if inven.sortOrder == ZO_SORT_ORDER_UP then
+			return inven.sortKey(left.data, right.data)
+		else
+			return inven.sortKey(right.data, left.data)
+		end
+	end
+	return ZO_TableOrderingFunction(left.data, right.data, 
+			inven.currentSortKey, sortKeys, inven.currentSortOrder)
+end
     
 local function prehookSort(self, inventoryType) 
 	local inventory = self.inventories[inventoryType]
 	if inventory == nil then
-	--[[
-	if inventoryType == INVENTORY_BANK then
-		inventory = self.inventories[INVENTORY_BANK]
-	elseif inventoryType == INVENTORY_GUILD_BANK then
-		inventory = self.inventories[INVENTORY_GUILD_BANK]
-	elseif inventoryType == INVENTORY_CRAFT_BAG then
-		inventory = self.inventories[INVENTORY_CRAFT_BAG]
-	elseif inventoryType == INVENTORY_HOUSE_BANK then
-		inventory = self.inventories[INVENTORY_HOUSE_BANK]
-	else
-	--]]
 		-- Use normal inventory by default (instead of the quest item inventory for example)
 		inventory = self.inventories[self.selectedTabType]
 	end
 	
 	--change sort function
+	--inventory.sortFn = function(left,right) sortInventoryFn(inventory,left,right) end
 	inventory.sortFn =  function(left, right) 
 		if AutoCategory.Enabled then
 			if right.sortPriorityName ~= left.sortPriorityName then
@@ -136,7 +175,7 @@ local function prehookSort(self, inventoryType)
 		end
 		return ZO_TableOrderingFunction(left.data, right.data, inventory.currentSortKey, sortKeys, inventory.currentSortOrder)
 	end
-
+	
 	local list = inventory.listView 
 	local scrollData = ZO_ScrollList_GetDataList(list) 
 	
@@ -166,46 +205,37 @@ local function prehookSort(self, inventoryType)
 	--sort data to add header
 	table.sort(scrollData, inventory.sortFn)  
 		
-	-- add header data	    
+	-- add header data	   
+	
 	local lastBestItemCategoryName
 	local newScrollData = {} 
 	local hiddenItem = false
 	local countItems = false
 	for i, entry in ipairs(scrollData) do 
-		if AutoCategory.Enabled and entry.bagTypeId ~= nil then					
-				if entry.bestItemTypeName ~= lastBestItemCategoryName then
-					--new header
-					hiddenItem = false
-					
-					lastBestItemCategoryName = entry.bestItemTypeName
-					local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, 
-							{bestItemTypeName = entry.bestItemTypeName, 
-							 stackLaunderPrice = 0})
-					headerEntry.sortPriorityName = entry.sortPriorityName
-					headerEntry.isHeader = true
-					headerEntry.bestItemTypeName = entry.bestItemTypeName
-					headerEntry.bagTypeId = entry.bagTypeId
-					local num = getCount(entry.bagTypeId, entry.bestItemTypeName) 
-					headerEntry.num = num
-					if entry.isHeader then
-						  countItems = false
-					else 
-						countItems = true
-						resetCount(entry.bagTypeId, entry.bestItemTypeName)
-					end
-					if entry.isHidden then
-						--don't add header
+		if AutoCategory.Enabled and entry.bagTypeId ~= nil then
+			if entry.bestItemTypeName ~= lastBestItemCategoryName then
+				--new header
+				hiddenItem = false
+				lastBestItemCategoryName = entry.bestItemTypeName
+				local headerEntry = createHeaderEntry(entry, num)
+				if entry.isHeader then
+					  countItems = false
+				else 
+					countItems = true
+					resetCount(entry.bagTypeId, entry.bestItemTypeName)
+				end
+				if entry.isHidden then
+					--don't add header
+					hiddenItem = true
+				else					
+					table.insert(newScrollData, headerEntry)
+					--check collapse
+					if AutoCategory.IsCategoryCollapsed(entry.bagTypeId, entry.bestItemTypeName) then
 						hiddenItem = true
-					else					
-						table.insert(newScrollData, headerEntry)
-						--check collapse
-						if AutoCategory.IsCategoryCollapsed(entry.bagTypeId, entry.bestItemTypeName) then
-							hiddenItem = true
-						end
 					end
-					
 				end
 			end
+		end
 		if entry.typeId ~= CATEGORY_HEADER then
 			if not hiddenItem then
 				table.insert(newScrollData, entry)
@@ -216,11 +246,13 @@ local function prehookSort(self, inventoryType)
 		end
 	end
 	list.data = newScrollData 
+	ZO_ScrollList_Commit(list)
 end
 
 
 local function prehookCraftSort(self)
 	--change sort function
+	--self.sortFunction = function(left,right) sortInventoryFn(self,left,right) end
 	self.sortFunction = function(left, right) 
 		if AutoCategory.Enabled then
 			if right.sortPriorityName ~= left.sortPriorityName then
@@ -347,285 +379,4 @@ function AutoCategory.HookKeyboardMode()
     ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData", prehookCraftSort)
     ZO_PreHook(SMITHING.improvementPanel.inventory, "SortData", prehookCraftSort)
 end
---[[
-function AutoCategory.HookKeyboardMode() 
-    
-	--Add a new data type: row with header
-	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
-	
-    local function AddTypeToList(datalist, inven_ndx) 
-        local cb
-        if inven_ndx then
-            cb = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
-        else
-            cb = nil
-        end
-        ZO_ScrollList_AddDataType(datalist, CATEGORY_HEADER, "AC_InventoryItemRowHeader", 
-          rowHeight, AC_Setup_InventoryRowWithHeader, cb, nil, 
-          ZO_InventorySlot_OnPoolReset)
-    end
-  
-    AddTypeToList(ZO_PlayerInventoryList, INVENTORY_BACKPACK)
-    AddTypeToList(ZO_CraftBagList, INVENTORY_BACKPACK)
-    AddTypeToList(ZO_PlayerBankBackpack, INVENTORY_BACKPACK)
-    AddTypeToList(ZO_GuildBankBackpack, INVENTORY_BACKPACK)
-    AddTypeToList(ZO_HouseBankBackpack, INVENTORY_BACKPACK)
-    AddTypeToList(ZO_PlayerInventoryQuest, INVENTORY_QUEST_ITEM)
-    AddTypeToList(SMITHING.deconstructionPanel.inventory.list, nil)
-    AddTypeToList(SMITHING.improvementPanel.inventory.list, nil)
-	
-	local function resetCount(bagTypeId, name)
-        AutoCategory.dataCount[bagTypeId] = validTable(AutoCategory.dataCount[bagTypeId])
-    	AutoCategory.dataCount[bagTypeId][name] = 0 
-	end
-    
-	local function addCount(bagTypeId, name)
-        AutoCategory.dataCount[bagTypeId] = validTable(AutoCategory.dataCount[bagTypeId])
-		if AutoCategory.dataCount[bagTypeId][name] == nil then
-			AutoCategory.dataCount[bagTypeId][name] = 0
-		end
-		AutoCategory.dataCount[bagTypeId][name] = AutoCategory.dataCount[bagTypeId][name] + 1
-	end
-    
-	local function getCount(bagTypeId, name)
-        AutoCategory.dataCount[bagTypeId] = validTable(AutoCategory.dataCount[bagTypeId])
-		if AutoCategory.dataCount[bagTypeId][name] == nil then
-			AutoCategory.dataCount[bagTypeId][name] = 0
-		end
-		return AutoCategory.dataCount[bagTypeId][name]
-	end
-    
-	local function prehookSort(self, inventoryType) 
-		local inventory = self.inventories[inventoryType]
-		if inventory == nil then
-		-- [ [
-	    if inventoryType == INVENTORY_BANK then
-	        inventory = self.inventories[INVENTORY_BANK]
-	    elseif inventoryType == INVENTORY_GUILD_BANK then
-	        inventory = self.inventories[INVENTORY_GUILD_BANK]
-	    elseif inventoryType == INVENTORY_CRAFT_BAG then
-	        inventory = self.inventories[INVENTORY_CRAFT_BAG]
-	    elseif inventoryType == INVENTORY_HOUSE_BANK then
-	        inventory = self.inventories[INVENTORY_HOUSE_BANK]
-	    else
-	    -- ] ]
-	        -- Use normal inventory by default (instead of the quest item inventory for example)
-	        inventory = self.inventories[self.selectedTabType]
-	    end
-		
-		--change sort function
-		inventory.sortFn =  function(left, right) 
-			if AutoCategory.Enabled then
-				if right.sortPriorityName ~= left.sortPriorityName then
-					return NilOrLessThan(left.sortPriorityName, right.sortPriorityName)
-				end
-				if right.isHeader ~= left.isHeader then
-					return NilOrLessThan(right.isHeader, left.isHeader)
-				end
-            end
-            --compatible with quality sort
-            if type(inventory.currentSortKey) == "function" then 
-                if inventory.currentSortOrder == ZO_SORT_ORDER_UP then
-                    return inventory.currentSortKey(left.data, right.data)
-                else
-                    return inventory.currentSortKey(right.data, left.data)
-                end
-            end
-			return ZO_TableOrderingFunction(left.data, right.data, inventory.currentSortKey, sortKeys, inventory.currentSortOrder)
-        end
 
-    local list = inventory.listView 
-    local scrollData = ZO_ScrollList_GetDataList(list) 
-		
-		for i, entry in ipairs(scrollData) do
-			--only match items(not headers)
-			if entry.typeId ~= CATEGORY_HEADER then
-				local slotData = entry.data
-				local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
-				if not matched or not AutoCategory.Enabled then
-  					entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
-  					entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
-  					entry.bagTypeId = bagTypeId 
-  					if not AutoCategory.Enabled or bagTypeId == nil then
-  						  entry.isHidden = false
-  					else
-  						  entry.isHidden = AutoCategory.saved.bags[bagTypeId].isUngroupedHidden
-  					end
-				else
-  					entry.bestItemTypeName = categoryName 
-  					entry.sortPriorityName = string.format("%03d%s", 100 - categoryPriority , categoryName) 
-  					entry.bagTypeId = bagTypeId
-  					entry.isHidden = isHidden 
-				end
-			end
-		end
-		
-		--sort data to add header
-    table.sort(scrollData, inventory.sortFn)  
-		
-		-- add header data	    
-    local lastBestItemCategoryName
-    local newScrollData = {} 
-		local hiddenItem = false
-		local countItems = false
-    for i, entry in ipairs(scrollData) do 
-		if AutoCategory.Enabled and entry.bagTypeId ~= nil then					
-				if entry.bestItemTypeName ~= lastBestItemCategoryName then
-					--new header
-					hiddenItem = false
-					
-					lastBestItemCategoryName = entry.bestItemTypeName
-					local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, 
-							{bestItemTypeName = entry.bestItemTypeName, 
-							 stackLaunderPrice = 0})
-					headerEntry.sortPriorityName = entry.sortPriorityName
-					headerEntry.isHeader = true
-					headerEntry.bestItemTypeName = entry.bestItemTypeName
-					headerEntry.bagTypeId = entry.bagTypeId
-					local num = getCount(entry.bagTypeId, entry.bestItemTypeName) 
-					headerEntry.num = num
-					if entry.isHeader then
-						  countItems = false
-					else 
-  						countItems = true
-  						resetCount(entry.bagTypeId, entry.bestItemTypeName)
-					end
-					if entry.isHidden then
-						--don't add header
-						hiddenItem = true
-					else					
-						table.insert(newScrollData, headerEntry)
-						--check collapse
-						if AutoCategory.IsCategoryCollapsed(entry.bagTypeId, entry.bestItemTypeName) then
-							hiddenItem = true
-						end
-					end
-					
-				end
-			end
-	    	if entry.typeId ~= CATEGORY_HEADER then
-				if not hiddenItem then
-					table.insert(newScrollData, entry)
-				end
-				if countItems then
-					addCount(entry.bagTypeId, entry.bestItemTypeName)
-				end
-	    	end
-	    end
-	    list.data = newScrollData 
-	end
-	
-	ZO_PreHook(ZO_InventoryManager, "ApplySort", prehookSort)
-	ZO_PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
-	
-	local function prehookCraftSort(self)
-		--change sort function
-		self.sortFunction = function(left, right) 
-			if AutoCategory.Enabled then
-				if right.sortPriorityName ~= left.sortPriorityName then
-					return NilOrLessThan(left.sortPriorityName, right.sortPriorityName)
-				end
-				if right.isHeader ~= left.isHeader then
-					return NilOrLessThan(right.isHeader, left.isHeader)
-				end
-				--compatible with quality sort
-				if type(self.sortKey) == "function" then 
-					if self.sortOrder == ZO_SORT_ORDER_UP then
-						return self.sortKey(left.data, right.data)
-					else
-						return self.sortKey(right.data, left.data)
-					end
-				end
-			end
-			return ZO_TableOrderingFunction(left.data, right.data, self.sortKey, sortKeys, self.sortOrder)
-		end
-
-		--add header data
-    local scrollData = ZO_ScrollList_GetDataList(self.list)
-		for i, entry in ipairs(scrollData) do
-			--only match items(not headers)
-			if entry.typeId ~= CATEGORY_HEADER then
-			local slotData = entry.data
-			local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex, AC_BAG_TYPE_CRAFTSTATION)
-			if not matched or not AutoCategory.Enabled then
-				entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
-				entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
-				entry.bagTypeId = bagTypeId
-				if not AutoCategory.Enabled then
-					entry.isHidden = false
-				else
-					entry.isHidden = AutoCategory.saved.bags[bagTypeId].isUngroupedHidden
-				end
-			else
-				entry.bestItemTypeName = categoryName 
-				entry.sortPriorityName = string.format("%03d%s", 100 - categoryPriority , categoryName) 
-				entry.bagTypeId = bagTypeId
-				entry.isHidden = isHidden
-				end
-			end
-		end
-		
-		--sort data to add header
-    table.sort(scrollData, self.sortFunction)
-		
-		-- add header data	    
-    local lastBestItemCategoryName
-    local newScrollData = {}
-		local hiddenItem = false
-		local countItems = true
-		local lastHeaderEntry 
-	    for i, entry in ipairs(scrollData) do 
-			if AutoCategory.Enabled then					
-				if entry.bestItemTypeName ~= lastBestItemCategoryName then
-					--new header
-					hiddenItem = false
-					
-					lastBestItemCategoryName = entry.bestItemTypeName
-					local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, {bestItemTypeName = entry.bestItemTypeName, stackLaunderPrice = 0})
-					headerEntry.sortPriorityName = entry.sortPriorityName
-					headerEntry.isHeader = true
-					headerEntry.bestItemTypeName = entry.bestItemTypeName
-					headerEntry.bagTypeId = entry.bagTypeId
-					--local num = getCount(entry.bagTypeId, entry.bestItemTypeName)
-					if lastHeaderEntry then 
-						lastHeaderEntry.num = getCount(lastHeaderEntry.bagTypeId, lastHeaderEntry.bestItemTypeName)
-					end
-					lastHeaderEntry = headerEntry
-					--headerEntry.num = num
-					 
-					if entry.isHeader then
-						countItems = false
-					else 
-						countItems = true
-						resetCount(entry.bagTypeId, entry.bestItemTypeName)
-					end
-					if entry.isHidden then
-						--don't add header
-						hiddenItem = true
-					else					
-						table.insert(newScrollData, headerEntry)
-						--check collapse
-						if AutoCategory.IsCategoryCollapsed(entry.bagTypeId, entry.bestItemTypeName) then
-							hiddenItem = true
-						end
-					end
-				end
-			end
-	    	if entry.typeId ~= CATEGORY_HEADER then
-				if not hiddenItem then
-					table.insert(newScrollData, entry)
-				end
-				if countItems then 
-					addCount(entry.bagTypeId, entry.bestItemTypeName)
-				end
-	    	end
-	    end
-		if lastHeaderEntry then 
-			lastHeaderEntry.num = getCount(lastHeaderEntry.bagTypeId, lastHeaderEntry.bestItemTypeName)
-		end
-	    self.list.data = newScrollData  
-	end
-    ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData", prehookCraftSort)
-    ZO_PreHook(SMITHING.improvementPanel.inventory, "SortData", prehookCraftSort)
-end
---]]

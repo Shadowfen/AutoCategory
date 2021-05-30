@@ -77,7 +77,7 @@ end
 -- Parameters: name - (string) Plugin name
 --             initfunc - (function) function to call to initialize the Plugin
 function AutoCategory.RegisterPlugin(name, initfunc)
-    if not initfunc or type(initfunc) ~= "function" then return end
+	if not initfunc or type(initfunc) ~= "function" then return end
     
     AutoCategory.Plugins[name] = initfunc
 	if AutoCategory.Inited then 

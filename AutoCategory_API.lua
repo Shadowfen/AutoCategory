@@ -45,39 +45,40 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		return false, "", 0, nil, nil
 	end
 	
+	--local logger = LibDebugLogger("AutoCategory")
+	--logger:SetEnabled(true)
+	
 	local needCheck = false
 	local bag = AutoCategory.saved.bags[bag_type_id]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
 		local rule = AutoCategory.GetRuleByName(entry.name)
-		if rule then
-			rule.damaged = nil
+		if rule and rule.damaged ~= true then
 			if rule.rule == nil then
-				return false, "", 0, bag_type_id, entry.isHidden
-			end
-			local ruleCode = AutoCategory.compiledRules[entry.name]
-			--local ruleCode, res = zo_loadstring( "return(" .. rule.rule ..")" )
-			if not ruleCode then
-				--d("Error1: " .. res)
 				rule.damaged = true 
-			else 
-				setfenv( ruleCode, AutoCategory.Environment )
-				AutoCategory.AdditionCategoryName = ""
-				local ok, res = pcall( ruleCode )
-				if ok then
-					if res == true then
-						return true, rule.name .. AutoCategory.AdditionCategoryName, entry.priority, bag_type_id, entry.isHidden
-					end 
-				else
-					--d("Error2: " .. res)
+			else
+				local ruleCode = AutoCategory.compiledRules[entry.name]
+				if not ruleCode or type(ruleCode) ~= "function" then
 					rule.damaged = true 
+					AutoCategory.compiledRules[entry.name] = nil
+				else 
+					setfenv( ruleCode, AutoCategory.Environment )
+					AutoCategory.AdditionCategoryName = ""
+					local ok, res = pcall( ruleCode )
+					if ok then
+						if res == true then
+							return true, rule.name .. AutoCategory.AdditionCategoryName, entry.priority, bag_type_id, entry.isHidden
+						end 
+					else
+						--logger:Error("Error2: " .. res)
+						rule.damaged = true 
+						AutoCategory.compiledRules[entry.name] = nil
+					end
 				end
-			end
-			if rule.damaged then
-				return false, "", 0, bag_type_id, entry.isHidden
 			end
 		end
 	end
+	--logger:SetEnabled(false)
 	
 	return false, "", 0, bag_type_id
 end 

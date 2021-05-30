@@ -61,11 +61,17 @@ end
 function AutoCategory.CompileRule(rule)
   if rule == nil then return end
   
-    local compiledfunc,err = zo_loadstring("return("..rule.rule..")")
+	local logger = LibDebugLogger("AutoCategory")
+	logger:SetEnabled(true)
+	local rulestr = "return("..rule.rule..")"
+	local compiledfunc,err = zo_loadstring(rulestr)
     if not compiledfunc then
-      rule.damaged = true
+		rule.damaged = true
+		logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
+		logger:SetEnabled(false)
       return err
     end
+	logger:SetEnabled(false)
     AC.compiledRules[rule.name] = compiledfunc
     return ""
 end
@@ -82,24 +88,29 @@ function AutoCategory.RecompileRules(ruleset)
     end
     if ruleset == nil then return end
     
+	local logger = LibDebugLogger("AutoCategory")
+	logger:SetEnabled(true)
     local compiled = AutoCategory.compiledRules
     for j = 1, #ruleset do
         if ruleset[j] then 
             local r = ruleset[j]
             local n = r.name
-            if r.compiled then
-                compiled[n] = r.compiled
+			if r.compiled then
+			    compiled[n] = r.compiled
             else
-                if not r.rule then
-                    r.damaged = nil
+				if not r.rule then
+				    r.damaged = nil
                 end
-                compiled[n],err = zo_loadstring(SF.str("return(",r.rule,")"))
+				local rulestr = "return(" .. r.rule .. ")"
+                compiled[n],err = zo_loadstring(rulestr)
                 if not compiled[n] then
                     r.damaged = true 
+					logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
                 end
             end
         end
     end
+	logger:SetEnabled(false)
 end
 
 -- ----------------------------- Sorting comparators ------------------

@@ -121,6 +121,24 @@ local function checkKeywords(str)
    return result
 end
 
+--[[
+function AutoCategory.CompileRule(rule)
+  if rule == nil then return end
+  
+	local rulestr = "return("..rule.rule..")"
+	local compiledfunc,err = zo_loadstring(rulestr)
+    if not compiledfunc then
+		rule.damaged = true
+		logger:Error("Failure to compile rule "..rulestr..". ERROR: "..err)
+		logger:SetEnabled(false)
+      return err
+    end
+	logger:SetEnabled(false)
+    AC.compiledRules[rule.name] = compiledfunc
+    return ""
+end
+
+--]]
 local function checkCurrentRule()
     ruleCheckStatus.err = nil
     ruleCheckStatus.good = nil
