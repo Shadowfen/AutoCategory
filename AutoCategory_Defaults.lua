@@ -256,7 +256,8 @@ AutoCategory.defaultAcctSettings = {
 	},
 	general = {
 		["SHOW_MESSAGE_WHEN_TOGGLE"] = false,
-		["SHOW_CATEGORY_ITEM_COUNT"] = true, 
+		["SHOW_CATEGORY_ITEM_COUNT"] = true,
+		["SHOW_CATEGORY_COLLAPSE_ICON"] = true,
 		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
 	},
     collapses = AutoCategory.defaultCollapses,

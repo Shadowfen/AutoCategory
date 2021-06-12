@@ -1186,9 +1186,7 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP,
                     getFunc = function() return saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
-                    setFunc = function(value) saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value end,
                 },
                 -- Show category item count
                 {
@@ -1196,19 +1194,27 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
                     getFunc = function() return saved.general["SHOW_CATEGORY_ITEM_COUNT"] end,
-                    setFunc = function(value) saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value end,
                 },
+                -- Show category collapse icon
+                {
+                    type = "checkbox",
+                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON,
+                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP,
+                    getFunc = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] end,
+                    setFunc = function(value) 
+                    	saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value 
+                    	AutoCategory.RefreshAllLists()
+                    end,
+                },                
                 -- Save category collapse status
                 {
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,
                     getFunc = function() return saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-                    setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value
-                        
-                    end,
+                    setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
+                    disabled = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
                 },
             }
         },

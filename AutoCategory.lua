@@ -597,18 +597,35 @@ function AutoCategory.RefreshCurrentList()
 	end
 end
 
-function AC_ItemRowHeader_OnMouseEnter(header)  
+function AutoCategory.RefreshAllLists()
+    PLAYER_INVENTORY:UpdateList(INVENTORY_BACKPACK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_QUEST_ITEM)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_CRAFT_BAG)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_GUILD_BANK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_HOUSE_BANK)
+    PLAYER_INVENTORY:UpdateList(INVENTORY_BANK)
+    
+    SMITHING.deconstructionPanel.inventory:PerformFullRefresh()
+    SMITHING.improvementPanel.inventory:PerformFullRefresh()
+end
+
+function AC_ItemRowHeader_OnMouseEnter(header)
 	local cateName = header.slot.dataEntry.bestItemTypeName
 	local bagTypeId = header.slot.dataEntry.bagTypeId
-	
+
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName) 
 	local markerBG = header:GetNamedChild("CollapseMarkerBG")
-	markerBG:SetHidden(false)
-	if collapsed then
-		markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
-	else
-		markerBG:SetTexture("EsoUI/Art/Buttons/minus_over.dds")
-	end
+
+    if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
+        markerBG:SetHidden(false)
+        if collapsed then
+            markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
+        else
+            markerBG:SetTexture("EsoUI/Art/Buttons/minus_over.dds")
+        end
+    else
+        markerBG:SetHidden(true)
+    end
 end
 
 function AC_ItemRowHeader_OnMouseExit(header)  
@@ -617,6 +634,8 @@ function AC_ItemRowHeader_OnMouseExit(header)
 end
 
 function AC_ItemRowHeader_OnMouseClicked(header)
+    if (AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false) then return end
+
 	local cateName = header.slot.dataEntry.bestItemTypeName
 	local bagTypeId = header.slot.dataEntry.bagTypeId
 	

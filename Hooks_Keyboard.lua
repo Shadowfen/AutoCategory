@@ -66,10 +66,15 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	
 	-- set the collapse marker
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName) 
-	if collapsed then
-		marker:SetTexture("EsoUI/Art/Buttons/plus_up.dds")
+	if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
+		marker:SetHidden(false)
+		if collapsed then
+			marker:SetTexture("EsoUI/Art/Buttons/plus_up.dds")
+		else
+			marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
+		end
 	else
-		marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
+		marker:SetHidden(true)
 	end
 	
 	rowControl:SetHeight(AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
