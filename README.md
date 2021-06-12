@@ -1,4 +1,4 @@
-[B][COLOR="DarkOrange"]Depends on the following (separately installed) libraries: LibStub, LibAddonMenu[/COLOR][/B]
+[B][COLOR="DarkOrange"]Depends on the following (separately installed) libraries: LibAddonMenu[/COLOR][/B]
 
 [b]Features[/b]
 [list]

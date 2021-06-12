@@ -1,3 +1,24 @@
+[COLOR="DeepSkyBlue"]2.20 (47)[/COLOR]:
+[LIST]
+[*] Added the following new item trait types introduced with the companions: 
+    o armor: 
+	  [COLOR="MediumSeaGreen"]armor_aggressive, armor_augmented, armor_bolstered, armor_focused, armor_prolific, armor_quickened, armor_shattering, armor_soothing, armor_vigorous[/COLOR]
+    o jewelry: 
+	  [COLOR="MediumSeaGreen"]jewelry_aggressive, jewelry_augmented, jewelry_bolstered, jewelry_focused, jewelry_prolific, jewelry_quickened, jewelry_shattering, jewelry_soothing, jewelry_vigorous[/COLOR]
+    o weapon: 
+	  [COLOR="MediumSeaGreen"]weapon_aggressive, weapon_augmented, weapon_bolstered, weapon_focused, weapon_prolific, weapon_quickened, weapon_shattering, weapon_soothing, weapon_vigorous[/COLOR]
+[*] Added the following item type (type): [COLOR="MediumSeaGreen"]group_repair[/COLOR]
+[*] Added the following specialized item types (sptype): 
+    [COLOR="MediumSeaGreen"]collectible_style_page, container_currency, container_style_page, siege_lancer, trophy_dungeon_buff_ingredient[/COLOR]
+[*] Removed the former item filter type (filtertype) [COLOR="LightSeaGreen"]reuse[/COLOR] that was removed by ESO.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.19 (46)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]iscompaniononly()[/COLOR] allows you to select companion gear.[/COLOR]
+[*] New operand for [COLOR="MediumSeaGreen"]filtertype(...)[/COLOR] which now also allows you to specify [COLOR="MediumSeaGreen"]companion[/COLOR] as one of the filters.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.18 (45)[/COLOR]:
 [LIST]
 [*] Reworked rule matching to continue matching against other rules after a rule errors out. Previously it would stop trying to match and just toss everything after that item into "Others".
