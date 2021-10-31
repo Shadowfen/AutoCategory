@@ -285,9 +285,9 @@ function AutoCategory.HookGamepadInventory()
 		local multiactionKeybind = {
             alignment = function()
                 if IsQuickSlotEnabled() then
-                    return KEYBIND_STRIP_ALIGN_RIGHT
-                elseif IsCompareModeEnabled() then
                     return KEYBIND_STRIP_ALIGN_LEFT
+                elseif IsCompareModeEnabled() then
+                    return KEYBIND_STRIP_ALIGN_RIGHT
                 end
             end,
             name = function()
@@ -514,8 +514,8 @@ function AutoCategory.HookGamepadStore(list)
 end
 
 function AutoCategory.HookGamepadBanking()
-	local oldSortParamsFunction = ZO_GamepadBanking.GetCurrentSortParams
-	ZO_GamepadBanking.GetCurrentSortParams = function (...)
+	local oldSortParamsFunction = ZO_BankingCommon_Gamepad.GetCurrentSortParams
+	ZO_BankingCommon_Gamepad.GetCurrentSortParams = function (...)
 		local sortKey, sortOptions, sortOrder = oldSortParamsFunction(...)
 		if sortKey == "bestGamepadItemCategoryName" then
 			sortKey = "sortPriorityName"
