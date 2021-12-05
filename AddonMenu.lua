@@ -1,6 +1,6 @@
 local LAM = LibAddonMenu2
 local LMP = LibMediaProvider
-  
+
 local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
@@ -60,7 +60,7 @@ local function AddChoice( dataArray, choice, value, tooltip )
     end
     -- choice is mandatory
     if not choice then return end
-        
+
     table.insert(dataArray.choices, choice)
     if dataArray.choicesValues then
         table.insert(dataArray.choicesValues, value)
@@ -148,8 +148,10 @@ local function checkCurrentRule()
     
     local func, err = zo_loadstring("return("..fieldData.currentRule.rule..")")
     if err then
+		logger.error("FAILED rule compile - "..err)
         ruleCheckStatus.err = err
         fieldData.currentRule.damaged = true 
+		fieldData.currentRule.err = err
     else
         local errt = checkKeywords(fieldData.currentRule.rule)
         if #errt == 0 then
@@ -187,7 +189,7 @@ local function RuleDataSortingFunction(a, b)
 		result = a.tag <b.tag
 	else
 		--alphabetical sort, cannot have same name rules
-		result = a.name <b.name
+		result = a.name < b.name
 	end
 	
 	return result
@@ -234,7 +236,7 @@ local function RefreshDropdownData()
 	if fieldData.editRuleTag.indexValue == "" and #cache.tags > 0 then
 		fieldData.editRuleTag.indexValue = cache.tags[1]
 	end
-    
+
 	if fieldData.editBag.indexValue == "" and #cache.bags.values > 0 then
 		fieldData.editBag.indexValue = cache.bags.values[1]
 	end
@@ -937,6 +939,7 @@ function AutoCategory.AddonMenuInit()
 						newRule.description = copyFrom.description
 						newRule.rule = copyFrom.rule
                         newRule.damaged = copyFrom.damaged
+						newRule.err = copyFrom.err
                         fieldData.currentRule = newRule
 						cache.AddRule(newRule)
 											
@@ -1155,18 +1158,6 @@ function AutoCategory.AddonMenuInit()
 					func = function()
                         local ruleName = fieldData.currentRule.name
                         checkCurrentRule()
-                        --[[
-						local func,err = zo_loadstring("return("..fieldData.currentRule.rule..")")
-                        if not func then
-                            ruleCheckStatus.err = err
-                            ruleCheckStatus.good = nil
-                            fieldData.currentRule.damaged = true 
-                        else
-                            ruleCheckStatus.err = nil
-                            ruleCheckStatus.good = true
-                            fieldData.currentRule.damaged = nil
-                        end
-                        --]]
                     end,
 					disabled = function() return fieldData.currentRule == nil end,
 					width = "half",
@@ -1215,6 +1206,17 @@ function AutoCategory.AddonMenuInit()
                     getFunc = function() return saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
                     setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
                     disabled = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
+                },
+                -- Show category "SET ()"
+                {
+                    type = "checkbox",
+                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
+                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
+                    getFunc = function() return saved.general["SHOW_CATEGORY_SET_TITLE"] end,
+                    setFunc = function(value) 
+						saved.general["SHOW_CATEGORY_SET_TITLE"] = value 
+						AutoCategory.ResetCollapse(saved)
+					end,
                 },
             }
         },

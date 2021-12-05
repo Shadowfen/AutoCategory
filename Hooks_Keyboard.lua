@@ -160,9 +160,8 @@ local function prehookSort(self, inventoryType)
 	end
 	
 	--change sort function
-	--inventory.sortFn = function(left,right) sortInventoryFn(inventory,left,right) end
 	inventory.sortFn =  function(left, right) 
-		if AutoCategory.Enabled then
+		if AutoCategory and AutoCategory.Enabled then
 			if right.sortPriorityName ~= left.sortPriorityName then
 				return NilOrLessThan(left.sortPriorityName, right.sortPriorityName)
 			end
@@ -181,6 +180,12 @@ local function prehookSort(self, inventoryType)
 		return ZO_TableOrderingFunction(left.data, right.data, inventory.currentSortKey, sortKeys, inventory.currentSortOrder)
 	end
 	
+    if SCENE_MANAGER and SCENE_MANAGER:GetCurrentScene() then
+        if AutoCategory.BulkMode and AutoCategory.BulkMode == true and SCENE_MANAGER:GetCurrentScene():GetName() == "guildBank" then
+            return false	-- skip out early
+        end
+    end
+
 	local list = inventory.listView 
 	local scrollData = ZO_ScrollList_GetDataList(list) 
 	
@@ -188,7 +193,7 @@ local function prehookSort(self, inventoryType)
 		--only match items(not headers)
 		if entry.typeId ~= CATEGORY_HEADER then
 			local slotData = entry.data
-			local matched, categoryName, categoryPriority, bagTypeId, isHidden = 	AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
+			local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex)
 			if not matched or not AutoCategory.Enabled then
 				entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
 				entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
@@ -252,12 +257,11 @@ local function prehookSort(self, inventoryType)
 	end
 	list.data = newScrollData 
 	ZO_ScrollList_Commit(list)
-end
 
+end
 
 local function prehookCraftSort(self)
 	--change sort function
-	--self.sortFunction = function(left,right) sortInventoryFn(self,left,right) end
 	self.sortFunction = function(left, right) 
 		if AutoCategory.Enabled then
 			if right.sortPriorityName ~= left.sortPriorityName then
@@ -329,7 +333,6 @@ local function prehookCraftSort(self)
 					lastHeaderEntry.num = getCount(lastHeaderEntry.bagTypeId, lastHeaderEntry.bestItemTypeName)
 				end
 				lastHeaderEntry = headerEntry
-				--headerEntry.num = num
 				 
 				if entry.isHeader then
 					countItems = false
@@ -378,7 +381,6 @@ function AutoCategory.HookKeyboardMode()
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list, nil)
 	
-	ZO_PreHook(ZO_InventoryManager, "ApplySort", prehookSort)
 	ZO_PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
 	
     ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData", prehookCraftSort)

@@ -602,6 +602,8 @@ end
 function AutoCategory_FCOIS.Initialize()
 	if FCOIS == nil then
         AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
         return
     end
     
@@ -613,6 +615,8 @@ function AutoCategory_FCOIS.Initialize()
     
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
+    AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+    AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
 end
 
 local markedTypeMap = {
@@ -721,7 +725,7 @@ end
 -- Implement ismarked() check function for FCOIS
 function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	local fn = "ismarked"
-	if FCOIS == nil then --or not AutoCategory.saved.integration["FCOIS_ENABLE"] then
+	if FCOIS == nil then
 		return false
 	end
 	local ac = select( '#', ... ) 
@@ -760,7 +764,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	end
 	
 	if additionalName ~= "" then
-		AutoCategory.AdditionCategoryName = AutoCategory.AdditionCategoryName .. string.format(" (%s)", additionalName)
+		AutoCategory.AdditionCategoryName = additionalName
 	end
 	
 	if #checkIconIds > 0 then
@@ -768,6 +772,26 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	else
 		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, -1)
 	end
+end
+
+-- Implement isfcoisprotected() check function for FCOIS
+function AutoCategory_FCOIS.RuleFunc.IsFCOISProtected( ... )
+	local fn = "isfcoisprotected"
+	if FCOIS == nil then
+		return false
+	end
+	
+	return FCOIS.IsLocked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+end
+
+-- Implement isfcoisgear() check function for FCOIS
+function AutoCategory_FCOIS.RuleFunc.IsFCOISGear( ... )
+	local fn = "isfcoisgear"
+	if FCOIS == nil or FCOIS.IsGear == nil then
+		return false
+	end
+	
+	return FCOIS.IsGear(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 AutoCategory.RegisterPlugin("FCOIS", AutoCategory_FCOIS.Initialize)

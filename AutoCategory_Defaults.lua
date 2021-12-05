@@ -259,6 +259,7 @@ AutoCategory.defaultAcctSettings = {
 		["SHOW_CATEGORY_ITEM_COUNT"] = true,
 		["SHOW_CATEGORY_COLLAPSE_ICON"] = true,
 		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
+		["SHOW_CATEGORY_SET_TITLE"] = true,
 	},
     collapses = AutoCategory.defaultCollapses,
 }

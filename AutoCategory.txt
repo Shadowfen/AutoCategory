@@ -1,12 +1,12 @@
 ## Title: AutoCategory
-## APIVersion: 100034 100035
+## APIVersion: 101031 101032
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
-## Description: Type "/ac" for settings
-## Version: 2.20
-## AddOnVersion: 47
+## Description: Inventory categorization. Type "/ac" for settings
+## Version: 2.34
+## AddOnVersion: 61
 ## SavedVariables: AutoCategorySavedVars
-## DependsOn: LibAddonMenu-2.0 LibSFUtils LibMediaProvider-1.0 LibDebugLogger
-## OptionalDependsOn: GridList GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver UnknownTracker
+## DependsOn: LibAddonMenu-2.0>=32 LibSFUtils>=38 LibMediaProvider-1.0 LibDebugLogger
+## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
 
 lang/strings.lua
 lang/$(language).lua
@@ -24,13 +24,13 @@ AutoCategory_API.lua
 Misc_Plugins.lua
 
 ; new style addon plugin files
+ItemMarker_Plugin.lua
 ItemSaver_Plugin.lua
 FCOIS_Plugin.lua
 Iakoni_GearChanger_Plugin.lua
 UnknownTracker_Plugin.lua
 
 ; old integration with other addons files
-AutoCategory_Integrations_Inventory_Grid_View.lua
 AutoCategory_Integrations_QuickMenu.lua
 
 Bindings.xml

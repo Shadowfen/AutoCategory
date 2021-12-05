@@ -13,7 +13,8 @@ AutoCategory_MiscAddons = {
 function AutoCategory_MiscAddons.Initialize()
     -- Master Merchant
 	AutoCategory.AddRuleFunc("getpricemm", AutoCategory_MiscAddons.RuleFunc.GetPriceMM)
-    
+	AutoCategory.AddRuleFunc("getamountttc", AutoCategory_MiscAddons.RuleFunc.GetAmountTTC)    
+	
     -- Tamriel Trade Center
     AutoCategory.AddRuleFunc("getpricettc", AutoCategory_MiscAddons.RuleFunc.GetPriceTTC)
     
@@ -29,6 +30,15 @@ function AutoCategory_MiscAddons.Initialize()
         AutoCategory.AddRuleFunc("istracked", AutoCategory.dummyRuleFunc)    -- always return false
     else
         AutoCategory.AddRuleFunc("istracked", AutoCategory_MiscAddons.RuleFunc.IsTracked)
+    end
+	
+	-- Character Knowledge
+	if not LibCharacterKnowledge then
+        AutoCategory.AddRuleFunc("ck_isknowncat", AutoCategory.dummyRuleFunc)    -- always return false
+        AutoCategory.AddRuleFunc("ck_isknown", AutoCategory.dummyRuleFunc)    -- always return false
+    else
+        AutoCategory.AddRuleFunc("ck_isknowncat", AutoCategory_MiscAddons.RuleFunc.IsKnownCatInCK)
+        AutoCategory.AddRuleFunc("ck_isknown", AutoCategory_MiscAddons.RuleFunc.IsKnownInCK)
     end
     
     
@@ -89,6 +99,19 @@ function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
 	return 0 
 end
 
+-- Implement getamountttc() check function for Tamriel Trade Center
+function AutoCategory_MiscAddons.RuleFunc.GetAmountTTC( ... )
+	local fn = "getamountttc"
+	if TamrielTradeCentre and TamrielTradeCentrePrice then
+		local itemLink = getCurrentItemLink()
+		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
+		if priceInfo then
+			return priceInfo.AmountCount
+		end
+	end
+	return 0
+end
+
 -- Implement alphagear() check function for Alpha Gear
 function AutoCategory_MiscAddons.RuleFunc.AlphaGear( ... ) 
 	if not (AG ) then
@@ -122,8 +145,7 @@ function AutoCategory_MiscAddons.RuleFunc.AlphaGear( ... )
 			for slot = 1,14 do
 				if AG.setdata[AG.setdata[nr].Set.gear].Gear[slot].id == uid then
 					local setName = AG.setdata[nr].Set.text[1]
-					AutoCategory.AdditionCategoryName = AutoCategory.AdditionCategoryName .. string.format(" (%s)", setName)
-	
+					AutoCategory.AdditionCategoryName = setName
 					return true
 				end
 			end
@@ -166,6 +188,89 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
   end
   -- not a set tracked by SetTrack
   return false  
+end
+
+local function getCharId( charname )
+	local sv = {}
+	for i = 1, GetNumCharacters() do
+		local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
+		sv[name] = characterId
+	end
+	if sv[charname] ~= nil then
+	    return sv[charname]
+	end
+	return nil
+end
+
+-- Implement ck_isknown() check function for Set Tracker
+function AutoCategory_MiscAddons.RuleFunc.IsKnownInCK( ... )
+	local fn = "ck_isknown"
+	if LibCharacterKnowledge == nil then
+		return false
+	end
+	
+	local itemLink = getCurrentItemLink()
+	local cat = LibCharacterKnowledge.GetItemCategory(itemLink)
+	
+	local server = zo_strsplit(" ", GetWorldName())
+	local ac = select( '#', ... )
+	local crafter, knowledge
+	if ac == 0 then
+		knowledge = LibCharacterKnowledge.GetItemKnowledgeForCharacter(itemLink, server)
+	else
+		local arg = select(1, ...)
+		for i = 1, GetNumCharacters() do
+			local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
+			name = zo_strformat("<<1>>", name)
+			if name == arg then
+				crafter = characterId
+			end
+		end
+		knowledge = LibCharacterKnowledge.GetItemKnowledgeForCharacter(itemLink, server, crafter)
+	end
+	if knowledge  == LibCharacterKnowledge.KNOWLEDGE_KNOWN then
+		return true
+	end
+  -- not known by character
+  return false  
+end
+
+-- Implement ck_isknowncat() check function for Set Tracker
+function AutoCategory_MiscAddons.RuleFunc.IsKnownCatInCK( ... )
+	local fn = "ck_isknowncat"
+	if LibCharacterKnowledge == nil then
+		return false
+	end
+
+	-- check if item is in one of CK's defined categories
+	local itemLink = getCurrentItemLink()
+	local cat = LibCharacterKnowledge.GetItemCategory(itemLink)
+	if cat == LibCharacterKnowledge.ITEM_CATEGORY_NONE then return false end
+	
+	-- decide which CK categories to look for
+	local names = { 
+		["recipe"] =  LibCharacterKnowledge.ITEM_CATEGORY_RECIPE, 
+		["plan"] = LibCharacterKnowledge.ITEM_CATEGORY_PLAN, 
+		["motif"] = LibCharacterKnowledge.ITEM_CATEGORY_MOTIF,
+		}
+	local chkCats = {}
+	local ac = select( '#', ... )
+	if ac == 0 then
+		return true
+	else
+		for ax = 1, ac do
+			local arg = select(ax, ...)
+			if not arg or not names[arg] then 
+				error( string.format("error: %s(): argument %d is error. %s not recognized." , fn, ax, arg ) )
+			end
+			
+			chkCats[names[arg]] = true
+		end
+	end	
+	if chkCats[cat] then
+	    return true
+	end
+	return false  
 end
 
 

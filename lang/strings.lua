@@ -120,6 +120,8 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP = "Shows an icon to collapse/expand the categories.",
     SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS = "Save Category Collapse Status",
     SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP = "Will keep the categories collapsed/expanded as they are after quit/log out.",
+	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE = "Show 'Set(name)' for autosets",
+	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP = "Show 'Set(name)' instead of 'name' in inventory for autosets",
 
     SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
     SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",

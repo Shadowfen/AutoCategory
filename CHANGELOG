@@ -1,5 +1,133 @@
+[COLOR="DeepSkyBlue"]2.33(60)[/COLOR]:
+[LIST]
+[*] Added "armor_invigorating" to the list of traittypes that you can check for. It is actually an alias for the already existing "armor_prosperous" which the game used to use as a different trait type. When Zenimax removed the "prosperous" trait type and introduced the "invigorating" one, they did not actually change the internal name from ITEM_TRAIT_TYPE_ARMOR_PROSPEROUS to something that more accurately expressed what it now represents.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.33(60)[/COLOR]:
+[LIST]
+[*] Fixed traittype("ornate") so that it will work again.
+[*] Added ability for the integration with UnknownTracker to tell us when Style Pages are unknown.
+[*] In addition to adding style pages to the UnknownTracker Plugin function isunknown(), we have a New function [COLOR="MediumSeaGreen"]isstyleunknown()[/COLOR] specifically to look for style pages from UnknownTracker.
+[*] Fixed multiple errors in the new bulkmode code when running with GridList.
+
+[*] Keyboard-mode only. Added a "BulkMode" capability for an inventory manager addon to turn off AutoCategory sorting in the Guild Bank while moving items to or from the guild bank - thereby speeding up the process immensely. Your inventory manager addon will need to set and release BulkMode inside of the addon to temporarily disable guildbank sorting and categorizing. To start, the author needs to set that their addon has an optional dependency on AutoCategory
+[CODE]
+## OptionalDependsOn: AutoCategory
+[/CODE]
+and then to turn on bulk mode:
+[CODE]
+	if AutoCategory then
+		AutoCategory.BulkMode = true
+	end
+[/CODE]
+before starting the automated guildbank management process. Once the process is done, the author then needs to reenable AutoCategory sorting and categorization with the following code.
+[CODE]
+	if AutoCategory and AutoCategory.BulkMode and AutoCategory.BulkMode == true then
+		AutoCategory.BulkMode = false
+		PLAYER_INVENTORY:UpdateList(INVENTORY_GUILD_BANK)
+	end
+[/CODE]
+(Note: If the author does not do this second part, the sorting and categorization that AutoCategory provides will be reenabled when the Guild Bank window is closed.)
+[*] Other performance enhancing changes.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.32(59)[/COLOR]:
+[*] Reverting changes while I work on the integration with GridList bug. This version is identical to previous 2.30 except the change in version number.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.31(58)[/COLOR]:
+[*] Version changes removed.
+[/LIST]
+
+
+[COLOR="DeepSkyBlue"]2.30(57)[/COLOR]:
+[LIST]
+[*] Enahncement to function [COLOR="MediumSeaGreen"]ck_isknown()[/COLOR] to accept an optional parameter specifying the character name in the same account who is your crafter and returns true or false if the item in question is marked as known by the specified character by CharacterKnowledge. If you do not specify a character name, then it assumes that you want ck_isknown() to use the current character. If you misspell your character name, or provide a character from a different account, it will ignore the parameter and assume you meant the current character.
+Exampe:
+[CODE]
+    ck_isknowncat("recipe") and not ck_isknown("My Crafty Crafter")
+[/CODE]
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.29 (56)[/COLOR]:
+[LIST]
+[*] New - Integration with CharacterKnowledge addon, requested by tralce.
+[*] New function [COLOR="MediumSeaGreen"]ck_isknowncat()[/COLOR] returns true or false if the item in question belongs to one of the categories recognized by CharacterKnowledge - "recipe", "plan", or "motif". You may specify one or more of these categories to restrict the membership you are looking for, or if you leave it empty then the function will check membership against any of the known categories.
+[*] New function [COLOR="MediumSeaGreen"]ck_isknown()[/COLOR] returns true or false if the item in question is marked as known for the current character (and server) by CharacterKnowledge. Note that this function will return false when tested against an item (such as a piece of armor, or a potion) that is not tracked by CharacterKnowledge. A recommended rule for checking unknowns would be
+[CODE]
+    ck_isknowncat() and not ck_isknown()
+[/CODE]
+More specifically, you can look for unknown recipes only by the following:
+[CODE]
+    ck_isknowncat("recipe") and not ck_isknown()
+[/CODE]
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.28 (55)[/COLOR]:
+[LIST]
+[*] New - Spanish language translation courtesy of MasterZiggy.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.27 (54)[/COLOR]:
+[LIST]
+[*] New setting to change category names from "Set (God Gear)" to simply "God Gear" when using the autoset rule. The default setting (ON) is to behave as it always has before. Turning it off will enable the display of "God Gear" instead of the old "Set (  )". Note that changing this setting will change all of your collapsed categories back to expanded in your inventory because those are stored by name.
+Categories are usually named "rule name" or "rule name (sub-name)" when there is a sub-name provided. Typically the autoset(), the FCOIS plugin, and the AlphaGear plugins are known to provide sub-names. If a subname is not provided, then we always display the only the rule name as the category.
+[*] FCOIS users, this new setting will also affect category names for FCOIS rules (in particular the Dynamic rules.)
+[*] AlphaGear users, this new setting will also affect category names for AlphaGear rules.
+[*] ANNOYING CHANGE for Plugin authors: Where previously, you would append " (sub-name)" to the AutoCategory.AdditionCategoryName, now you should simply assign your subname to it (AutoCategory.AdditionCategoryName = subname). The AutoCategory addon will be responsible for putting the subname in parentheses as necessary for display.
+[*] Translations of:
+[code]
+	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE = "Show 'Set(name)' for autosets",
+	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP = "Show 'Set(name)' instead of 'name' in inventory for autosets",
+[/code]
+are requested for German, French, Russian, and Chinese to update the new strings for those languages
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.26 (53)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]isinzone()[/COLOR] returns true or false if the name of the item in question contains the name of the current zone. (Primarily useful for treasure maps and surveys!)
+[*] New function [COLOR="MediumSeaGreen"]zone()[/COLOR] returns the name of the current zone.
+[*] API bump.
+[/LIST]
+Gamepad changes from [COLOR="Gold"]Friday-the13-rus.[/COLOR]
+[LIST]
+[*] Fix for gamepad guild bank and updated gamepad inventory keybinds position to match vanilla inventory
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.25 (52)[/COLOR]:
+[LIST]
+[*] Require minimum version of installed LibAddonMenu to be at least 32. Earlier versions will break the user interface.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.24 (51)[/COLOR]:
+[LIST]
+[*] Implemented minor speedup suggested by Klingo. Thanks!
+[*] Update minimum versions of required libraries checked for.
+[*] API bump.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.23 (50)[/COLOR]:
+FCOItemSaver integration enhancements: (requested by Baertram)
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]isfcoisprotected()[/COLOR] checks if the item is protected by FCOIS.
+[*] New function [COLOR="MediumSeaGreen"]isfcoisgear()[/COLOR] checks of the item is marked as gear in FCOIS.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.22 (49)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]getamountttc()[/COLOR] to get the number of sales for the current item from TTC.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.21 (48)[/COLOR]:
+[LIST]
+[*] Put in a fix addressing the lag issue with banking. 
+[*] Commented out the remains of the old (nonsupported) Inventory Grid View addon integration. For using a grid inventory view with AutoCategory, I recommend the Grid List addon. 
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.20 (47)[/COLOR]:
 [LIST]
+[*] Merged in code from @Saenic to turn on/off the display of the plus/minus to expand/condense individual categories within the inventory. 
+    The default setting is to have the display of plus/minus be ON (as it worked before).
 [*] Added the following new item trait types introduced with the companions: 
     o armor: 
 	  [COLOR="MediumSeaGreen"]armor_aggressive, armor_augmented, armor_bolstered, armor_focused, armor_prolific, armor_quickened, armor_shattering, armor_soothing, armor_vigorous[/COLOR]

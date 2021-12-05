@@ -93,11 +93,11 @@ function AutoCategory_UnknownTracker.Initialize()
     AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
 
     -- load supporting rule functions
-    AutoCategory.AddRuleFunc("isunknown", AutoCategory_UnknownTracker.RuleFunc.IsUnknown)
-    AutoCategory.AddRuleFunc("isrecipeunknown", AutoCategory_UnknownTracker.RuleFunc.IsRecipeUnknown)
-    AutoCategory.AddRuleFunc("isfurnishingunknown", AutoCategory_UnknownTracker.RuleFunc.IsFurnishingUnknown)
-    AutoCategory.AddRuleFunc("ismotifunknown", AutoCategory_UnknownTracker.RuleFunc.IsMotifUnknown)
-    AutoCategory.AddRuleFunc("isstyleunknown", AutoCategory_UnknownTracker.RuleFunc.IsStyleUnknown)
+    AutoCategory.AddRuleFunc("isunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown)
+    AutoCategory.AddRuleFunc("isrecipeunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsRecipeUnknown)
+    AutoCategory.AddRuleFunc("isfurnishingunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsFurnishingUnknown)
+    AutoCategory.AddRuleFunc("ismotifunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown)
+    AutoCategory.AddRuleFunc("isstyleunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsStyleUnknown)
     
 end
 
@@ -105,13 +105,15 @@ local valid_itemtypes = {
   [ITEMTYPE_RACIAL_STYLE_MOTIF] = true,
   [ITEMTYPE_RECIPE] = true,
   [ITEMTYPE_CONTAINER] = true,      -- problem here there are some containers we are not interested in
+  [ITEMTYPE_COLLECTIBLE] = true,	-- there are lots of collectibles we are not interested in
 }
 
 local function lookupItem(itemLink, characters)
+	if UnknownTracker == nil then return false end
+	
     -- find out who knows the item
     local isvalid, knownlist = UnknownTracker:IsValidAndWhoKnowsIt(itemLink)
     if not isvalid then
-        --d("invalid "..itemLink)
         -- not a real item
         return false 
     end
@@ -179,31 +181,35 @@ local function getCharList(...)
 end
 
 -- Implement isunknown() check function for UnknownTracker
-function AutoCategory_UnknownTracker.RuleFunc.IsUnknown( ... )
+function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
 	local fn = "isunknown"
-	if UnknownTracker == nil then
-        return false
-	end
+	if UnknownTracker == nil then return false end
+	
     local isunknown = false
     local characters = getCharList(...)
     
     -- find out who knows it (if UT display setting is true)
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if not itemLink then return false end
-    local itemType = GetItemLinkItemType(itemLink)
+	
+	-- it is an item that can be learned
+    local itemType,sptype = GetItemLinkItemType(itemLink)
     local islearnable = false
-    if valid_itemtypes[itemType] == true then
+	--if itemType == ITEMTYPE_COLLECTIBLE and sptype == SPECIALIZED_ITEMTYPE_COLLECTIBLE_STYLE_PAGE then
+    --    return lookupItem(itemLink, characters)
+	--end
+	if valid_itemtypes[itemType] == true then
         islearnable = true
     end
     if not islearnable then return false end
+	
     return lookupItem(itemLink, characters)
 end
 
-function AutoCategory_UnknownTracker.RuleFunc.IsRecipeUnknown( ... )
+function AutoCategory_UnknownTracker.RuleFunc.UT_IsRecipeUnknown( ... )
 	local fn = "isrecipeunknown"
-	if UnknownTracker == nil then
-        return false
-	end
+	if UnknownTracker == nil then return false end
+	
     local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
@@ -220,11 +226,10 @@ function AutoCategory_UnknownTracker.RuleFunc.IsRecipeUnknown( ... )
     return lookupItem(itemLink, characters)
 end
 
-function AutoCategory_UnknownTracker.RuleFunc.IsMotifUnknown( ... )
+function AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown( ... )
 	local fn = "ismotifunknown"
-	if UnknownTracker == nil then
-        return false
-	end
+	if UnknownTracker == nil then return false end
+	
     local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
@@ -253,11 +258,30 @@ local valid_furnishingTypes = {
   [SPECIALIZED_ITEMTYPE_RECIPE_WOODWORKING_BLUEPRINT_FURNISHING] = true,
 }
 
-function AutoCategory_UnknownTracker.RuleFunc.IsFurnishingUnknown( ... )
+function AutoCategory_UnknownTracker.RuleFunc.UT_IsFurnishingUnknown( ... )
 	local fn = "isfurnishingunknown"
-	if UnknownTracker == nil then
-        return false
-	end
+	if UnknownTracker == nil then return false end
+	
+    local isunknown = false
+    -- who is supposed to know it?
+    local characters = getCharList(...)
+    
+    -- are we interested in the item?
+    local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    if not itemLink then return false end
+	
+    local itemType, sptype = GetItemLinkItemType(itemLink)
+    if itemType ~= ITEMTYPE_RECIPE then return false end
+    if not valid_furnishingTypes[sptype]then return false end
+
+    -- return true if characters don't know this one
+    return lookupItem(itemLink, characters)
+end
+
+function AutoCategory_UnknownTracker.RuleFunc.UT_IsStyleUnknown( ... )
+	local fn = "isstyleunknown"
+	if UnknownTracker == nil then return false end
+	
     local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
@@ -266,12 +290,12 @@ function AutoCategory_UnknownTracker.RuleFunc.IsFurnishingUnknown( ... )
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if not itemLink then return false end
     local itemType, sptype = GetItemLinkItemType(itemLink)
-    if itemType ~= ITEMTYPE_RECIPE then return false end
-    if not valid_furnishingTypes[sptype]then return false end
+    if sptype ~= SPECIALIZED_ITEMTYPE_COLLECTIBLE_STYLE_PAGE then return false end
 
     -- return true if characters don't know this one
     return lookupItem(itemLink, characters)
 end
+
 
 
 -- Register this plugin with AutoCategory to be initialized and used when AutoCategory loads.
