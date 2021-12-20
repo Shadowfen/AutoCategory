@@ -1,4 +1,4 @@
-[COLOR="DeepSkyBlue"]2.33(60)[/COLOR]:
+[COLOR="DeepSkyBlue"]2.34(61)[/COLOR]:
 [LIST]
 [*] Added "armor_invigorating" to the list of traittypes that you can check for. It is actually an alias for the already existing "armor_prosperous" which the game used to use as a different trait type. When Zenimax removed the "prosperous" trait type and introduced the "invigorating" one, they did not actually change the internal name from ITEM_TRAIT_TYPE_ARMOR_PROSPEROUS to something that more accurately expressed what it now represents.
 [/LIST]
