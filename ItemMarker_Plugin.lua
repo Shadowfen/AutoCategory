@@ -10,35 +10,36 @@ AutoCategory_ItemMarker = {
 --Initialize plugin for Auto Category - Item Saver
 function AutoCategory_ItemMarker.Initialize()
 	if not ItemMarker then
-        AutoCategory.AddRuleFunc("ismarkedim", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("im_ismarked", AutoCategory.dummyRuleFunc)
         return
     end
     
     -- load supporting rule functions
-    AutoCategory.AddRuleFunc("ismarkedim", AutoCategory_ItemMarker.RuleFunc.IsMarkedIM)
+    AutoCategory.AddRuleFunc("im_ismarked", AutoCategory_ItemMarker.RuleFunc.IsMarkedIM)
     
 end
 
 -- Implement ismarkedis() check function for Item Marker
 function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
-	local fn = "ismarkedim"
+	local fn = "im_ismarked"
 	if ItemMarker == nil then
 		return false
 	end
 	local ac = select( '#', ... ) 
-	local checkSets = {}
+	local checkMarks = {}
 	for ax = 1, ac do
 		
 		local arg = select( ax, ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		checkSets[arg]=true
+		checkMarks[arg]=true
 	end
-	local ismarked, setname = ItemMarker_IsItemMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local ismarked, markName = ItemMarker_IsItemMarked(AutoCategory.checkingItemBagId,
+										AutoCategory.checkingItemSlotIndex)
 	if ismarked == true then
 		if ac > 0 then
-			if checkSets[setname] ~= nil then
+			if checkMarks[markName] then
 				return true
 			end
 			return false

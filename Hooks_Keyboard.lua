@@ -179,12 +179,24 @@ local function prehookSort(self, inventoryType)
 		end
 		return ZO_TableOrderingFunction(left.data, right.data, inventory.currentSortKey, sortKeys, inventory.currentSortOrder)
 	end
-	
+
+	-- from nogetrandom
+	if SCENE_MANAGER and SCENE_MANAGER:GetCurrentScene() then
+	  if AutoCategory.BulkMode and AutoCategory.BulkMode == true then
+		local scene = SCENE_MANAGER:GetCurrentScene():GetName()
+		if scene == "guildBank" or (XLGearBanker and scene == "bank") then
+		  return false	-- skip out early
+		end
+	  end
+	end	
+	-- end nogetrandom recommend
+	--[[
     if SCENE_MANAGER and SCENE_MANAGER:GetCurrentScene() then
         if AutoCategory.BulkMode and AutoCategory.BulkMode == true and SCENE_MANAGER:GetCurrentScene():GetName() == "guildBank" then
             return false	-- skip out early
         end
     end
+	--]]
 
 	local list = inventory.listView 
 	local scrollData = ZO_ScrollList_GetDataList(list) 
@@ -288,7 +300,8 @@ local function prehookCraftSort(self)
 		--only match items(not headers)
 		if entry.typeId ~= CATEGORY_HEADER then
 		local slotData = entry.data
-		local matched, categoryName, categoryPriority, bagTypeId, isHidden = AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex, AC_BAG_TYPE_CRAFTSTATION)
+		local matched, categoryName, categoryPriority, bagTypeId, isHidden = 
+			AutoCategory:MatchCategoryRules(slotData.bagId, slotData.slotIndex, AC_BAG_TYPE_CRAFTSTATION)
 		if not matched or not AutoCategory.Enabled then
 			entry.bestItemTypeName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"] 
 			entry.sortPriorityName = string.format("%03d%s", 999 , categoryName) 
@@ -381,6 +394,7 @@ function AutoCategory.HookKeyboardMode()
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list, nil)
 	
+	ZO_PreHook(ZO_InventoryManager, "ApplySort", prehookSort)
 	ZO_PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
 	
     ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData", prehookCraftSort)
