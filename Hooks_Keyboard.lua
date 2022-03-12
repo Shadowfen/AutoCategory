@@ -394,7 +394,7 @@ function AutoCategory.HookKeyboardMode()
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list, nil)
 	
-	ZO_PreHook(ZO_InventoryManager, "ApplySort", prehookSort)
+	--ZO_PreHook(ZO_InventoryManager, "ApplySort", prehookSort)
 	ZO_PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
 	
     ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData", prehookCraftSort)
