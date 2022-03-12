@@ -652,6 +652,15 @@ function AutoCategory.RuleFunc.IsCharBound( ... )
     return false
 end
 
+function AutoCategory.RuleFunc.IsUnknownCollectible( ... )
+	local fn = "isunknowncollectible"
+
+	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local collectibleId = GetItemLinkContainerCollectibleId(itemLink)
+	if collectibleId == 0 then return false end
+	return not IsCollectibleUnlocked(collectibleId)
+end
+
 function AutoCategory.RuleFunc.IsCollected( ... )
 	local fn = "iscollected"
 	
@@ -1483,6 +1492,7 @@ AutoCategory.Environment = {
 	isunbound        = AutoCategory.RuleFunc.IsUnbound,
 	isboptradeable = AutoCategory.RuleFunc.IsBoPTradeable,
 	
+	isunknowncollectible = AutoCategory.RuleFunc.IsUnknownCollectible,
 	iscollected    = AutoCategory.RuleFunc.IsCollected,
 	isnotcollected = AutoCategory.RuleFunc.IsNotCollected, 
 	
