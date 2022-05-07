@@ -602,6 +602,7 @@ EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_PLAYER_ACTIVATED, AutoCa
 --== Interface ==--
 local AC_DECON = 880
 local AC_IMPROV = 881
+local UV_DECON = 882
 
 local inven_data = {
 	[INVENTORY_BACKPACK] = {
@@ -638,6 +639,10 @@ local inven_data = {
 		control = SMITHING.improvementPanel.control,
 	},
 	
+	[UV_DECON] = {
+		object = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory,
+		control = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control,
+	},
 }
 
 local function RefreshList(inventoryType, even_if_hidden)
@@ -657,6 +662,10 @@ local function RefreshList(inventoryType, even_if_hidden)
 		if even_if_hidden == false and not SMITHING.improvementPanel.control:IsHidden() then
 			SMITHING.improvementPanel.inventory:PerformFullRefresh()
 		end
+	elseif inventoryType == UV_DECON then
+		if even_if_hidden == false and not UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control:IsHidden() then
+			UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory:PerformFullRefresh()
+		end
 	else
 		PLAYER_INVENTORY:UpdateList(inventoryType, even_if_hidden)
 	end
@@ -674,6 +683,7 @@ function AutoCategory.RefreshCurrentList(even_if_hidden)
 	RefreshList(INVENTORY_BANK, even_if_hidden)
 	RefreshList(AC_DECON, even_if_hidden)
 	RefreshList(AC_IMPROV, even_if_hidden)
+	RefreshList(UV_DECON, even_if_hidden)
 end
 
 function AutoCategory.RefreshAllLists()

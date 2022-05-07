@@ -1,6 +1,21 @@
+[COLOR="DeepSkyBlue"]2.38(65)[/COLOR]:
+[LIST]
+[*] API bump (High Isle)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.37(64)[/COLOR]:
+[LIST]
+[*] Fix the category headers in Giladil's deconstruction list so that they will expand and contract properly.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]2.36(63)[/COLOR]:
+[LIST]
+[*] Add AutoCategory sorting to Giladil The Rag Picker's deconstruction screen.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]2.35(62)[/COLOR]:
 [LIST]
-[*] New function [COLOR="MediumSeaGreen"]ck_isunknowncollectible()[/COLOR]. This function matches style pages, runeboxes and collectible fragments the user hasn't collected yet. Previously this was only possible with Unknown Tracker integration. Code provided by jkhsjdhjs.
+[*] New function [COLOR="MediumSeaGreen"]isunknowncollectible()[/COLOR]. This function matches style pages, runeboxes and collectible fragments the user hasn't collected yet. Previously this was only possible with Unknown Tracker integration. Code provided by jkhsjdhjs.
 [*] API bump
 [/LIST]
 
