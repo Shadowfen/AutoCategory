@@ -8,3 +8,4 @@ test_run.lua
 .buildpath
 .project
 .settings
+tags.sqlite
