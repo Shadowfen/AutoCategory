@@ -1293,7 +1293,7 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	local armoryBuildListNames = { GetItemArmoryBuildList(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
 	if not armoryBuildListNames then return false end
 	
-	local numBuilds = select('#', armoryBuildListNames)
+	local numBuilds = #(armoryBuildListNames)
 	if numBuilds == 0 then return false end
 	
 	for ax = 1, ac do
