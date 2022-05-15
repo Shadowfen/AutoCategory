@@ -1277,6 +1277,37 @@ function AutoCategory.RuleFunc.AlphaGear( ... )
 	return false 
 end
 
+function AutoCategory.RuleFunc.ArmoryBuild( ... )
+	local fn = "armorybuild"
+	local ac = select( '#', ... )
+	
+	if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+
+	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
+	local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then return false end
+	
+	-- Retrieve a list of armory builds this item is part of
+	local armoryBuildListNames = { GetItemArmoryBuildList(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
+	if not armoryBuildListNames then return false end
+	
+	local numBuilds = select('#', armoryBuildListNames)
+	if numBuilds == 0 then return false end
+	
+	for ax = 1, ac do
+		local arg = select( ax, ... )
+		for build = 1,numBuilds do
+			local buildName = armoryBuildListNames[build]
+			if arg == buildName then
+				AutoCategory.AdditionCategoryName = buildName
+				return true
+			end
+		end
+	end
+	return false
+end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsEquipping( ... )
@@ -1510,6 +1541,7 @@ AutoCategory.Environment = {
 	
 	isinbank       = AutoCategory.RuleFunc.IsInBank,
 	isinbackpack   = AutoCategory.RuleFunc.IsInBackpack,
+	armorybuild    = AutoCategory.RuleFunc.ArmoryBuild,
 
 	isinquickslot  = AutoCategory.RuleFunc.IsInQuickslot,
 	 
