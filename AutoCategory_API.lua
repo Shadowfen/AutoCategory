@@ -1,4 +1,5 @@
 --====API====--
+local SF = LibSFUtils
 
 -- For use by bulk updaters of inventory (ESPECIALLY the Guild Bank)
 -- to not perform sorting for a specific period of time (until the
@@ -8,35 +9,88 @@
 -- It is hoped that by entering into bulk mode that we do not perform
 -- server requests for the guild bank 
 function AutoCategory.EnterBulkMode()
-	AutoCategory.BulkMode(false)
+	AutoCategory.BulkMode(true)
 end
 function AutoCategory.ExitBulkMode()
 	AutoCategory.BulkMode(false)
 end
 
+
 -- Convert a ZOS bagId into AutoCategory bag_type_id
 -- returns the bag_type_id enum value 
 --       or nil if bagId is not recognized
-local function convert2BagTypeId(bagId)
-	local bag_type_id = nil
-	if bagId == BAG_BACKPACK or bagId == BAG_WORN then
-		bag_type_id = AC_BAG_TYPE_BACKPACK
-	elseif bagId == BAG_BANK or bagId == BAG_SUBSCRIBER_BANK then
-		bag_type_id = AC_BAG_TYPE_BANK
-	elseif bagId == BAG_VIRTUAL then
-		bag_type_id = AC_BAG_TYPE_CRAFTBAG
-	elseif bagId == BAG_GUILDBANK then
-		bag_type_id = AC_BAG_TYPE_GUILDBANK
-	elseif bagId == BAG_HOUSE_BANK_ONE or bagId == BAG_HOUSE_BANK_TWO or bagId == BAG_HOUSE_BANK_THREE 
-			or bagId == BAG_HOUSE_BANK_FOUR or bagId == BAG_HOUSE_BANK_FIVE or bagId == BAG_HOUSE_BANK_SIX 
-			or bagId == BAG_HOUSE_BANK_SEVEN or bagId == BAG_HOUSE_BANK_EIGHT then
-		bag_type_id = AC_BAG_TYPE_HOUSEBANK
+local BagTypeConversion = {
+	[BAG_BACKPACK] = AC_BAG_TYPE_BACKPACK,
+	[BAG_WORN] = AC_BAG_TYPE_BACKPACK,
+	[BAG_BANK] = AC_BAG_TYPE_BANK,
+	[BAG_SUBSCRIBER_BANK] = AC_BAG_TYPE_BANK,
+	[BAG_VIRTUAL] = AC_BAG_TYPE_CRAFTBAG,
+	[BAG_GUILDBANK] = AC_BAG_TYPE_GUILDBANK,
+	[BAG_HOUSE_BANK_ONE] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_TWO] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_THREE] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_FOUR] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_FIVE] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_SIX] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_SEVEN] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_EIGHT] = AC_BAG_TYPE_HOUSEBANK,
+}
+-- convert ZOS bag type to AC bag type
+function convert2BagTypeId(bagId, acprimary)
+	if acprimary ~= nil then return acprimary end
+	if bagId == nil then return nil end
+	return BagTypeConversion[bagId]
+end
+
+function AutoCategory.validateBagRules(bagId, acprimary)
+	return AutoCategory.validateACBagRules(convert2BagTypeId(bagId, acprimary))
+end
+	
+-- Make sure that all of the rules for this bag are valid/undamaged
+-- Do this by bag rather than by rule to avoid repeating this unnecessarily
+-- as the bag of rules is evaluated per each item in the bag.
+-- Do this up front to save time.
+function AutoCategory.validateACBagRules(acBagType)
+
+	if acBagType == nil then return false end
+
+	--local logger = LibDebugLogger("AutoCategory")
+	--logger:SetEnabled(true)
+	
+	-- Mark rules as damaged when we find something wrong with them
+	local function checkValidRule(name, rule)
+		if rule == nil or name == nil then return end
+		
+		local isValid = true
+		if rule.rule == nil then
+			rule.damaged = true 
+			return
+		end
+		local ruleCode = AutoCategory.compiledRules[name]
+		if not ruleCode or type(ruleCode) ~= "function" then
+			rule.damaged = true 
+			AutoCategory.compiledRules[name] = nil
+			return
+		end
+		rule.damaged = false
+		return
 	end
-	return bag_type_id
+	
+	-- Make sure all of the rules in the bag are evaluated if damaged and marked appropriately
+	local bag = AutoCategory.saved.bags[acBagType]
+	for i = 1, #bag.rules do
+		local entry = bag.rules[i] 
+		local rule = AutoCategory.GetRuleByName(entry.name)
+		checkValidRule(entry.name, rule)
+	end
+	--logger:SetEnabled(false)
 end
 
 -- see if we find a category rule match for the item passed in.
 --     i.e. execute the rule on the specific inventory item
+-- runs all the rules assigned to the specific bag type against
+--     each item in the bag
+--
 -- returns
 --   boolean - was a match found?
 --   string  - name of rule matched combined with additionCategoryName
@@ -44,64 +98,84 @@ end
 --   enum    - bag type id
 --   boolean - is entry hidden?
 function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
-	AutoCategory.LazyInit()
-
-	self.checkingItemBagId = bagId
-	self.checkingItemSlotIndex = slotIndex
-	local bag_type_id
-	if specialType then
-		bag_type_id = specialType
-	else 
-		bag_type_id = convert2BagTypeId(bagId)
-	end
-	if not bag_type_id then
-		-- invalid bag
-		return false, "", 0, nil, nil
-	end
-	
 	local logger = LibDebugLogger("AutoCategory")
 	logger:SetEnabled(true)
 	
-	local needCheck = false
+	AutoCategory.LazyInit()
+
+	-- set up bagId and slotIndex to "pass in" to the rule functions
+	self.checkingItemBagId = bagId
+	self.checkingItemSlotIndex = slotIndex
+	self.checkingItemLink = GetItemLink(bagId, slotIndex)
+
+	
+	local bag_type_id = convert2BagTypeId(bagId, specialType)
+	if not bag_type_id then
+		-- invalid bag
+		logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
+		return false, "", 0, nil, nil
+	end
+	
+	-- Adjust the name of the category based on the presence of an enhancement (set name) and
+	-- if SHOW_CATEGORY_SET_TITLE is enabled
+	local function adjustName(name, enhancement)
+		if enhancement == "" then
+			-- just use declared category name
+			return name
+		else
+			if AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
+				-- just use the set name without the category name
+				return enhancement
+			else
+				-- combine the category and set names
+				return name .. string.format(" (%s)", enhancement)
+			end
+		end
+	end
+	
+	
+	-- Make sure that we have a valid (and undamaged) rule to run on the item
+	local function checkValidRule(name, rule)
+		if rule == nil or name == nil then return false end
+		if rule.damaged == true then return false end
+		-- damage check/rule validation really occurs before the MatchCategoryRules call 
+		return true
+	end
+	
+	
 	local bag = AutoCategory.saved.bags[bag_type_id]
+	if not bag then
+		logger:Error("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
+		return  false, "", 0, nil, nil
+	end
+	if not bag.rules then
+		logger:Error("[MatchCategoryRules] bag.rules was nil")
+		return  false, "", 0, nil, nil
+	end
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
 		local rule = AutoCategory.GetRuleByName(entry.name)
-		if rule and rule.damaged ~= true then
-			if rule.rule == nil then
-				rule.damaged = true 
-			else
-				local ruleCode = AutoCategory.compiledRules[entry.name]
-				if not ruleCode or type(ruleCode) ~= "function" then
+		if checkValidRule(entry.name, rule) then
+			local ruleCode = AutoCategory.compiledRules[entry.name]
+			if ruleCode then
+				setfenv( ruleCode, AutoCategory.Environment )
+				AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
+				local exec_ok, res = pcall( ruleCode )
+				if exec_ok then
+					if res == true then
+						return true, adjustName(rule.name, AutoCategory.AdditionCategoryName), 
+							entry.priority, bag_type_id, entry.isHidden
+					end 
+				else
+					logger:Error("Error2: " .. entry.name.. " - ".. res)
 					rule.damaged = true 
+					rule.err = res
 					AutoCategory.compiledRules[entry.name] = nil
-				else 
-					setfenv( ruleCode, AutoCategory.Environment )
-					AutoCategory.AdditionCategoryName = ""
-					local ok, res = pcall( ruleCode )
-					if ok then
-						if res == true then
-							if AutoCategory.AdditionCategoryName == "" then
-								return true, rule.name, entry.priority, bag_type_id, entry.isHidden
-							else
-								if AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
-									return true, AutoCategory.AdditionCategoryName, entry.priority, bag_type_id, entry.isHidden
-								else
-									return true, rule.name .. string.format(" (%s)", AutoCategory.AdditionCategoryName), entry.priority, bag_type_id, entry.isHidden
-								end
-							end
-						end 
-					else
-						logger:Error("Error2: " .. res)
-						rule.damaged = true 
-						rule.err = res
-						AutoCategory.compiledRules[entry.name] = nil
-					end
 				end
 			end
 		end
 	end
-	--logger:SetEnabled(false)
+	logger:SetEnabled(false)
 	
-	return false, "", 0, bag_type_id
+	return false, "", 0, bag_type_id, false
 end 

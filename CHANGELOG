@@ -1,5 +1,82 @@
-[COLOR="DeepSkyBlue"]2.38(65)[/COLOR]:
+[COLOR="DeepSkyBlue"]3.1.7(77)[/COLOR]:
 [LIST]
+[*] Fixed error message during handling of damaged rules.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.6(76)[/COLOR]:
+[LIST]
+[*] Repair a paste error in the French translations file.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.5(75)[/COLOR]:
+[LIST]
+[*] New French translations for text in AutoCategory provided by XXXspartiateXXX. Note that you may need to delete your saved variables for AutoCategory in order for the new translations to be used inside your rules.
+[*] Fixed visibility so that when changing inventory sorting such as sort by status, name, value or even add-on sorting like quality sort add-on, collapsed categories are hidden, only revealed back when collapsing another category. (Reported by Anntauri)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.4(74)[/COLOR]:
+[LIST]
+[*] Fix for a nil function call specific to using the Rag Picker.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.3(73)[/COLOR]:
+[LIST]
+[*] Fix for the handling of craftstation rules (contributed by Kip).
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.2(72)[/COLOR]:
+[LIST]
+[*] Fixed broken isinquickslot() function so it works with the new quickslot system.
+[*] Fixed reported missing items when opening up a collapsed category.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1.1(71)[/COLOR]:
+[LIST]
+[*] Fixed a typo (as identified by Kyp).
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.1(70)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]armorybuild()[/COLOR]. (Contributed by MA3o.) This function that categorizes items based on the armory builds set up for the current character. It mimics the AlphaGear integration in behaviour, but instead of grouping items that belong to a AlphaGear set, it groups items that belong to an armory build.
+
+As an example, if you had an armory build called "Testing", the rule
+[CODE]
+armorybuild("Testing")
+[/CODE]
+will group items that are used in this armory build in a category called "-Category name- (Testing)".
+[*] Prevent categories that have been hidden (per the bag settings) from being displayed anyway.
+[*] Very minor speedup of most of the rule functions.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.0.4(69)[/COLOR]:
+[LIST]
+[*] Changed item count color to the same color as the rest of the category header. (Contributed by kueqvzzv.)
+[*] Prevent category headers with no items under them.
+[*] Code cleanup.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.0.3(68)[/COLOR]:
+[LIST]
+[*] Issue with the header collapse/uncollapse at the deconstruct stations and the Rag Picker is fixed. (Reported by IsharaMeradin, AlbertVonMoosseedorf, SamBF1991, and others)
+[*] Adding checking to gracefully complain about a rule that has an empty definition instead of just throwing an error. (reported by SerLoras)
+[*] Raised the minimum version for LibSFUtils that AutoCategory requires. (Thanks Saenic!)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.0.2(67)[/COLOR]:
+[LIST]
+[*] Fixed remaining issues with High Isle (at least on the PTS server since NA megaserver is still down).
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.0.1(66)[/COLOR]:
+[LIST]
+[*] Comment out the Quickslots hook that was changed in High Isle until I can take a look at it.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.0(65)[/COLOR]:
+[LIST]
+[*] Major rewrite of rule processing to enable speed ups for guild bank handling - heavily based on the code contributed by Bwadrochit -. Thank you!
+[*] The problem with stacksize() == 200 should be fixed.
+[*] The empty New category is no longer reproducable.
 [*] API bump (High Isle)
 [/LIST]
 

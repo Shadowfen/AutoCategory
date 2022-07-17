@@ -6,7 +6,7 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
-AutoCategory.compiledRules = {}
+AutoCategory.compiledRules = SF.safeTable(AC.compiledRules)
 AutoCategory.saved = {
     rules = {}, -- [#] rule {name, tag, description, rule, damaged}
     bags = {} -- [bagId] {rules{name, priority, isHidden}, isHidden}
@@ -14,7 +14,7 @@ AutoCategory.saved = {
 AutoCategory.cache = {
     rulesByName = {}, -- [name] rule#
     rulesByTag = {}, -- [tag] {showNames{rule.name}, tooltips{rule.desc/name}}
-    compiledRules = AutoCategory.compiledRules, -- [name] function
+    compiledRules = AC.compiledRules, -- [name] function
     tags = {}, -- [#] tagname
     bags = {}, -- {showNames{bagname}, values{bagid}, tooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {showNames{ico rule.name (pri)}, values{rule.name}, tooltips{rule.desc/name or missing}} --
@@ -27,6 +27,21 @@ local saved = AutoCategory.saved
 local cache = AutoCategory.cache
 
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
+
+
+local function getCategoryName()
+    local cateName = header.slot.dataEntry.data.AC_categoryName
+	return cateName
+end
+
+local function getBagTypeId(header)
+	SF.dTable(header,5,"getBagTypeId - header")
+	local bagTypeId = header.slot.dataEntry.data.AC_bagTypeId
+    if not bagTypeId then 
+		bagTypeId = header.slot.dataEntry.AC_bagTypeId 
+	end
+	return bagTypeId
+end
 
 function AC.listcount(tbl)
     local i = 0
@@ -56,67 +71,61 @@ end
 -- or an error string returned from the compile
 --
 function AutoCategory.CompileRule(rule)
+    --local logger = LibDebugLogger("AutoCategory")
+    --logger:SetEnabled(true)
     if rule == nil then
         return
     end
+	if rule.name == nil or rule.name == "" then
+		return
+	end 
 
-    local logger = LibDebugLogger("AutoCategory")
-    logger:SetEnabled(true)
 	rule.damaged = nil
 	rule.err = nil
+	AC.compiledRules[rule.name] = nil
+	if rule.rule == nil or rule.rule == "" then
+		rule.err = "Missing rule definition"
+		rule.damaged = true
+        --logger:SetEnabled(false)
+        return err
+	end
+	
     local rulestr = "return(" .. rule.rule .. ")"
     local compiledfunc, err = zo_loadstring(rulestr)
     if not compiledfunc then
         rule.damaged = true
+		AC.compiledRules[rule.name] = nil
 		rule.err = err
-        logger:Error("Failure to compile rule " .. rulestr .. ". ERROR: " .. err)
-        logger:SetEnabled(false)
+        --logger:SetEnabled(false)
         return err
     end
-    logger:SetEnabled(false)
+    --logger:SetEnabled(false)
     AC.compiledRules[rule.name] = compiledfunc
     return ""
 end
 
 -- -----------------------------------------------------
--- Compile all of the rules that we know
+-- Compile all of the rules that we know (if necessary)
 -- Mark those that failed to compile as damaged
 --
 function AutoCategory.RecompileRules(ruleset)
-    if not AutoCategory.compiledRules then
-        AutoCategory.compiledRules = {}
-    else
-        ZO_ClearTable(AutoCategory.compiledRules)
-    end
+	AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
+	if not ZO_IsTableEmpty(AutoCategory.compiledRules) then
+		ZO_ClearTable(AutoCategory.compiledRules)
+	end
+	
     if ruleset == nil then
+		--logger:SetEnabled(false)
         return
     end
-
-    local logger = LibDebugLogger("AutoCategory")
-    logger:SetEnabled(true)
     local compiled = AutoCategory.compiledRules
     for j = 1, #ruleset do
         if ruleset[j] then
             local r = ruleset[j]
-            local n = r.name
-            if r.compiled then
-                compiled[n] = r.compiled
-            else
-                if not r.rule then
-                    r.damaged = nil
-					r.err = nil
-                end
-                local rulestr = "return(" .. r.rule .. ")"
-                compiled[n], err = zo_loadstring(rulestr)
-                if not compiled[n] then
-                    r.damaged = true
-					r.err = err
-                    logger:Error("Failure to compile rule " .. rulestr .. ". ERROR: " .. err)
-                end
-            end
+            --local n = r.name
+			AutoCategory.CompileRule(r)
         end
     end
-    logger:SetEnabled(false)
 end
 
 -- ----------------------------- Sorting comparators ------------------
@@ -197,7 +206,7 @@ function AutoCategory.BagRuleEntry.formatShow(entry, rule)
         -- missing rule (nil was passed in)
         sn = string.format("|cFF4444(!)|r %s (%d)", entry.name, entry.priority)
     else
-        if entry.isHidden then
+        if entry.AC_isHidden then
             sn = string.format("|c626250%s (%d)|r", entry.name, entry.priority)
         else
             sn = string.format("%s (%d)", entry.name, entry.priority)
@@ -252,9 +261,15 @@ function AutoCategory.ResetCollapse(vars)
     end
 end
 
+-- Determine if the specified category of the particular bag is collapsed or not
 function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
-    saved.collapses[bagTypeId][categoryName] = SF.nilDefault(AC.saved.collapses[bagTypeId][categoryName], false)
-    return saved.collapses[bagTypeId][categoryName]
+	if bagTypeId == nil or categoryName == nil then return false end
+	
+	saved.collapses[bagTypeId] = SF.safeTable(saved.collapses[bagTypeId])
+	collapsetbl = saved.collapses[bagTypeId]
+    collapsetbl[categoryName] = SF.nilDefault(collapsetbl[categoryName], false)
+
+    return collapsetbl[categoryName]
 end
 
 function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
@@ -464,31 +479,34 @@ end
 function AutoCategory.cache.AddRule(rule)
     if not rule or not rule.name then
         return "AddRule: Rule or name of rule was nil"
-    end -- can't use nil rule
+    end -- can't use a nil rule
 
-    -- rule already exists
-    if cache.rulesByName[rule.name] then
-        return "AddRule: Rule (" .. rule.name .. ") already exists. Ignoring"
+    local tt = rule.description
+    if not tt or tt == "" then
+        tt = rule.name
     end
-
-    table.insert(saved.rules, rule)
-
-    cache.rulesByName[rule.name] = #saved.rules
-
     if not rule.tag or rule.tag == "" then
         rule.tag = AC_EMPTY_TAG_NAME
     end
     if cache.rulesByTag[rule.tag] == nil then
         cache.rulesByTag[rule.tag] = {showNames = {}, values = {}, tooltips = {}}
     end
+	
+	local rule_ndx = cache.rulesByName[rule.name]
+    if rule_ndx then
+		-- rule already exists
+		saved.rules[rule_ndx] = rule
+        --return "AddRule: Rule (" .. rule.name .. ") already exists. Ignoring"
+	else
+		-- add the new rule
+		table.insert(saved.rules, rule)
+		rule_ndx = #saved.rules
+		cache.rulesByName[rule.name] = rule_ndx
 
-    local tt = rule.description
-    if not tt or tt == "" then
-        tt = rule.name
+		table.insert(cache.rulesByTag[rule.tag].showNames, rule.name)
+		table.insert(cache.rulesByTag[rule.tag].values, rule.name)
+		table.insert(cache.rulesByTag[rule.tag].tooltips, tt)
     end
-    table.insert(cache.rulesByTag[rule.tag].showNames, rule.name)
-    table.insert(cache.rulesByTag[rule.tag].values, rule.name)
-    table.insert(cache.rulesByTag[rule.tag].tooltips, tt)
 
     AC.CompileRule(rule)
 end
@@ -525,7 +543,7 @@ function AutoCategory.removeDuplicatedRules()
             local data = bag.rules[j]
             if keys[data.name] ~= nil then
                 --remove duplicated category
-                d("removed (" .. j .. ") " .. data.name)
+                --d("removed (" .. j .. ") " .. data.name)
                 table.remove(saved.bags[i].rules, j)
             else
                 --flag this category
@@ -537,6 +555,11 @@ end
 
 function AutoCategory.LazyInit()
     if not AutoCategory.Inited then
+        AutoCategory.Inited = true
+
+		local logger = LibDebugLogger("AutoCategory")
+		logger:SetEnabled(true)
+		
         -- initialize plugins
         for name, initfunc in pairs(AutoCategory.Plugins) do
             if initfunc then
@@ -545,7 +568,7 @@ function AutoCategory.LazyInit()
         end
 
         AutoCategory.AddonMenuInit()
-        AutoCategory.RecompileRules(saved.rules)
+		AutoCategory.RecompileRules(saved.rules)
 
         -- hooks
         AutoCategory.HookGamepadMode()
@@ -553,8 +576,7 @@ function AutoCategory.LazyInit()
 
         --capabilities with other add-ons
         IntegrateQuickMenu()
-
-        AutoCategory.Inited = true
+		logger:SetEnabled(false)
     end
 end
 
@@ -592,7 +614,6 @@ function AutoCategory.onPlayerActivated()
     EVENT_MANAGER:UnregisterForEvent(AutoCategory.name, EVENT_PLAYER_ACTIVATED)
 	EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_CLOSE_GUILD_BANK, function () AC.BulkMode = false end)
 	EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_CLOSE_BANK, function () AC.BulkMode = false end)
-
 end
 
 -- register our event handler function to be called to do initialization
@@ -642,6 +663,7 @@ local inven_data = {
 	[UV_DECON] = {
 		object = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory,
 		control = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control,
+		--ZO_UniversalDeconstructionPanel_Keyboard
 	},
 }
 
@@ -653,30 +675,34 @@ local function RefreshList(inventoryType, even_if_hidden)
 	if not inventoryType or not inven_data[inventoryType] then return end
 	
 	local obj = inven_data[inventoryType].object
+	local ctl = inven_data[inventoryType].control
 
 	if inventoryType == AC_DECON then
-		if even_if_hidden == false and not SMITHING.deconstructionPanel.control:IsHidden() then
-			SMITHING.deconstructionPanel.inventory:PerformFullRefresh()
+		if even_if_hidden == false and not ctl:IsHidden() then
+			obj:PerformFullRefresh()
 		end
+		
 	elseif inventoryType == AC_IMPROV then
-		if even_if_hidden == false and not SMITHING.improvementPanel.control:IsHidden() then
-			SMITHING.improvementPanel.inventory:PerformFullRefresh()
+		if even_if_hidden == false and not ctl:IsHidden() then
+			obj:PerformFullRefresh()
 		end
+		
 	elseif inventoryType == UV_DECON then
-		if even_if_hidden == false and not UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control:IsHidden() then
-			UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory:PerformFullRefresh()
+		if even_if_hidden == false and not ctl:IsHidden() then
+			obj:PerformFullRefresh()
 		end
+		
 	else
 		PLAYER_INVENTORY:UpdateList(inventoryType, even_if_hidden)
 	end
 end
 
+AutoCategory.RefreshList = RefreshList
 
 function AutoCategory.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
 	
 	RefreshList(INVENTORY_BACKPACK, even_if_hidden)
-	--RefreshList(INVENTORY_QUEST_ITEM)
 	RefreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
 	RefreshList(INVENTORY_GUILD_BANK, even_if_hidden)
 	RefreshList(INVENTORY_HOUSE_BANK, even_if_hidden)
@@ -686,15 +712,11 @@ function AutoCategory.RefreshCurrentList(even_if_hidden)
 	RefreshList(UV_DECON, even_if_hidden)
 end
 
-function AutoCategory.RefreshAllLists()
 
-	AC.RefreshCurrentList(true)
-	
-end
---]]
 function AC_ItemRowHeader_OnMouseEnter(header)
-    local cateName = header.slot.dataEntry.bestItemTypeName
-    local bagTypeId = header.slot.dataEntry.bagTypeId
+    local cateName = header.slot.dataEntry.data.AC_categoryName	
+    local bagTypeId = getBagTypeId(header)
+
 
     local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
     local markerBG = header:GetNamedChild("CollapseMarkerBG")
@@ -721,8 +743,8 @@ function AC_ItemRowHeader_OnMouseClicked(header)
         return
     end
 
-    local cateName = header.slot.dataEntry.bestItemTypeName
-    local bagTypeId = header.slot.dataEntry.bagTypeId
+    local cateName = header.slot.dataEntry.data.AC_categoryName
+    local bagTypeId = getBagTypeId(header)
 
     local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
     AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, not collapsed)
@@ -731,8 +753,8 @@ end
 
 function AC_ItemRowHeader_OnShowContextMenu(header)
     ClearMenu()
-    local cateName = header.slot.dataEntry.bestItemTypeName
-    local bagTypeId = header.slot.dataEntry.bagTypeId
+    local cateName = header.slot.dataEntry.data.AC_categoryName	
+    local bagTypeId = getBagTypeId(header)
 
     local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
     if collapsed then

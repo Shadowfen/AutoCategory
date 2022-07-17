@@ -34,37 +34,37 @@ local L = GetString
 AutoCategory_UnknownTracker.predefinedRules = {
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isUnknown()",
+        ["rule"] = "isunknown()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_ALL_UNKNOWN_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_ALL_UNKNOWN),
     },
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isUnknown(\"me\")",
+        ["rule"] = "isunknown(\"me\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_UNKNOWN_TO_ME_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_UNKNOWN_TO_ME),
     },
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isRecipeUnknown()",
+        ["rule"] = "isrecipeunknown()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_RECIPE_UNKNOWN_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_RECIPE_UNKNOWN),
     },
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isMotifUnknown()",
+        ["rule"] = "ismotifunknown()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_MOTIF_UNKNOWN_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_MOTIF_UNKNOWN),
     },
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isFurnishingUnknown()",
+        ["rule"] = "isfurnishingunknown()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_FURNISHING_UNKNOWN_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_FURNISHING_UNKNOWN),
     },
     {
         ["tag"] = "UnknownTracker",
-        ["rule"] = "isStyleUnknown()",
+        ["rule"] = "isstyleunknown()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_UT_STYLE_UNKNOWN_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_UT_STYLE_UNKNOWN),
     },
@@ -139,8 +139,6 @@ local function lookupItem(itemLink, characters)
     else    
         unknowers = UnknownTracker:RemainsList(allchars, knownlist)
     end
-    --d("unknowers")
-    --d(unknowers)
     if not next(unknowers) then
         -- everyone knows it
         return false
