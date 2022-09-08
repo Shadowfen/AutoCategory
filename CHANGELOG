@@ -1,3 +1,15 @@
+[COLOR="DeepSkyBlue"]3.2(78)[/COLOR]:
+[LIST]
+[*] New function [COLOR="MediumSeaGreen"]istag()[/COLOR] requested by BastionNtB. This function will allow you to match against one or more of the "Treasure Types" listed in the tooltip window for the item. This can help you to write rules to look for specific item types you need to acquire for some of the crow quests in Clockwork City.
+For instance, some of the Treasure Types you might see are:
+Artwork, Cosmetics, Dolls, Drinkware, Fishing Supplies, Games, Grooming Items, Musical Instruments, Oddities, Ritual Objects, Statues, Tools, Trifles and Ornaments, Wall Décor
+(If your client runs a language other than English you will see language-appropriate versions of the above.)
+You can create a rule to look for items that are games or dolls with the rule "istag('dolls','games')".
+The tags that you specify must exactly match the name of the tag type (except that upper-case is ignored). "grooming" will not match "grooming Items" because the second word is missing. Also, "Wall Decor" will not match "Wall Décor" (which has a UTF-8 character instead of a plain 'e').
+If you do not specify any tags to look for (just "istag()"), then the function will revert back to the [COLOR="MediumSeaGreen"]istreasure()[/COLOR] function's behaviour.
+[*] The additional companion jewelry traits "jewelry_quickened" and "jewelry_focused" have been added. The rest of the companion jewelry traits were already there.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.1.7(77)[/COLOR]:
 [LIST]
 [*] Fixed error message during handling of damaged rules.

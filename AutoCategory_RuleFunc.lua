@@ -44,7 +44,8 @@ local specializedItemTypeMap = {
 	["food_savoury"] = SPECIALIZED_ITEMTYPE_FOOD_SAVOURY,
 	["food_unique"] = SPECIALIZED_ITEMTYPE_FOOD_UNIQUE,
 	["food_vegetable"] = SPECIALIZED_ITEMTYPE_FOOD_VEGETABLE,
-    ["furnishing_attunable_crafting_station"] = SPECIALIZED_ITEMTYPE_FURNISHING_ATTUNABLE_CRAFTING_STATION,
+    ["furnishing_attunable_crafting_station"] = 	
+			SPECIALIZED_ITEMTYPE_FURNISHING_ATTUNABLE_CRAFTING_STATION,
 	["furnishing_crafting_station"] = SPECIALIZED_ITEMTYPE_FURNISHING_CRAFTING_STATION,
 	["furnishing_light"] = SPECIALIZED_ITEMTYPE_FURNISHING_LIGHT,
 	["furnishing_material_alchemy"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_ALCHEMY,
@@ -94,14 +95,19 @@ local specializedItemTypeMap = {
 	["reagent_herb"] = SPECIALIZED_ITEMTYPE_REAGENT_HERB,
 	["recall_stone_keep"] = SPECIALIZED_ITEMTYPE_RECALL_STONE_KEEP,
 	["recipe_alchemy_formula_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_ALCHEMY_FORMULA_FURNISHING,
-	["recipe_blacksmithing_diagram_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_BLACKSMITHING_DIAGRAM_FURNISHING,
+	["recipe_blacksmithing_diagram_furnishing"] = 
+		SPECIALIZED_ITEMTYPE_RECIPE_BLACKSMITHING_DIAGRAM_FURNISHING,
 	["recipe_clothier_pattern_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_CLOTHIER_PATTERN_FURNISHING,
-	["recipe_enchanting_schematic_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_ENCHANTING_SCHEMATIC_FURNISHING,
-	["recipe_jewelry_sketch_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_JEWELRYCRAFTING_SKETCH_FURNISHING,
-	["recipe_provisioning_design_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_PROVISIONING_DESIGN_FURNISHING,
+	["recipe_enchanting_schematic_furnishing"] = 
+		SPECIALIZED_ITEMTYPE_RECIPE_ENCHANTING_SCHEMATIC_FURNISHING,
+	["recipe_jewelry_sketch_furnishing"] = 
+		SPECIALIZED_ITEMTYPE_RECIPE_JEWELRYCRAFTING_SKETCH_FURNISHING,
+	["recipe_provisioning_design_furnishing"] = 
+		SPECIALIZED_ITEMTYPE_RECIPE_PROVISIONING_DESIGN_FURNISHING,
 	["recipe_provisioning_standard_drink"] = SPECIALIZED_ITEMTYPE_RECIPE_PROVISIONING_STANDARD_DRINK,
 	["recipe_provisioning_standard_food"] = SPECIALIZED_ITEMTYPE_RECIPE_PROVISIONING_STANDARD_FOOD,
-	["recipe_woodworking_blueprint_furnishing"] = SPECIALIZED_ITEMTYPE_RECIPE_WOODWORKING_BLUEPRINT_FURNISHING,
+	["recipe_woodworking_blueprint_furnishing"] = 
+		SPECIALIZED_ITEMTYPE_RECIPE_WOODWORKING_BLUEPRINT_FURNISHING,
 	["siege_ballista"] = SPECIALIZED_ITEMTYPE_SIEGE_BALLISTA,
 	["siege_battle_standard"] = SPECIALIZED_ITEMTYPE_SIEGE_BATTLE_STANDARD,
 	["siege_catapult"] = SPECIALIZED_ITEMTYPE_SIEGE_CATAPULT,
@@ -347,7 +353,9 @@ local traitMap = {
 	["jewelry_swift"] = ITEM_TRAIT_TYPE_JEWELRY_SWIFT,
 	["jewelry_triune"] = ITEM_TRAIT_TYPE_JEWELRY_TRIUNE,
 	["jewelry_vigorous"] = ITEM_TRAIT_TYPE_JEWELRY_VIGOROUS,
-	["none"] = ITEM_TRAIT_TYPE_NONE,
+    ["jewelry_quickened"] = ITEM_TRAIT_TYPE_JEWELRY_QUICKENED,
+    ["jewelry_focused"] = ITEM_TRAIT_TYPE_JEWELRY_FOCUSED,
+    ["none"] = ITEM_TRAIT_TYPE_NONE,
 	["weapon_aggressive"] = ITEM_TRAIT_TYPE_WEAPON_AGGRESSIVE,
 	["weapon_augmented"] = ITEM_TRAIT_TYPE_WEAPON_AUGMENTED,
 	["weapon_bolstered"] = ITEM_TRAIT_TYPE_WEAPON_BOLSTERED,
@@ -1186,6 +1194,41 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	return false
 end
 
+function AutoCategory.RuleFunc.IsTag( ... )
+	local fn = "istag"
+	
+	local ac = select( '#', ... )
+	if ac == 0 then
+		return AutoCategory.RuleFunc.IsTreasure()
+	end
+	local taglist = {}
+	for ax = 1, ac do
+		local arg = select( ax, ... )
+		table.insert(taglist, arg)
+	end
+
+	
+	local itemLink =AutoCategory.checkingItemLink
+	local numItemTags = GetItemLinkNumItemTags(itemLink)
+	if numItemTags <= 0 then return false end
+	local itemTagStrings = {}
+
+	-- Build a map of tag category -> table of tags in that category
+	for i = 1, numItemTags do
+		local itemTagDescription, itemTagCategory = GetItemLinkItemTagInfo(itemLink, i)
+		if itemTagCategory == TAG_CATEGORY_TREASURE_TYPE and itemTagDescription ~= "" then
+			table.insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
+		end
+	end
+	for _,idsc in ipairs(itemTagStrings) do
+		d(idsc)
+		for _,desc in ipairs(taglist) do
+			if string.lower(idsc) == string.lower(desc) then return true end
+		end
+	end
+	return false
+end
+
 -- returns true/false
 function AutoCategory.RuleFunc.IsTreasure( ... )
 	local fn = "istreasure"
@@ -1527,6 +1570,7 @@ AutoCategory.Environment = {
 	istransmuted   = AutoCategory.RuleFunc.isTransmuted,
 	
 	istreasure     = AutoCategory.RuleFunc.IsTreasure,
+	istag          = AutoCategory.RuleFunc.IsTag,
 	isinzone       = AutoCategory.RuleFunc.IsInCurrentZone,
 	
 	armorybuild    = AutoCategory.RuleFunc.ArmoryBuild,
