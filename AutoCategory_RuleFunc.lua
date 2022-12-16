@@ -1221,7 +1221,7 @@ function AutoCategory.RuleFunc.IsTag( ... )
 		end
 	end
 	for _,idsc in ipairs(itemTagStrings) do
-		d(idsc)
+		--d(idsc)
 		for _,desc in ipairs(taglist) do
 			if string.lower(idsc) == string.lower(desc) then return true end
 		end
