@@ -290,8 +290,10 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 		end
 		if type( arg ) == "number" then
 			comIndex = arg
+			
 		elseif type( arg ) == "string" then
 			comIndex = tonumber(arg)
+			
 		else
 			error( string.format("error: %s(): argument is error." , fn ) )
 		end

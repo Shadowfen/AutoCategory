@@ -1,11 +1,11 @@
 ## Title: AutoCategory
-## APIVersion: 101036 101037
+## APIVersion: 101038 101037
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 3.2.2
-## AddOnVersion: 80
-## SavedVariables: AutoCategorySavedVars
-## DependsOn: LibAddonMenu-2.0>=32 LibSFUtils>=41 LibMediaProvider-1.0 LibDebugLogger
+## Version: 3.6.2
+## AddOnVersion: 89
+## SavedVariables: AutoCategorySavedVars AutoCatRules
+## DependsOn: LibAddonMenu-2.0>=32 LibSFUtils>=45 LibMediaProvider-1.0 LibDebugLogger
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
 
 lang/strings.lua

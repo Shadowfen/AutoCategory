@@ -171,6 +171,7 @@ local function getCharList(...)
 		end
         if arg == "me" then
             characters[zo_strformat("<<1>>", GetRawUnitName("player"))] = true
+			
         else
             characters[arg]=true
         end
@@ -193,9 +194,6 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
 	-- it is an item that can be learned
     local itemType,sptype = GetItemLinkItemType(itemLink)
     local islearnable = false
-	--if itemType == ITEMTYPE_COLLECTIBLE and sptype == SPECIALIZED_ITEMTYPE_COLLECTIBLE_STYLE_PAGE then
-    --    return lookupItem(itemLink, characters)
-	--end
 	if valid_itemtypes[itemType] == true then
         islearnable = true
     end

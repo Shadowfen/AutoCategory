@@ -1,3 +1,54 @@
+[COLOR="DeepSkyBlue"]3.6.2(89)[/COLOR]:
+[LIST]
+[*] Fixed addon settings so that you do not get a bunch of extra (possibly missing) categories listed in the Bag Settings categories drop down menu. This error was traced down to only occurring when you do not use Account-Wide - it added them anyway. (Reported most recently by Saint-Ange.)
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.6.1(88)[/COLOR]:
+[LIST]
+[*] Removed debug message that was reporting "throwing away collapse status of ...". (Reported by Slane320). Sorry.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.6(87)[/COLOR]:
+[LIST]
+[*] Added an Appearance Setting for a new "Hidden Category Text Color" which allows you to choose what color that a category that was set as Hidden will be displayed as. This will make it readily apparent when you have turned Hidden ON for a category or for "ungrouped" which is where Others is listed as it will make the category name a different color from the non-hidden ones. (Hopefully, this will assist in telling the difference between addon bugs and unfortunate unintended settings.)
+[*] Modified the storage of collapsed categories in Saved Variables so that it takes up less space in the file.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.5.2(86)[/COLOR]:
+[LIST]
+[*] Possibly corrected a problem reported by Kiasmalyn regarding a UI error getting thrown in AddonMenu.lua.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.5.1(85)[/COLOR]:
+[LIST]
+[*] Corrected a problem with [COLOR="MediumSeaGreen"]cannotdecon()[/COLOR] that only affected players who do not have ESO+. For some reason, it just wasn't working properly.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.5(84)[/COLOR]:
+[LIST]
+[*] Increased the size of the rule definition edit box to 10 lines (up from 3).
+[*] New function [COLOR="MediumSeaGreen"]cannotdecon()[/COLOR]. This function will return true or false depending on if the item can be deconstructed or not. Examples of things that cannot be deconstructed are: jewelry acquired before the Summerset Chapter was released, companion gear, food, potions, etc. Obviously, this is most useful for a rule that picks out items to be deconstructed.
+[*] The function [COLOR="MediumSeaGreen"]isinquickslot()[/COLOR] has been fixed.
+[*] API bump for Necrom.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.3(82)[/COLOR]:
+[LIST]
+[*] Changed functions [COLOR="MediumSeaGreen"]ck_isunknown()[/COLOR] to work for characters in all accounts on the same computer for the current ESO server (NA, Europe, etc.). The [COLOR="MediumSeaGreen"]ck_isunknown()[/COLOR] and [COLOR="MediumSeaGreen"]ck_isunknowncat()[/COLOR] functions require you to have installed the [COLOR="DarkOrange"]LibCharacterKnowledge[/COLOR] addon by @code65536.
+[*] Increased the available range of priority numbers for rules to 1-1000. This does not change the already assigned rule priorities, but you now have room to spread out your rules. Just note that if you have hundreds of rules, your inventory/bank access will be SLOW!
+[/LIST]
+Added alternate names for several addon integration commands. Both the old and new commands are available and the new commands take the same parameters as the old ones:
+[LIST]
+* Old command [COLOR="MediumSeaGreen"]getpricemm()[/COLOR] - alternate command [COLOR="MediumSeaGreen"]mm_getprice()[/COLOR] - integration with MasterMerchant
+* Old command [COLOR="MediumSeaGreen"]getpricettc()[/COLOR] - alternate command [COLOR="MediumSeaGreen"]ttc_getprice()[/COLOR] - integration with Tamriel Trade Centre
+* Old command [COLOR="MediumSeaGreen"]getamountttc()[/COLOR] - alternate command [COLOR="MediumSeaGreen"]ttc_getamount()[/COLOR] - integration with Tamriel Trade Centre
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.2.3(81)[/COLOR]:
+[LIST]
+[*] API bump for Scribes of Fate.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.2.2(80)[/COLOR]:
 [LIST]
 [*] API bump for Firesong.

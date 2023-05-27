@@ -35,16 +35,45 @@ AutoCategory.dataCount = {}
 
 local sortKeys = {
     slotIndex = { isNumeric = true },
-    stackCount = { tiebreaker = "slotIndex", isNumeric = true },
+    stackCount = { 
+		tiebreaker = "slotIndex", 
+		isNumeric = true 
+	},
     name = { tiebreaker = "stackCount" },
-    quality = { tiebreaker = "name", isNumeric = true },
-    stackSellPrice = { tiebreaker = "name", tieBreakerSortOrder = ZO_SORT_ORDER_UP, isNumeric = true },
+    quality = { 
+		tiebreaker = "name", 
+		isNumeric = true 
+	},
+    stackSellPrice = { 
+		tiebreaker = "name", 
+		tieBreakerSortOrder = ZO_SORT_ORDER_UP, 
+		isNumeric = true 
+	},
     statusSortOrder = { tiebreaker = "age", isNumeric = true},
-    age = { tiebreaker = "name", tieBreakerSortOrder = ZO_SORT_ORDER_UP, isNumeric = true},
-    statValue = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
-    traitInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
-    sellInformationSortOrder = { tiebreaker = "name", isNumeric = true, tieBreakerSortOrder = ZO_SORT_ORDER_UP },
-	ptValue = { tiebreaker = "name", isNumeric = true },
+    age = { 
+		tiebreaker = "name", 
+		tieBreakerSortOrder = ZO_SORT_ORDER_UP, 
+		isNumeric = true
+	},
+    statValue = { 
+		tiebreaker = "name", 
+		isNumeric = true, 
+		tieBreakerSortOrder = ZO_SORT_ORDER_UP 
+	},
+    traitInformationSortOrder = { 
+		tiebreaker = "name", 
+		isNumeric = true, 
+		tieBreakerSortOrder = ZO_SORT_ORDER_UP 
+	},
+    sellInformationSortOrder = { 
+		tiebreaker = "name", 
+		isNumeric = true, 
+		tieBreakerSortOrder = ZO_SORT_ORDER_UP 
+	},
+	ptValue = { 
+		tiebreaker = "name", 
+		isNumeric = true 
+	},
 }
 
 local CATEGORY_HEADER = 998
@@ -53,11 +82,16 @@ local CATEGORY_HEADER = 998
 local function NilOrLessThan(value1, value2)
     if value1 == nil then
         return true
+		
     elseif value2 == nil then
         return false
+		
 	elseif type(value1) == "boolean" then
-		if value1 == false then return true end
+		if value1 == false then 
+			return true 
+		end
 		return false
+		
     else 
         return value1 < value2
     end
@@ -77,22 +111,40 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	local headerLabel = rowControl:GetNamedChild("HeaderName")	
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
 	headerLabel:SetFont(string.format('%s|%d|%s', 
-			LMP:Fetch('font', appearance["CATEGORY_FONT_NAME"]), 
-			appearance["CATEGORY_FONT_SIZE"], appearance["CATEGORY_FONT_STYLE"]))
-	headerLabel:SetColor(appearance["CATEGORY_FONT_COLOR"][1], appearance["CATEGORY_FONT_COLOR"][2], 
-						 appearance["CATEGORY_FONT_COLOR"][3], appearance["CATEGORY_FONT_COLOR"][4])
-	
+			LMP:Fetch('font', 
+				appearance["CATEGORY_FONT_NAME"]), 
+				appearance["CATEGORY_FONT_SIZE"], 
+				appearance["CATEGORY_FONT_STYLE"]))
 	local data = SF.safeTable(slot.dataEntry.data)
 	local cateName = SF.nilDefault(data.AC_categoryName, "Unknown")
 	local bagTypeId = SF.nilDefault(data.AC_bagTypeId, 0)
 	local num = SF.nilDefault(data.AC_catCount,0)
 	
+	local cache = AutoCategory.cache
+	local headerColor = "CATEGORY_FONT_COLOR"
+	if cache.entriesByName[bagTypeId][cateName] then
+		if cache.entriesByName[bagTypeId][cateName].isHidden then
+			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
+		end
+		
+	elseif AC.saved.bags[bagTypeId].isUngroupedHidden and
+			cateName == AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] then
+		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
+	end
+	headerLabel:SetColor(appearance[headerColor][1], 
+						 appearance[headerColor][2], 
+						 appearance[headerColor][3], 
+						 appearance[headerColor][4])
+	
 	-- Add count to category name if selected in options
     if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
         headerLabel:SetColor(
-			appearance["CATEGORY_FONT_COLOR"][1], appearance["CATEGORY_FONT_COLOR"][2],
-			appearance["CATEGORY_FONT_COLOR"][3], appearance["CATEGORY_FONT_COLOR"][4])
+			appearance[headerColor][1], 
+			appearance[headerColor][2],
+			appearance[headerColor][3], 
+			appearance[headerColor][4])
+			
     else
         headerLabel:SetText(cateName)
     end	
@@ -104,14 +156,17 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 		marker:SetHidden(false)
 		if collapsed then
 			marker:SetTexture("EsoUI/Art/Buttons/plus_up.dds")
+			
 		else
 			marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
 		end
+		
 	else
 		marker:SetHidden(true)
 	end
 	
-	rowControl:SetHeight(AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
+	rowControl:SetHeight(
+		AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
 	rowControl.slot = slot
 end
 
@@ -181,11 +236,13 @@ local function runRulesOnEntry(itemEntry, specialType)
 	data.AC_matched = matched
 	if matched then
 		data.AC_categoryName = categoryName
-		data.AC_sortPriorityName = string.format("%03d%s", 100 - categoryPriority , categoryName)
+		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
 		data.AC_isHidden = isHidden
+		
 	else
 		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
-		data.AC_sortPriorityName = string.format("%03d%s", 999 , data.AC_categoryName)
+		data.AC_sortPriorityName = string.format("%04d%s", 
+			9999 , data.AC_categoryName)
 		-- if was not matched, then the isHidden value that was returned is not valid
 		data.AC_isHidden = isUngroupedHidden(bagTypeId)
 	end
@@ -195,6 +252,12 @@ local function runRulesOnEntry(itemEntry, specialType)
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
+	if left == nil or left.data == nil then
+		return true
+	end
+	if right == nil or right.data == nil then
+		return false
+	end
 	if AutoCategory.BulkMode then
 		-- revert to default
 		return ZO_TableOrderingFunction(left.data, right.data, 
@@ -217,11 +280,17 @@ local function sortInventoryFn(inven, left, right, key, order)
 	if type(inven.sortKey) == "function" then 
 		if inven.sortOrder == ZO_SORT_ORDER_UP then
 			return inven.sortKey(left.data, right.data)
+			
 		else
 			return inven.sortKey(right.data, left.data)
 		end
 	end
 	
+	if key == nil or sortKeys[key] == nil then
+		-- possible fix for Arkadius' Trading Tools sort bug
+		key =  "statValue"
+	end
+
 	return ZO_TableOrderingFunction(left.data, right.data, 
 			key, sortKeys, order)
 end
@@ -238,8 +307,8 @@ local function constructEntryHash(itemEntry)
 			end
 		end
 	end
-	local newEntryHash = buildHashString(data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable,
-					data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
+	local newEntryHash = buildHashString(
+					data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
 					data.meetsUsageRequirement, data.locked, data.isJunk, hashFCOIS)
 	return newEntryHash
 end
@@ -250,11 +319,11 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	local currentTime = os.clock()
 	
 	local function setChange(val)
-		if val == true then
-			data.AC_lastUpdateTime = currentTime
-			changeDetected = true
-		end	
-		return changeDetected
+		if val == false then return false end
+		
+		data.AC_lastUpdateTime = currentTime
+		changeDetected = true
+		return true
 	end
 	
 	if needReload == true then
@@ -270,6 +339,7 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	--- Test last update time, triggers update if more than 2s
 	if data.AC_lastUpdateTime == nil then
 		return setChange(true)
+		
 	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 2 then
 		return setChange(true)
 	end
@@ -461,8 +531,6 @@ local function prehookCraftSort(self)
 	-- revert to default behaviour if safety conditions not met
 	if not AutoCategory.Enabled then return false end
 
-	--AutoCategory.validateBagRules(nil, AC_BAG_TYPE_CRAFTSTATION)
-	
 	--change sort function
 	self.sortFunction = function(left, right) 
 			return sortInventoryFn(self, left, right, self.sortKey, self.sortOrder)

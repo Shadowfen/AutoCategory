@@ -43,6 +43,7 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 				return true
 			end
 			return false
+			
 		else
 			return true
 		end

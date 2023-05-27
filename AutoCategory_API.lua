@@ -20,18 +20,18 @@ end
 -- returns the bag_type_id enum value 
 --       or nil if bagId is not recognized
 local BagTypeConversion = {
-	[BAG_BACKPACK] = AC_BAG_TYPE_BACKPACK,
-	[BAG_WORN] = AC_BAG_TYPE_BACKPACK,
-	[BAG_BANK] = AC_BAG_TYPE_BANK,
-	[BAG_SUBSCRIBER_BANK] = AC_BAG_TYPE_BANK,
-	[BAG_VIRTUAL] = AC_BAG_TYPE_CRAFTBAG,
-	[BAG_GUILDBANK] = AC_BAG_TYPE_GUILDBANK,
-	[BAG_HOUSE_BANK_ONE] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_TWO] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_BACKPACK]         = AC_BAG_TYPE_BACKPACK,
+	[BAG_WORN]             = AC_BAG_TYPE_BACKPACK,
+	[BAG_BANK]             = AC_BAG_TYPE_BANK,
+	[BAG_SUBSCRIBER_BANK]  = AC_BAG_TYPE_BANK,
+	[BAG_VIRTUAL]          = AC_BAG_TYPE_CRAFTBAG,
+	[BAG_GUILDBANK]        = AC_BAG_TYPE_GUILDBANK,
+	[BAG_HOUSE_BANK_ONE]   = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_TWO]   = AC_BAG_TYPE_HOUSEBANK,
 	[BAG_HOUSE_BANK_THREE] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_FOUR] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_FIVE] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_SIX] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_FOUR]  = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_FIVE]  = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_HOUSE_BANK_SIX]   = AC_BAG_TYPE_HOUSEBANK,
 	[BAG_HOUSE_BANK_SEVEN] = AC_BAG_TYPE_HOUSEBANK,
 	[BAG_HOUSE_BANK_EIGHT] = AC_BAG_TYPE_HOUSEBANK,
 }
@@ -116,21 +116,20 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		return false, "", 0, nil, nil
 	end
 	
-	-- Adjust the name of the category based on the presence of an enhancement (set name) and
-	-- if SHOW_CATEGORY_SET_TITLE is enabled
+	-- Adjust the name of the category based on the presence of 
+	-- an enhancement (set name) and if SHOW_CATEGORY_SET_TITLE is enabled
 	local function adjustName(name, enhancement)
 		if enhancement == "" then
 			-- just use declared category name
 			return name
-		else
-			if AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
-				-- just use the set name without the category name
-				return enhancement
-			else
-				-- combine the category and set names
-				return name .. string.format(" (%s)", enhancement)
-			end
+			
+		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
+			-- just use the set name without the category name
+			return enhancement
+			
 		end
+		-- combine the category and set names
+		return name .. string.format(" (%s)", enhancement)
 	end
 	
 	
@@ -166,6 +165,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						return true, adjustName(rule.name, AutoCategory.AdditionCategoryName), 
 							entry.priority, bag_type_id, entry.isHidden
 					end 
+					
 				else
 					logger:Error("Error2: " .. entry.name.. " - ".. res)
 					rule.damaged = true 

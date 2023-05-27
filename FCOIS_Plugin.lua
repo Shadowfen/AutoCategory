@@ -741,6 +741,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 		 
 		if type( arg ) == "number" then
 			table.insert(checkIconIds, arg)
+			
 		elseif type( arg ) == "string" then
 			local v = markedTypeMap[string.lower( arg )]
 			if v then
@@ -769,6 +770,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	
 	if #checkIconIds > 0 then
 		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, checkIconIds)
+		
 	else
 		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, -1)
 	end

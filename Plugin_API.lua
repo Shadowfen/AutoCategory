@@ -23,6 +23,7 @@ end
 function AutoCategory.AddRuleFunc(name, func)
     if func == nil then
         AutoCategory.Environment[name] = AutoCategory.dummyRuleFunc
+		
     else
         AutoCategory.Environment[name] = func
     end
@@ -60,9 +61,11 @@ function AutoCategory.AddPredefinedRules( ruletable )
             local err = AutoCategory.cache.AddRule({name=ruledef.name, tag=ruledef.tag, rule=ruledef.rule, description=ruledef.description})
             if err then
                 table.insert(errtbl,err)
+				
             else
                 added = added + 1
             end
+			
         else
             table.insert(errtbl,"Rule was invalid. ("..err..")")
         end

@@ -42,6 +42,7 @@ function AutoCategory_ItemSaver.RuleFunc.IsMarkedIS( ... )
 				return true
 			end
 			return false
+			
 		else
 			return true
 		end
