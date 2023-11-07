@@ -1,3 +1,19 @@
+[COLOR="DeepSkyBlue"]3.6.5 (92)[/COLOR]:
+[LIST]
+[*] API bump.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.6.4 (91)[/COLOR]:
+[LIST]
+[*] Fixed UI error relating to the loading of saved variables for a character that is using character-based rather than account-wide configuration. (Bug reported by Gork)
+[*] Added in new aliases for the old ismarked(), isfcoisprotected(), and isfcoisgear() FCOIS functions to be fco_ismarked(), fco_isprotected(), and fco_isgear(). Changed the default FCOIS/AC rules to use fco_ismarked() instead of ismarked(), etc. The old names of functions will still work, but may someday go away.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]3.6.3(90)[/COLOR]:
+[LIST]
+[*] Fixed "Collapse All" context menu option so that it collapses the categories in the inventory when selected. (Bug reported by ZoLatKam)
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.6.2(89)[/COLOR]:
 [LIST]
 [*] Fixed addon settings so that you do not get a bunch of extra (possibly missing) categories listed in the Bag Settings categories drop down menu. This error was traced down to only occurring when you do not use Account-Wide - it added them anyway. (Reported most recently by Saint-Ange.)

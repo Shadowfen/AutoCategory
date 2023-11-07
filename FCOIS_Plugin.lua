@@ -338,7 +338,7 @@ AutoCategory_FCOIS.predefinedRules = {
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"dynamic_1\")",
+        ["rule"] = "fco_ismarked(\"dynamic_1\")",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_1_DESC),
     },
@@ -346,125 +346,125 @@ AutoCategory_FCOIS.predefinedRules = {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_2_DESC),
-        ["rule"] = "ismarked(\"dynamic_2\")",
+        ["rule"] = "fco_ismarked(\"dynamic_2\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_3_DESC),
-        ["rule"] = "ismarked(\"dynamic_3\")",
+        ["rule"] = "fco_ismarked(\"dynamic_3\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_4_DESC),
-        ["rule"] = "ismarked(\"dynamic_4\")",
+        ["rule"] = "fco_ismarked(\"dynamic_4\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_5_DESC),
-        ["rule"] = "ismarked(\"dynamic_5\")",
+        ["rule"] = "fco_ismarked(\"dynamic_5\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_6_DESC),
-        ["rule"] = "ismarked(\"dynamic_6\")",
+        ["rule"] = "fco_ismarked(\"dynamic_6\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_7_DESC),
-        ["rule"] = "ismarked(\"dynamic_7\")",
+        ["rule"] = "fco_ismarked(\"dynamic_7\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_8_DESC),
-        ["rule"] = "ismarked(\"dynamic_8\")",
+        ["rule"] = "fco_ismarked(\"dynamic_8\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_9_DESC),
-        ["rule"] = "ismarked(\"dynamic_9\")",
+        ["rule"] = "fco_ismarked(\"dynamic_9\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_10_DESC),
-        ["rule"] = "ismarked(\"dynamic_10\")",
+        ["rule"] = "fco_ismarked(\"dynamic_10\")",
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"gear_1\")",
+        ["rule"] = "fco_ismarked(\"gear_1\")",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_1_DESC),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"gear_2\")", 
+        ["rule"] = "fco_ismarked(\"gear_2\")", 
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_2_DESC),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"gear_3\")", 
+        ["rule"] = "fco_ismarked(\"gear_3\")", 
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_3_DESC),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"gear_4\")", 
+        ["rule"] = "fco_ismarked(\"gear_4\")", 
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_4_DESC),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"gear_5\")", 
+        ["rule"] = "fco_ismarked(\"gear_5\")", 
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_GEAR_5_DESC),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"improvement\")",
+        ["rule"] = "fco_ismarked(\"improvement\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_IMPROVEMENT_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"intricate\")",
+        ["rule"] = "fco_ismarked(\"intricate\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_INTRICATE_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"research\")",
+        ["rule"] = "fco_ismarked(\"research\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_RESEARCH_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"sell_at_guildstore\")",
+        ["rule"] = "fco_ismarked(\"sell_at_guildstore\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_AT_GUILDSTORE_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"sell\")",
+        ["rule"] = "fco_ismarked(\"sell\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_SELL_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked(\"lock\")",
+        ["rule"] = "fco_ismarked(\"lock\")",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_LOCK_MARK),
     },
     {
         ["tag"] = "FCOIS",
-        ["rule"] = "ismarked()",
+        ["rule"] = "fco_ismarked()",
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK_DESC),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_ALL_MARK),
     },
@@ -472,121 +472,121 @@ AutoCategory_FCOIS.predefinedRules = {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_11_DESC),
-        ["rule"] = "ismarked(\"dynamic_11\")",
+        ["rule"] = "fco_ismarked(\"dynamic_11\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_12_DESC),
-        ["rule"] = "ismarked(\"dynamic_12\")",
+        ["rule"] = "fco_ismarked(\"dynamic_12\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_13_DESC),
-        ["rule"] = "ismarked(\"dynamic_13\")",
+        ["rule"] = "fco_ismarked(\"dynamic_13\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_14_DESC),
-        ["rule"] = "ismarked(\"dynamic_14\")",
+        ["rule"] = "fco_ismarked(\"dynamic_14\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_15_DESC),
-        ["rule"] = "ismarked(\"dynamic_15\")",
+        ["rule"] = "fco_ismarked(\"dynamic_15\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_16_DESC),
-        ["rule"] = "ismarked(\"dynamic_16\")",
+        ["rule"] = "fco_ismarked(\"dynamic_16\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_17_DESC),
-        ["rule"] = "ismarked(\"dynamic_17\")",
+        ["rule"] = "fco_ismarked(\"dynamic_17\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_18_DESC),
-        ["rule"] = "ismarked(\"dynamic_18\")",
+        ["rule"] = "fco_ismarked(\"dynamic_18\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_19_DESC),
-        ["rule"] = "ismarked(\"dynamic_19\")",
+        ["rule"] = "fco_ismarked(\"dynamic_19\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_20_DESC),
-        ["rule"] = "ismarked(\"dynamic_20\")",
+        ["rule"] = "fco_ismarked(\"dynamic_20\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_21_DESC),
-        ["rule"] = "ismarked(\"dynamic_21\")",
+        ["rule"] = "fco_ismarked(\"dynamic_21\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_22_DESC),
-        ["rule"] = "ismarked(\"dynamic_22\")",
+        ["rule"] = "fco_ismarked(\"dynamic_22\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_23_DESC),
-        ["rule"] = "ismarked(\"dynamic_23\")",
+        ["rule"] = "fco_ismarked(\"dynamic_23\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_24_DESC),
-        ["rule"] = "ismarked(\"dynamic_24\")",
+        ["rule"] = "fco_ismarked(\"dynamic_24\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_25_DESC),
-        ["rule"] = "ismarked(\"dynamic_25\")",
+        ["rule"] = "fco_ismarked(\"dynamic_25\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_26_DESC),
-        ["rule"] = "ismarked(\"dynamic_26\")",
+        ["rule"] = "fco_ismarked(\"dynamic_26\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_27_DESC),
-        ["rule"] = "ismarked(\"dynamic_27\")",
+        ["rule"] = "fco_ismarked(\"dynamic_27\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_28_DESC),
-        ["rule"] = "ismarked(\"dynamic_28\")",
+        ["rule"] = "fco_ismarked(\"dynamic_28\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_29_DESC),
-        ["rule"] = "ismarked(\"dynamic_29\")",
+        ["rule"] = "fco_ismarked(\"dynamic_29\")",
     },
     {
         ["tag"] = "FCOIS",
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_FCOIS_DYNAMIC_30_DESC),
-        ["rule"] = "ismarked(\"dynamic_30\")",
+        ["rule"] = "fco_ismarked(\"dynamic_30\")",
     },
 }
 
@@ -601,6 +601,9 @@ end
 --Initialize plugin for Auto Category - FCOIS
 function AutoCategory_FCOIS.Initialize()
 	if FCOIS == nil then
+        AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
+        AutoCategory.AddRuleFunc("fco_isgear", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
@@ -615,7 +618,12 @@ function AutoCategory_FCOIS.Initialize()
     
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
-    AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+    AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
+    AutoCategory.AddRuleFunc("fco_isprotected", 
+		AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+    AutoCategory.AddRuleFunc("isfcoisprotected",
+		AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+    AutoCategory.AddRuleFunc("fco_isgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
     AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
 end
 
@@ -722,9 +730,9 @@ local function GetFCOISIconText( iconId )
 	return ""
 end
 
--- Implement ismarked() check function for FCOIS
+-- Implement fco_ismarked() check function for FCOIS
 function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
-	local fn = "ismarked"
+	local fn = "fco_ismarked"
 	if FCOIS == nil then
 		return false
 	end
@@ -776,9 +784,9 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	end
 end
 
--- Implement isfcoisprotected() check function for FCOIS
+-- Implement fco_isprotected() check function for FCOIS
 function AutoCategory_FCOIS.RuleFunc.IsFCOISProtected( ... )
-	local fn = "isfcoisprotected"
+	local fn = "fco_isprotected"
 	if FCOIS == nil then
 		return false
 	end
@@ -786,9 +794,9 @@ function AutoCategory_FCOIS.RuleFunc.IsFCOISProtected( ... )
 	return FCOIS.IsLocked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
--- Implement isfcoisgear() check function for FCOIS
+-- Implement fco_isgear() check function for FCOIS
 function AutoCategory_FCOIS.RuleFunc.IsFCOISGear( ... )
-	local fn = "isfcoisgear"
+	local fn = "fco_isgear"
 	if FCOIS == nil or FCOIS.IsGear == nil then
 		return false
 	end

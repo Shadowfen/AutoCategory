@@ -907,7 +907,7 @@ AutoCategory.defaultAcctBagSettings = {
 }
 
 AutoCategory.defaultCharSettings = {
-	--bags = AutoCategory.defaultAcctBagSettings.bags, 
+	bags = AutoCategory.defaultAcctBagSettings.bags, 
     collapses = AutoCategory.defaultCollapses,
 }
 

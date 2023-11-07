@@ -18,7 +18,8 @@ AutoCategory.cache = {
     tags = {}, -- [#] tagname
     bags_svt = {}, -- {showNames{bagname}, values{bagid}, tooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {showNames{ico rule.name (pri)}, values{rule.name}, tooltips{rule.desc/name or missing}} --
-    entriesByName = {} -- [bagId][rulename] {priority, isHidden}
+    entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
+	collapses = {},
 }
 
 AutoCategory.BagRuleEntry = {}
@@ -271,12 +272,15 @@ function AutoCategory.LoadCollapse()
     if not saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
         AutoCategory.ResetCollapse(saved)
+	else
+		SF.deepCopy(AC.saved.collapses)
     end
 end
 
 function AutoCategory.ResetCollapse(vars)
     for i = 1, #cache.bags_svt do
 		vars.collapses[i] = nil
+		cache.collapses[i] = SF.safeTable(cache.collapses[i])
     end
 end
 
@@ -284,15 +288,19 @@ end
 function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
 	if bagTypeId == nil or categoryName == nil then return false end
 	
+	--collapsetbl = SF.safeTable(cache.collapses[bagTypeId])
 	collapsetbl = SF.safeTable(saved.collapses[bagTypeId])
     return collapsetbl[categoryName] or false
 end
 
 function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
+	cache.collapses[bagTypeId] = SF.safeTable(cache.collapses[bagTypeId])
+	if not categoryName then return end
+	cache.collapses[bagTypeId][categoryName] = collapsed
 	if collapsed == false then 
 		collapsed = nil 
 	end
-    saved.collapses[bagTypeId][categoryName] = collapsed
+	saved.collapses[bagTypeId][categoryName] = collapsed
 end
 -- -----------------------------------------------------------
 
@@ -381,6 +389,9 @@ function AutoCategory.cacheInitialize()
             table.insert(ebag.tooltips, tt)
         end
     end
+	
+    cache.collapses = SF.safeClearTable(cache.collapses)
+	
 end
 
 function AutoCategory.GetRuleByName(name)
@@ -620,7 +631,7 @@ function AutoCategory.onLoad(event, addon)
     end
 
     AutoCategory.UpdateCurrentSavedVars()
-    AutoCategory.LoadCollapse()
+    AutoCategory.LoadCollapse()		-- must follow UpdateCurrentSavedVars()
 
     AutoCategory.LazyInit()
 
@@ -797,8 +808,8 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_EXPAND_ALL),
         function()
-            for k, v in pairs(AutoCategory.saved.collapses[bagTypeId]) do
-                AutoCategory.saved.collapses[bagTypeId][k] = nil
+            for k, v in pairs(AutoCategory.cache.collapses[bagTypeId]) do
+                AC.SetCategoryCollapsed(bagTypeId,k,false)
             end
             AutoCategory.RefreshCurrentList()
         end
@@ -806,9 +817,10 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_COLLAPSE_ALL),
         function()
-            for k, v in pairs(AutoCategory.saved.collapses[bagTypeId]) do
-                AutoCategory.saved.collapses[bagTypeId][k] = true
+            for k, v in pairs(AutoCategory.cache.collapses[bagTypeId]) do
+                AC.SetCategoryCollapsed(bagTypeId,k,true)
             end
+			AC.SetCategoryCollapsed(bagTypeId,saved.appearance["CATEGORY_OTHER_TEXT"],true)
             AutoCategory.RefreshCurrentList()
         end
     )

@@ -119,6 +119,10 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	-- Adjust the name of the category based on the presence of 
 	-- an enhancement (set name) and if SHOW_CATEGORY_SET_TITLE is enabled
 	local function adjustName(name, enhancement)
+		if name == nil or name == "" then 
+			name  = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+			enhancement = ""
+		end
 		if enhancement == "" then
 			-- just use declared category name
 			return name
@@ -161,10 +165,17 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 				AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
 				local exec_ok, res = pcall( ruleCode )
 				if exec_ok then
+					local catname = adjustName(rule.name,
+											AutoCategory.AdditionCategoryName)
+					AutoCategory.SetCategoryCollapsed(bag_type_id, catname,
+						AutoCategory.IsCategoryCollapsed(bag_type_id, catname))
 					if res == true then
-						return true, adjustName(rule.name, AutoCategory.AdditionCategoryName), 
-							entry.priority, bag_type_id, entry.isHidden
-					end 
+						return true, 
+							catname, 
+							entry.priority, 
+							bag_type_id, 
+							entry.isHidden
+					end
 					
 				else
 					logger:Error("Error2: " .. entry.name.. " - ".. res)

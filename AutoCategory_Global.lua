@@ -5,11 +5,20 @@ AC_BAG_TYPE_CRAFTBAG = 4
 AC_BAG_TYPE_CRAFTSTATION = 5
 AC_BAG_TYPE_HOUSEBANK = 6
 
+AC_INVEN_CV ={
+	[AC_BAG_TYPE_BACKPACK]=INVENTORY_BACKPACK,
+	[AC_BAG_TYPE_BANK]=INVENTORY_BANK,
+	[AC_BAG_TYPE_GUILDBANK]=INVENTORY_GUILD_BANK,
+	[AC_BAG_TYPE_CRAFTBAG]=INVENTORY_CRAFT_BAG,
+	[AC_BAG_TYPE_CRAFTSTATION]=INVENTORY_BACKPACK,
+	[AC_BAG_TYPE_HOUSEBANK]=INVENTORY_HOUSE_BANK,
+}
+
 local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "3.6.2",
+    version = "3.6.5",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice, Friday_the13_rus",

@@ -714,6 +714,12 @@ end
 function AutoCategory.RuleFunc.IsCompanionOnly( ... )
 	local fn = "iscompaniononly"
 
+	local actorCategory = GetItemActorCategory(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+	if actorCategory == GAMEPLAY_ACTOR_CATEGORY_COMPANION then
+		return true
+	end
+	return false
+	--[[
 	local itemFilterType = { GetItemFilterTypeInfo(AC.checkingItemBagId, AC.checkingItemSlotIndex) }
 		
 	local testFilterType = ITEMFILTERTYPE_COMPANION
@@ -724,6 +730,7 @@ function AutoCategory.RuleFunc.IsCompanionOnly( ... )
 	end
 	
 	return false
+	--]]
 end
 
 function AutoCategory.RuleFunc.IsCrafted( ... )

@@ -249,12 +249,8 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		knowledge = LCK.GetItemKnowledgeForCharacter(itemLink, server)
 		
 	else
-		--local charlist = LCK.GetCharacterList(server)
 		local arg = select(1, ...)
 		for i,v in pairs(AutoCategory_MiscAddons.charlist) do
-		--for i = 1, GetNumCharacters() do
-		--	local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
-		--	name = zo_strformat("<<1>>", name)
 			local name = zo_strformat("<<1>>",v.name)
 			if name == arg then
 				crafter = v.id --characterId
