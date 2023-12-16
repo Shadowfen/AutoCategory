@@ -11,7 +11,7 @@ local cache = AutoCategory.cache
 local saved = AutoCategory.saved
 
 --cache data for dropdown: 
-cache.bags_svt.showNames = { 
+cache.bags_svt.choices = { 
 	[AC_BAG_TYPE_BACKPACK]     = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
 	[AC_BAG_TYPE_BANK]         = L(SI_AC_BAGTYPE_SHOWNAME_BANK),
 	[AC_BAG_TYPE_GUILDBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
@@ -19,7 +19,7 @@ cache.bags_svt.showNames = {
 	[AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION), 
 	[AC_BAG_TYPE_HOUSEBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
 }
-cache.bags_svt.values = {	
+cache.bags_svt.choicesValues = {	
 	AC_BAG_TYPE_BACKPACK, 
 	AC_BAG_TYPE_BANK, 
 	AC_BAG_TYPE_GUILDBANK, 
@@ -27,7 +27,7 @@ cache.bags_svt.values = {
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
 }
-cache.bags_svt.tooltips = {  
+cache.bags_svt.choicesTooltips = {  
 	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK), 
 	L(SI_AC_BAGTYPE_TOOLTIP_BANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
@@ -38,20 +38,15 @@ cache.bags_svt.tooltips = {
 
 local function newCVT(ndx)
 	local tbl = {
-		indexValue = "", 
-		choices = {}, choicesValues = {}, choicesTooltips = {}
+		choices = {}, choicesValues = {}, choicesTooltips = {},
 	}
 	if ndx == nil then return tbl end
 	indexValue = ndx
 	return tbl
 end
 
-local function newSVT()
-	return {showNames = {}, values = {}, tooltips = {}, }
-end
-
 local fieldData = {
-	editBag_cvt =     newCVT(AC_BAG_TYPE_BACKPACK),
+	editBag_cvt = newCVT(AC_BAG_TYPE_BACKPACK),
 	editBagRule = newCVT(),
 	addCatTag =   newCVT(),
 	addCatRule =  newCVT(),
@@ -62,7 +57,8 @@ local fieldData = {
 		name = "", 
 		description = "", 
 		rule = "false", 
-		tag = "", },
+		tag = "", 
+	},
 }
 
 -- It is the responsiblity of the caller to pass in a non-duplicated entry
@@ -91,12 +87,12 @@ local dropdownFontStyle	= {
 	'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'
 }
 local dropdownFontAlignment = {}
-dropdownFontAlignment.showNames = {
+dropdownFontAlignment.choices = {
 	L(SI_AC_ALIGNMENT_LEFT), 
 	L(SI_AC_ALIGNMENT_CENTER), 
 	L(SI_AC_ALIGNMENT_RIGHT)
 }
-dropdownFontAlignment.values = {0, 1, 2} 
+dropdownFontAlignment.choicesValues = {0, 1, 2} 
 
 local ruleCheckStatus = {}
 
@@ -246,46 +242,46 @@ end
 local function RefreshDropdownData()
 	 
 	--update tag & bag selection first
-	if fieldData.addCatTag.indexValue == "" and #cache.tags > 0 then
+	if fieldData.addCatTag.indexValue == nil and #cache.tags > 0 then
 		fieldData.addCatTag.indexValue = cache.tags[1]
 	end
     
-	if fieldData.editRuleTag.indexValue == "" and #cache.tags > 0 then
+	if fieldData.editRuleTag.indexValue == nil and #cache.tags > 0 then
 		fieldData.editRuleTag.indexValue = cache.tags[1]
 	end
 
-	if fieldData.editBag_cvt.indexValue == "" and #cache.bags_svt.values > 0 then
-		fieldData.editBag_cvt.indexValue = cache.bags_svt.values[1]
+	if fieldData.editBag_cvt.indexValue == nil and #cache.bags_svt.choicesValues > 0 then
+		fieldData.editBag_cvt.indexValue = cache.bags_svt.choicesValues[1]
 	end
 
 	--refresh current dropdown rules
-	local dataCurrentRules_EditRule = newSVT()
+	local dataCurrentRules_EditRule = newCVT()
     local ltag = fieldData.editRuleTag.indexValue
 	if ltag and cache.rulesByTag_svt[ltag] then 
-		dataCurrentRules_EditRule.showNames = cache.rulesByTag_svt[ltag].showNames
-		dataCurrentRules_EditRule.values    = cache.rulesByTag_svt[ltag].values
-		dataCurrentRules_EditRule.tooltips  = cache.rulesByTag_svt[ltag].tooltips
+		dataCurrentRules_EditRule.choices = cache.rulesByTag_svt[ltag].choices
+		dataCurrentRules_EditRule.choicesValues    = cache.rulesByTag_svt[ltag].choicesValues
+		dataCurrentRules_EditRule.choicesTooltips  = cache.rulesByTag_svt[ltag].choicesTooltips
 	end	
-	fieldData.editRuleCat.choices         = SF.safeTable(dataCurrentRules_EditRule.showNames)
-	fieldData.editRuleCat.choicesValues   = SF.safeTable(dataCurrentRules_EditRule.values)
-	fieldData.editRuleCat.choicesTooltips = SF.safeTable(dataCurrentRules_EditRule.tooltips)
-	if fieldData.editRuleCat.indexValue == "" and #dataCurrentRules_EditRule.values > 0 then
-		fieldData.editRuleCat.indexValue = dataCurrentRules_EditRule.values[1]
+	fieldData.editRuleCat.choices         = SF.safeTable(dataCurrentRules_EditRule.choices)
+	fieldData.editRuleCat.choicesValues   = SF.safeTable(dataCurrentRules_EditRule.choicesValues)
+	fieldData.editRuleCat.choicesTooltips = SF.safeTable(dataCurrentRules_EditRule.choicesTooltips)
+	if fieldData.editRuleCat.indexValue == nil and #dataCurrentRules_EditRule.choicesValues > 0 then
+		fieldData.editRuleCat.indexValue = dataCurrentRules_EditRule.choicesValues[1]
 	end
     UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
 
-	local dataCurrentRules_EditBag = newSVT()
+	local dataCurrentRules_EditBag = newCVT()
     local lbag = fieldData.editBag_cvt.indexValue
 	if lbag and cache.entriesByBag[lbag] then 
-		dataCurrentRules_EditBag.showNames = cache.entriesByBag[lbag].showNames
-		dataCurrentRules_EditBag.values    = cache.entriesByBag[lbag].values
-		dataCurrentRules_EditBag.tooltips  = cache.entriesByBag[lbag].tooltips
+		dataCurrentRules_EditBag.choices = cache.entriesByBag[lbag].choices
+		dataCurrentRules_EditBag.choicesValues    = cache.entriesByBag[lbag].choicesValues
+		dataCurrentRules_EditBag.choicesTooltips  = cache.entriesByBag[lbag].choicesTooltips
 	end
-	fieldData.editBagRule.choices         = dataCurrentRules_EditBag.showNames
-	fieldData.editBagRule.choicesValues   = dataCurrentRules_EditBag.values
-	fieldData.editBagRule.choicesTooltips = dataCurrentRules_EditBag.tooltips
-	if fieldData.editBagRule.indexValue == "" and #dataCurrentRules_EditBag.values > 0 then
-		fieldData.editBagRule.indexValue = dataCurrentRules_EditBag.values[1]
+	fieldData.editBagRule.choices         = dataCurrentRules_EditBag.choices
+	fieldData.editBagRule.choicesValues   = dataCurrentRules_EditBag.choicesValues
+	fieldData.editBagRule.choicesTooltips = dataCurrentRules_EditBag.choicesTooltips
+	if fieldData.editBagRule.indexValue == nil and #dataCurrentRules_EditBag.choicesValues > 0 then
+		fieldData.editBagRule.indexValue = dataCurrentRules_EditBag.choicesValues[1]
 	end
     UpdateChoices("AC_DROPDOWN_EDITBAG_RULE", fieldData.editBagRule)
 
@@ -293,20 +289,20 @@ local function RefreshDropdownData()
     local latag = fieldData.addCatTag.indexValue
 	if latag and cache.rulesByTag_svt[latag] then 
 		--remove the rules alreadly in bag
-		for i = 1, #cache.rulesByTag_svt[latag].values do
-			local value = cache.rulesByTag_svt[latag].values[i]
+		for i = 1, #cache.rulesByTag_svt[latag].choicesValues do
+			local value = cache.rulesByTag_svt[latag].choicesValues[i]
 			if lbag and cache.entriesByName[lbag][value] == nil then
 				--add the rule if not in bag
-				table.insert(dataCurrentRules_AddCategory.choices, cache.rulesByTag_svt[latag].showNames[i])
-				table.insert(dataCurrentRules_AddCategory.choicesValues, cache.rulesByTag_svt[latag].values[i])
-				table.insert(dataCurrentRules_AddCategory.choicesTooltips, cache.rulesByTag_svt[latag].tooltips[i])
+				table.insert(dataCurrentRules_AddCategory.choices, cache.rulesByTag_svt[latag].choices[i])
+				table.insert(dataCurrentRules_AddCategory.choicesValues, cache.rulesByTag_svt[latag].choicesValues[i])
+				table.insert(dataCurrentRules_AddCategory.choicesTooltips, cache.rulesByTag_svt[latag].choicesTooltips[i])
 			end
 		end
 	end
 	fieldData.addCatRule.choices         = dataCurrentRules_AddCategory.choices
 	fieldData.addCatRule.choicesValues   = dataCurrentRules_AddCategory.choicesValues
 	fieldData.addCatRule.choicesTooltips = dataCurrentRules_AddCategory.choicesTooltips
-	if fieldData.addCatRule.indexValue == "" 
+	if fieldData.addCatRule.indexValue == nil 
 			and #dataCurrentRules_AddCategory.choicesValues > 0 then
 		fieldData.addCatRule.indexValue = dataCurrentRules_AddCategory.choicesValues[1]
 	end
@@ -329,7 +325,7 @@ local function RemoveDropDownItem(dataArray, removeItem, emptyCallback)
 	
 	if num == 1 then
 		--select none
-		dataArray.indexValue = ""
+		dataArray.indexValue = nil
 		if emptyCallback then
 			emptyCallback(dataArray)
 		end
@@ -383,9 +379,9 @@ function AutoCategory.AddonMenuInit()
     AC.cacheInitialize()
     
     -- initialize tables
-	fieldData.editBag_cvt.choices = cache.bags_svt.showNames
-	fieldData.editBag_cvt.choicesValues = cache.bags_svt.values
-    fieldData.editBag_cvt.choicesTooltips = cache.bags_svt.tooltips
+	fieldData.editBag_cvt.choices = cache.bags_svt.choices
+	fieldData.editBag_cvt.choicesValues = cache.bags_svt.choicesValues
+    fieldData.editBag_cvt.choicesTooltips = cache.bags_svt.choicesTooltips
 	
 	fieldData.addCatTag.choices = cache.tags
 	fieldData.addCatTag.choicesValues = cache.tags
@@ -400,9 +396,9 @@ function AutoCategory.AddonMenuInit()
 	fieldData.editRuleTag.choicesValues = cache.tags
 	fieldData.editRuleTag.choicesTooltips = cache.tags
 	
-	fieldData.importBag.choices = cache.bags_svt.showNames
-	fieldData.importBag.choicesValues = cache.bags_svt.values
-	fieldData.importBag.choicesTooltips = cache.bags_svt.tooltips
+	fieldData.importBag.choices = cache.bags_svt.choices
+	fieldData.importBag.choicesValues = cache.bags_svt.choicesValues
+	fieldData.importBag.choicesTooltips = cache.bags_svt.choicesTooltips
 	 
 	RefreshDropdownData() 
  
@@ -421,11 +417,11 @@ function AutoCategory.AddonMenuInit()
 			AutoCategory.cacheInitialize() 
 			
             fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
-			fieldData.editBagRule.indexValue = ""
-			fieldData.addCatTag.indexValue = ""
-			fieldData.addCatRule.indexValue = ""
-			fieldData.editRuleTag.indexValue = ""
-			fieldData.editRuleCat.indexValue = ""
+			fieldData.editBagRule.indexValue = nil
+			fieldData.addCatTag.indexValue = nil
+			fieldData.addCatRule.indexValue = nil
+			fieldData.editRuleTag.indexValue = nil
+			fieldData.editRuleCat.indexValue = nil
 			
 			RefreshDropdownData()
 		end,
@@ -445,11 +441,11 @@ function AutoCategory.AddonMenuInit()
                 AutoCategory.UpdateCurrentSavedVars()
                 
                 fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
-                fieldData.editBagRule.indexValue = ""
-                fieldData.addCatTag.indexValue = ""
-                fieldData.addCatRule.indexValue = ""
-                fieldData.editRuleTag.indexValue = ""
-                fieldData.editRuleCat.indexValue = ""
+                fieldData.editBagRule.indexValue = nil
+                fieldData.addCatTag.indexValue = nil
+                fieldData.addCatRule.indexValue = nil
+                fieldData.editRuleTag.indexValue = nil
+                fieldData.editRuleCat.indexValue = nil
                 ruleCheckStatus.err = nil
                 ruleCheckStatus.good = nil
                 
@@ -484,9 +480,9 @@ function AutoCategory.AddonMenuInit()
 					end,
 					setFunc = function(value)
                         fieldData.editBag_cvt.indexValue = value
-						fieldData.editBagRule.indexValue = ""
+						fieldData.editBagRule.indexValue = nil
 						--reset add rule's selection, since all data will be changed.
-						fieldData.addCatRule.indexValue = ""
+						fieldData.addCatRule.indexValue = nil
 						 
 						RefreshDropdownData() 
 					end, 
@@ -501,10 +497,12 @@ function AutoCategory.AddonMenuInit()
 					tooltip = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP,
 					getFunc = function()					
 						local bag = fieldData.editBag_cvt.indexValue
+						if not bag then return false end
 						return saved.bags[bag].isUngroupedHidden
 					end,
 					setFunc = function(value)  
 						local bag = fieldData.editBag_cvt.indexValue
+						if not bag then return end
 						saved.bags[bag].isUngroupedHidden = value
 					end,
 					width = "half",
@@ -557,7 +555,7 @@ function AutoCategory.AddonMenuInit()
 						end
 					end,
 					disabled = function() 
-						if fieldData.editBagRule.indexValue == "" then
+						if fieldData.editBagRule.indexValue == nil then
 							return true
 						end 
 						if #fieldData.editBagRule.choices == 0 then
@@ -591,7 +589,7 @@ function AutoCategory.AddonMenuInit()
 						end
 					end,
 					disabled = function() 
-						if fieldData.editBagRule.indexValue == "" then
+						if fieldData.editBagRule.indexValue == nil then
 							return true
 						end 
 						if #fieldData.editBagRule.choices == 0 then
@@ -638,7 +636,7 @@ function AutoCategory.AddonMenuInit()
 							end
 						end
 						RemoveDropDownItem("AC_DROPDOWN_EDITBAG_RULE", fieldData.editBagRule.choicesValues, ruleName)
-						if fieldData.editBagRule.indexValue == "" and #fieldData.editBagRule.choices > 0 then
+						if fieldData.editBagRule.indexValue == nil and #fieldData.editBagRule.choices > 0 then
                             fieldData.editBagRule.indexValue = fieldData.editBagRule.choicesValues[1]
                         end
 						AutoCategory.cacheInitialize()
@@ -674,7 +672,7 @@ function AutoCategory.AddonMenuInit()
                         if oldvalue == value then return end
                         
 						fieldData.addCatTag.indexValue = value
-						fieldData.addCatRule.indexValue = ""
+						fieldData.addCatRule.indexValue = nil
 						RefreshDropdownData() 
 					end, 
 					width = "half",
@@ -777,9 +775,9 @@ function AutoCategory.AddonMenuInit()
 									saved.bags[i] = SF.deepCopy(selectedBag)
 								end
                                 
-                                fieldData.editBagRule.indexValue = ""
+                                fieldData.editBagRule.indexValue = nil
 								--reset add rule's selection, since all data will be changed.
-								fieldData.addCatRule.indexValue = ""
+								fieldData.addCatRule.indexValue = nil
 								 
 								--RefreshCache()
 								RefreshDropdownData() 
@@ -819,9 +817,9 @@ function AutoCategory.AddonMenuInit()
 							func = function() 
 
 								saved.bags[fieldData.editBag_cvt.indexValue] = SF.deepCopy( saved.bags[fieldData.importBag.indexValue] )
-                                fieldData.editBagRule.indexValue = ""
+                                fieldData.editBagRule.indexValue = nil
 								--reset add rule's selection, since all data will be changed.
-								fieldData.addCatRule.indexValue = ""
+								fieldData.addCatRule.indexValue = nil
 								 
 								AutoCategory.cacheInitialize()
 								RefreshDropdownData() 
@@ -867,7 +865,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					setFunc = function(value) 			
                         fieldData.editRuleTag.indexValue = value
-                        fieldData.editRuleCat.indexValue = ""
+                        fieldData.editRuleCat.indexValue = nil
                         fieldData.currentRule = nil
                         RefreshDropdownData() 
                         UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
@@ -917,12 +915,12 @@ function AutoCategory.AddonMenuInit()
 						
 						if oldRuleName == fieldData.addCatRule.indexValue then
 							--rule removed, clean selection in add rule menu if selected
-							fieldData.addCatRule.indexValue = ""
+							fieldData.addCatRule.indexValue = nil
 						end
 						
                         fieldData.currentRule = nil
                         checkCurrentRule()
-                        fieldData.editRuleCat.indexValue = ""
+                        fieldData.editRuleCat.indexValue = nil
                         if #fieldData.editRuleCat.choicesValues > 0 then
                             fieldData.editRuleCat.indexValue = fieldData.editRuleCat.choicesValues[1]
                         end
@@ -1284,8 +1282,8 @@ function AutoCategory.AddonMenuInit()
                 {
                     type = 'dropdown',
                     name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT,
-                    choices = dropdownFontAlignment.showNames,
-                    choicesValues = dropdownFontAlignment.values,
+                    choices = dropdownFontAlignment.choices,
+                    choicesValues = dropdownFontAlignment.choicesValues,
                     getFunc = function()
                         return saved.appearance["CATEGORY_FONT_ALIGNMENT"]
                     end,

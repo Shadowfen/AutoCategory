@@ -13,11 +13,11 @@ AutoCategory.saved = {
 }
 AutoCategory.cache = {
     rulesByName = {}, -- [name] rule#
-    rulesByTag_svt = {}, -- [tag] {showNames{rule.name}, tooltips{rule.desc/name}}
+    rulesByTag_svt = {}, -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
     compiledRules = AC.compiledRules, -- [name] function
     tags = {}, -- [#] tagname
-    bags_svt = {}, -- {showNames{bagname}, values{bagid}, tooltips{bagname}} -- for the bags themselves
-    entriesByBag = {}, -- [bagId] {showNames{ico rule.name (pri)}, values{rule.name}, tooltips{rule.desc/name or missing}} --
+    bags_svt = {}, -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
+    entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
     entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
 	collapses = {},
 }
@@ -272,8 +272,8 @@ function AutoCategory.LoadCollapse()
     if not saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
         AutoCategory.ResetCollapse(saved)
-	else
-		SF.deepCopy(AC.saved.collapses)
+	--else
+	--	SF.deepCopy(AC.saved.collapses)
     end
 end
 
@@ -346,15 +346,15 @@ function AutoCategory.cacheInitialize()
         --update cache for tag grouping
         if not cache.rulesByTag_svt[tag] then
             table.insert(cache.tags, tag)
-            cache.rulesByTag_svt[tag] = {showNames = {}, values = {}, tooltips = {}}
+            cache.rulesByTag_svt[tag] = {choices = {}, choicesValues = {}, choicesTooltips = {}}
         end
         local tooltip = rule.description
         if rule.description == "" then
             tooltip = rule.name
         end
-        table.insert(cache.rulesByTag_svt[tag].showNames, name)
-        table.insert(cache.rulesByTag_svt[tag].values, name)
-        table.insert(cache.rulesByTag_svt[tag].tooltips, tooltip)
+        table.insert(cache.rulesByTag_svt[tag].choices, name)
+        table.insert(cache.rulesByTag_svt[tag].choicesValues, name)
+        table.insert(cache.rulesByTag_svt[tag].choicesTooltips, tooltip)
     end
 
     -- initialize the bag-based lookups
@@ -363,7 +363,7 @@ function AutoCategory.cacheInitialize()
     -- load in the bagged rules (sorted by priority high-to-low)
     for bagId = 1, #saved.bags do
 		if cache.entriesByBag[bagId] == nil then
-			cache.entriesByBag[bagId] = {showNames = {}, values = {}, tooltips = {}}
+			cache.entriesByBag[bagId] = {choices = {}, choicesValues = {}, choicesTooltips = {}}
 		end
 
 		cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId])
@@ -380,13 +380,13 @@ function AutoCategory.cacheInitialize()
 
             local ruleName = data.name
             ename[ruleName] = data
-            table.insert(ebag.values, AC.BagRuleEntry.formatValue(data))
+            table.insert(ebag.choicesValues, AC.BagRuleEntry.formatValue(data))
 
             local rule = AC.GetRuleByName(ruleName)
             local sn = AC.BagRuleEntry.formatShow(data, rule)
             local tt = AC.BagRuleEntry.formatTooltip(rule)
-            table.insert(ebag.showNames, sn)
-            table.insert(ebag.tooltips, tt)
+            table.insert(ebag.choices, sn)
+            table.insert(ebag.choicesTooltips, tt)
         end
     end
 	
@@ -414,12 +414,12 @@ function AutoCategory.cache.RemoveRuleFromBag(bagId, name)
 
     -- remove from entriesByBag
     local r = cache.entriesByBag[bagId]
-    for i = 1, #r.values do
-        local p, n = AutoCategory.BagRuleEntry.splitValue(r.values[i])
+    for i = 1, #r.choicesValues do
+        local p, n = AutoCategory.BagRuleEntry.splitValue(r.choicesValues[i])
         if n == name then
-            table.remove(r.values, i)
-            table.remove(r.showNames, i)
-            table.remove(r.tooltips, i)
+            table.remove(r.choicesValues, i)
+            table.remove(r.choices, i)
+            table.remove(r.choicesTooltips, i)
             break
         end
     end
@@ -444,14 +444,14 @@ function AutoCategory.cache.RemoveRuleByName(name)
 
     -- remove from cache.rulesByTag_svt
     for t, s in pairs(cache.rulesByTag_svt) do
-        for i = 1, #s.showNames do
-            if s.showNames[i] == name then
-                table.remove(s.showNames, i)
-                if s.values then
-                    table.remove(s.values, i)
+        for i = 1, #s.choices do
+            if s.choices[i] == name then
+                table.remove(s.choices, i)
+                if s.choicesValues then
+                    table.remove(s.choicesValues, i)
                 end
-                if s.tooltips then
-                    table.remove(s.tooltips, i)
+                if s.choicesTooltips then
+                    table.remove(s.choicesTooltips, i)
                 end
                 break
             end
@@ -510,7 +510,7 @@ function AutoCategory.cache.AddRule(rule)
         rule.tag = AC_EMPTY_TAG_NAME
     end
     if cache.rulesByTag_svt[rule.tag] == nil then
-        cache.rulesByTag_svt[rule.tag] = {showNames = {}, values = {}, tooltips = {}}
+        cache.rulesByTag_svt[rule.tag] = {choices = {}, choicesValues = {}, choicesTooltips = {}}
     end
 	
 	local rule_ndx = cache.rulesByName[rule.name]
@@ -525,9 +525,9 @@ function AutoCategory.cache.AddRule(rule)
 		rule_ndx = #saved.rules
 		cache.rulesByName[rule.name] = rule_ndx
 
-		table.insert(cache.rulesByTag_svt[rule.tag].showNames, rule.name)
-		table.insert(cache.rulesByTag_svt[rule.tag].values, rule.name)
-		table.insert(cache.rulesByTag_svt[rule.tag].tooltips, tt)
+		table.insert(cache.rulesByTag_svt[rule.tag].choices, rule.name)
+		table.insert(cache.rulesByTag_svt[rule.tag].choicesValues, rule.name)
+		table.insert(cache.rulesByTag_svt[rule.tag].choicesTooltips, tt)
     end
 
     AC.CompileRule(rule)
@@ -550,11 +550,11 @@ function AutoCategory.cache.AddRuleToBag(bagId, rulename, priority)
     local tt = AutoCategory.BagRuleEntry.formatTooltip(rule)
 
 	if cache.entriesByBag[bagId] == nil then
-		cache.entriesByBag[bagId] = {showNames = {}, values = {}, tooltips = {}}
+		cache.entriesByBag[bagId] = {choices = {}, choicesValues = {}, choicesTooltips = {}}
 	end
-    table.insert(cache.entriesByBag[bagId].showNames, sn)
-    table.insert(cache.entriesByBag[bagId].values, rulename)
-    table.insert(cache.entriesByBag[bagId].tooltips, tt)
+    table.insert(cache.entriesByBag[bagId].choices, sn)
+    table.insert(cache.entriesByBag[bagId].choicesValues, rulename)
+    table.insert(cache.entriesByBag[bagId].choicesTooltips, tt)
 end
 
 --remove duplicated categories in bag
