@@ -12,6 +12,7 @@ AutoCategory_MiscAddons = {
 
 --Initialize plugin for Auto Category - Misc Addons
 function AutoCategory_MiscAddons.Initialize()
+
     -- Master Merchant
 	AutoCategory.AddRuleFunc("getpricemm", 
 		AutoCategory_MiscAddons.RuleFunc.GetPriceMM)

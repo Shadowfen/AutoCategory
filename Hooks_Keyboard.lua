@@ -1,24 +1,30 @@
 --[[
 CHANGE DETECTION STRATEGY
 This file uses hooks on API functions: 
-	PLAYER_INVENTORY:ApplySort, SMITHING.deconstructionPanel.inventory:SortData, and SMITHING.improvementPanel.inventory:SortData 
+	PLAYER_INVENTORY:ApplySort, 
+	SMITHING.deconstructionPanel.inventory:SortData, and 
+	SMITHING.improvementPanel.inventory:SortData 
 to order items in categories, in all inventories (including crafting station)
 This process involves executing all active rules for each items, and can be 
 triggered multiple times in a row, notably for bank transfers (more than ten calls)
 In order to reduce the impact of the add-on:
 	1 - The results of rules' execution are stored in 'itemEntry.data'.
- 		As 'itemEntry.data' is persistent, results can be reused directly without having to re-execute all the rules every time.
-		However, 'itemEntry.data' will not persist forever and will be reset at some point, and rules will need to be re-executed, but this is not much of an issue.
+ 		As 'itemEntry.data' is persistent, results can be reused directly 
+		without having to re-execute all the rules every time.
+		However, 'itemEntry.data' will not persist forever and will be reset 
+		at some point, and rules will need to be re-executed, but this is not much of an issue.
 		
 	2 - A change detection strategy is used to re-execute rules when necessary.
 		A hash for each item is used to trigger re-execution of rules for a single item based on:
-			- Time, as a safety net, in case a change were missed for any reason: test if the results stored are older than 2 seconds
-			- Base game data: test various variables like isPlayerLocked, brandNew, isInArmory etc.
+			- Time, as a safety net, in case a change were missed for any reason: 
+				test if the results stored are older than 2 seconds
+			- Base game data: test various variables like isPlayerLocked, brandNew, 
+				isInArmory etc.
 			- FCOIS data: test if item's marks have changed
 			
 		Some API events are monitored:
 			- A hook on PLAYER_INVENTORY:OnInventorySlotUpdated triggers re-execution of rules for a single item
-			- A callback on LAM-PanelClosed triggers re-execution of rules
+			- A callback on LAM-PanelClosed triggers re-execution of rules (due to potential rule changes)
 			- The event EVENT_STACKED_ALL_ITEMS_IN_BAG is used so re-execution of rules with inventory refresh can be triggered manually by stacking all items.
 ]]
 
@@ -115,6 +121,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 				appearance["CATEGORY_FONT_NAME"]), 
 				appearance["CATEGORY_FONT_SIZE"], 
 				appearance["CATEGORY_FONT_STYLE"]))
+				
 	local data = SF.safeTable(slot.dataEntry.data)
 	local cateName = SF.nilDefault(data.AC_categoryName, "Unknown")
 	local bagTypeId = SF.nilDefault(data.AC_bagTypeId, 0)
@@ -301,9 +308,11 @@ end
 local function constructEntryHash(itemEntry)
 	local data = itemEntry.data
 	--- Hash construction
+	local bagId = data.bagId
+	local slotIndex = data.slotIndex
 	local hashFCOIS = "" -- retrieve FCOIS mark data for change detection with itemEntry hash
-	if FCOIS and data.bagId and data.bagId > 0 and data.slotIndex and data.slotIndex > 0 then
-		local _, markedIconsArray = FCOIS.IsMarked(data.bagId, data.slotIndex, -1)
+	if FCOIS and not NilOrLessThan(bagId, 0) and not NilOrLessThan(slotIndex,0) then
+		local _, markedIconsArray = FCOIS.IsMarked(bagId, slotIndex, -1)
 		if markedIconsArray then
 			for _, value in ipairs(markedIconsArray) do
 				hashFCOIS = hashFCOIS .. tostring(value)

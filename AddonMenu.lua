@@ -11,24 +11,24 @@ local cache = AutoCategory.cache
 local saved = AutoCategory.saved
 
 --cache data for dropdown: 
-cache.bags_svt.choices = { 
+cache.bags_svt.choices = {
 	[AC_BAG_TYPE_BACKPACK]     = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
 	[AC_BAG_TYPE_BANK]         = L(SI_AC_BAGTYPE_SHOWNAME_BANK),
 	[AC_BAG_TYPE_GUILDBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
 	[AC_BAG_TYPE_CRAFTBAG]     = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
-	[AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION), 
+	[AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
 	[AC_BAG_TYPE_HOUSEBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
 }
-cache.bags_svt.choicesValues = {	
-	AC_BAG_TYPE_BACKPACK, 
-	AC_BAG_TYPE_BANK, 
-	AC_BAG_TYPE_GUILDBANK, 
-	AC_BAG_TYPE_CRAFTBAG, 
+cache.bags_svt.choicesValues = {
+	AC_BAG_TYPE_BACKPACK,
+	AC_BAG_TYPE_BANK,
+	AC_BAG_TYPE_GUILDBANK,
+	AC_BAG_TYPE_CRAFTBAG,
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
 }
 cache.bags_svt.choicesTooltips = {  
-	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK), 
+	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK),
 	L(SI_AC_BAGTYPE_TOOLTIP_BANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG),
@@ -60,7 +60,7 @@ local fieldData = {
 		tag = "", 
 	},
 }
-
+--[[ unused
 -- It is the responsiblity of the caller to pass in a non-duplicated entry
 local function AddChoice( dataArray, choice, value, tooltip )
     -- value is only optional if we don't have a table to put it into
@@ -82,17 +82,18 @@ local function AddChoice( dataArray, choice, value, tooltip )
         table.insert(dataArray.choicesTooltips, tooltip)
     end
 end
+--]]
 
 local dropdownFontStyle	= {
 	'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'
 }
 local dropdownFontAlignment = {}
 dropdownFontAlignment.choices = {
-	L(SI_AC_ALIGNMENT_LEFT), 
-	L(SI_AC_ALIGNMENT_CENTER), 
+	L(SI_AC_ALIGNMENT_LEFT),
+	L(SI_AC_ALIGNMENT_CENTER),
 	L(SI_AC_ALIGNMENT_RIGHT)
 }
-dropdownFontAlignment.choicesValues = {0, 1, 2} 
+dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 local ruleCheckStatus = {}
 
@@ -100,11 +101,11 @@ function ruleCheckStatus.getTitle()
     if ruleCheckStatus.err == nil then
         if ruleCheckStatus.good == nil then
             return ""
-			
+
         else
             return L(SI_AC_MENU_EC_BUTTON_CHECK_RESULT_GOOD)
         end
-		
+
     else
         if not fieldData.currentRule.damaged then
             return L(SI_AC_MENU_EC_BUTTON_CHECK_RESULT_WARNING)
@@ -116,7 +117,7 @@ end
 function ruleCheckStatus.getText()
     if ruleCheckStatus.err == nil then
         return ""
-		
+
     else
         return ruleCheckStatus.err
     end
@@ -128,7 +129,7 @@ local function checkKeywords(str)
         local found = false
         if AC.Environment[w] then
             found = true
-			
+
         else
             for i=1, #AC.dictionary do
                 if AC.dictionary[i][w] then
@@ -186,7 +187,7 @@ local warningDuplicatedName = {
 local function UpdateDuplicateNameWarning()
 	local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_NAME", "")
 	if control then
-		control:UpdateWarning()			
+		control:UpdateWarning()
 	end
 end
 
@@ -223,7 +224,7 @@ local function ToggleSubmenu(typeString, open)
 		control.open = open
 		if control.open then
 			control.animation:PlayFromStart()
-			
+
 		else
 			control.animation:PlayFromEnd()
 		end	

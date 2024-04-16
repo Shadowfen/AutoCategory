@@ -32,8 +32,8 @@ local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 local function getBagTypeId(header)
 	SF.dTable(header,5,"getBagTypeId - header")
 	local bagTypeId = header.slot.dataEntry.data.AC_bagTypeId
-    if not bagTypeId then 
-		bagTypeId = header.slot.dataEntry.AC_bagTypeId 
+    if not bagTypeId then
+		bagTypeId = header.slot.dataEntry.AC_bagTypeId
 	end
 	return bagTypeId
 end
@@ -83,7 +83,7 @@ function AutoCategory.CompileRule(rule)
     --logger:SetEnabled(true)
     if rule == nil or rule.name == nil or rule.name == "" then
 		return
-	end 
+	end
 
 	rule.damaged = nil
 	rule.err = nil
@@ -94,7 +94,7 @@ function AutoCategory.CompileRule(rule)
         --logger:SetEnabled(false)
         return err
 	end
-	
+
     local rulestr = "return(" .. rule.rule .. ")"
     local compiledfunc, err = zo_loadstring(rulestr)
     if not compiledfunc then
@@ -119,7 +119,7 @@ function AutoCategory.RecompileRules(ruleset)
 	if not ZO_IsTableEmpty(AutoCategory.compiledRules) then
 		ZO_ClearTable(AutoCategory.compiledRules)
 	end
-	
+
     if ruleset == nil then
 		--logger:SetEnabled(false)
         return
@@ -153,7 +153,7 @@ local function RuleDataSortingFunction(a, b)
     local result = false
     if a.tag ~= b.tag then
         result = a.tag < b.tag
-		
+
     else
         --alphabetical sort, cannot have same name rules
         result = a.name < b.name
@@ -167,14 +167,14 @@ end
 local function BagDataSortingFunction(a, b)
     local result = false
 	if b == nil then return true end
-	
+
 	-- b is not nil
 	if a == nil then return false end
-	
+
 	-- a is not nil
     if a.priority ~= b.priority then
         result = a.priority > b.priority
-		
+
     else
 		if a.name == nil then return false end
 		if b.name == nil then return true end
@@ -196,7 +196,7 @@ function AutoCategory.UpdateCurrentSavedVars()
     if not AutoCategory.charSaved.accountWide then
         saved.bags = AutoCategory.charSaved.bags
         saved.collapses = AutoCategory.charSaved.collapses
-		
+
     else
         saved.bags = AutoCategory.acctSaved.bags
         saved.collapses = AutoCategory.acctSaved.collapses
@@ -222,11 +222,11 @@ function AutoCategory.BagRuleEntry.formatShow(entry, rule)
     if not rule then
         -- missing rule (nil was passed in)
         sn = string.format("|cFF4444(!)|r %s (%d)", entry.name, entry.priority)
-		
+
     else
         if entry.AC_isHidden then
             sn = string.format("|c626250%s (%d)|r", entry.name, entry.priority)
-			
+
         else
             sn = string.format("%s (%d)", entry.name, entry.priority)
         end
@@ -239,7 +239,7 @@ function AutoCategory.BagRuleEntry.formatTooltip(rule)
     if not rule then
         -- missing rule (nil was passed in)
         tt = L(SI_AC_WARNING_CATEGORY_MISSING)
-		
+
     else
         tt = rule.description
         if not tt or tt == "" then
@@ -287,7 +287,7 @@ end
 -- Determine if the specified category of the particular bag is collapsed or not
 function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
 	if bagTypeId == nil or categoryName == nil then return false end
-	
+
 	--collapsetbl = SF.safeTable(cache.collapses[bagTypeId])
 	collapsetbl = SF.safeTable(saved.collapses[bagTypeId])
     return collapsetbl[categoryName] or false
@@ -297,8 +297,8 @@ function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 	cache.collapses[bagTypeId] = SF.safeTable(cache.collapses[bagTypeId])
 	if not categoryName then return end
 	cache.collapses[bagTypeId][categoryName] = collapsed
-	if collapsed == false then 
-		collapsed = nil 
+	if collapsed == false then
+		collapsed = nil
 	end
 	saved.collapses[bagTypeId][categoryName] = collapsed
 end
@@ -389,9 +389,9 @@ function AutoCategory.cacheInitialize()
             table.insert(ebag.choicesTooltips, tt)
         end
     end
-	
+
     cache.collapses = SF.safeClearTable(cache.collapses)
-	
+
 end
 
 function AutoCategory.GetRuleByName(name)
@@ -467,7 +467,7 @@ end
 function AutoCategory.isValidRule(ruledef)
     --make sure rule is well-formed
 	-- validate rule name
-    if (not ruledef or not ruledef.name 
+    if (not ruledef or not ruledef.name
 			or type(ruledef.name) ~= "string" or ruledef.name == "") then
         return false, "name is required"
     end
@@ -512,13 +512,13 @@ function AutoCategory.cache.AddRule(rule)
     if cache.rulesByTag_svt[rule.tag] == nil then
         cache.rulesByTag_svt[rule.tag] = {choices = {}, choicesValues = {}, choicesTooltips = {}}
     end
-	
+
 	local rule_ndx = cache.rulesByName[rule.name]
     if rule_ndx then
 		-- rule already exists
 		saved.rules[rule_ndx] = rule
         --return "AddRule: Rule (" .. rule.name .. ") already exists. Ignoring"
-		
+
 	else
 		-- add the new rule
 		table.insert(saved.rules, rule)
@@ -569,7 +569,7 @@ function AutoCategory.removeDuplicatedRules()
                 --remove duplicated category
                 --d("removed (" .. j .. ") " .. data.name)
                 table.remove(saved.bags[i].rules, j)
-				
+
             else
                 --flag this category
                 keys[data.name] = true
@@ -584,7 +584,7 @@ function AutoCategory.LazyInit()
 
 		local logger = LibDebugLogger("AutoCategory")
 		logger:SetEnabled(true)
-		
+
         -- initialize plugins
         for name, initfunc in pairs(AutoCategory.Plugins) do
             if initfunc then
@@ -624,7 +624,7 @@ function AutoCategory.onLoad(event, addon)
             if not AC.acctSaved.bags[k].rules or #AC.acctSaved.bags[k].rules == 0 then
                 AC.acctSaved.bags[k] = v
             end
-			
+
         else
             AC.acctSaved.bags[k] = v
         end
@@ -641,7 +641,7 @@ function AutoCategory.onPlayerActivated()
     EVENT_MANAGER:UnregisterForEvent(AutoCategory.name, EVENT_PLAYER_ACTIVATED)
 	EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_CLOSE_GUILD_BANK, function () AC.BulkMode = false end)
 	EVENT_MANAGER:RegisterForEvent(AutoCategory.name, EVENT_CLOSE_BANK, function () AC.BulkMode = false end)
-	
+
 end
 
 -- register our event handler function to be called to do initialization
@@ -658,27 +658,27 @@ local inven_data = {
 		object = ZO_PlayerInventory,
 		control = ZO_PlayerInventory,
 	},
-	
+
 	[INVENTORY_CRAFT_BAG] = {
 		object = ZO_CraftBag,
 		control = ZO_CraftBag,
 	},
-	
+
 	[INVENTORY_GUILD_BANK] = {
 		object = ZO_GuildBank,
 		control = ZO_GuildBank,
 	},
-	
+
 	[INVENTORY_HOUSE_BANK] = {
 		object = ZO_HouseBank,
 		control = ZO_HouseBank,
 	},
-	
+
 	[INVENTORY_BANK] = {
 		object = ZO_PlayerBank,
 		control = ZO_PlayerBank,
 	},
-	
+
 	[AC_DECON] = {
 		object = SMITHING.deconstructionPanel.inventory,
 		control = SMITHING.deconstructionPanel.control,
@@ -687,7 +687,7 @@ local inven_data = {
 		object = SMITHING.improvementPanel.inventory,
 		control = SMITHING.improvementPanel.control,
 	},
-	
+
 	[UV_DECON] = {
 		object = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory,
 		control = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control,
@@ -696,12 +696,12 @@ local inven_data = {
 }
 
 local function RefreshList(inventoryType, even_if_hidden)
-	if even_if_hidden == nil then 
-		even_if_hidden = false 
+	if even_if_hidden == nil then
+		even_if_hidden = false
 	end
-	
+
 	if not inventoryType or not inven_data[inventoryType] then return end
-	
+
 	local obj = inven_data[inventoryType].object
 	local ctl = inven_data[inventoryType].control
 
@@ -709,17 +709,17 @@ local function RefreshList(inventoryType, even_if_hidden)
 		if even_if_hidden == false and not ctl:IsHidden() then
 			obj:PerformFullRefresh()
 		end
-		
+
 	elseif inventoryType == AC_IMPROV then
 		if even_if_hidden == false and not ctl:IsHidden() then
 			obj:PerformFullRefresh()
 		end
-		
+
 	elseif inventoryType == UV_DECON then
 		if even_if_hidden == false and not ctl:IsHidden() then
 			obj:PerformFullRefresh()
 		end
-		
+
 	else
 		PLAYER_INVENTORY:UpdateList(inventoryType, even_if_hidden)
 	end
@@ -729,7 +729,7 @@ AutoCategory.RefreshList = RefreshList
 
 function AutoCategory.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
-	
+
 	RefreshList(INVENTORY_BACKPACK, even_if_hidden)
 	RefreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
 	RefreshList(INVENTORY_GUILD_BANK, even_if_hidden)
@@ -742,7 +742,7 @@ end
 
 
 function AC_ItemRowHeader_OnMouseEnter(header)
-    local cateName = header.slot.dataEntry.data.AC_categoryName	
+    local cateName = header.slot.dataEntry.data.AC_categoryName
     local bagTypeId = getBagTypeId(header)
 
 
@@ -753,11 +753,11 @@ function AC_ItemRowHeader_OnMouseEnter(header)
         markerBG:SetHidden(false)
         if collapsed then
             markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
-			
+
         else
             markerBG:SetTexture("EsoUI/Art/Buttons/minus_over.dds")
         end
-		
+
     else
         markerBG:SetHidden(true)
     end
@@ -783,7 +783,7 @@ end
 
 function AC_ItemRowHeader_OnShowContextMenu(header)
     ClearMenu()
-    local cateName = header.slot.dataEntry.data.AC_categoryName	
+    local cateName = header.slot.dataEntry.data.AC_categoryName
     local bagTypeId = getBagTypeId(header)
 
     local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
@@ -795,7 +795,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
                 AutoCategory.RefreshCurrentList()
             end
         )
-		
+
     else
         AddMenuItem(
             L(SI_CONTEXT_MENU_COLLAPSE),
@@ -832,7 +832,7 @@ function AC_Binding_ToggleCategorize()
     if AutoCategory.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] then
         if AutoCategory.Enabled then
             d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON))
-			
+
         else
             d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF))
         end

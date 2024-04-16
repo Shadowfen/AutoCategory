@@ -1,3 +1,10 @@
+[COLOR="DeepSkyBlue"]3.6.6 (93)[/COLOR]:
+[LIST]
+[*] Removed item type "spellcrafting_tablet" since it no longer seems to be supported by ZOS. If you use this in item() in your rule(s), it will fail.
+[*] Added a new item filter type "quest_quickslot" as a possible parameter for filtertype() since it has been added by ZOS. Don't really know what it does.
+[*] Updated required minimum versions of dependencies.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.6.5 (92)[/COLOR]:
 [LIST]
 [*] API bump.
