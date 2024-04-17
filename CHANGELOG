@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]3.6.7 (94)[/COLOR]:
+[LIST]
+[*] API bump.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.6.6 (93)[/COLOR]:
 [LIST]
 [*] Removed item type "spellcrafting_tablet" since it no longer seems to be supported by ZOS. If you use this in item() in your rule(s), it will fail.
