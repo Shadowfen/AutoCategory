@@ -33,6 +33,12 @@ local LMP = LibMediaProvider
 local SF = LibSFUtils
 local AC = AutoCategory
 
+
+local logger = LibDebugLogger("AutoCategory")
+do
+	--logger:SetEnabled(true)
+end
+
 -- uniqueIDs of items that have been updated (need rule re-execution), 
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
 local forceRuleReloadByUniqueIDs = {} 
@@ -83,6 +89,7 @@ local sortKeys = {
 }
 
 local CATEGORY_HEADER = 998
+local CATEGORY_SUBHEADER = 997
 
 -- convenience function
 local function NilOrLessThan(value1, value2)
@@ -110,6 +117,37 @@ end
 -- ---------------------------------------------------
 -- Category Header functions
 
+-- currently fetched fontface
+local header_face = nil
+
+-- Reset header_face to nil to force it to be
+-- fetched from LMP again. (Probably user changed
+-- desired fontface in settings.)
+--
+-- Provides a function to clear the current fetched font face
+-- for AddonMenu.lua to use when the user changes the header
+-- text font.
+function AC.resetface()
+	header_face = nil
+end
+
+-- Return the currently fetched fontface.
+-- If there is not one, fetch a new one based on
+-- the current setting.
+--
+-- By doing this, we are no longer fetching the font
+-- every single time that we create a category header.
+local function getHeaderFace()
+	if header_face ~= nil then
+		return header_face
+	end
+	local appearance = AutoCategory.acctSaved.appearance
+	logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
+	logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	return header_face
+end
+
 -- setup function for category header type to be added to the scroll list
 local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	--set header
@@ -117,15 +155,18 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	local headerLabel = rowControl:GetNamedChild("HeaderName")	
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
 	headerLabel:SetFont(string.format('%s|%d|%s', 
-			LMP:Fetch('font', 
-				appearance["CATEGORY_FONT_NAME"]), 
-				appearance["CATEGORY_FONT_SIZE"], 
-				appearance["CATEGORY_FONT_STYLE"]))
-				
-	local data = SF.safeTable(slot.dataEntry.data)
-	local cateName = SF.nilDefault(data.AC_categoryName, "Unknown")
-	local bagTypeId = SF.nilDefault(data.AC_bagTypeId, 0)
-	local num = SF.nilDefault(data.AC_catCount,0)
+			getHeaderFace(), 
+			appearance["CATEGORY_FONT_SIZE"], 
+			appearance["CATEGORY_FONT_STYLE"]))
+	
+	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
+	local data = slot.dataEntry.data
+	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, "Unknown")
+	local cateName = data.AC_categoryName
+	data.AC_bagTypeId = SF.nilDefault(data.AC_bagTypeId, 0)
+	local bagTypeId = data.AC_bagTypeId
+	data.AC_catCount = SF.nilDefault(data.AC_catCount, 0)
+	local num = data.AC_catCount
 	
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
@@ -181,8 +222,9 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 end
 
 -- create the row header type and add to the inventory scroll list
-local function AddTypeToList(rowHeight, datalist, inven_ndx) 
+local function AddTypeToList(rowHeight, datalist, inven_ndx, headerType) 
 	if datalist == nil then return end
+	if headerType == nil then headerType = CATEGORY_HEADER end
 	
 	local templateName = "AC_InventoryItemRowHeader"
 	local setupFunc = setup_InventoryItemRowHeader
@@ -191,12 +233,14 @@ local function AddTypeToList(rowHeight, datalist, inven_ndx)
 	if inven_ndx then
 		hiddenCB = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
 	end
-	ZO_ScrollList_AddDataType(datalist, CATEGORY_HEADER, templateName, 
+	ZO_ScrollList_AddDataType(datalist, headerType, templateName, 
 	    rowHeight, setupFunc, hiddenCB, nil, resetCB)
 end
 
-local function createHeaderEntry(catInfo)
-	local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, { 
+local function createHeaderEntry(catInfo, headerType)
+	if headerType == nil then headerType = CATEGORY_HEADER end
+
+	local headerEntry = ZO_ScrollList_CreateDataEntry(headerType, { 
 			AC_categoryName = catInfo.AC_categoryName,
 			AC_sortPriorityName = catInfo.AC_sortPriorityName,
 			AC_bagTypeId = catInfo.AC_bagTypeId,
@@ -205,6 +249,7 @@ local function createHeaderEntry(catInfo)
 			stackLaunderPrice = 0})
 	return headerEntry
 end
+
 
 -- ---------------------------------------------------
 
@@ -236,20 +281,25 @@ end
 local function runRulesOnEntry(itemEntry, specialType)
 	--only match on items(not headers)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
+	if itemEntry.typeId == CATEGORY_SUBHEADER then return end
 	
+	--logger:Debug("itemEntry is not header so run rules")
 	local data = itemEntry.data
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
+	--logger:Debug(SF.str("bagId=", bagId, "  slotIndex=", slotIndex, " ", GetItemName(bagId, slotIndex)))
 	
 	local matched, categoryName, categoryPriority, bagTypeId, isHidden 
 				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
 	data.AC_matched = matched
 	if matched then
+		--logger:Debug(SF.str("matched, categoryName=",categoryName))
 		data.AC_categoryName = categoryName
 		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
 		data.AC_isHidden = isHidden
 		
 	else
+		--logger:Debug(SF.str("unmatched, categoryName=other"))
 		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 		data.AC_sortPriorityName = string.format("%04d%s", 
 			9999 , data.AC_categoryName)
@@ -322,6 +372,7 @@ local function constructEntryHash(itemEntry)
 	local newEntryHash = buildHashString(
 					data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
 					data.meetsUsageRequirement, data.locked, data.isJunk, hashFCOIS)
+	--logger:Debug(bagId,", ",slotIndex, " ", GetItemName(bagId, slotIndex)," - ", newEntryHash)
 	return newEntryHash
 end
 
@@ -348,11 +399,11 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 		return setChange(true)
 	end
 
-	--- Test last update time, triggers update if more than 2s
+	--- Test last update time, triggers update if more than 4s
 	if data.AC_lastUpdateTime == nil then
 		return setChange(true)
 		
-	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 2 then
+	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 4 then
 		return setChange(true)
 	end
 
@@ -411,7 +462,7 @@ local function getListBagID(scrollData)
 end
 
 --- Create list with visible items and headers (performs category count).
-local function createNewScrollData(scrollData)
+local function createNewScrollData(scrollData, sortfn)
 	local newScrollData = {} --- output, entries sorted with category headers
 	local bagTypeId = getListBagID(scrollData)
 	
@@ -446,7 +497,7 @@ local function createNewScrollData(scrollData)
 	for _, itemEntry in ipairs(scrollData) do 
 		-- add visible non-header rows to the new scrollData table
 		if not isHiddenEntry(itemEntry) then
-			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
+			if itemEntry.typeId ~= CATEGORY_HEADER and itemEntry.typeId ~= CATEGORY_SUBHEADER and not isCollapsed(itemEntry) then 
 				-- add item if visible
 				table.insert(newScrollData, itemEntry)
 			end
@@ -486,6 +537,9 @@ local function createNewScrollData(scrollData)
 			local headerEntry = createHeaderEntry(catInfo)
 			table.insert(newScrollData, headerEntry)
 		end
+	end
+	if sortfn then
+		table.sort(newScrollData, sortfn)
 	end
 	return newScrollData
 end
@@ -533,8 +587,8 @@ local function prehookSort(self, inventoryType)
 	
 	-- add header rows	   
 	--> rebuild scrollData with headers and visible items
-	list.data = createNewScrollData(scrollData) 
-	table.sort(list.data, zo_inventory.sortFn)  
+	list.data = createNewScrollData(scrollData, zo_inventory.sortFn) 
+	--table.sort(list.data, zo_inventory.sortFn)  
 	ZO_ScrollList_Commit(list)
 	return false
 end
@@ -554,8 +608,8 @@ local function prehookCraftSort(self)
 		handleRules(scrollData, true, AC_BAG_TYPE_CRAFTSTATION)
 
 		-- add header rows	    
-		self.list.data = createNewScrollData(scrollData)
-		table.sort(self.list.data, self.sortFunction)
+		self.list.data = createNewScrollData(scrollData, self.sortFunction)
+		--table.sort(self.list.data, self.sortFunction)
 		ZO_ScrollList_Commit(self.list)
 	end
 	-- continue on to run follow-on hooks

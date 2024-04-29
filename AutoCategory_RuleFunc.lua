@@ -501,6 +501,29 @@ function AutoCategory.RuleFunc.CurrentZone()
     return ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex()))
 end
 
+function AutoCategory.RuleFunc.isItemId(...)
+	local fn = "isitemid"
+	local ac = select( '#', ... )
+	if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+	
+	local chkId = GetItemLinkItemId(AC.checkingItemLink)
+	for ax = 1, ac do
+		
+		local arg = select( ax, ... )
+		
+		if not arg then
+			error( string.format("error: %s():  argument is nil." , fn))
+		end
+		
+        if arg == chkId then return true end
+		
+	end
+	
+	return false
+end
+
 function AutoCategory.RuleFunc.SpecializedItemType( ... )
 	local fn = "type"
 	local ac = select( '#', ... )
@@ -632,7 +655,8 @@ end
 function AutoCategory.RuleFunc.IsBound( ... )
 	local fn = "isbound"
 	
-	local itemLink = GetItemLink(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+	--local itemLink = GetItemLink(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+	local itemLink = AC.checkingItemLink
 	local isBound = IsItemLinkBound(itemLink)
 	return isBound
 end
@@ -1503,7 +1527,7 @@ end
 -- returns ITEM_DISPLAY_QUALITY_*
 function AutoCategory.RuleFunc.GetMaxTraits( ... )
     local fn = "getmaxtraits"
-	local itemLink = AutoCategory.checkingItemLink
+	local itemLink = AC.checkingItemLink
     if IsCraftedPotion(itemLink) then
         local quality = ITEM_DISPLAY_QUALITY_NORMAL
         for i = 1, GetMaxTraits() do
@@ -1586,6 +1610,8 @@ AutoCategory.Environment = {
 	
 	-- -------------------------------------------
 	-- properties of items
+	
+	isitemid = AutoCategory.RuleFunc.isItemId,
 	
 	iscompaniononly = AutoCategory.RuleFunc.IsCompanionOnly,
 

@@ -1,5 +1,10 @@
 [COLOR="DeepSkyBlue"]3.6.7 (94)[/COLOR]:
 [LIST]
+[*] New function [COLOR="MediumSeaGreen"]isitemid()[/COLOR]. This function takes one or more itemId numbers as arguments and returns true if the inventory item being checked has an item Id that matches any one of the ids provided as arguments. Getting itemIds can require advanced skills (or a friend with advanced skills), or else, finding "rule recipes". An example of usage is my new rule called "Thief Supplies" which has the rule definition "islockpick() or isitemid(73753, 73754, 71779, 79504)". The islockpick() is self-explanatory. The item id's are
+73753 - Grand Amnesty Edict, 73754 - Leniency Edict, 71779 - Counterfeit Pardon, and 79504 - Unmarked Sack. Note that the advantage to isitemid() over itemname() is that isitemid() is faster (when you have the itemids) and it does not depend on which language your client is set to.
+[*] Increased the max wait for update time in order to prevent randomly placed items in inventory categories.
+[*] Reduce the number of times that a font is fetched from LibMediaProvider so that it only happens when the font setting is changed - instead of every time a category header is created.
+[*] Tested what happens when a font that was set in the Appearance settings disappears from the game because the other addon that installed it was uninstalled. (It defaults back to use the ESO default text font - so it is still readable when you look at the inventory.)
 [*] API bump.
 [/LIST]
 

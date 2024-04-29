@@ -3,9 +3,9 @@
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
 ## Version: 3.6.7
-## AddOnVersion: 93
+## AddOnVersion: 94
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=32 LibSFUtils>=45 LibMediaProvider-1.0 LibDebugLogger
+## DependsOn: LibAddonMenu-2.0>=36 LibSFUtils>=51 LibMediaProvider-1.0>=28 LibDebugLogger
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
 
 lang/strings.lua

@@ -36,6 +36,23 @@ cache.bags_svt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
 }
 
+local function divider()
+	return {
+		type = "divider",
+		width = "full", --or "half" (optional)
+		height = 10,
+		alpha = 0.5,
+	}
+end
+
+local function header(strId)
+	return {
+		type = "header",
+		name = strId,
+		width = "full",
+	}
+end
+
 local function newCVT(ndx)
 	local tbl = {
 		choices = {}, choicesValues = {}, choicesTooltips = {},
@@ -60,29 +77,7 @@ local fieldData = {
 		tag = "", 
 	},
 }
---[[ unused
--- It is the responsiblity of the caller to pass in a non-duplicated entry
-local function AddChoice( dataArray, choice, value, tooltip )
-    -- value is only optional if we don't have a table to put it into
-    if value == nil and dataArray.choicesValues then
-		return  -- bad value
-    end
-    -- tooltip is only optional if we don't have a table to put it into
-    if tooltip == nil and dataArray.choicesTooltips then
-		return  -- bad tooltip
-    end
-    -- choice is mandatory
-    if not choice then return end
 
-    table.insert(dataArray.choices, choice)
-    if dataArray.choicesValues then
-        table.insert(dataArray.choicesValues, value)
-    end
-    if dataArray.choicesTooltips then
-        table.insert(dataArray.choicesTooltips, tooltip)
-    end
-end
---]]
 
 local dropdownFontStyle	= {
 	'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'
@@ -275,8 +270,8 @@ local function RefreshDropdownData()
     local lbag = fieldData.editBag_cvt.indexValue
 	if lbag and cache.entriesByBag[lbag] then 
 		dataCurrentRules_EditBag.choices = cache.entriesByBag[lbag].choices
-		dataCurrentRules_EditBag.choicesValues    = cache.entriesByBag[lbag].choicesValues
-		dataCurrentRules_EditBag.choicesTooltips  = cache.entriesByBag[lbag].choicesTooltips
+		dataCurrentRules_EditBag.choicesValues = cache.entriesByBag[lbag].choicesValues
+		dataCurrentRules_EditBag.choicesTooltips = cache.entriesByBag[lbag].choicesTooltips
 	end
 	fieldData.editBagRule.choices         = dataCurrentRules_EditBag.choices
 	fieldData.editBagRule.choicesValues   = dataCurrentRules_EditBag.choicesValues
@@ -457,9 +452,7 @@ function AutoCategory.AddonMenuInit()
                 UpdateChoices("AC_DROPDOWN_EDITRULE_TAG",    fieldData.editRuleTag)
             end,
         },			
-        {
-            type = "divider",
-        },
+        divider(),
         -- Bag Settings
 		{
 			type = "submenu",
@@ -508,9 +501,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					width = "half",
 				},			
-                {
-                    type = "divider",
-                },
+                divider(),
                 -- Rule name   - AC_DROPDOWN_EDITBAG_RULE
 				{		
 					type = "dropdown",
@@ -650,11 +641,7 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 				},
                 -- Add Category to Bag Section
-				{
-					type = "header",
-					name = SI_AC_MENU_HEADER_ADD_CATEGORY,
-					width = "full",
-				},
+				header(SI_AC_MENU_HEADER_ADD_CATEGORY),
                 -- Tag Dropdown - AC_DROPDOWN_ADDCATEGORY_TAG
 				{		
 					type = "dropdown",
@@ -751,21 +738,15 @@ function AutoCategory.AddonMenuInit()
 					disabled = function() return #fieldData.addCatRule.choices == 0 end,
 					width = "half",
 				}, 
-				{
-					type = "divider",
-				},
+				divider(),
                 -- Import/Export Bag Settings
 				{
 					type = "submenu",
 					name = SI_AC_MENU_SUBMENU_IMPORT_EXPORT,
 					reference = "SI_AC_MENU_SUBMENU_IMPORT_EXPORT",
 					controls = {
-						{
-							type = "header",
-							name = SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS,
-							width = "full",
-						},
-                        -- Export To All Button
+						header(SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS),
+						-- Export To All Button
 						{
 							type = "button",
 							name = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS,
@@ -785,12 +766,7 @@ function AutoCategory.AddonMenuInit()
 							end, 
 							width = "full",
 						},				
-						
-						{
-							type = "header",
-							name = SI_AC_MENU_HEADER_IMPORT_BAG_SETTING,
-							width = "full",
-						},
+						header(SI_AC_MENU_HEADER_IMPORT_BAG_SETTING),
                         --  - AC_DROPDOWN_IMPORTBAG_BAG
 						{
 							type = "dropdown",
@@ -832,9 +808,7 @@ function AutoCategory.AddonMenuInit()
 						},	 
 					},
 				}, 
-				{
-					type = "divider",
-				},
+				divider(),
                 -- Need Help button
 				{			
 					type = "button",
@@ -967,11 +941,7 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 				},
                 -- Edit Category Title
-				{
-					type = "header",
-					name = SI_AC_MENU_HEADER_EDIT_CATEGORY,
-					width = "full",
-				},
+				header(SI_AC_MENU_HEADER_EDIT_CATEGORY),
                 -- New Category Button
 				{
 					type = "button",
@@ -1250,9 +1220,7 @@ function AutoCategory.AddonMenuInit()
                     type = "description",
                     text = L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), -- or string id or function returning a string						
                 },
-                {
-                    type = "divider",
-                },
+                divider(),
                 -- Category Text Font
                 {
                     type = 'dropdown',
@@ -1263,6 +1231,7 @@ function AutoCategory.AddonMenuInit()
                     end,
                     setFunc = function(v)
                         saved.appearance["CATEGORY_FONT_NAME"] = v
+						AC.resetface()
                     end,
                     scrollable = 7,
                 },
@@ -1376,9 +1345,7 @@ function AutoCategory.AddonMenuInit()
                     type = "description",
                     text = L(SI_AC_MENU_GMS_DESCRIPTION_TIP),
                 },
-                {
-                    type = "divider",
-                },
+                divider(),
                 {
                     type = "checkbox",
                     name = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD,

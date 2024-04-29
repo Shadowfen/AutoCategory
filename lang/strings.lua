@@ -39,7 +39,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_BS_DROPDOWN_BAG = "Bag",
     SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP = "Select a bag to modify categories that are being used",
     SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN = "Hide Ungrouped Items",
-    SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Check this will hide your ungrouped items, you cannot find them in current bag setting!",
+    SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Check this will hide your ungrouped items (Others), you cannot find them in current bag setting!",
 
     SI_AC_MENU_BS_DROPDOWN_CATEGORIES = "Categories",
     SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY = "Priority",
