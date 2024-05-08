@@ -54,25 +54,24 @@ function AutoCategory.validateACBagRules(acBagType)
 
 	if acBagType == nil then return false end
 
-	--local logger = LibDebugLogger("AutoCategory")
-	--logger:SetEnabled(true)
-	
 	-- Mark rules as damaged when we find something wrong with them
 	local function checkValidRule(name, rule)
 		if rule == nil or name == nil then return end
 		
 		local isValid = true
 		if rule.rule == nil then
-			rule.damaged = true 
+			rule:setError(true,"missing rule definition")
+			--rule.damaged = true 
 			return
 		end
 		local ruleCode = AutoCategory.compiledRules[name]
 		if not ruleCode or type(ruleCode) ~= "function" then
-			rule.damaged = true 
+			rule:setError(true,"invalid compiled rule function")
+			--rule.damaged = true 
 			AutoCategory.compiledRules[name] = nil
 			return
 		end
-		rule.damaged = false
+		rule.damaged = nil
 		return
 	end
 	
@@ -83,7 +82,6 @@ function AutoCategory.validateACBagRules(acBagType)
 		local rule = AutoCategory.GetRuleByName(entry.name)
 		checkValidRule(entry.name, rule)
 	end
-	--logger:SetEnabled(false)
 end
 
 -- see if we find a category rule match for the item passed in.
@@ -98,8 +96,7 @@ end
 --   enum    - bag type id
 --   boolean - is entry hidden?
 function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
-	local logger = LibDebugLogger("AutoCategory")
-	logger:SetEnabled(true)
+	local logger = AutoCategory.logger
 	
 	AutoCategory.LazyInit()
 
@@ -179,14 +176,12 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 					
 				else
 					logger:Error("Error2: " .. entry.name.. " - ".. res)
-					rule.damaged = true 
-					rule.err = res
+					rule:setError(true, res)
 					AutoCategory.compiledRules[entry.name] = nil
 				end
 			end
 		end
 	end
-	logger:SetEnabled(false)
 	
 	return false, "", 0, bag_type_id, false
 end 

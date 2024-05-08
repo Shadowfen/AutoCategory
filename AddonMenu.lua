@@ -80,8 +80,10 @@ local fieldData = {
 
 
 local dropdownFontStyle	= {
-	'none', 'outline', 'thin-outline', 'thick-outline', 'shadow', 'soft-shadow-thin', 'soft-shadow-thick'
+	'none', 'outline', 'thin-outline', 'thick-outline', 
+	'shadow', 'soft-shadow-thin', 'soft-shadow-thick',
 }
+
 local dropdownFontAlignment = {}
 dropdownFontAlignment.choices = {
 	L(SI_AC_ALIGNMENT_LEFT),
@@ -156,8 +158,7 @@ local function checkCurrentRule()
     
     local func, err = zo_loadstring("return("..fieldData.currentRule.rule..")")
     if err then
-		-- logger.error("FAILED rule compile - "..err)
-        ruleCheckStatus.err = err
+		ruleCheckStatus.err = err
         fieldData.currentRule.damaged = true 
 		fieldData.currentRule.err = err
 		
@@ -352,15 +353,7 @@ local function GetUsableRuleName(name)
 	return testName
 end
 
-local function CreateNewRule(name, tag)
-	local rule = {
-		name = name,
-		description = "",
-		rule = "true",
-		tag = tag,
-	}
-	return rule
-end
+local CreateNewRule = AC.CreateNewRule
 
 local function CreateNewBagRuleEntry(name)
 	local entry = {
@@ -370,7 +363,176 @@ local function CreateNewBagRuleEntry(name)
 	return entry	
 end
 
+local function CreatePanel()
+	AC.ebrlc = AC.ebr_le()
+	return {
+		type = "panel",
+		name = AutoCategory.settingName,
+		displayName = AutoCategory.settingDisplayName,
+		author = AutoCategory.author,
+		version = AutoCategory.version,
+        slashCommand = "/ac",
+		registerForRefresh = true,
+		registerForDefaults = true,
+		resetFunc = function() 
+			AutoCategory.ResetToDefaults()
+			AutoCategory.UpdateCurrentSavedVars()
+			AutoCategory.cacheInitialize() 
+			
+            fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
+			fieldData.editBagRule.indexValue = nil
+			fieldData.addCatTag.indexValue = nil
+			fieldData.addCatRule.indexValue = nil
+			fieldData.editRuleTag.indexValue = nil
+			fieldData.editRuleCat.indexValue = nil
+			
+			RefreshDropdownData()
+		end,
+	}
+end
+
+
 -- -------------------------------------------------
+function AC.ebr_le()
+	local entries = {}
+	local i = 1
+	AC.logger:Info("Creating list entries")
+	for k,v in pairs(fieldData.editBagRule.choicesValues) do
+		local ent = {}
+		ent.uniqueKey = i
+		ent.value = v
+		if fieldData.editBagRule.choices then
+			ent.text = fieldData.editBagRule.choices[k]
+		end
+		if fieldData.editBagRule.choicesTooltips then
+			ent.tooltip = fieldData.editBagRule.choicesTooltips[k]
+		end
+		i = i + 1
+		table.insert(entries, ent)
+		AC.logger:Info(SF.dTable(ent,1,"ListEntry"))
+	end
+	return entries
+end
+
+local function BagSet_OrderRule()
+	AC.logger:Info("Running BagSet_OrderRule")
+	
+	local orderlistbox = {
+		type = "orderlistbox",
+		name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
+		tooltip = "The order in which rules are evaluated. Very important because the first rule that matches is the category that is selected.",
+		getFunc = function() return AC.ebrlc end,
+		setFunc = function(currentSortedListEntries)  AC.ebrlc = currentSortedListEntries end,
+		listEntries = entries,
+		--disabled = function() return #fieldData.editBagRule.choices == 0 end,
+		width = "half",
+		isExtraWide = true,
+		reference = "AC_ORDERLIST_EDITBAG_RULE",
+		--showPosition = true,
+	}
+	--[[
+	listEntries = {
+		[1] = {
+			value = "Value of the entry", -- or number or boolean or function returning the value of this entry
+			uniqueKey = 1, --number of the unique key of this list entry. This will not change if the order changes. Will be used to identify the entry uniquely
+			text  = "Text of this entry", -- or string id or function returning a string (optional)
+			tooltip = "Tooltip text shown at this entry", -- or string id or function returning a string (optional)
+		},
+		[2] = {...},
+		...
+	},
+	getFunc = function() return db.currentSortedListEntries end,
+	setFunc = function(currentSortedListEntries) db.currentSortedListEntries = currentSortedListEntries doStuff() end,
+	tooltip = "OrderListBox's tooltip text.", -- or string id or function returning a string (optional)
+	width = "full", -- or "half" (optional)
+	isExtraWide = false, -- or function returning a boolean (optional). Show the listBox as extra wide box
+	minHeight = function() return db.minHeightNumber end, --or number for the minimum height of this control. Default: 125 (optional)
+	maxHeight = function() return db.maxHeightNumber end, --or number for the maximum height of this control. Default: value of minHeight (optional)
+	rowHeight = function() return db.rowHeightNumber end, --or number for the height of the row of the entries in listEntries. Default: 25 (optional)
+	rowTemplate = "LAM2_OrderListBox_Widget_Scrolllist_Row", --String defining the XML virtual template control for a row of the listEntries (optional)
+	rowFont = "ZoFontWinH4", --or function returning a String of the font to use for the row (optional),
+	rowMaxLineCount = 1, --or function returning a number of the maximum text lines within the row. 1 = Only 1 text line, no wrapping, get#s truncated. (optional)
+	rowSelectionTemplate = "ZO_ThinListHighlight", --String defining the XML virtual template control for the selection at a row of the listEntries (optional)
+	rowSelectedCallback = function doStuffOnSelection(rowControl, previouslySelectedData, selectedData, reselectingDuringRebuild) end, --An optional callback function when a row of the listEntries got selected (optional)
+	rowHideCallback = function doStuffOnHide(rowControl, currentRowData) end, --An optional callback function when a row of the listEntries got hidden (optional)
+	dataTypeSelectSound = SOUNDS["NONE"], --or function returning a String of a sound from the global SOUNDS table. Will be played as any row containing the datatype (1) of the orderListBox will be selected (optional)
+	dataTypeResetControlCallback = function doStuffOnReset(control) end, --An optional callback function when the datatype control gets reset. (optional)
+	disableDrag = false, -- or function returning a boolean (optional). Disable the drag&drop of the rows
+	disableButtons = false, -- or function returning a boolean (optional). Disable the move up/move down/move to top/move to bottom buttons
+	showPosition = false, -- or function returning a boolean (optional). Show the position number in front of the list entry
+	showValue = false, -- or function returning a boolean (optional). Show the value of the entry after the list entry text, surrounded by []
+	showValueAtTooltip = false, -- or function returning a boolean (optional). Show the value of the entry after the tooltip text, surrounded by []
+	disabled = function() return db.someBooleanSetting end, -- or boolean (optional)
+	warning = "May cause permanent awesomeness.", -- or string id or function returning a string (optional)
+	requiresReload = false, -- boolean, if set to true, the warning text will contain a notice that changes are only applied after an UI reload and any change to the value will make the "Apply Settings" button appear on the panel which will reload the UI when pressed (optional)
+	default = defaults.var, -- default value or function that returns the default value (optional)
+	helpUrl = "https://www.esoui.com/portal.php?id=218&a=faq", -- a string URL or a function that returns the string URL (optional)
+	reference = "MyAddonOrderListBox" -- function returning String, or String unique global reference to control (optional)
+	--]]
+	AC.logger:Debug("orderlistbox = "..SF.str(type(orderlistbox)))
+	AC.logger:Debug("listEntries = "..SF.str(type(orderlistbox.listEntries)))
+	return orderlistbox
+end
+	
+AutoCategory.BSOR = BagSet_OrderRule
+
+local function BagSet_EditRule()
+	-- Rule name   - AC_DROPDOWN_EDITBAG_RULE
+	return
+		{		
+			type = "dropdown",
+			name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
+	tooltip = "The combination of category and priority determine order in which rules are evaluated (Highest number goes first). Very important because the first rule that matches is the category that is selected.",
+			scrollable = true,
+			choices         = fieldData.editBagRule.choices,
+			choicesValues   = fieldData.editBagRule.choicesValues,
+			choicesTooltips = fieldData.editBagRule.choicesTooltips,
+			
+			getFunc = function() 
+				return fieldData.editBagRule.indexValue
+			end,
+			setFunc = function(value) 			 
+				fieldData.editBagRule.indexValue = value
+			end, 
+			disabled = function() return #fieldData.editBagRule.choices == 0 end,
+			--default = "",
+			width = "half",
+			reference = "AC_DROPDOWN_EDITBAG_RULE",
+		}
+
+end
+
+local function BagSet_EditBag()
+	-- Bag     - AC_DROPDOWN_EDITBAG_BAG
+	return                 
+		{		
+			type = "dropdown",
+			name = SI_AC_MENU_BS_DROPDOWN_BAG,
+			scrollable = false,
+			tooltip = L(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP),
+			choices         = fieldData.editBag_cvt.choices,
+			choicesValues   = fieldData.editBag_cvt.choicesValues,
+			choicesTooltips = fieldData.editBag_cvt.choicesTooltips,
+			
+			getFunc = function()  
+				return fieldData.editBag_cvt.indexValue
+			end,
+			setFunc = function(value)
+				fieldData.editBag_cvt.indexValue = value
+				fieldData.editBagRule.indexValue = nil
+				--reset add rule's selection, since all data will be changed.
+				fieldData.addCatRule.indexValue = nil
+				 
+				RefreshDropdownData() 
+			end, 
+			default = AC_BAG_TYPE_BACKPACK,
+			width = "half",
+			reference = "AC_DROPDOWN_EDITBAG_BAG",
+		}
+
+end
+
+	
 function AutoCategory.AddonMenuInit()
     AC.cacheInitialize()
     
@@ -398,30 +560,8 @@ function AutoCategory.AddonMenuInit()
 	 
 	RefreshDropdownData() 
  
-	local panelData =  {
-		type = "panel",
-		name = AutoCategory.settingName,
-		displayName = AutoCategory.settingDisplayName,
-		author = AutoCategory.author,
-		version = AutoCategory.version,
-        slashCommand = "/ac",
-		registerForRefresh = true,
-		registerForDefaults = true,
-		resetFunc = function() 
-			AutoCategory.ResetToDefaults()
-			AutoCategory.UpdateCurrentSavedVars()
-			AutoCategory.cacheInitialize() 
-			
-            fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
-			fieldData.editBagRule.indexValue = nil
-			fieldData.addCatTag.indexValue = nil
-			fieldData.addCatRule.indexValue = nil
-			fieldData.editRuleTag.indexValue = nil
-			fieldData.editRuleCat.indexValue = nil
-			
-			RefreshDropdownData()
-		end,
-	}
+	local panelData = CreatePanel()
+
 	
 	local optionsTable = { 
         -- Account Wide
@@ -459,31 +599,8 @@ function AutoCategory.AddonMenuInit()
 		    name = SI_AC_MENU_SUBMENU_BAG_SETTING, -- or string id or function returning a string
 			reference = "AC_SUBMENU_BAG_SETTING",
 		    controls = {
-                -- Bag     - AC_DROPDOWN_EDITBAG_BAG
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_BS_DROPDOWN_BAG,
-					scrollable = false,
-					tooltip = L(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP),
-					choices         = fieldData.editBag_cvt.choices,
-					choicesValues   = fieldData.editBag_cvt.choicesValues,
-					choicesTooltips = fieldData.editBag_cvt.choicesTooltips,
-					
-					getFunc = function()  
-						return fieldData.editBag_cvt.indexValue
-					end,
-					setFunc = function(value)
-                        fieldData.editBag_cvt.indexValue = value
-						fieldData.editBagRule.indexValue = nil
-						--reset add rule's selection, since all data will be changed.
-						fieldData.addCatRule.indexValue = nil
-						 
-						RefreshDropdownData() 
-					end, 
-                    default = AC_BAG_TYPE_BACKPACK,
-					width = "half",
-					reference = "AC_DROPDOWN_EDITBAG_BAG",
-				},
+				-- Select bag
+				BagSet_EditBag(),
                 -- Hide ungrouped in bag
 				{
 					type = "checkbox",
@@ -502,26 +619,10 @@ function AutoCategory.AddonMenuInit()
 					width = "half",
 				},			
                 divider(),
-                -- Rule name   - AC_DROPDOWN_EDITBAG_RULE
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
-					scrollable = true,
-					choices         = fieldData.editBagRule.choices,
-					choicesValues   = fieldData.editBagRule.choicesValues,
-					choicesTooltips = fieldData.editBagRule.choicesTooltips,
-					
-					getFunc = function() 
-						return fieldData.editBagRule.indexValue
-					end,
-					setFunc = function(value) 			 
-						fieldData.editBagRule.indexValue = value
-					end, 
-					disabled = function() return #fieldData.editBagRule.choices == 0 end,
-                    --default = "",
-					width = "half",
-					reference = "AC_DROPDOWN_EDITBAG_RULE",
-				},
+				-- testing
+				--BagSet_OrderRule(),
+                --Show/select the list of categories assigned to the bag
+				BagSet_EditRule(),	
                 -- Priority
 				{
 					type = "slider",
@@ -1111,7 +1212,7 @@ function AutoCategory.AddonMenuInit()
 					end, 
 					setFunc = function(value) 
                         fieldData.currentRule.rule = value
-                        ruleCheckStatus.err = AC.CompileRule(fieldData.currentRule)
+                        ruleCheckStatus.err = fieldData.currentRule:compile()
                         if ruleCheckStatus.err == "" then
                             ruleCheckStatus.err = nil
                             ruleCheckStatus.good = true

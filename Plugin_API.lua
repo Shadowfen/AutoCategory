@@ -56,9 +56,10 @@ function AutoCategory.AddPredefinedRules( ruletable )
     local errtbl = {}
     for i=1,#ruletable do
         local ruledef = ruletable[i]
-        local rslt, err = AC.isValidRule(ruledef)
+        local rslt, err = AC.isValidRule(ruledef) -- can't use r:isValid because only added by later AddRule()
         if rslt then
-            local err = AutoCategory.cache.AddRule({name=ruledef.name, tag=ruledef.tag, rule=ruledef.rule, description=ruledef.description})
+            local r = {name=ruledef.name, tag=ruledef.tag, rule=ruledef.rule, description=ruledef.description, pred=1}
+            local err = AutoCategory.cache.AddRule(r)
             if err then
                 table.insert(errtbl,err)
 				

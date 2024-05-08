@@ -5,8 +5,11 @@
 ## Version: 3.6.7
 ## AddOnVersion: 94
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=36 LibSFUtils>=51 LibMediaProvider-1.0>=28 LibDebugLogger
+## DependsOn: LibAddonMenu-2.0>=36 LibCustomMenu LibSFUtils>=52 LibMediaProvider-1.0>=28 LibDebugLogger
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
+
+; LibAddonMenuOrderListBox  
+
 
 lang/strings.lua
 lang/$(language).lua

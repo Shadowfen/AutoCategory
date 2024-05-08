@@ -1,3 +1,10 @@
+[COLOR="DeepSkyBlue"]3.7 (95)[/COLOR]:
+[LIST]
+[*] Added a menu item to the inventory context menu to get the item id for the inventory item that you are hovering over. Bring up the context menu while hovering (usually a right click) and look for the menu item "AC: Get Item Id" to select. It will display a message in chat with the name of the inventory item and its item id (suitable for use with the isitemid() rule function). The item id is identifying the type of the item - not that unique item - so the id will match against other stacks of the same thing in your inventory when evaluating the rule.
+[*] Convert to use LibSFUtils event management. (Change should be transparent to users.)
+[*] Code cleanup and refactoring. (Change should be transparent to users.)
+[/LIST]
+
 [COLOR="DeepSkyBlue"]3.6.7 (94)[/COLOR]:
 [LIST]
 [*] New function [COLOR="MediumSeaGreen"]isitemid()[/COLOR]. This function takes one or more itemId numbers as arguments and returns true if the inventory item being checked has an item Id that matches any one of the ids provided as arguments. Getting itemIds can require advanced skills (or a friend with advanced skills), or else, finding "rule recipes". An example of usage is my new rule called "Thief Supplies" which has the rule definition "islockpick() or isitemid(73753, 73754, 71779, 79504)". The islockpick() is self-explanatory. The item id's are

@@ -54,3 +54,24 @@ function AutoCategory.checkLibraryVersions()
         vc:CheckVersion("UnknownTracker",73)
     end
 end
+
+
+--[[
+An implementation of a logger which uses the lua print function
+to output the messages.
+--]]
+local printLibDebug = {
+    Error = function(self,...)  print("ERROR: "..string.format(...)) end,
+    Warn = function(self,...)  print("WARN: "..string.format(...)) end,
+    Info = function(self,...)  print("INFO: "..string.format(...)) end,
+    Debug = function(self,...)  print("DEBUG: "..string.format(...)) end,
+}
+setmetatable(printLibDebug, getmetatable(nilLibDebug))
+
+
+if LibDebugLogger then
+  AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
+  AutoCategory.logger:SetEnabled(true)
+else
+  AutoCategory.logger = printLibDebug
+end

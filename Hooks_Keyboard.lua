@@ -34,7 +34,7 @@ local SF = LibSFUtils
 local AC = AutoCategory
 
 
-local logger = LibDebugLogger("AutoCategory")
+local logger = AutoCategory.logger
 do
 	--logger:SetEnabled(true)
 end
@@ -199,7 +199,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 		
 	-- set the collapse marker
 	local marker = rowControl:GetNamedChild("CollapseMarker")
-	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName) 
+	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
 	if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
 		marker:SetHidden(false)
 		if collapsed then
@@ -663,9 +663,8 @@ function AutoCategory.HookKeyboardMode()
 	-- Other events that cause a full refresh
 	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", 
 		refresh, true)
-			
-	EVENT_MANAGER:RegisterForEvent(AutoCategory.name, 
-			EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems )
+	
+	AC.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
 
 end
 
