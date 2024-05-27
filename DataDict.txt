@@ -1,0 +1,34 @@
+AutoCategory structures and objects
+
+AutoCategory = {} -- includes general, accountwide, appearance, bags, rules, collapses, version, meta, acctRules, acctSaved, charSaved
+
+-- not saved in SV
+AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+AutoCategory.compiledRules -- [name] function
+
+--saved in SV
+AutoCategory.saved = {
+    --rules = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err, pred}	-- OBSOLETE
+    bags = {}   -- [bagId#] isUngroupedHidden, rules{[#] {bagRule}}
+}
+
+-- saved in SV
+AC.acctRules  = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err}
+
+AutoCategory.cache = {
+    rulesByName = {}, -- [name] rule#
+    rulesByTag_svt = {}, -- [tag] {choices{rule.name}, choicesValues{rule.name}, choicesTooltips{rule.desc/name}}
+    compiledRules = AC.compiledRules, -- [name] function
+    tags = {}, -- [#] tagname
+    bags_svt = {}, -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
+    entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
+    entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
+	collapses = {},     -- [bagId][categoryName] true
+}
+
+AutoCategory.BagRuleEntry = {name, priority, AC_isHidden}	-- bagRule
+
+
+AutoCategory.CVT = controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue
+
+AC.rulefuncs -- metatable for rules with functions to manipulate them

@@ -1,10 +1,12 @@
-require "AutoCategory.test.zos"
+require "AutoCategory.test.zos-ac"
 require "AutoCategory.test.tk"
 local TK = TestKit
-local TR = test_run
 local d = print
 
+require "LibSFUtils.LibSFUtils_Global"
+require "LibSFUtils.SFUtils_Color"
 require "LibSFUtils.LibSFUtils"
+require "LibSFUtils.SFUtils_LoadLanguage"
 local SF = LibSFUtils
 require "AutoCategory.AutoCategory_Global"
 require "AutoCategory.Plugin_API"
@@ -126,7 +128,7 @@ local function Plugins_testRegisterPlugin()
 end
 
 
-function Plugins_runTests()
+--function Plugins_runTests()
     Plugins_testInitialLoadLanguage()
     Plugins_testPluginLoadLanguage()
     Plugins_testChineseOnlyLoadLanguage()
@@ -139,5 +141,5 @@ function Plugins_runTests()
     testZO_ResetStringTables() -- set the string tables back to a pre-loaded state (mostly)
     AutoCategory.LoadLanguage(AutoCategory_localization_strings,"en")
 
-end
+--end
 

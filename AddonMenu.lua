@@ -53,6 +53,8 @@ local function header(strId)
 	}
 end
 
+local CVT = AutoCategory.CVT
+-- -------------------------------------------------------
 local function newCVT(ndx)
 	local tbl = {
 		choices = {}, choicesValues = {}, choicesTooltips = {},
@@ -70,13 +72,9 @@ local fieldData = {
 	editRuleTag = newCVT(),
 	editRuleCat = newCVT(),
 	importBag =   newCVT(AC_BAG_TYPE_BACKPACK),
-    currentRule = { 
-		name = "", 
-		description = "", 
-		rule = "false", 
-		tag = "", 
-	},
 }
+
+local currentRule = AC.CreateNewRule("","")
 
 
 local dropdownFontStyle	= {
@@ -92,6 +90,16 @@ dropdownFontAlignment.choices = {
 }
 dropdownFontAlignment.choicesValues = {0, 1, 2}
 
+local function editCat_getPredef()
+    if currentRule and currentRule.pred == 1 then
+        return L(SI_AC_MENU_EC_BUTTON_PREDEFINED)
+
+    else
+        return ""
+    end
+end
+
+-- -------------------------------------------------------
 local ruleCheckStatus = {}
 
 function ruleCheckStatus.getTitle()
@@ -104,7 +112,7 @@ function ruleCheckStatus.getTitle()
         end
 
     else
-        if not fieldData.currentRule.damaged then
+        if not currentRule.damaged then
             return L(SI_AC_MENU_EC_BUTTON_CHECK_RESULT_WARNING)
         end
         return L(SI_AC_MENU_EC_BUTTON_CHECK_RESULT_ERROR)
@@ -145,32 +153,31 @@ end
 local function checkCurrentRule()
     ruleCheckStatus.err = nil
     ruleCheckStatus.good = nil
-    if fieldData.currentRule == nil then
+    if currentRule == nil then
         return
     end
     
-    if fieldData.currentRule.rule == nil or fieldData.currentRule.rule == "" then
-		fieldData.currentRule.err = "Rule definition cannot be empty"
-		ruleCheckStatus.err = fieldData.currentRule.err
-		fieldData.currentRule.damaged = true 
+    if currentRule.rule == nil or currentRule.rule == "" then
+		currentRule:setError(true,"Rule definition cannot be empty")
+		ruleCheckStatus.err = currentRule.err
         return
     end
     
-    local func, err = zo_loadstring("return("..fieldData.currentRule.rule..")")
+    local func, err = zo_loadstring("return("..currentRule.rule..")")
     if err then
 		ruleCheckStatus.err = err
-        fieldData.currentRule.damaged = true 
-		fieldData.currentRule.err = err
+        currentRule.damaged = true 
+		currentRule.err = err
 		
     else
-        local errt = checkKeywords(fieldData.currentRule.rule)
+        local errt = checkKeywords(currentRule.rule)
         if #errt == 0 then
             ruleCheckStatus.good = true
-            fieldData.currentRule.damaged = nil
+            currentRule.damaged = nil
 			
         else
             ruleCheckStatus.err = table.concat(errt,", ")
-            fieldData.currentRule.damaged = nil 
+            currentRule.damaged = nil 
         end
     end
 end
@@ -186,6 +193,8 @@ local function UpdateDuplicateNameWarning()
 		control:UpdateWarning()
 	end
 end
+
+-- -------------------------------------------------------
 
 local function RefreshPanel()
 	UpdateDuplicateNameWarning()
@@ -225,6 +234,13 @@ local function ToggleSubmenu(typeString, open)
 			control.animation:PlayFromEnd()
 		end	
 	end
+end
+
+local function RefreshControls()
+	fieldData.editRuleCat:updateControl()
+	fieldData.editBagRule:updateControl()
+	fieldData.addCatRule:updateControl()
+
 end
 
 local function UpdateChoices(controlname, data)
@@ -343,6 +359,10 @@ local function IsRuleNameUsed(name)
 	return cache.rulesByName[name] ~= nil
 end
 
+local GetUsableRuleName = AC.GetUsableRuleName
+local CreateNewRule = AC.CreateNewRule
+
+--[[
 local function GetUsableRuleName(name)
 	local testName = name
 	local index = 1
@@ -354,6 +374,7 @@ local function GetUsableRuleName(name)
 end
 
 local CreateNewRule = AC.CreateNewRule
+--]]
 
 local function CreateNewBagRuleEntry(name)
 	local entry = {
@@ -363,6 +384,7 @@ local function CreateNewBagRuleEntry(name)
 	return entry	
 end
 
+-- -------------------------------------------------------
 local function CreatePanel()
 	AC.ebrlc = AC.ebr_le()
 	return {
@@ -393,10 +415,12 @@ end
 
 
 -- -------------------------------------------------
+-- function to create list entries for an orderedlistbox
+--    used by BagSet_OrderRule
 function AC.ebr_le()
 	local entries = {}
 	local i = 1
-	AC.logger:Info("Creating list entries")
+	--AC.logger:Info("Creating list entries")
 	for k,v in pairs(fieldData.editBagRule.choicesValues) do
 		local ent = {}
 		ent.uniqueKey = i
@@ -409,13 +433,14 @@ function AC.ebr_le()
 		end
 		i = i + 1
 		table.insert(entries, ent)
-		AC.logger:Info(SF.dTable(ent,1,"ListEntry"))
+		--AC.logger:Info(SF.dTable(ent,1,"ListEntry"))
 	end
 	return entries
 end
 
+-- create the info for the ordered rule set listbox
 local function BagSet_OrderRule()
-	AC.logger:Info("Running BagSet_OrderRule")
+	--AC.logger:Info("Running BagSet_OrderRule")
 	
 	local orderlistbox = {
 		type = "orderlistbox",
@@ -469,20 +494,21 @@ local function BagSet_OrderRule()
 	helpUrl = "https://www.esoui.com/portal.php?id=218&a=faq", -- a string URL or a function that returns the string URL (optional)
 	reference = "MyAddonOrderListBox" -- function returning String, or String unique global reference to control (optional)
 	--]]
-	AC.logger:Debug("orderlistbox = "..SF.str(type(orderlistbox)))
-	AC.logger:Debug("listEntries = "..SF.str(type(orderlistbox.listEntries)))
+	--AC.logger:Debug("orderlistbox = "..SF.str(type(orderlistbox)))
+	--AC.logger:Debug("listEntries = "..SF.str(type(orderlistbox.listEntries)))
 	return orderlistbox
 end
 	
 AutoCategory.BSOR = BagSet_OrderRule
 
+-- dropdown of names of rules assigned to a particular bag
 local function BagSet_EditRule()
 	-- Rule name   - AC_DROPDOWN_EDITBAG_RULE
 	return
 		{		
 			type = "dropdown",
 			name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
-	tooltip = "The combination of category and priority determine order in which rules are evaluated (Highest number goes first). Very important because the first rule that matches is the category that is selected.",
+			tooltip = "The combination of category and priority determine order in which rules are evaluated (Highest number goes first). Very important because the first rule that matches is the category that is selected.",
 			scrollable = true,
 			choices         = fieldData.editBagRule.choices,
 			choicesValues   = fieldData.editBagRule.choicesValues,
@@ -502,6 +528,7 @@ local function BagSet_EditRule()
 
 end
 
+-- the dropdown of all of the bags that we can deal with. You have to choose a bag to deal with what's inside it.
 local function BagSet_EditBag()
 	-- Bag     - AC_DROPDOWN_EDITBAG_BAG
 	return                 
@@ -545,7 +572,7 @@ function AutoCategory.AddonMenuInit()
 	fieldData.addCatTag.choicesValues = cache.tags
 	fieldData.addCatTag.choicesTooltips = cache.tags
     
-    -- this will get populated by RefreshDropdownData()
+    -- addCatRule will get populated by RefreshDropdownData()
     fieldData.addCatRule.choices = {}
     fieldData.addCatRule.choicesValues = {}
     fieldData.addCatRule.choicesTooltips = {}
@@ -632,9 +659,9 @@ function AutoCategory.AddonMenuInit()
 					max = 1000,
 					getFunc = function() 
 						local bag = fieldData.editBag_cvt.indexValue
-						local rule = fieldData.editBagRule.indexValue
-						if cache.entriesByName[bag][rule] then
-							return cache.entriesByName[bag][rule].priority
+						local bagrule = fieldData.editBagRule.indexValue
+						if bag and bagrule and cache.entriesByName[bag][bagrule] then
+							return cache.entriesByName[bag][bagrule].priority
 						end
 						return 0
 					end, 
@@ -667,8 +694,8 @@ function AutoCategory.AddonMenuInit()
 					getFunc = function()					
 						local bag = fieldData.editBag_cvt.indexValue
 						local rule = fieldData.editBagRule.indexValue
-						if cache.entriesByName[bag][rule] then
-							return cache.entriesByName[bag][rule].isHidden
+						if bag and rule and cache.entriesByName[bag][rule] then
+							return cache.entriesByName[bag][rule].isHidden or false
 						end
 						return 0
 					end,
@@ -676,7 +703,7 @@ function AutoCategory.AddonMenuInit()
 						local bag = fieldData.editBag_cvt.indexValue
 						local rule = fieldData.editBagRule.indexValue
 						if cache.entriesByName[bag][rule] then
-							cache.entriesByName[bag][rule].isHidden = value 
+							cache.entriesByName[bag][rule].isHidden = value or nil
 							AutoCategory.cacheInitialize()
 							RefreshDropdownData()
 						end
@@ -691,6 +718,12 @@ function AutoCategory.AddonMenuInit()
 						return false
 					end,
                     default = false,
+					width = "half",
+				},
+				-- blank pad for Hide Category button
+				{
+					type = "custom",
+					width = "half",
 				},
                 -- Edit Category Button
 				{
@@ -703,7 +736,7 @@ function AutoCategory.AddonMenuInit()
 						if rule then
 							fieldData.editRuleTag.indexValue = rule.tag
 							fieldData.editRuleCat.indexValue = rule.name
-                            fieldData.currentRule = rule
+                            currentRule = rule
                             checkCurrentRule()
 							RefreshDropdownData()
 							ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
@@ -768,7 +801,7 @@ function AutoCategory.AddonMenuInit()
 					disabled = function() return #fieldData.addCatTag.choicesValues == 0 end,
 					reference = "AC_DROPDOWN_ADDCATEGORY_TAG",
 				},
-                -- Categories unused dropdown - AC_DROPDOWN_ADDCATEGORY_RULE
+                -- Categories currently unused dropdown - AC_DROPDOWN_ADDCATEGORY_RULE
 				{		
 					type = "dropdown",
 					name = SI_AC_MENU_AC_DROPDOWN_CATEGORY,
@@ -799,7 +832,7 @@ function AutoCategory.AddonMenuInit()
 						if rule then
 							fieldData.editRuleTag.indexValue = rule.tag
 							fieldData.editRuleCat.indexValue = rule.name
-                            fieldData.currentRule = rule
+                            currentRule = rule
                             checkCurrentRule()
 							RefreshDropdownData()
 							ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
@@ -925,6 +958,12 @@ function AutoCategory.AddonMenuInit()
 		    name = SI_AC_MENU_SUBMENU_CATEGORY_SETTING,
 			reference = "AC_SUBMENU_CATEGORY_SETTING",
 		    controls = {
+                -- Select Existing
+                {
+                    type = "description",
+                    text = "Select Existing Category:", -- or string id or function returning a string
+                    width = "full", --or "half" (optional)
+                },
                 -- Tags - AC_DROPDOWN_EDITRULE_TAG
 				{		
 					type = "dropdown",
@@ -942,7 +981,8 @@ function AutoCategory.AddonMenuInit()
 					setFunc = function(value) 			
                         fieldData.editRuleTag.indexValue = value
                         fieldData.editRuleCat.indexValue = nil
-                        fieldData.currentRule = nil
+                        currentRule = nil
+						AC.logger:Debug("EDITRUlE_TAG: Refreshing dropdowns after tag changed to "..value)
                         RefreshDropdownData() 
                         UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
 					end, 
@@ -961,48 +1001,51 @@ function AutoCategory.AddonMenuInit()
                     sort = "name-up",
 					
 					getFunc = function() 
-                        fieldData.currentRule = AC.GetRuleByName(fieldData.editRuleCat.indexValue)
+                        currentRule = AC.GetRuleByName(fieldData.editRuleCat.indexValue)
 						return fieldData.editRuleCat.indexValue 
 					end,
 					setFunc = function(value)
                         fieldData.editRuleCat.indexValue = value
-                        fieldData.currentRule = AC.GetRuleByName(value)
+                        currentRule = AC.GetRuleByName(value)
                         checkCurrentRule()
                    end, 
 					disabled = function() return #fieldData.editRuleCat.choices == 0 end,
 					width = "half",
 					reference = "AC_DROPDOWN_EDITRULE_RULE",
 				},
-                -- Delete Category/Rule Button
+                -- Create New
+                {
+                    type = "description",
+                    text = "Create/Copy a new Category:", -- or string id or function returning a string
+                    --title = SI_AC_MENU_EC_BUTTON_PREDEFINED, -- or string id or function returning a string (optional)
+                    width = "full", --or "half" (optional)
+                },
+                --[[ New Category Button
 				{
 					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,
-                    isDangerous = true,
-					func = function()  
-						local oldRuleName = fieldData.editRuleCat.indexValue
-						local oldTagName = fieldData.editRuleTag.indexValue
-                        local ndx = cache.rulesByName[oldRuleName]
-                        if ndx then
-                            table.remove(saved.rules,ndx)
-                            AC.cacheInitialize()
-                            RefreshDropdownData()
-                        end
-						
-						if oldRuleName == fieldData.addCatRule.indexValue then
-							--rule removed, clean selection in add rule menu if selected
-							fieldData.addCatRule.indexValue = nil
+					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
+					func = function() 
+						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
+						local tag = fieldData.editRuleTag.indexValue
+						if tag == "" then
+							tag = AC_EMPTY_TAG_NAME
 						end
+						local newRule = CreateNewRule(newName, tag)
+						cache.AddRule(newRule)
+                        currentRule = newRule
+											
+						fieldData.editRuleCat.indexValue = newName
+						fieldData.editRuleTag.indexValue = newRule.tag
 						
-                        fieldData.currentRule = nil
-                        checkCurrentRule()
-                        fieldData.editRuleCat.indexValue = nil
-                        if #fieldData.editRuleCat.choicesValues > 0 then
-                            fieldData.editRuleCat.indexValue = fieldData.editRuleCat.choicesValues[1]
-                        end
+						AutoCategory.cacheInitialize()
+						RefreshDropdownData()
+						fieldData.addCatTag:updateControl()
+						fieldData.editRuleTag:updateControl()
+						AutoCategory.RecompileRules(AC.rules)
+						--AutoCategory.RecompileRules(saved.rules)
 					end,
 					width = "half",
-					disabled = function() return fieldData.currentRule == nil end,
 				},
                 -- Copy Category/Rule Button
 				{
@@ -1011,7 +1054,66 @@ function AutoCategory.AddonMenuInit()
 					tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
 					func = function() 
 						local ruleName = fieldData.editRuleCat.indexValue
-						local newName = GetUsableRuleName(fieldData.currentRule.name)
+						local newName = GetUsableRuleName(currentRule.name)
+						local tag = fieldData.editRuleTag.indexValue
+						if tag == "" then
+							tag = AC_EMPTY_TAG_NAME
+						end
+						local newRule = AC.CopyFrom(currentRule)
+                        currentRule = newRule
+						cache.AddRule(newRule)
+											
+						fieldData.editRuleCat.indexValue = newName
+						fieldData.editRuleTag.indexValue = newRule.tag
+                        checkCurrentRule()
+						
+						AutoCategory.cacheInitialize()
+						RefreshDropdownData()
+						fieldData.addCatTag:updateControl()
+						fieldData.addCatRule:updateControl()
+						fieldData.editRuleTag:updateControl()
+						fieldData.editRuleCat:updateControl()
+                        AutoCategory.RecompileRules(AC.rules)
+                        --AutoCategory.RecompileRules(saved.rules)
+					end,
+					disabled = function() return currentRule == nil end,
+					width = "half",
+				},
+				--]]
+                -- New Category Button
+				{
+					type = "button",
+					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
+					func = function() 
+						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
+						local tag = fieldData.editRuleTag.indexValue
+						if tag == "" then
+							tag = AC_EMPTY_TAG_NAME
+						end
+						local newRule = CreateNewRule(newName, tag)
+						cache.AddRule(newRule)
+                        fieldData.currentRule = newRule
+											
+						fieldData.editRuleCat.indexValue = newName
+						fieldData.editRuleTag.indexValue = newRule.tag
+						
+						AutoCategory.cacheInitialize()
+						RefreshDropdownData()
+						UpdateChoices("AC_DROPDOWN_EDITRULE_TAG", fieldData.editRuleTag)
+						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
+						AutoCategory.RecompileRules(AC.rules)
+					end,
+					width = "half",
+				},
+				-- Copy Category/Rule Button
+				{
+					type = "button",
+					name = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
+					func = function() 
+						local ruleName = fieldData.editRuleCat.indexValue
+						local newName = GetUsableRuleName(currentRule.name)
 						local tag = fieldData.editRuleTag.indexValue
 						if tag == "" then
 							tag = AC_EMPTY_TAG_NAME
@@ -1036,39 +1138,12 @@ function AutoCategory.AddonMenuInit()
 						UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
 						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_RULE", fieldData.addCatRule)
 						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
-                        AutoCategory.RecompileRules(saved.rules)
+                        AutoCategory.RecompileRules(AC.rules)
 					end,
-					disabled = function() return fieldData.currentRule == nil end,
+					disabled = function() return currentRule == nil end,
 					width = "half",
 				},
-                -- Edit Category Title
-				header(SI_AC_MENU_HEADER_EDIT_CATEGORY),
-                -- New Category Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
-					func = function() 
-						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
-						local tag = fieldData.editRuleTag.indexValue
-						if tag == "" then
-							tag = AC_EMPTY_TAG_NAME
-						end
-						local newRule = CreateNewRule(newName, tag)
-						cache.AddRule(newRule)
-                        fieldData.currentRule = newRule
-											
-						fieldData.editRuleCat.indexValue = newName
-						fieldData.editRuleTag.indexValue = newRule.tag
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						UpdateChoices("AC_DROPDOWN_EDITRULE_TAG", fieldData.editRuleTag)
-						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
-						AutoCategory.RecompileRules(saved.rules)
-					end,
-					width = "half",
-				},
+
                 -- Learn Rules button
 				{			
 					type = "button",
@@ -1076,14 +1151,54 @@ function AutoCategory.AddonMenuInit()
 					func = function() RequestOpenUnsafeURL("https://github.com/Shadowfen/AutoCategory/wiki/Creating-Custom-Categories") end,
 					width = "half",
 				},
+                -- Delete Category/Rule Button
+				{
+					type = "button",
+					name = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,
+					tooltip = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,
+                    isDangerous = true,
+					func = function()  
+						local oldRuleName = fieldData.editRuleCat.indexValue
+						local oldTagName = fieldData.editRuleTag.indexValue
+                        local ndx = cache.rulesByName[oldRuleName]
+                        if ndx then
+                            table.remove(AC.rules,ndx)
+                            AC.cacheInitialize()
+                            RefreshDropdownData()
+                        end
+						
+						if oldRuleName == fieldData.addCatRule.indexValue then
+							--rule removed, clean selection in add rule menu if selected
+							fieldData.addCatRule.indexValue = nil
+						end
+						
+                        fieldData.currentRule = nil
+                        checkCurrentRule()
+                        fieldData.editRuleCat.indexValue = nil
+                        if #fieldData.editRuleCat.choicesValues > 0 then
+                            fieldData.editRuleCat.indexValue = fieldData.editRuleCat.choicesValues[1]
+                        end
+					end,
+					width = "half",
+					disabled = function() return fieldData.currentRule == nil end,
+				},
+                -- Edit Category Title
+				header(SI_AC_MENU_HEADER_EDIT_CATEGORY),
+                -- Predefined Text
+                {
+                    type = "description",
+                    text = editCat_getPredef, -- or string id or function returning a string
+                    --title = SI_AC_MENU_EC_BUTTON_PREDEFINED, -- or string id or function returning a string (optional)
+                    width = "full", --or "half" (optional)
+                },
                 -- Name EditBox - AC_EDITBOX_EDITRULE_NAME
                 {
 					type = "editbox",
 					name = SI_AC_MENU_EC_EDITBOX_NAME,
 					tooltip = SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP,
 					getFunc = function()  
-                        if fieldData.currentRule then
-                            return fieldData.currentRule.name
+                        if currentRule then
+                            return currentRule.name
                         end
                         return ""
 					end,
@@ -1115,7 +1230,7 @@ function AutoCategory.AddonMenuInit()
 						end
 
 						fieldData.editRuleCat.indexValue = value
-                        fieldData.currentRule.name = value
+                        currentRule.name = value
                         
 						--Update bags so that every entry has the same name, should be changed to new name.
 						for i = 1, #saved.bags do
@@ -1133,7 +1248,7 @@ function AutoCategory.AddonMenuInit()
 						RefreshDropdownData()
 					end,
 					isMultiline = false,
-					disabled = function() return fieldData.currentRule == nil end,
+					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "half",
 					reference = "AC_EDITBOX_EDITRULE_NAME",
 				},
@@ -1143,28 +1258,28 @@ function AutoCategory.AddonMenuInit()
 					name = SI_AC_MENU_EC_EDITBOX_TAG,
 					tooltip = SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP,
 					getFunc = function() 
-						if fieldData.currentRule then
-                            return fieldData.currentRule.tag
+						if currentRule then
+                            return currentRule.tag
                         end
                         return ""
 					end, 
 				 	setFunc = function(value) 
-                        local oldtag = fieldData.currentRule.tag
+                        local oldtag = currentRule.tag
 						if value == "" then
 							value = AC_EMPTY_TAG_NAME
                             local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_TAG", "")
                             control.editbox:SetText(value)
 						end
                         
-                        fieldData.currentRule.tag = value
+                        currentRule.tag = value
 						
 						AutoCategory.cacheInitialize()
 						RefreshDropdownData()
-						fieldData.editRuleTag.indexValue = fieldData.currentRule.tag
-						fieldData.editRuleCat.indexValue = fieldData.currentRule.name
+						fieldData.editRuleTag.indexValue = currentRule.tag
+						fieldData.editRuleCat.indexValue = currentRule.name
 					end,
 					isMultiline = false,
-					disabled = function() return fieldData.currentRule == nil end,
+					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "half",
 					reference = "AC_EDITBOX_EDITRULE_TAG",
 				},
@@ -1174,14 +1289,14 @@ function AutoCategory.AddonMenuInit()
 					name = SI_AC_MENU_EC_EDITBOX_DESCRIPTION,
 					tooltip = SI_AC_MENU_EC_EDITBOX_DESCRIPTION_TOOLTIP,
 					getFunc = function()
-                        if fieldData.currentRule then
-                            return fieldData.currentRule.description
+                        if currentRule then
+                            return currentRule.description
                         end
                         return ""
 					end, 
 					setFunc = function(value) 
-                        local oldval = fieldData.currentRule.description
-                        fieldData.currentRule.description = value
+                        local oldval = currentRule.description
+                        currentRule.description = value
                         if oldval ~= value then
                             AC.cacheInitialize() -- reset tooltips to new value
                             RefreshDropdownData()
@@ -1189,12 +1304,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					isMultiline = false,
 					isExtraWide = true,
-					disabled = function() 
-                        if not fieldData or not fieldData.currentRule then
-                            return true
-                        end
-                        return false
-                    end,
+					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "full",
 				},
                 -- Rule EditBox
@@ -1203,16 +1313,16 @@ function AutoCategory.AddonMenuInit()
 					name = SI_AC_MENU_EC_EDITBOX_RULE,
 					tooltip = SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,
 					getFunc = function() 
-                        if fieldData.currentRule then
-                            return fieldData.currentRule.rule
+                        if currentRule then
+                            return currentRule.rule
                         end
                         ruleCheckStatus.err = nil
                         ruleCheckStatus.good = nil
                         return ""
 					end, 
 					setFunc = function(value) 
-                        fieldData.currentRule.rule = value
-                        ruleCheckStatus.err = fieldData.currentRule:compile()
+                        currentRule.rule = value
+                        ruleCheckStatus.err = currentRule:compile()
                         if ruleCheckStatus.err == "" then
                             ruleCheckStatus.err = nil
                             ruleCheckStatus.good = true
@@ -1223,7 +1333,7 @@ function AutoCategory.AddonMenuInit()
                         end,
 					isMultiline = true,
 					isExtraWide = true,
-					disabled = function() return fieldData.currentRule == nil end,
+					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "full",
 					reference = "AC_EDITBOX_EDITRULE_RULE",
 				},
@@ -1240,10 +1350,10 @@ function AutoCategory.AddonMenuInit()
 					name = SI_AC_MENU_EC_BUTTON_CHECK_RULE,
                     tooltip = SI_AC_MENU_EC_BUTTON_CHECK_RULE_TOOLTIP,
 					func = function()
-                        local ruleName = fieldData.currentRule.name
+                        local ruleName = currentRule.name
                         checkCurrentRule()
                     end,
-					disabled = function() return fieldData.currentRule == nil end,
+					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "half",
 				},
 		    },
@@ -1319,7 +1429,7 @@ function AutoCategory.AddonMenuInit()
             controls = { 
                 {
                     type = "description",
-                    text = L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), -- or string id or function returning a string						
+                    text = SF.ColorText(L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), SF.hex.mocassin),
                 },
                 divider(),
                 -- Category Text Font
@@ -1444,7 +1554,7 @@ function AutoCategory.AddonMenuInit()
             controls = { 
                 {
                     type = "description",
-                    text = L(SI_AC_MENU_GMS_DESCRIPTION_TIP),
+                    text = SF.ColorText(L(SI_AC_MENU_GMS_DESCRIPTION_TIP), SF.hex.mocassin),
                 },
                 divider(),
                 {

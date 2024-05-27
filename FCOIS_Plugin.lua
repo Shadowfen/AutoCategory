@@ -599,7 +599,7 @@ function AutoCategory_FCOIS.LoadLanguage(defaultlang)
 end
 
 --Initialize plugin for Auto Category - FCOIS
-function AutoCategory_FCOIS.Initialize()
+function AutoCategory_FCOIS.Initialize(loadpred)
 	if FCOIS == nil then
         AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
@@ -609,12 +609,17 @@ function AutoCategory_FCOIS.Initialize()
         AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
         return
     end
+	AutoCategory.logger:Warn("Initializing FCOIS plugin integration")
     
     -- initialize strings
     AutoCategory_FCOIS.LoadLanguage("en")
     
     -- load predefinedRules
-    AutoCategory.AddPredefinedRules(AutoCategory_FCOIS.predefinedRules)
+	--if loadpred then
+		AutoCategory.logger:Info("Loading pre-defines for FCOIS - "..#AutoCategory_FCOIS.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
+		AutoCategory.AddPredefinedRules(AutoCategory_FCOIS.predefinedRules)
+		AutoCategory.logger:Info("Finsihed loading pre-defines for FCOIS - "..#AutoCategory_FCOIS.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
+	--end
     
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
@@ -804,5 +809,5 @@ function AutoCategory_FCOIS.RuleFunc.IsFCOISGear( ... )
 	return FCOIS.IsGear(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
-AutoCategory.RegisterPlugin("FCOIS", AutoCategory_FCOIS.Initialize)
+AutoCategory.RegisterPlugin("FCOIS", AutoCategory_FCOIS.Initialize, AutoCategory_FCOIS.predefinedRules)
 

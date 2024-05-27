@@ -2,13 +2,28 @@ require "AutoCategory.test.zos"
 require "AutoCategory.test.tk"
 local TK = TestKit
 
-local TR = test_run
 local d = print
 
+local INVENTORY_BACKPACK = 1
+local INVENTORY_CRAFT_BAG = 2
+local INVENTORY_GUILD_BANK = 3
+local INVENTORY_HOUSE_BANK = 4
+local INVENTORY_BANK = 5
+local AC_DECON = 6
+local AC_IMPROV = 7
+local UV_DECON = 8
+
+local ZO_PlayerInventory = {}
+
+require "LibSFUtils.LibSFUtils_Global"
+require "LibSFUtils.SFUtils_Color"
 require "LibSFUtils.LibSFUtils"
+require "LibSFUtils.SFUtils_Tables"
+require "LibSFUtils.SFUtils_LoadLanguage"
 local SF = LibSFUtils
 require "AutoCategory.AutoCategory_Global"
 require "AutoCategory.AutoCategory_Defaults"
+--require "AutoCategory.Hooks_Keyboard"
 require "AutoCategory.AutoCategory"
 local AC = AutoCategory
 
@@ -98,10 +113,10 @@ local function Cache_testUpdateSavedVars()
     TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "#saved.rules == #compiledRules")
 end
 
-function Cache_runTests()
+--function Cache_runTests()
     Cache_testIsValidRule()
     Cache_testGetRuleByName()
     Cache_testResetToDefaults()
     Cache_testAddRule()
     Cache_testUpdateSavedVars()
-end
+--end

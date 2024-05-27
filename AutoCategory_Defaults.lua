@@ -249,7 +249,7 @@ AutoCategory.defaultSettings = {
 }
  
 AutoCategory.defaultAcctSettings = {
-	rules = AutoCategory.predefinedRules,
+--	rules = {}, --AutoCategory.predefinedRules,
 	bags = {
 		[AC_BAG_TYPE_BACKPACK] = {
             rules = {},
@@ -299,6 +299,7 @@ AutoCategory.defaultAcctSettings = {
 	},
     collapses = AutoCategory.defaultCollapses,
 }
+
 AutoCategory.defaultAcctBagSettings = {
 	bags = {
 		[AC_BAG_TYPE_BACKPACK] = {

@@ -40,13 +40,13 @@ end
 
 function TK.showResult(suitename)
   if( suitename ) then
-    d(suitename..GetString(ls.SUITE_RESULTS))
+    print(suitename..GetString(ls.SUITE_RESULTS))
   else
-    d(GetString(ls.TK_RESULTS))
+    print(GetString(ls.TK_RESULTS))
   end
-  d(string.format("  %-25s %d",ls.TESTS_RUN, TK.num_tests))
-  d(string.format("  %-25s %d",ls.PASS, TK.pass))
-  d(string.format("  %-25s %d",ls.FAIL, TK.fail))
+  print(string.format("  %-25s %d",ls.TESTS_RUN, TK.num_tests))
+  print(string.format("  %-25s %d",ls.PASS, TK.pass))
+  print(string.format("  %-25s %d",ls.FAIL, TK.fail))
 end
   
   
@@ -54,10 +54,10 @@ end
 function TK.assertTrue(c, tname)
   TK.num_tests = TK.num_tests + 1
   if(c) then
-    d(string.format("%-10s%s", ls.PASS, tname ))
+    print(string.format("%-10s%s", ls.PASS, tname ))
     TK.pass = TK.pass + 1
   else
-    d(string.format("%-10s%s", ls.FAIL, tname ))
+    print(string.format("%-10s%s", ls.FAIL, tname ))
     TK.fail = TK.fail + 1
   end
 end
@@ -65,10 +65,10 @@ end
 function TK.assertFalse(c, tname)
   TK.num_tests = TK.num_tests + 1
   if(not c) then
-    d(string.format("%-10s%s", ls.PASS,tname ))
+    print(string.format("%-10s%s", ls.PASS,tname ))
     TK.pass = TK.pass + 1
   else
-    d(string.format("%-10s%s", ls.FAIL,tname ))
+    print(string.format("%-10s%s", ls.FAIL,tname ))
     TK.fail = TK.fail + 1
   end
 end
@@ -76,10 +76,10 @@ end
 function TK.assertNil(c, tname)
   TK.num_tests = TK.num_tests + 1
   if( c == nil ) then
-    d(string.format("%-10s%s", ls.PASS,tname ))
+    print(string.format("%-10s%s", ls.PASS,tname ))
     TK.pass = TK.pass + 1
   else
-    d(string.format("%-10s%s", ls.FAIL,tname ))
+    print(string.format("%-10s%s", ls.FAIL,tname ))
     TK.fail = TK.fail + 1
   end
 end
@@ -87,10 +87,10 @@ end
 function TK.assertNotNil(c, tname)
   TK.num_tests = TK.num_tests + 1
   if( c ~= nil ) then
-    d(string.format("%-10s%s", ls.PASS,tname ))
+    print(string.format("%-10s%s", ls.PASS,tname ))
     TK.pass = TK.pass + 1
   else
-    d(string.format("%-10s%s", ls.FAIL,tname ))
+    print(string.format("%-10s%s", ls.FAIL,tname ))
     TK.fail = TK.fail + 1
   end
 end

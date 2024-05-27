@@ -5,12 +5,15 @@ local TK = TestKit
 local TR = test_run
 local d = print
 
+require "LibSFUtils.LibSFUtils_Global"
+require "LibSFUtils.SFUtils_Color"
+require "LibSFUtils.LibSFUtils"
+require "LibSFUtils.SFUtils_LoadLanguage"
 require "AutoCategory.AutoCategory_Global"
 local AC = AutoCategory
-require "LibSFUtils.LibSFUtils"
-local SF = LibSFUtils
-require "AutoCategory.Misc_Plugins"
 require "AutoCategory.Plugin_API"
+require "AutoCategory.Misc_Plugins"
+local SF = LibSFUtils
 
 local moduleName = "MiscPlugins"
 
@@ -34,6 +37,6 @@ local function Misc_testgetPriceTTC()
     TK.assertTrue(AutoCategory_MiscAddons.RuleFunc.GetPriceTTC("suggested") == 10, "Got TTC suggested price")
 end
 
-function Misc_runTests()
+--function Misc_runTests()
     Misc_testgetPriceTTC()
-end
+--end

@@ -36,6 +36,33 @@ AutoCategory.Enabled = true
 SF.LoadLanguage(AutoCategory_localization_strings, "en")
 
 
+--[[
+An implementation of a logger which uses the lua print function
+to output the messages.
+
+Generally used for out-of-game testing.
+--]]
+local printLibDebug = {
+    Error = function(self,...)  print("ERROR: "..string.format(...)) end,
+    Warn = function(self,...)  print("WARN: "..string.format(...)) end,
+    Info = function(self,...)  print("INFO: "..string.format(...)) end,
+    Debug = function(self,...)  print("DEBUG: "..string.format(...)) end,
+}
+setmetatable(printLibDebug,  { __call = function(self, name) 
+            self.addonName = name 
+            return self
+        end
+    })
+
+-- initialize the logger for AutoCategory
+if LibDebugLogger then
+  AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
+  AutoCategory.logger:SetEnabled(true)
+  
+else
+  AutoCategory.logger = printLibDebug
+end
+
 -- checks the versions of libraries (where possible) and warn in
 -- debug logger if we detect out of date libraries.
 function AutoCategory.checkLibraryVersions()
@@ -56,22 +83,3 @@ function AutoCategory.checkLibraryVersions()
 end
 
 
---[[
-An implementation of a logger which uses the lua print function
-to output the messages.
---]]
-local printLibDebug = {
-    Error = function(self,...)  print("ERROR: "..string.format(...)) end,
-    Warn = function(self,...)  print("WARN: "..string.format(...)) end,
-    Info = function(self,...)  print("INFO: "..string.format(...)) end,
-    Debug = function(self,...)  print("DEBUG: "..string.format(...)) end,
-}
-setmetatable(printLibDebug, getmetatable(nilLibDebug))
-
-
-if LibDebugLogger then
-  AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
-  AutoCategory.logger:SetEnabled(true)
-else
-  AutoCategory.logger = printLibDebug
-end

@@ -20,6 +20,7 @@ Plugin_API.lua
 AutoCategory.xml
 Hooks_Keyboard.lua
 Hooks_Gamepad.lua
+AC_Classes.lua
 AutoCategory.lua
 AddonMenu.lua
 AutoCategory_RuleFunc.lua

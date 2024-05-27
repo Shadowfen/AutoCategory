@@ -19,7 +19,7 @@ function AutoCategory_ItemMarker.Initialize()
     
 end
 
--- Implement ismarkedis() check function for Item Marker
+-- Implement im_ismarked() check function for Item Marker
 function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 	local fn = "im_ismarked"
 	if ItemMarker == nil then
@@ -35,16 +35,22 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 		end
 		checkMarks[arg]=true
 	end
+	
 	local ismarked, markName = ItemMarker_IsItemMarked(AutoCategory.checkingItemBagId,
 										AutoCategory.checkingItemSlotIndex)
 	if ismarked == true then
+		local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+		--AutoCategory.logger:Debug("im_marked return positive for "..markName.." on "..name.."  ac = "..ac)
 		if ac > 0 then
 			if checkMarks[markName] then
+				--AutoCategory.logger:Debug("In checkMarks")
 				return true
 			end
+			--AutoCategory.logger:Debug("Not in checkMarks")
 			return false
 			
 		else
+			--AutoCategory.logger:Debug("Matched")
 			return true
 		end
 	end
@@ -52,4 +58,4 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 end
 
 -- Register this plugin with AutoCategory to be initialized and used when AutoCategory loads.
-AutoCategory.RegisterPlugin("ItemMarker", AutoCategory_ItemMarker.Initialize)
+AutoCategory.RegisterPlugin("ItemMarker", AutoCategory_ItemMarker.Initialize, nil)

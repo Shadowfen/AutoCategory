@@ -151,3 +151,17 @@ end
 function EVENT_MANAGER:RegisterForEvent()
 end
 
+ZO_Object = {}
+
+function ZO_Object:New(template)
+    template = template or self
+    local newObject = setmetatable ({}, template)
+    local mt = getmetatable (newObject)
+    mt.__index = template
+    
+    return newObject
+end
+
+function ZO_Object:Subclass()
+    return setmetatable({}, {__index = self})
+end

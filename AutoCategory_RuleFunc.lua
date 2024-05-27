@@ -1030,6 +1030,31 @@ function AutoCategory.RuleFunc.AutoSetName( ... )
 	return true
 end
 
+function AutoCategory.RuleFunc.CombinedAutoSetName( ... )
+	local fn = "combined_autoset"
+
+	local hasSet, setName, _, _, _, setId, _  = GetItemLinkSetInfo(AC.checkingItemLink)
+	if not hasSet then
+		-- item is not part of a set
+		return false
+	end
+	--fix german language issue
+	setName = string.gsub( setName , "%^.*", "")
+	
+	local nonperf = GetItemSetUnperfectedSetId(setId)
+	--AC.logger:Debug("combined_autoset: setId="..tostring(setId).."  nonperf="..tostring(nonperf))
+	if nonperf and nonperf>0 and nonperf ~= setId then
+		AutoCategory.AdditionCategoryName = GetItemSetName(nonperf)
+		
+	else
+		-- add in the category (set name) if necessary and assign item to it
+		AutoCategory.AdditionCategoryName = setName
+
+	end
+	--AC.logger:Debug("AdditionCategoryName="..tostring(AC.AdditionCategoryName))
+	return true
+end
+
 function AutoCategory.RuleFunc.IsSet( ... )
 	local fn = "isset"
 	local hasSet, setName = GetItemLinkSetInfo(AC.checkingItemLink)
@@ -1675,7 +1700,8 @@ AutoCategory.Environment = {
 
 	-- -------------------------------------------
 	-- special sort gear into sets functionality
-	autoset      = AutoCategory.RuleFunc.AutoSetName,	
+	autoset      = AutoCategory.RuleFunc.AutoSetName,
+	combined_autoset = AutoCategory.RuleFunc.CombinedAutoSetName,
     
 	--[[
 	-- see new implementatons in AutoCategory/Misc_Plugins.lua

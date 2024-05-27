@@ -54,12 +54,20 @@ function AutoCategory.AddPredefinedRules( ruletable )
         return 0, {"rule table was nil or empty"}
     end
     local errtbl = {}
-    for i=1,#ruletable do
-        local ruledef = ruletable[i]
-        local rslt, err = AC.isValidRule(ruledef) -- can't use r:isValid because only added by later AddRule()
+    for i,r in pairs(ruletable) do
+        local ruledef = r
+        local rslt, err = AC.isValidRule(r) -- can't use r:isValid because only added by later AddRule()
         if rslt then
-            local r = {name=ruledef.name, tag=ruledef.tag, rule=ruledef.rule, description=ruledef.description, pred=1}
-            local err = AutoCategory.cache.AddRule(r)
+            --AutoCategory.logger:Debug("Marking rule "..r.name.." as pre-defined")
+            --r.pred = 1
+            local rl = {name=r.name, tag=r.tag, rule=r.rule, description=r.description, pred=1}
+            --AutoCategory.logger:Debug("Adding rule "..rl.name.." to predefines")
+            if AutoCategory.predefinedRules.rule ~= ruletable then
+                table.insert(AutoCategory.predefinedRules, rl)
+            end
+            local err = AutoCategory.cache.AddRule(rl)
+            --AutoCategory.logger:Debug("Added predef rule "..rl.name.." to cache")
+            --table.insert(AutoCategory.rules, rl)
             if err then
                 table.insert(errtbl,err)
 				
@@ -71,7 +79,7 @@ function AutoCategory.AddPredefinedRules( ruletable )
             table.insert(errtbl,"Rule was invalid. ("..err..")")
         end
     end
-    return added,errtbl
+    return added, errtbl
 end
 
 -- Register the plugin with AutoCategory so that it will be initialized along with
@@ -80,10 +88,17 @@ end
 --
 -- Parameters: name - (string) Plugin name
 --             initfunc - (function) function to call to initialize the Plugin
-function AutoCategory.RegisterPlugin(name, initfunc)
-	if not initfunc or type(initfunc) ~= "function" then return end
+--             predefined - (lists) contains a list of all of the predefined rules for this plugin
+--
+function AutoCategory.RegisterPlugin(name, initfunc, predefined)
+	if not initfunc then return end
     
-    AutoCategory.Plugins[name] = initfunc
+    local entry = {}
+	if type(initfunc) == "function" then
+        entry.init = initfunc
+    end
+    entry.predef = predefined
+    AutoCategory.Plugins[name] = entry
 	if AutoCategory.Inited then 
         -- AutoCategory is already loaded so go ahead and load plugin
         initfunc()
