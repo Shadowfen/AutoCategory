@@ -2,9 +2,9 @@ AutoCategory structures and objects
 
 AutoCategory = {} -- includes general, accountwide, appearance, bags, rules, collapses, version, meta, acctRules, acctSaved, charSaved
 
--- not saved in SV
+-- not saved in SV - combo of all sets of rules, user and predef and plugin predef
 AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
-AutoCategory.compiledRules -- [name] function
+AutoCategory.compiledRules -- [name] compiledFunction
 
 --saved in SV
 AutoCategory.saved = {
@@ -16,19 +16,29 @@ AutoCategory.saved = {
 AC.acctRules  = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err}
 
 AutoCategory.cache = {
-    rulesByName = {}, -- [name] rule#
-    rulesByTag_svt = {}, -- [tag] {choices{rule.name}, choicesValues{rule.name}, choicesTooltips{rule.desc/name}}
+    rulesByName = {},    -- [name] rule# (index from AC.rules)
+    rulesByTag_cvt = {}, -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
     compiledRules = AC.compiledRules, -- [name] function
     tags = {}, -- [#] tagname
-    bags_svt = {}, -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
+    bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
     entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
 	collapses = {},     -- [bagId][categoryName] true
 }
 
-AutoCategory.BagRuleEntry = {name, priority, AC_isHidden}	-- bagRule
+AutoCategory.BagRuleEntry = {name, priority, isHidden}	-- bagRule
+BagRule = { name, priority, isHidden } 
 
-
-AutoCategory.CVT = controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue
+AutoCategory.CVT = {controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue, dirty}
 
 AC.rulefuncs -- metatable for rules with functions to manipulate them
+
+AC_UI members:
+AddCat_SelectTag_LAM - BaseDD - { choices = cache.tags }
+AddCat_SelectRule_LAM - BaseDD - {choices{rule.name}, choicesTooltips{rule.desc/name}}
+BagSet_SelectBag_LAM - BaseDD - (bags_cvt) {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
+BagSet_SelectRule_LAM - BaseDD - {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} 
+CatSet_SelectRule_LAM - BaseDD - { choices, choicesTooltips }
+CatSet_SelectTag_LAM - BaseDD - { choices = cache.tags }
+ImpExp_ImportBag_LAM - BaseDD - (bags_cvt)  {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
+

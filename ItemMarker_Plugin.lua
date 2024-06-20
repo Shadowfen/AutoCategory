@@ -7,7 +7,7 @@ AutoCategory_ItemMarker = {
     RuleFunc = {},
 }
 
---Initialize plugin for Auto Category - Item Saver
+--Initialize plugin for Auto Category - Item Marker
 function AutoCategory_ItemMarker.Initialize()
 	if not ItemMarker then
         AutoCategory.AddRuleFunc("im_ismarked", AutoCategory.dummyRuleFunc)

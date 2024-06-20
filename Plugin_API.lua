@@ -58,16 +58,9 @@ function AutoCategory.AddPredefinedRules( ruletable )
         local ruledef = r
         local rslt, err = AC.isValidRule(r) -- can't use r:isValid because only added by later AddRule()
         if rslt then
-            --AutoCategory.logger:Debug("Marking rule "..r.name.." as pre-defined")
-            --r.pred = 1
             local rl = {name=r.name, tag=r.tag, rule=r.rule, description=r.description, pred=1}
-            --AutoCategory.logger:Debug("Adding rule "..rl.name.." to predefines")
-            if AutoCategory.predefinedRules.rule ~= ruletable then
-                table.insert(AutoCategory.predefinedRules, rl)
-            end
+            table.insert(AutoCategory.predefinedRules, rl)
             local err = AutoCategory.cache.AddRule(rl)
-            --AutoCategory.logger:Debug("Added predef rule "..rl.name.." to cache")
-            --table.insert(AutoCategory.rules, rl)
             if err then
                 table.insert(errtbl,err)
 				
