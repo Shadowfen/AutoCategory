@@ -1,25 +1,34 @@
-[COLOR="DeepSkyBlue"]3.7 (95)[/COLOR]:
+[COLOR="DeepSkyBlue"]4.0 (95)[/COLOR]:
 [COLOR="Red"]WARNING: BEFORE YOU UPGRADE - [/COLOR] be sure to back up (make a copy of) your SavedVariables\AutoCategory.lua file. The way that your category rules are stored has changed. This backup will preserve your old rules for you to be able to refer to if necessary.
 [LIST]
-[*] Requires the latest version of LibSFUtils (version )
+[*] Requires the latest version of LibSFUtils (version 52)
 [*] A new function [COLOR="MediumSeaGreen"]combined_autoset()[/COLOR]. This function behaves similarly to the autoset() function except that perfected set pieces will now be grouped together with their non-perfected set brothers under the non-perfected set name. For instance, the "Saxhleel Champion's Perfected Cuirass" will then get grouped with other "Saxhleel Champion" set items. You should not have both autoset() and combined_autoset() rules assigned to a bag, as the one with the highest priority will win, and the lower priority will have nothing to do (but will still take time to not do it). Requested by Tazmyr.
-[*] Added a menu item to the inventory context menu to get the item id for the inventory item that you are hovering over. Bring up the context menu while hovering (usually a right click) and look for the menu item "AC: Get Item Id" to select. It will display a message in chat with the name of the inventory item and its item id (suitable for use with the isitemid() rule function). The item id is identifying the type of the item - not that unique item - so the id will match against other stacks of the same thing in your inventory when evaluating the rule.
+[*] Added a menu item to the inventory context menu to get the item id for the inventory item that you are hovering over. Bring up the context menu while hovering (usually a right click) and look for the menu item "AC: Get Item Id" to select. It will display a message in chat with the name of the inventory item and its item id (suitable for use with the [COLOR="MediumSeaGreen"]isitemid()[/COLOR] rule function). The item id is identifying the type of the item - not that unique item - so the id will match against other stacks of the same thing in your inventory when evaluating the rule.
 [*] User category rules have all been made accessible account-wide. (See Category Rule Changes below.) Predefined rules are no longer saved because they don't change.
 [*] Made the "Hide Category" ON/OFF only extend halfway across, so that it is not as easy to hit it accidentally while changing the category priority.
 [*] The collapses (+/- on the categories in inventory) are going to be reset to Uncollapsed All to begin with. Due to a bug with removing rules from a bag in the bag setting, and removing the corresponding collapse settings for the now removed rule, the saved collapses had become corrupted and filled with settings for rules that weren't even there.
-[*] Code cleanup and refactoring.
+[*] Lots of changes to the UI implementation to make it less fragile (hopefully).
+[*] Code cleanup and refactoring. Lots and lots of testing.
 [*] Convert to use LibSFUtils event management. (Change should be transparent to users.)
+[/LIST]
+[COLOR="MediumSlateBlue"]New Scribing-related abilities[/color]]
+[LIST]
+[*] Update to the UnknownTracker Plugin is provided by keera to look for scripts.
+[*] Added the following values for look for in the item types function [COLOR="MediumSeaGreen"]type()[/COLOR]: "grimoire", "scribing", "scribing_ink". Some were provided by saenic and g0thicicecream. Thanks!
+[*] Added the following values to look in the specialty item  function [COLOR="MediumSeaGreen"]sptype()[/COLOR]: "scribing_ink", "script", "script_focus", "script_signature", "script_affix".
 [/LIST]
 [COLOR="MediumSlateBlue"]Category Rule Changes[/color]]
 [LIST]
 [*] Because of consolodating all of the character and account rules into a single account-wide collection, some of the rules might have been renamed in the conversion (by adding a number after the original name). This has the potential of causing problems with your Bag Settings which also works off of rule names. If you are having a problem, check through the defined categories to find the specific one that you want to be running and add it to your bag as appropriate. (Don't forget to Remove from Bag the old rule that was incorrect!)
-[*] For any of you that have privately-built plugins for AutoCategory, the AutoCategory.RegisterPlugin() now has an additional parameter - a list of the predefined rules for your plugin (typically named .predefinedRules). The Initialize() function can still add the predefinedRules to AutoCategory as it has before. The additional parameter is so that AutoCategory can access the plugin pre-defines before the plugin is initialized (to allow the pruning out of plugin predefines from the saved variables). If you do not have any predefines for your plugin, register as before with only the plugin name and the initialize function (or pass in nil for the new third parameter). For examples, see the Plugin files included with AutoCategory.
-[*] The saved variables layout has changed. The section "AutoCategorySavedVars" still saves the toon-specific variables and some of the account-wide variables - however, rule definitions have been removed. There is a new section "AutoCatRules" which contains all of the rules accessible to all of the toons of the account. 
+[*] [B]Plugins:[/B] For any of you that have privately-built plugins for AutoCategory, the AutoCategory.RegisterPlugin() now has an additional parameter - a list of the predefined rules for your plugin (typically named .predefinedRules). The Initialize() function can still add the predefinedRules to AutoCategory as it has before. The additional parameter is so that AutoCategory can access the plugin pre-defines before the plugin is initialized (to allow the pruning out of plugin predefines from the saved variables). If you do not have any predefines for your plugin, register as before with only the plugin name and the initialize function (or pass in nil for the new third parameter). For examples, see the Plugin files included with AutoCategory.
+[*] The saved variables layout has changed. The section "AutoCategorySavedVars" still saves the toon-specific variables and some of the account-wide variables - however, rule definitions have been removed from this section. There is a new section "AutoCatRules" which contains all of the rules accessible to all of the toons of the account. 
 [*] When you login each toon the first time after upgrading AutoCategory, rule definitions from the old account-wide and old character rules are moved to the new "AutoCatRules" and the pre-defined rules are stripped away.
 [*] User-defined rules may be editted and deleted as usual. All user-defined rules are account-wide so that they are available to any toon in an account without having to redefine them over and over again.
 [*] Predefined rule/categories are no longer stored in the SavedVariables file. Instead, they are recreated/loaded in when you log in to the game. This allows new or improved pre-defined categories to be available with upgrades to AutoCategory, or upgrades to plugins.
 [*] Predefined rules/categories can no longer be editted or deleted. Instead, you can make a copy of a particular predefined rule (changing the name and making it a user-rule) so it can be renamed, editted, or enhanced. The predefined rule will still exist with the old name.
 [/LIST]
+
+
 
 [COLOR="DeepSkyBlue"]3.6.7 (94)[/COLOR]:
 [LIST]
