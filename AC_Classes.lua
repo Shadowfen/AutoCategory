@@ -48,7 +48,7 @@ function AutoCategory.CVT:initialize(ctlname, ndx, usesFlags)
 		self.controlName = ctlname
 	end
 
-	self.choices = {}
+	self.choices = {}		-- mandatory list
 
 	if usesFlags and (usesFlags == USE_VALUES or usesFlags == USE_ALL)  then
 		self.choicesValues = {}
@@ -184,12 +184,15 @@ function AutoCategory.CVT:append(choice, value, tooltip)
 	if not choice then return false end
 
 	self.dirty = 1
-	table.insert(self.choices, choice)
+	self.choices[#self.choices+1] = choice
+	--table.insert(self.choices, choice)
 	if value and self.choicesValues then
-		table.insert(self.choicesValues, value)
+		self.choicesValues[#self.choicesValues+1] = value
+		--table.insert(self.choicesValues, value)
 	end
 	if tooltip and self.choicesTooltips then
-		table.insert(self.choicesTooltips, tooltip)
+		self.choicesTooltips[#self.choicesTooltips+1] = tooltip
+		--table.insert(self.choicesTooltips, tooltip)
 	end
 	return true
 end

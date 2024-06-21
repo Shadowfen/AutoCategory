@@ -314,12 +314,12 @@ end
 function AC_UI.BagSet_HideCat_LAM:setValue(value)
 	local bag = getCurrentBagId()
 	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
-	AC.logger:Debug("HideCat:setValue - bag = "..bag.."  rule = "..tostring(ruleNm))
+	--AC.logger:Debug("HideCat:setValue - bag = "..bag.."  rule = "..tostring(ruleNm))
 	if cache.entriesByName[bag][ruleNm] then
 		local isHidden = cache.entriesByName[bag][ruleNm].isHidden or false
-		AC.logger:Debug("HideCat:setValue - bagrule found for rule = "..ruleNm.." isHidden = "..tostring( cache.entriesByName[bag][ruleNm].isHidden))
+		--AC.logger:Debug("HideCat:setValue - bagrule found for rule = "..ruleNm.." isHidden = "..tostring( cache.entriesByName[bag][ruleNm].isHidden))
 		if isHidden ~= value then
-			AC.logger:Debug("HideCat:setValue - value is changing to "..tostring(value))
+			--AC.logger:Debug("HideCat:setValue - value is changing to "..tostring(value))
 			if not value then value = nil end
 			cache.entriesByName[bag][ruleNm].isHidden = value
 			AutoCategory.cacheBagInitialize()
@@ -362,19 +362,19 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	AC.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	--AC.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
 		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and cache.entriesByBag[currentBag] then
-			AC.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			--AC.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
 			dataCurrentRules_EditBag:assign(cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
 		--self:updateControl()
 	end
 	BagSet_SelectRule_LAM:setValue(ndx)
-	AC.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	--AC.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -472,7 +472,7 @@ end
 -- ------------------------------------------------
 function AC_UI.BagSet_EditCat_LAM:execute()
 	local ruleName = BagSet_SelectRule_LAM:getValue()
-	AC.logger:Debug("Executing BagSet_EditCat_LAM for rule "..tostring(ruleName))
+	--AC.logger:Debug("Executing BagSet_EditCat_LAM for rule "..tostring(ruleName))
 	local rule = AC.GetRuleByName(ruleName)
 	if rule then
 		CatSet_DisplayRule(rule)
@@ -597,7 +597,7 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	end
 
 	local rbyt = cache.rulesByTag_cvt[tag]
-	AC.logger:Debug("size for rulesByTag_cvt for tag "..tag.." = "..rbyt:size().." control "..tostring(AddCat_SelectRule_LAM:getControlName()))
+	--AC.logger:Debug("size for rulesByTag_cvt for tag "..tag.." = "..rbyt:size().." control "..tostring(AddCat_SelectRule_LAM:getControlName()))
 	for i = 1, rbyt:size() do
 		local value = rbyt.choices[i]
 		if value and cache.entriesByName[bagId][value] == nil then
@@ -653,11 +653,11 @@ end
 -- ----------------------------------------------------------
 function AC_UI.AddCat_EditRule_LAM:execute()
 	local ruleName = AddCat_SelectRule_LAM:getValue()
-	AC.logger:Debug("AddCat_EditRule_LAM for rule "..tostring(ruleName))
+	--AC.logger:Debug("AddCat_EditRule_LAM for rule "..tostring(ruleName))
 	local rule = AC.GetRuleByName(ruleName)
 	if not rule then return end
 
-	AC.logger:Debug("found rule for name "..tostring(ruleName).." tag "..rule.tag)
+	--AC.logger:Debug("found rule for name "..tostring(ruleName).." tag "..rule.tag)
 	CatSet_DisplayRule(rule)
 	AC_UI.RefreshDropdownData()
 	currentRule = rule
@@ -670,7 +670,7 @@ function AC_UI.AddCat_EditRule_LAM:execute()
 	CatSet_SelectRule_LAM:refresh()
 	CatSet_SelectRule_LAM:setValue(rule.name)
 	--CatSet_SelectRule_LAM:updateControl()
-	AC.logger:Debug("set to current rule for name "..tostring(ruleName).." tag "..rule.tag)
+	--AC.logger:Debug("set to current rule for name "..tostring(ruleName).." tag "..rule.tag)
 
 	AC_UI.ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
 	AC_UI.ToggleSubmenu("AC_SUBMENU_CATEGORY_SETTING", true)
@@ -696,14 +696,14 @@ end
 function AC_UI.AddCat_BagAdd_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = AddCat_SelectRule_LAM:getValue()
-	AC.logger:Debug("AddCat_BagAdd: bagId = "..bagId.." rule = "..ruleName)
+	--AC.logger:Debug("AddCat_BagAdd: bagId = "..bagId.." rule = "..ruleName)
 	assert(cache.entriesByName[bagId][ruleName] == nil, "Bag(" .. bagId .. ") already has the rule: ".. ruleName)
 
 	if cache.entriesByName[bagId][ruleName] then return end
 
 	local entry = AC.CreateNewBagRule(ruleName)
-	AC.logger:Debug("AddCat_BagAdd: inserting new bagrule to saved.bags - bagId = "..bagId.." rule = "..ruleName)
-	table.insert(saved.bags[bagId].rules, entry)
+	--AC.logger:Debug("AddCat_BagAdd: inserting new bagrule to saved.bags - bagId = "..bagId.." rule = "..ruleName)
+	saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
 	currentBagRule = entry.name
 
 	AutoCategory.cacheBagInitialize()
@@ -736,7 +736,7 @@ end
 -- -------------------------------------------------------
 
 local function copyBagToBag(srcBagId, destBagId)
-	AC.logger:Info("copyBagToBag started, destBagId = "..destBagId.." srcBagId = "..tostring(srcBagId))
+	--AC.logger:Info("copyBagToBag started, destBagId = "..destBagId.." srcBagId = "..tostring(srcBagId))
 	--saved.bags[bagId] = SF.safeClearTable(saved.bags[destBagId])
 	saved.bags[destBagId] = SF.deepCopy( saved.bags[srcBagId] )
 end
@@ -777,7 +777,7 @@ end
 -- customization of BaseDD for ImpExp_ImportBag_LAM
 -- -------------------------------------------------------
 function AC_UI.ImpExp_ImportBag_LAM:setValue(value)
-	AC.logger:Info("ImportBag_LAM:setValue() value = "..value)
+	--AC.logger:Info("ImportBag_LAM:setValue() value = "..value)
 	self:select(value)
 end
 
@@ -807,19 +807,19 @@ end
 -- -------------------------------------------------------
 function AC_UI.ImpExp_Import_LAM:execute()
 
-	AC.logger:Info("ImpExp_Import_LAM:execute() started")
+	--AC.logger:Info("ImpExp_Import_LAM:execute() started")
 	local bagId = getCurrentBagId()
 	local srcBagId = ImpExp_ImportBag_LAM:getValue()
-	AC.logger:Info("ImpExp_Import_LAM:execute() cur bagId = "..bagId.." srcBagId = "..tostring(srcBagId))
+	--AC.logger:Info("ImpExp_Import_LAM:execute() cur bagId = "..bagId.." srcBagId = "..tostring(srcBagId))
 	--saved.bags[bagId] = SF.safeClearTable(saved.bags[bagId])
 	--saved.bags[bagId] = SF.deepCopy( saved.bags[srcBagId] )
 	copyBagToBag(srcBagId, bagId)
 
-	AC.logger:Info("ImpExp_Import_LAM:execute() finished copy, clearing indexes for BagSet and AddCat")
+	--AC.logger:Info("ImpExp_Import_LAM:execute() finished copy, clearing indexes for BagSet and AddCat")
 	BagSet_SelectRule_LAM:clearIndex()
 	--reset add rule's selection, since all data will be changed.
 	AddCat_SelectRule_LAM:clearIndex()
-	AC.logger:Info("ImpExp_Import_LAM:execute() rebuild cache and refresh dropdowns/controls")
+	--AC.logger:Info("ImpExp_Import_LAM:execute() rebuild cache and refresh dropdowns/controls")
 
 	AutoCategory.cacheInitialize()
 	AC_UI.RefreshDropdownData()
@@ -1112,7 +1112,7 @@ function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 
 	-- if tag is new, then update tags lists
 	if not ZO_IsElementInNumericallyIndexedTable(cache.tags, newtag) then
-		table.insert(cache.tags, newtag)
+		cache.tags[#cache.tags+1] = newtag
 		-- create a new tag list if necessary
 		cache.rulesByTag_cvt[newtag] = CVT:New(nil,nil,CVT.USE_TOOLTIPS)	--uses choicesTooltips
 	end
@@ -1183,7 +1183,7 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 	local oldRuleName = CatSet_SelectRule_LAM:getValue()
 	local ndx = cache.rulesByName[oldRuleName]
 	if ndx then
-		AC.logger:Debug("DeleteCat:execute - removing rule "..oldRuleName.." at "..tostring(ndx))
+		--AC.logger:Debug("DeleteCat:execute - removing rule "..oldRuleName.." at "..tostring(ndx))
 		table.remove(AC.rules,ndx)
 		-- remove from the rule list that gets saved
 		for i,v in pairs(AC.acctRules.rules) do
@@ -1193,7 +1193,7 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 				break
 			end
 		end
-		AC.logger:Debug("DeleteCat:execute - rebuilding rule cache tables "..currentRule.name)
+		--AC.logger:Debug("DeleteCat:execute - rebuilding rule cache tables "..currentRule.name)
 		AC.cacheRuleInitialize()
 		--AC.logger:Debug("DeleteCat:execute - refreshing dropdown tables "..currentRule.name)
 		--AC_UI.RefreshDropdownData()
@@ -1312,7 +1312,8 @@ local function checkKeywords(str)
             end
         end
         if found == false then
-            table.insert(result, w)
+			result[#result+1] = w
+            --table.insert(result, w)
         end
     end
    return result

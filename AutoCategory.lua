@@ -355,7 +355,8 @@ function AutoCategory.cacheRuleInitialize()
 		
         --update tag grouping lookups
         if not cache.rulesByTag_cvt[tag] then
-            table.insert(cache.tags, tag)
+			cache.tags[#cache.tags+1] = tag
+            --table.insert(cache.tags, tag)
             cache.rulesByTag_cvt[tag] = AC.CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
         end
         cache.rulesByTag_cvt[tag]:append(name, name, rule:getDesc())
@@ -397,14 +398,17 @@ function AutoCategory.cacheBagInitialize()
 				if not ename[ruleName] then
 					ename[ruleName] = bagrule
 					if ebag.choicesValues then
-					table.insert(ebag.choicesValues, bagrule:formatValue())
+						ebag.choicesValues[#ebag.choicesValues+1] = bagrule:formatValue()
+						--table.insert(ebag.choicesValues, bagrule:formatValue())
 					end
-					
+
 					local sn = bagrule:formatShow()
 					local tt = bagrule:formatTooltip()
-					table.insert(ebag.choices, sn)
+					ebag.choices[#ebag.choices+1] = sn
+					--table.insert(ebag.choices, sn)
 					if ebag.choicesTooltips then
-					table.insert(ebag.choicesTooltips, tt)
+						ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
+						--table.insert(ebag.choicesTooltips, tt)
 					end
 				end
 			end
@@ -459,18 +463,18 @@ function AutoCategory.cache.RemoveRuleFromBag(bagId, rulename)
             break
         end
     end
-	
+
     -- remove from collapses
 	cache.entriesByName[bagId][rulename] = nil
-	
+
 	-- remove from collapse bag
 	local collapsebag = saved.collapses[bagId]
 	local tname = rulename.." %("
 	for k,_ in pairs(collapsebag) do
-		
+
 		if k == rulename then
 			collapsebag[k] = nil
-			
+
 		elseif 1 == string.find(k,tname) then
 			collapsebag[k] = nil
 		end
@@ -556,9 +560,11 @@ function AutoCategory.cache.AddRule(rule)
 			--table.insert(AC.predefinedRules, rule) 
 			
 		else
-			table.insert(AC.acctRules.rules, rule)
+			AC.acctRules.rules[#AC.acctRules.rules+1] = rule
+			--table.insert(AC.acctRules.rules, rule)
 		end
-		table.insert(AC.rules, rule)
+		AC.rules[#AC.rules+1] = rule
+		--table.insert(AC.rules, rule)
 		rule_ndx = #AC.rules
 		cache.rulesByName[rule.name] = rule_ndx
 
@@ -616,82 +622,89 @@ end
 -- Add the rules in a table of rules to the combined, acctRules, and predefinedRules lists
 -- as appropriate.
 -- The table must be { rules = {} } and tbl.rules contains the list of rules.
+--
 -- The tblname is used only for logger messages - i.e. debugging.
+--
 -- If notdel is true then the rules are NOT removed from the source table.
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --
 local function addTableRules(tbl, tblname, notdel, ispredef)
 	if not tbl.rules or tbl.rules == AC.rules then return end
-	
-	--AC.logger:Info("Adding rules from table "..(tblname or "unknown"))
-	local r, rndx, newName
-	
+
+	--AC.logger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
+	local rndx, newName
+
 	-- add a rule to the combined rules list and the name-lookup
 	local function addCombinedRule(rl)
-		table.insert(AC.rules, rl)
+		AC.rules[#AC.rules+1] = rl
+		--table.insert(AC.rules, rl)
 		--AC.logger:Info("Adding rule "..rl.name.." to AC.rules ndx="..#AC.rules)
 		cache.rulesByName[rl.name] = #AC.rules
 	end
-	
+
 	-- process all of the rules in the table
+	local v, r
 	for k=#tbl.rules, 1, -1 do
-		local v = tbl.rules[k]
-		--AC.logger:Info((tblname or "unknown").." "..k..". "..v.name)
-		if not notdel then
-			table.remove(tbl.rules, k)
-		end
+		v = tbl.rules[k]
+		--.logger:Info((tblname or "unknown").." "..k..". "..v.name)
+		--if not notdel then
+		--	table.remove(tbl.rules, k)
+		--end
 		if ispredef == true then
 			v.pred=1
 		end
-		
-		rndx = cache.rulesByName[v.name]
-		if rndx then
+
+		r = AC.GetRuleByName(v.name)
+		if r then
 			--AC.logger:Warn("Found duplicate rule name - "..v.name)
-			r = AC.GetRuleByName(v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule, so don't add it again
 				--AC.logger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
-				
+
 			else
 				local oldname = v.name
 				-- rename different rule
 				newName = AC.GetUsableRuleName(v.name)
 				v.name = newName
-				
+
 				addCombinedRule(v)
-				AC.renameBagRule(oldname, newName)				
+				AC.renameBagRule(oldname, newName)
 				if (v.pred and v.pred == 1) or ispredef then 
 					-- add to predefinedRules
 					if tbl.rules ~= AC.predefinedRules then
-						table.insert(AC.predefinedRules, v) 
+						AC.predefinedRules[#AC.predefinedRules+1] = v
+						--table.insert(AC.predefinedRules, v) 
 					end
-					
+
 				else
 					-- add to acctRules
 					if tbl.rules ~= AC.acctRules.rules then
-						table.insert(AC.acctRules.rules, v)
+						AC.acctRules.rules[#AC.acctRules.rules+1] = v
+						--table.insert(AC.acctRules.rules, v)
 					end
 				end
 				-- add to input table (if notdel == true)
 				if notdel == true then
-				    table.remove(tbl.rules, k)
-				    table.insert(tbl.rules, v)
+				    --table.remove(tbl.rules, k)
+					tbl.rules[k] = v
 				end
 			end
-			
+
 		else
 			-- brand new (never seen) rule
 			if (v.pred and v.pred == 1) or ispredef then 
 				-- it's a predefined rule
 				if tbl.rules ~= AC.predefinedRules then
-				  table.insert(AC.predefinedRules, v) 
+					AC.predefinedRules[#AC.predefinedRules+1] = v
+					--table.insert(AC.predefinedRules, v) 
 				end
-      
+
 		    else
 				-- it's a user rule
 			    if tbl.rules ~= AC.acctRules.rules then
-					table.insert(AC.acctRules.rules, v)
+					AC.acctRules.rules[#AC.acctRules.rules+1] = v
+					--table.insert(AC.acctRules.rules, v)
 			    end
 			end
 			-- add it to the combined (AC.rule) list
@@ -709,7 +722,7 @@ function AutoCategory.onLoad(event, addon)
 	-- make sure we are not called again
 	AC.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
 
-    AutoCategory.checkLibraryVersions()
+    AC.checkLibraryVersions()
 
     -- load our saved variables (no longer loads pre-defined rules)
     AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
@@ -731,7 +744,7 @@ function AutoCategory.onLoad(event, addon)
 		-- check acctSaved
 		AC.acctSaved.bags = SF.safeTable(AC.acctSaved.bags)
 		if SF.isEmpty(AC.acctSaved.bags) then
-			SF.defaultMissing(AC.acctSaved.bags, AutoCategory.defaultAcctBagSettings.bags)
+			SF.defaultMissing(AC.acctSaved.bags, AC.defaultAcctBagSettings.bags)
 			AC.ResetCollapse(AC.acctSaved)
 		end
 		
@@ -746,6 +759,7 @@ function AutoCategory.onLoad(event, addon)
 
 end
 
+-- --------------------------------------------------------------------
 -- keep track of registered events for AutoCategory
 AC.evtmgr = SF.EvtMgr:New("AutoCategory")
 
@@ -753,30 +767,23 @@ AC.evtmgr = SF.EvtMgr:New("AutoCategory")
 -- continues initialization after all addons are loaded into the game
 function AutoCategory.onPlayerActivated()
 	local evtmgr = AC.evtmgr
-	
+
 	-- make sure we are only called once
 	evtmgr:unregEvt(EVENT_PLAYER_ACTIVATED)
-	
-	
+
 	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AC.BulkMode = false end)
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AC.BulkMode = false end)
-	
+
 	-- combine the user-defined and pre-defined into a single set for use
 	AC.rules = SF.safeClearTable(AutoCategory.rules) -- start empty
-	
-	--AC.logger:Debug("1 predefined "..SF.GetSize(AC.predefinedRules))
-	--AC.logger:Debug ("1 acctSaved "..SF.GetSize(AC.acctSaved.rules))
-	--AC.logger:Debug ("1 charSaved "..SF.GetSize(AC.charSaved.rules))
-	--AC.logger:Debug ("1 rules "..SF.GetSize(AC.rules))
-	--AC.logger:Debug ("1 acctRules "..SF.GetSize(AC.acctRules.rules))
 
 	-- add pre-defined rules first to the combined rules and name-lookup
 	local pred = { rules = AC.predefinedRules, }
 	addTableRules(pred, "AC.predefinedRules", true, true)
 	--AC.logger:Debug("2 predefined "..SF.GetSize(AC.predefinedRules))
-	
+
 	-- add plugin predefined rules to the combined rules and name-lookup
-	for name, v in pairs(AutoCategory.Plugins) do	
+	for name, v in pairs(AutoCategory.Plugins) do
 		AC.logger:Debug("plugin: "..name)
 		if v.predef then
 			AC.logger:Debug ("Processing predefs from".. name.." "..SF.GetSize(v.predef))
@@ -791,13 +798,13 @@ function AutoCategory.onPlayerActivated()
 	for k, v in pairs(AC.predefinedRules) do
 		if lpred[v.name] then
 			--AC.logger:Info("Found duplicate predefine: "..v.name.." ("..k..") - original k = "..lpred[v.name])
-			
+
 		else
 			lpred[v.name] = k
 		end
 	end
 	--AC.logger:Debug("2 lpred "..SF.GetSize(lpred))
-	
+
 	-- debug output function to display rule tables in log
 	local function printRuleTbl(tbl, tblname)
 		for k,v in pairs(tbl) do
@@ -805,13 +812,15 @@ function AutoCategory.onPlayerActivated()
 		end
 
 	end
-	
+
 	-- remove predefines from the passed-in table
 	--     note: tblname is only used for logger messages.
 	local function pruneTables(tbl, tblname)
 		if not tbl or SF.GetSize(tbl) == 0 then return end
+
+		local v
 		for k=#tbl,1, -1 do
-			local v= tbl[k]
+			v= tbl[k]
 			if lpred[v.name] then
 				-- delete dupe
 				--AC.logger:Warn("Deleting pre-def from acctSaved.rules: "..v.name)
@@ -822,25 +831,26 @@ function AutoCategory.onPlayerActivated()
 		--printRuleTbl(tbl,tblname)
 
 	end
-	
+
 	if not AC.charSaved.nep then
 		-- prune pre-defines from acctSaved
-		if AC.acctSaved.rules then
+		if AC.acctSaved.rules and #AC.acctSaved.rules > 0 then
 			pruneTables(AC.acctSaved.rules, "acctSaved.rules")
 		end
 
-		
 		-- prune pre-defines from charSaved
-		if AC.charSaved.rules then
+		if AC.charSaved.rules and #AC.charSaved.rules > 0 then
 			pruneTables(AC.charSaved.rules, "charSaved.rules")
 		end
 	end
-	
+
 	-- add user-defined rules next
 	addTableRules(AC.acctRules, "AC.acctRules.rules", true)	-- "real" user-defined rules, do not delete rules from AC.acctRules table
 	if not AC.charSaved.nep then
 		addTableRules(AC.acctSaved, "AC.acctSaved.rules")		-- old acct-wide combo rules
+		AC.acctSaved.rules = nil
 		addTableRules(AC.charSaved, "AC.charSaved.rules")		-- old char combo rules
+		AC.charSaved.rules = nil
 	end
 
 	-- cannot use printRuleTbl() because this is NOT a table of rules
@@ -851,7 +861,7 @@ function AutoCategory.onPlayerActivated()
 
 	--printRuleTbl(AC.rules, "combrules")
 	--printRuleTbl(AC.acctRules.rules,"acctRules.rules")
-	
+
 	--AC.logger:Debug("lpred "..#lpred)
 	--AC.logger:Debug("3 predefined "..SF.GetSize(AC.predefinedRules))
 	--AC.logger:Debug ("3 acctSaved "..SF.GetSize(AC.acctSaved.rules))
@@ -862,17 +872,17 @@ function AutoCategory.onPlayerActivated()
 	if AC.charSaved.nep == nil then
 		AC.charSaved.nep = 1
 	end
-	
-    AutoCategory.UpdateCurrentSavedVars()
-    AutoCategory.LoadCollapse()		-- must follow UpdateCurrentSavedVars()
 
-    AutoCategory.LazyInit()	-- also loads in predefines for plugins
+    AC.UpdateCurrentSavedVars()
+    AC.LoadCollapse()		-- must follow UpdateCurrentSavedVars()
+
+    AC.LazyInit()	-- also loads in predefines for plugins
 end
 
 do
 	-- register our event handler function to be called to do initialization
-	AC.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, AutoCategory.onLoad)
-	AC.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, AutoCategory.onPlayerActivated)
+	AC.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 		AutoCategory.onLoad)
+	AC.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCategory.onPlayerActivated)
 end
 
 

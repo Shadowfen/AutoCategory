@@ -463,7 +463,7 @@ function AutoCategory.getItemStyles()
 		style = GetItemStyleName(k)
 		if style and style ~= "" and style ~= "use me" and style ~= "witches festival 2019" then
 			style = zo_strlower(style)
-			table.insert(is,style)
+			is[#is+1] = style
 		end
 	end
 	--d(is)
@@ -1288,7 +1288,7 @@ function AutoCategory.RuleFunc.IsTag( ... )
 	local taglist = {}
 	for ax = 1, ac do
 		local arg = select( ax, ... )
-		table.insert(taglist, arg)
+		taglist[#taglist+1] = arg
 	end
 
 	

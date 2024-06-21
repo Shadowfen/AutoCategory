@@ -59,17 +59,20 @@ function AutoCategory.AddPredefinedRules( ruletable )
         local rslt, err = AC.isValidRule(r) -- can't use r:isValid because only added by later AddRule()
         if rslt then
             local rl = {name=r.name, tag=r.tag, rule=r.rule, description=r.description, pred=1}
-            table.insert(AutoCategory.predefinedRules, rl)
+            AC.predefinedRules[#AC.predefinedRules+1] = r1
+            --table.insert(AutoCategory.predefinedRules, rl)
             local err = AutoCategory.cache.AddRule(rl)
             if err then
-                table.insert(errtbl,err)
+                errtbl[#errtbl+1] = err
+                --table.insert(errtbl,err)
 				
             else
                 added = added + 1
             end
 			
         else
-            table.insert(errtbl,"Rule was invalid. ("..err..")")
+            errtbl[#errtbl+1] = "Rule was invalid. ("..err..")"
+            --table.insert(errtbl,"Rule was invalid. ("..err..")")
         end
     end
     return added, errtbl
