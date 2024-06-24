@@ -25,14 +25,14 @@ AutoCategory.lua
 AddonMenu.lua
 AutoCategory_RuleFunc.lua
 AutoCategory_API.lua
-Misc_Plugins.lua
+plugins/Misc_Plugins.lua
 
 ; new style addon plugin files
-ItemMarker_Plugin.lua
-ItemSaver_Plugin.lua
-FCOIS_Plugin.lua
-Iakoni_GearChanger_Plugin.lua
-UnknownTracker_Plugin.lua
+plugins/ItemMarker_Plugin.lua
+plugins/ItemSaver_Plugin.lua
+plugins/FCOIS_Plugin.lua
+plugins/Iakoni_GearChanger_Plugin.lua
+plugins/UnknownTracker_Plugin.lua
 
 ; old integration with other addons files
 AutoCategory_Integrations_QuickMenu.lua

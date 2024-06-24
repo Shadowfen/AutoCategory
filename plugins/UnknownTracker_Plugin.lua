@@ -90,9 +90,9 @@ function AutoCategory_UnknownTracker.Initialize()
     end
     
     -- load predefinedRules
-    AutoCategory.logger:Info("Loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
+    --AutoCategory.logger:Info("Loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
     AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
-    AutoCategory.logger:Info("Finsihed loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
+    --AutoCategory.logger:Info("Finsihed loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
     AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
 
     -- load supporting rule functions
