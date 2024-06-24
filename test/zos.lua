@@ -185,3 +185,13 @@ end
 function ZO_Object:Subclass()
     return setmetatable({}, {__index = self})
 end
+
+function ZO_IsElementInNumericallyIndexedTable(t, element)
+    for index, value in ipairs(t) do
+        if value == element then
+            return true
+        end
+    end
+    return false
+end
+
