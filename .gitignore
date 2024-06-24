@@ -2,6 +2,8 @@ tags.idx
 tags
 output/
 AutoCategory/
+screenshots/
+.vscode/
 ._*
 *.bak
 test_run.lua
@@ -10,3 +12,6 @@ test_run.lua
 .settings
 tags.sqlite
 NppGTags.cfg
+*broken.lua
+AC_SavedVars.lua
+AC-dgsd-281.html
