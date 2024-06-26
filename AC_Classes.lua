@@ -390,7 +390,7 @@ function AutoCategory.BaseDD:updateControl()
     end
 
 	if self.cvt.dirty == 1 then		-- only do this if cvt lists have been modified
-		AC.logger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
+		--AC.logger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
 		-- only update the choices if we know that the lists contents changed
 		self.cvt.dirty = nil
 		dropdownCtrl:UpdateChoices(self.cvt.choices, self.cvt.choicesValues,
