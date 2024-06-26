@@ -1615,6 +1615,41 @@ function AutoCategory.RuleFunc.CharName(...)
 	return false
 end
 
+-- see if any of the listed character names matches your character name
+-- returns true/false
+function AutoCategory.RuleFunc.AcctName(...)
+    local fn = "acctname" 
+    local pn = string.lower(GetDisplayName())
+    local ac = select( '#', ... )
+	if ac == 0 then
+		error( string.format("error: %s(): require arguments." , fn))
+	end
+	for ax = 1, ac do
+		
+		local arg = select( ax, ... )
+		
+		if not arg then
+			error( string.format("error: %s():  argument is nil." , fn))
+		end
+		
+		local findString
+		if type( arg ) == "number" then
+			findString = tostring(arg)
+			
+		elseif type( arg ) == "string" then
+			findString = arg
+			
+		else
+			error( string.format("error: %s(): argument is error." , fn ) )
+		end
+		if string.find(pn, findString, 1 ,true) then
+			return true
+		end
+	end
+	
+	return false
+end
+
 function AutoCategory.AddRuleFunc(name, func)
     AutoCategory.Environment[name] = func
 end
@@ -1692,6 +1727,7 @@ AutoCategory.Environment = {
 	charlevel    = AutoCategory.RuleFunc.CharLevel,
 	charcp       = AutoCategory.RuleFunc.CharCP,
     charname     = AutoCategory.RuleFunc.CharName,
+    acctname     = AutoCategory.RuleFunc.AcctName,
 
 	sellprice    = AutoCategory.RuleFunc.SellPrice,
 	stacksize    = AutoCategory.RuleFunc.StackSize,
