@@ -3,11 +3,13 @@
 [LIST]
 [*] Documentation in the wiki (help) has been updated and expanded.
 [*] Requires the latest version of LibSFUtils (version 52)
+[*] A new function [COLOR="MediumSeaGreen"]acctname("@name",...)[/COLOR]. This function takes one or more account names ("@name"s) as parameters and returns true if the current account matches any of the listed names. It returns false if the current account does not match any name in the list. This can be useful for "locking" rules only to trigger on specific accounts if you happen to have multiple accounts.
 [*] A new function [COLOR="MediumSeaGreen"]combined_autoset()[/COLOR]. This function behaves similarly to the autoset() function except that perfected set pieces will now be grouped together with their non-perfected set brothers under the non-perfected set name. For instance, the "Saxhleel Champion's Perfected Cuirass" will then get grouped with other "Saxhleel Champion" set items. You should not have both autoset() and combined_autoset() rules assigned to a bag, as the one with the highest priority will win, and the lower priority will have nothing to do (but will still take time to not do it). Requested by Tazmyr.
 [*] Added a menu item to the inventory context menu to get the item id for the inventory item that you are hovering over. Bring up the context menu while hovering (usually a right click) and look for the menu item "AC: Get Item Id" to select. It will display a message in chat with the name of the inventory item and its item id (suitable for use with the [COLOR="MediumSeaGreen"]isitemid()[/COLOR] rule function). The item id is identifying the type of the item - not that unique item - so the id will match against other stacks of the same thing in your inventory when evaluating the rule.
 [*] User category definitions (rules) have all been made accessible account-wide. (See Category Rule Changes below.) Predefined rules are no longer saved because they don't change.
 [*] Made the "Hide Category" ON/OFF only extend halfway across, so that it is not as easy to hit it accidentally while changing the category priority.
 [*] The collapses (+/-) on the categories in inventory are going to be reset to Uncollapsed All to begin with. Due to a bug with removing rules from a bag in the bag setting, and removing the corresponding collapse settings for the now removed rule, the saved collapses had become corrupted and filled with settings for rules that weren't even there.
+[*] Fixed initial load after first install to provide bag rules for use.
 [*] Lots of changes to the UI implementation to make it easier and less fragile (hopefully).
 [*] Code cleanup and refactoring. Lots and lots of testing.
 [*] Convert to use LibSFUtils event management. (Change should be transparent to users.)
