@@ -35,9 +35,6 @@ local AC = AutoCategory
 
 
 local logger = AutoCategory.logger
-do
-	--logger:SetEnabled(true)
-end
 
 -- uniqueIDs of items that have been updated (need rule re-execution), 
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
@@ -142,9 +139,9 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	--logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	--logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
 	return header_face
 end
 
@@ -170,7 +167,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
-	if cache.entriesByName[bagTypeId][cateName] then
+	if bagTypeId and cateName and cache.entriesByName[bagTypeId][cateName] then
 		if cache.entriesByName[bagTypeId][cateName].isHidden then
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
@@ -266,7 +263,7 @@ local function isHiddenEntry(itemEntry)
 		return true 
 	end
 	
-	return false --AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
+	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
 end
 
 local function isCollapsed(itemEntry)
@@ -283,26 +280,21 @@ local function runRulesOnEntry(itemEntry, specialType)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
 	if itemEntry.typeId == CATEGORY_SUBHEADER then return end
 	
-	--logger:Debug("itemEntry is not header so run rules")
 	local data = itemEntry.data
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
-	--logger:Debug(SF.str("bagId=", bagId, "  slotIndex=", slotIndex, " ", GetItemName(bagId, slotIndex)))
 	
 	local matched, categoryName, categoryPriority, bagTypeId, isHidden 
 				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
 	data.AC_matched = matched
 	if matched then
-		--logger:Debug(SF.str("matched, categoryName=",categoryName))
 		data.AC_categoryName = categoryName
 		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
 		data.AC_isHidden = isHidden
 		
 	else
-		--logger:Debug(SF.str("unmatched, categoryName=other"))
 		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
-		data.AC_sortPriorityName = string.format("%04d%s", 
-			9999 , data.AC_categoryName)
+		data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
 		-- if was not matched, then the isHidden value that was returned is not valid
 		data.AC_isHidden = isUngroupedHidden(bagTypeId)
 	end
@@ -372,7 +364,6 @@ local function constructEntryHash(itemEntry)
 	local newEntryHash = buildHashString(
 					data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
 					data.meetsUsageRequirement, data.locked, data.isJunk, hashFCOIS)
-	--logger:Debug(bagId,", ",slotIndex, " ", GetItemName(bagId, slotIndex)," - ", newEntryHash)
 	return newEntryHash
 end
 
@@ -507,8 +498,7 @@ local function createNewScrollData(scrollData, sortfn)
 		-- or else create an entry with count = 1
 		local data = itemEntry.data
 		local AC_categoryName = data.AC_categoryName
-		if not categoryList[AC_categoryName] then 
-		
+		if not categoryList[AC_categoryName] then 		
 			-- keep track of categories and required data
 			categoryList[AC_categoryName] =  {
 				AC_sortPriorityName = data.AC_sortPriorityName,
@@ -533,7 +523,7 @@ local function createNewScrollData(scrollData, sortfn)
 	
 	-- Create headers and append to newScrollData
 	for _, catInfo in pairs(categoryList) do ---> add tracked categories
-		if catInfo.AC_catCount ~= nil then --and catInfo.AC_catCount ~= 0 then
+		if catInfo.AC_catCount ~= nil then
 			local headerEntry = createHeaderEntry(catInfo)
 			table.insert(newScrollData, headerEntry)
 		end
@@ -638,11 +628,11 @@ function AutoCategory.HookKeyboardMode()
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 	
     AddTypeToList(rowHeight, ZO_PlayerInventoryList,  INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_CraftBagList,         INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,   INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_GuildBankBackpack,    INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_HouseBankBackpack,    INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest, INVENTORY_QUEST_ITEM)
+    AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
 	
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)

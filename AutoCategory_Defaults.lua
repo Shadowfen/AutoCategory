@@ -223,7 +223,6 @@ AutoCategory.defaultCollapses = {
     }
 
 AutoCategory.defaultSettings = {
-	--rules = AutoCategory.predefinedRules,
 	bags = {
 		[AC_BAG_TYPE_BACKPACK] = {
 			rules = {},
@@ -248,64 +247,13 @@ AutoCategory.defaultSettings = {
 	accountWide = true,
 }
  
-AutoCategory.defaultAcctSettings = {
---	rules = {}, --AutoCategory.predefinedRules,
-	bags = {
-		[AC_BAG_TYPE_BACKPACK] = {
-            rules = {},
-		},
-		[AC_BAG_TYPE_BANK] = {
-            rules = {},
-		},
-		[AC_BAG_TYPE_GUILDBANK] = {
-            rules = {},
-		},
-		[AC_BAG_TYPE_CRAFTBAG] = {
-            rules = {},
-		},
-		[AC_BAG_TYPE_CRAFTSTATION] = {
-            rules = {},
-		},
-		[AC_BAG_TYPE_HOUSEBANK] = {
-            rules = {},
-		},
-	}, 
-	appearance = {
-		["CATEGORY_FONT_NAME"] = "Univers 67",
-		["CATEGORY_FONT_STYLE"] = "soft-shadow-thin",
-		["CATEGORY_FONT_COLOR"] =  {
-			[1] = 1,
-			[2] = 1,
-			[3] = 1,
-			[4] = 1,
-		},
-		["HIDDEN_CATEGORY_FONT_COLOR"] =  {
-			[1] = 125,
-			[2] = 125,
-			[3] = 125,
-			[4] = 1,
-		},
-		["CATEGORY_FONT_SIZE"] = 18,
-		["CATEGORY_FONT_ALIGNMENT"] = 1,
-		["CATEGORY_OTHER_TEXT"] = L(SI_AC_DEFAULT_NAME_CATEGORY_OTHER),
-		["CATEGORY_HEADER_HEIGHT"] = 52, 
-	},
-	general = {
-		["SHOW_MESSAGE_WHEN_TOGGLE"] = false,
-		["SHOW_CATEGORY_ITEM_COUNT"] = true,
-		["SHOW_CATEGORY_COLLAPSE_ICON"] = true,
-		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
-		["SHOW_CATEGORY_SET_TITLE"] = true,
-	},
-    collapses = AutoCategory.defaultCollapses,
-}
 
 AutoCategory.defaultAcctBagSettings = {
 	bags = {
 		[AC_BAG_TYPE_BACKPACK] = {
 			rules = {
 				{
-					["priority"] = 1000,
+					["priority"] = 975,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE),
 				},
 				{
@@ -413,7 +361,7 @@ AutoCategory.defaultAcctBagSettings = {
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_PROVISIONING),
 				},
 				{
-					["priority"] = 100,
+					["priority"] = 90,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS),
 				},
 				{
@@ -942,6 +890,38 @@ AutoCategory.defaultCharSettings = {
     collapses = AutoCategory.defaultCollapses,
 }
 
+AutoCategory.defaultAcctSettings = {
+	bags = AutoCategory.defaultAcctBagSettings.bags,
+	appearance = {
+		["CATEGORY_FONT_NAME"] = "Univers 67",
+		["CATEGORY_FONT_STYLE"] = "soft-shadow-thin",
+		["CATEGORY_FONT_COLOR"] =  {
+			[1] = 1,
+			[2] = 1,
+			[3] = 1,
+			[4] = 1,
+		},
+		["HIDDEN_CATEGORY_FONT_COLOR"] =  {
+			[1] = 125,
+			[2] = 125,
+			[3] = 125,
+			[4] = 1,
+		},
+		["CATEGORY_FONT_SIZE"] = 18,
+		["CATEGORY_FONT_ALIGNMENT"] = 1,
+		["CATEGORY_OTHER_TEXT"] = L(SI_AC_DEFAULT_NAME_CATEGORY_OTHER),
+		["CATEGORY_HEADER_HEIGHT"] = 52, 
+	},
+	general = {
+		["SHOW_MESSAGE_WHEN_TOGGLE"] = false,
+		["SHOW_CATEGORY_ITEM_COUNT"] = true,
+		["SHOW_CATEGORY_COLLAPSE_ICON"] = true,
+		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
+		["SHOW_CATEGORY_SET_TITLE"] = true,
+	},
+	collapses = AutoCategory.defaultCollapses,
+}
+	
 AutoCategory.default_rules = {
 	rules = {
 	},

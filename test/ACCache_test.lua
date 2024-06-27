@@ -21,8 +21,8 @@ require "LibSFUtils.LibSFUtils"
 require "LibSFUtils.SFUtils_Tables"
 require "LibSFUtils.SFUtils_LoadLanguage"
 local SF = LibSFUtils
-require "AutoCategory.AutoCategory_Global"
-require "AutoCategory.AutoCategory_Defaults"
+--require "AutoCategory.AutoCategory_Global"
+--require "AutoCategory.AutoCategory_Defaults"
 --require "AutoCategory.Hooks_Keyboard"
 require "AutoCategory.AutoCategory"
 local AC = AutoCategory
@@ -31,7 +31,7 @@ local saved = AutoCategory.saved
 local cache = AutoCategory.cache
 
 
-local mn = "Cache"
+local mn = "Class"
 
 local function Cache_testIsValidRule()
     local tn = "testIsValidRule"

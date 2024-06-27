@@ -5,21 +5,23 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
+AC_UI = {}
+
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 local cache = AutoCategory.cache
 local saved = AutoCategory.saved
 
 --cache data for dropdown: 
-cache.bags_svt.choices = {
-	[AC_BAG_TYPE_BACKPACK]     = L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK), 
-	[AC_BAG_TYPE_BANK]         = L(SI_AC_BAGTYPE_SHOWNAME_BANK),
-	[AC_BAG_TYPE_GUILDBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
-	[AC_BAG_TYPE_CRAFTBAG]     = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
-	[AC_BAG_TYPE_CRAFTSTATION] = L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
-	[AC_BAG_TYPE_HOUSEBANK]    = L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
+cache.bags_cvt.choices = {
+	L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK),
+	L(SI_AC_BAGTYPE_SHOWNAME_BANK),
+	L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
+	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
+	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
+	L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
 }
-cache.bags_svt.choicesValues = {
+cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_BACKPACK,
 	AC_BAG_TYPE_BANK,
 	AC_BAG_TYPE_GUILDBANK,
@@ -27,7 +29,7 @@ cache.bags_svt.choicesValues = {
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
 }
-cache.bags_svt.choicesTooltips = {  
+cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK),
 	L(SI_AC_BAGTYPE_TOOLTIP_BANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
@@ -53,32 +55,33 @@ local function header(strId)
 	}
 end
 
-local CVT = AutoCategory.CVT
--- -------------------------------------------------------
-local function newCVT(ndx)
-	local tbl = {
-		choices = {}, choicesValues = {}, choicesTooltips = {},
-	}
-	if ndx == nil then return tbl end
-	indexValue = ndx
-	return tbl
+local function description(textId, titleId)
+	return
+		{
+			type = "description",
+			text = textId, -- text or string id or function returning a string
+			title = titleId, -- or string id or function returning a string (optional)
+			width = "full", --or "half" (optional)
+		}
 end
 
+
+-- aliases
+local CVT = AutoCategory.CVT
+
+-- -------------------------------------------------------
+
+-- CVT containers for the dropdowns that we use
 local fieldData = {
-	editBag_cvt = newCVT(AC_BAG_TYPE_BACKPACK),
-	editBagRule = newCVT(),
-	addCatTag =   newCVT(),
-	addCatRule =  newCVT(),
-	editRuleTag = newCVT(),
-	editRuleCat = newCVT(),
-	importBag =   newCVT(AC_BAG_TYPE_BACKPACK),
+	importBag =   CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
 }
 
 local currentRule = AC.CreateNewRule("","")
+local currentBagRule = nil
 
 
 local dropdownFontStyle	= {
-	'none', 'outline', 'thin-outline', 'thick-outline', 
+	'none', 'outline', 'thin-outline', 'thick-outline',
 	'shadow', 'soft-shadow-thin', 'soft-shadow-thick',
 }
 
@@ -89,6 +92,1180 @@ dropdownFontAlignment.choices = {
 	L(SI_AC_ALIGNMENT_RIGHT)
 }
 dropdownFontAlignment.choicesValues = {0, 1, 2}
+
+-- This is not a "class"! It is more of a singleton instance.
+AC_UI.BagSet_SelectBag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+local BagSet_SelectBag_LAM = AC_UI.BagSet_SelectBag_LAM
+
+AC_UI.BagSet_HideOther_LAM = AC.BaseUI:New("AC_CHECKBOX_HIDEOTHER")	-- checkbox
+local BagSet_HideOther_LAM = AC_UI.BagSet_HideOther_LAM
+
+AC_UI.BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+local BagSet_SelectRule_LAM = AC_UI.BagSet_SelectRule_LAM
+
+AC_UI.BagSet_Priority_LAM = AC.BaseUI:New()		-- slider
+local BagSet_Priority_LAM = AC_UI.BagSet_Priority_LAM
+
+AC_UI.BagSet_HideCat_LAM = AC.BaseUI:New()		-- checkbox
+local BagSet_HideCat_LAM = AC_UI.BagSet_HideCat_LAM
+
+AC_UI.BagSet_EditCat_LAM = AC.BaseUI:New()	-- button
+local BagSet_EditCat_LAM = AC_UI.BagSet_EditCat_LAM
+
+AC_UI.BagSet_RemoveCat_LAM = AC.BaseUI:New()	-- button
+local BagSet_RemoveCat_LAM = AC_UI.BagSet_RemoveCat_LAM
+
+AC_UI.AddCat_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_TAG")	-- only uses choices
+local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
+
+AC_UI.AddCat_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_RULE",nil ,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+local AddCat_SelectRule_LAM = AC_UI.AddCat_SelectRule_LAM
+
+AC_UI.AddCat_EditRule_LAM = AC.BaseUI:New()	-- button
+local AddCat_EditRule_LAM = AC_UI.AddCat_EditRule_LAM
+
+AC_UI.AddCat_BagAdd_LAM = AC.BaseUI:New()	-- button
+local AddCat_BagAdd_LAM = AC_UI.AddCat_BagAdd_LAM
+
+AC_UI.ImpExp_ExportAll_LAM = AC.BaseUI:New()	-- button
+local ImpExp_ExportAll_LAM = AC_UI.ImpExp_ExportAll_LAM
+
+AC_UI.ImpExp_ImportBag_LAM = AC.BaseDD:New("AC_DROPDOWN_IMPORTBAG_BAG", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+local ImpExp_ImportBag_LAM = AC_UI.ImpExp_ImportBag_LAM
+
+AC_UI.ImpExp_Import_LAM = AC.BaseUI:New()	-- button
+local ImpExp_Import_LAM = AC_UI.ImpExp_Import_LAM
+
+AC_UI.CatSet_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_TAG") -- only uses choices
+local CatSet_SelectTag_LAM = AC_UI.CatSet_SelectTag_LAM
+
+AC_UI.CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  CVT.USE_TOOLTIPS) -- uses choicesTooltips
+local CatSet_SelectRule_LAM = AC_UI.CatSet_SelectRule_LAM
+
+AC_UI.CatSet_NewCat_LAM = AC.BaseUI:New() 	-- button
+local CatSet_NewCat_LAM = AC_UI.CatSet_NewCat_LAM
+
+AC_UI.CatSet_CopyCat_LAM = AC.BaseUI:New() 	-- button
+local CatSet_CopyCat_LAM = AC_UI.CatSet_CopyCat_LAM
+
+AC_UI.CatSet_DeleteCat_LAM = AC.BaseUI:New()	-- button
+local CatSet_DeleteCat_LAM = AC_UI.CatSet_DeleteCat_LAM
+
+AC_UI.CatSet_NameEdit_LAM = AC.BaseUI:New("AC_EDITBOX_EDITRULE_NAME") -- editbox
+local CatSet_NameEdit_LAM = AC_UI.CatSet_NameEdit_LAM
+
+AC_UI.CatSet_TagEdit_LAM = AC.BaseUI:New("AC_EDITBOX_EDITRULE_TAG")	-- editbox
+local CatSet_TagEdit_LAM = AC_UI.CatSet_TagEdit_LAM
+
+
+local function CatSet_DisplayRule(rule)
+	CatSet_SelectTag_LAM:refresh()
+	CatSet_SelectTag_LAM:setValue(rule.tag)
+
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(rule.name)
+	CatSet_SelectRule_LAM:updateControl()
+
+	currentRule = rule
+	AC_UI.checkCurrentRule()
+end
+
+local function getCurrentBagId()
+	return BagSet_SelectBag_LAM:getValue()
+end
+AC.getCurrentBagId = getCurrentBagId   -- make available
+
+--warning message
+local warningDuplicatedName = {
+	warningMessage = nil,
+}
+
+-- returns the current bagSetting table (or nil if the bag was not found)
+-- if parameter bagId is nil then get the current bagId from BagSet
+-- bagSetting table = {isOtherHidden, {rules{name, priority, isHidden}} }
+local function getBagSettings(bagId)
+	if not bagId then bagId = getCurrentBagId() end
+	if saved and saved.bags then
+		return saved.bags[bagId]	-- still might be nil
+	end
+	return nil
+end
+
+
+-- customization of BaseDD for BagSet_SelectBag_LAM
+-- ------------------------------------------------
+AC_UI.BagSet_SelectBag_LAM.defaultVal = AC_BAG_TYPE_BACKPACK
+
+-- refresh the selection value of the cvt lists for BagSet_SelectBag_LAM from the 
+-- current contents of the cache.bags_cvt list.
+function AC_UI.BagSet_SelectBag_LAM:refresh()
+	if self:getValue() == nil then
+		self:select(cache.bags_cvt.choicesValues)
+	end
+end
+
+function AC_UI.BagSet_SelectBag_LAM:getValue()
+	return self.cvt.indexValue
+end
+
+function AC_UI.BagSet_SelectBag_LAM:setValue(value)
+	if value == self:getValue() then
+		-- nothing to do because no change
+		return
+	end
+
+	local bs = getBagSettings(value)
+	--if not bs then return end
+
+	-- value will always be a valid cvt value, so we don't need to check CVT lists first
+	self.cvt.indexValue = value
+	-- we don't need to add/remove for the CVT as those lists are static
+
+	BagSet_HideOther_LAM:setValue(bs.isUngroupedHidden)
+
+	-- manage related control values
+	AC_UI.RefreshDropdownData()
+
+	BagSet_SelectRule_LAM:clearIndex()
+	BagSet_SelectRule_LAM:refresh()
+
+	--reset add rule's selection, since all data will be changed.
+	AddCat_SelectRule_LAM:clearIndex()
+	AddCat_SelectRule_LAM:refresh()
+
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.BagSet_SelectBag_LAM:controlDef()
+	-- Bag     - AC_DROPDOWN_EDITBAG_BAG
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_BS_DROPDOWN_BAG,
+			scrollable = false,
+			tooltip = L(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP),
+			choices         = self.cvt.choices,
+			choicesValues   = self.cvt.choicesValues,
+			choicesTooltips = self.cvt.choicesTooltips,
+
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) self:setValue(value) end,
+			default = AC_BAG_TYPE_BACKPACK,
+			width = "half",
+			reference = self:getControlName(),
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for BagSet_HideOther_LAM checkbox
+-- -------------------------------------------------------
+function AC_UI.BagSet_HideOther_LAM:getValue()
+	local bs = getBagSettings()
+	if not bs then
+		-- no such bag
+		return false
+	end
+	return bs.isUngroupedHidden
+end
+
+function AC_UI.BagSet_HideOther_LAM:setValue(value)
+	local bs = getBagSettings()
+	if not bs then return false end
+
+	if value == false then 
+		value = nil
+	end
+	bs.isUngroupedHidden = value
+
+end
+
+function AC_UI.BagSet_HideOther_LAM:controlDef()
+	-- Hide ungrouped in bag Checkbox
+	return
+		{
+			type = "checkbox",
+			name = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN,
+			tooltip = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP,
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) self:setValue(value) end,
+			default = false,
+			width = "half",
+			reference = self:getControlName(),
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for BagSet_HideCat_LAM checkbox
+-- -------------------------------------------------------
+function AC_UI.BagSet_HideCat_LAM:getValue()
+	local bag = getCurrentBagId()
+	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	if bag and ruleNm and cache.entriesByName[bag][ruleNm] then
+		return cache.entriesByName[bag][ruleNm].isHidden or false
+	end
+	return 0
+end
+
+function AC_UI.BagSet_HideCat_LAM:setValue(value)
+	local bag = getCurrentBagId()
+	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	if cache.entriesByName[bag][ruleNm] then
+		local isHidden = cache.entriesByName[bag][ruleNm].isHidden or false
+		if isHidden ~= value then
+			if not value then value = nil end
+
+			cache.entriesByName[bag][ruleNm].isHidden = value
+			AutoCategory.cacheBagInitialize()
+			AC_UI.RefreshDropdownData()
+			BagSet_SelectRule_LAM:setValue(ruleNm)
+			AC_UI.RefreshControls()
+		end
+	end
+end
+
+function AC_UI.BagSet_HideCat_LAM:controlDef()
+	-- Hide Category Checkbox
+	return
+		{
+			type = "checkbox",
+			name = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN,
+			tooltip = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP,
+			getFunc = function()	return self:getValue() end,
+			setFunc = function(value)  self:setValue(value) end,
+			disabled = function()
+				if BagSet_SelectRule_LAM:getValue() == nil then
+					return true
+				end
+				if BagSet_SelectRule_LAM:size() == 0 then
+					return true
+				end
+				return false
+			end,
+			default = false,
+			width = "half",
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseDD for BagSet_SelectRule_LAM
+-- ------------------------------------------------
+-- refresh the contents of the cvt lists for BagSet_SelectRule_LAM from the 
+-- current contents of the cache.entriesByBag[bagId] list.
+function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
+	local currentBag = bagId or getCurrentBagId()
+	local ndx = BagSet_SelectRule_LAM:getValue()
+
+	AC.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	do
+		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
+		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+		if currentBag and cache.entriesByBag[currentBag] then
+			AC.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			dataCurrentRules_EditBag:assign(cache.entriesByBag[currentBag])
+		end
+		self:assign(dataCurrentRules_EditBag)
+	end
+	if not ndx then 
+		self:select({})
+	else
+		self:select(ndx)
+	end
+	self:setValue(self:getValue())
+	AC.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+end
+
+-- set the selection of the BagSet_SelectRule_LAM field
+function AC_UI.BagSet_SelectRule_LAM:setValue(val)
+	if not val then return end
+	--if self:getValue() == val then return end
+	self:select(val)
+	currentBagRule = val
+	local bagrule = cache.entriesByName[getCurrentBagId()][val]
+	--AC.logger:Debug("bagule = "..type(bagrule))
+	--AC.logger:Debug("retrieving bagrule for name "..tostring(val))
+	--AC.logger:Debug("bagule.name = "..tostring(bagrule.name))
+	--AC.logger:Debug("bagule.priority = "..tostring(bagrule.priority))
+	if bagrule and bagrule.priority then
+		BagSet_Priority_LAM:setValue(bagrule.priority)
+	end
+end
+
+function AC_UI.BagSet_SelectRule_LAM:controlDef()
+	-- Rule name   - AC_DROPDOWN_EDITBAG_RULE
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
+			tooltip = "",
+			scrollable = true,
+			choices         = self.cvt.choices,
+			choicesValues   = self.cvt.choicesValues,
+			choicesTooltips = self.cvt.choicesTooltips,
+
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) self:setValue(value) end,
+			disabled = function() return self:size() == 0 end,
+			width = "half",
+			reference = self:getControlName(),
+		}
+end
+-- ----------------------------------------------------------
+
+-- customization of BaseUI for BagSet_Priority_LAM
+-- ------------------------------------------------
+AC_UI.BagSet_Priority_LAM.maxVal = 1000
+AC_UI.BagSet_Priority_LAM.minVal = 0
+
+function AC_UI.BagSet_Priority_LAM:getValue()
+	local bag = getCurrentBagId()
+	local bagrule = currentBagRule --BagSet_SelectRule_LAM:getValue()
+	if bag and bagrule and cache.entriesByName[bag][bagrule] then
+		return cache.entriesByName[bag][bagrule].priority
+	end
+	return self.minVal
+end
+
+function AC_UI.BagSet_Priority_LAM:setValue(value)
+
+	if value > self.maxVal then
+		value = self.maxVal
+	end
+	if value < self.minVal then
+		value = self.minVal
+	end
+	local bag = getCurrentBagId()
+	local ruleName = currentBagRule or AC_UI.BagSet_SelectRule_LAM:getValue()
+	if ruleName == nil then return end
+
+	if cache.entriesByName[bag][ruleName] then
+		if cache.entriesByName[bag][ruleName].priority == value then return end
+		--local bagrule = cache.entriesByName[bag][ruleName]
+		cache.entriesByName[bag][ruleName].priority = value
+		AC.cacheInitialize()
+		CatSet_SelectRule_LAM:setValue(ruleName)
+		BagSet_SelectRule_LAM:setValue(ruleName)
+		BagSet_SelectRule_LAM:refresh()
+		AC_UI.RefreshControls()
+	end
+end
+
+function AC_UI.BagSet_Priority_LAM:controlDef()
+	-- Priority Slider
+	return
+		{
+			type = "slider",
+			name = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY,
+			tooltip = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP,
+			min = self.minVal,
+			max = self.maxVal,
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) self:setValue(value) end,
+			disabled = function()
+				if BagSet_SelectRule_LAM:getValue() == nil then
+					return true
+				end
+				if BagSet_SelectRule_LAM:size() == 0 then
+					return true
+				end
+				return false
+			end,
+			default = 0,
+			width = "half",
+		}
+end
+-- ------------------------------------------------
+
+
+-- customization of BaseUI for BagSet_EditCat_LAM Button
+-- ------------------------------------------------
+function AC_UI.BagSet_EditCat_LAM:execute()
+	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	local rule = AC.GetRuleByName(ruleName)
+	if rule then
+		CatSet_DisplayRule(rule)
+		AC_UI.ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
+		AC_UI.ToggleSubmenu("AC_SUBMENU_CATEGORY_SETTING", true)
+	end
+end
+
+function AC_UI.BagSet_EditCat_LAM:controlDef()
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_BS_BUTTON_EDIT,
+			tooltip = SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP,
+			func = function() self:execute() end,
+			disabled = function()
+				return BagSet_SelectRule_LAM:size() == 0 or BagSet_SelectRule_LAM:getValue() == nil
+			end,
+			width = "half",
+		}
+end
+-- ----------------------------------------------------------
+
+-- customization of BaseUI for BagSet_RemoveCat_LAM Button
+-- ----------------------------------------------------------
+function AC_UI.BagSet_RemoveCat_LAM:execute()
+	local bagId = getCurrentBagId()
+	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	local savedbag = saved.bags[bagId]
+	for i = 1, #savedbag.rules do
+		local bagEntry = savedbag.rules[i]
+		if bagEntry.name == ruleName then
+			table.remove(savedbag.rules, i)
+			break
+		end
+	end
+	BagSet_SelectRule_LAM.cvt:removeItemChoiceValue(ruleName)
+	if BagSet_SelectRule_LAM:getValue() == nil and BagSet_SelectRule_LAM:size() > 0 then
+		BagSet_SelectRule_LAM:select({}) 	-- select first
+	end
+
+	AC.cacheBagInitialize()
+	BagSet_SelectRule_LAM:refresh()
+	AddCat_SelectRule_LAM:refresh()
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.BagSet_RemoveCat_LAM:controlDef()
+	-- Remove Category from Bag Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_BS_BUTTON_REMOVE,
+			tooltip = SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP,
+			func = function() self:execute() end,
+			disabled = function() return BagSet_SelectRule_LAM:size() == 0 end,
+			width = "half",
+		}
+
+end
+-- ----------------------------------------------------------
+
+-- customization of BaseDD for AddCat_SelectTag_LAM
+-- ----------------------------------------------------------
+-- refresh the selection value of the cvt lists for AddCat_SelectTag_LAM from the 
+-- current contents of the cache.tags list.
+function AC_UI.AddCat_SelectTag_LAM:refresh()
+	if self:getValue() == nil then
+		self:select(cache.tags)
+	end
+end
+
+function AC_UI.AddCat_SelectTag_LAM:setValue(value)
+	local oldvalue = self:getValue()
+	if oldvalue == value then return end
+
+	self.cvt.indexValue = value
+
+	AddCat_SelectRule_LAM:clearIndex()
+	AddCat_SelectRule_LAM:assign(AddCat_SelectRule_LAM.filterRules(getCurrentBagId(),value))
+	AddCat_SelectRule_LAM:refresh()
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.AddCat_SelectTag_LAM:controlDef()
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_AC_DROPDOWN_TAG,
+			scrollable = true,
+			choices         = self.cvt.choices,
+			sort = "name-up",
+
+			getFunc = function()
+				return self:getValue()
+			end,
+			setFunc = function(value) self:setValue(value) end,
+			width = "half",
+			disabled = function() return self.cvt:size() == 0 end,
+			reference = self:getControlName(),
+		}
+end
+-- ----------------------------------------------------------
+
+-- customization of BaseDD for AddCat_SelectRule_LAM
+-- ----------------------------------------------------------
+
+-- will return empty CVT if no rules match the filter
+function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
+	if not bagId or not tag then return nil end
+	if not cache.entriesByName[bagId] then
+		cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId] )
+	end
+
+	-- filter out already-in-use rules from the "add category" list for bag rules
+	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(),nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+	dataCurrentRules_AddCategory.dirty = 1
+	if not cache.rulesByTag_cvt[tag] then
+		-- no rules available for tag
+		return dataCurrentRules_AddCategory
+	end
+
+	local rbyt = cache.rulesByTag_cvt[tag]
+	for i = 1, rbyt:size() do
+		local value = rbyt.choices[i]
+		if value and cache.entriesByName[bagId][value] == nil then
+			--add the rule if not in bag
+			dataCurrentRules_AddCategory:append(rbyt.choices[i], nil, rbyt.choicesTooltips[i])
+		end
+	end
+	return dataCurrentRules_AddCategory
+end
+
+-- refresh the selection value of the cvt lists for AddCat_SelectRule_LAM from the 
+-- output of the filterRules().
+function AC_UI.AddCat_SelectRule_LAM:refresh()
+	local currentBag = getCurrentBagId()
+	do
+		-- dropdown lists for Adding Rules to Bag selection (AC_DROPDOWN_ADDCATEGORY_RULE)
+		local latag = AddCat_SelectTag_LAM:getValue()
+		local dataCurrentRules_AddCategory = AddCat_SelectRule_LAM.filterRules(currentBag, latag)
+		if dataCurrentRules_AddCategory then
+			AddCat_SelectRule_LAM:assign(dataCurrentRules_AddCategory)
+			AddCat_SelectRule_LAM:select()
+		end
+	end
+
+end
+
+function AC_UI.AddCat_SelectRule_LAM:setValue(value)
+	self:select(value)
+end
+
+function AC_UI.AddCat_SelectRule_LAM:controlDef()
+	-- Categories currently unused dropdown - AC_DROPDOWN_ADDCATEGORY_RULE
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_AC_DROPDOWN_CATEGORY,
+			scrollable = true,
+			choices = self.cvt.choices,
+			--choicesValues = self.cvt.choicesValues,
+			choicesTooltips = self.cvt.choicesTooltips,
+			sort = "name-up",
+
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) self:setValue(value) end,
+			disabled = function() return self:size() == 0 end,
+			width = "half",
+			reference = self:getControlName(),
+		}
+
+end
+-- ----------------------------------------------------------
+
+-- customization of BaseUI for AddCat_EditRule_LAM button
+-- ----------------------------------------------------------
+function AC_UI.AddCat_EditRule_LAM:execute()
+	local ruleName = AddCat_SelectRule_LAM:getValue()
+	local rule = AC.GetRuleByName(ruleName)
+	if not rule then return end
+
+	CatSet_DisplayRule(rule)
+	AC_UI.RefreshDropdownData()
+	currentRule = rule
+	CatSet_SelectTag_LAM:setValue(rule.tag)
+	CatSet_SelectTag_LAM:refresh()
+	--CatSet_SelectTag_LAM:updateControl()
+
+	AC_UI.checkCurrentRule()
+	AC_UI.RefreshDropdownData()
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(rule.name)
+	--CatSet_SelectRule_LAM:updateControl()
+
+	AC_UI.ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
+	AC_UI.ToggleSubmenu("AC_SUBMENU_CATEGORY_SETTING", true)
+end
+
+function AC_UI.AddCat_EditRule_LAM:controlDef()
+                -- Edit Rule Category Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_AC_BUTTON_EDIT,
+			tooltip = SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP,
+			func = function()	self:execute() end,
+			disabled = function() return AddCat_SelectRule_LAM:size() == 0 end,
+			width = "half",
+		}
+
+end
+-- ----------------------------------------------------------
+
+-- -------------------------------------------------------
+-- customization of BaseUI for AddCat_BagAdd_LAM button
+function AC_UI.AddCat_BagAdd_LAM:execute()
+	local bagId = getCurrentBagId()
+	local ruleName = AddCat_SelectRule_LAM:getValue()
+	assert(cache.entriesByName[bagId][ruleName] == nil, "Bag(" .. bagId .. ") already has the rule: ".. ruleName)
+
+	if cache.entriesByName[bagId][ruleName] then return end
+
+	local entry = AC.CreateNewBagRule(ruleName)
+	saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
+	currentBagRule = entry.name
+
+	AutoCategory.cacheBagInitialize()
+
+	BagSet_SelectRule_LAM:select(ruleName)
+	BagSet_Priority_LAM:setValue(entry.priority)
+	AddCat_SelectRule_LAM.cvt:removeItemChoiceValue(ruleName)
+
+	AddCat_SelectRule_LAM:refresh()
+	AddCat_SelectRule_LAM:updateControl()
+
+	BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:updateControl()
+
+	AddCat_SelectRule_LAM:updateControl()
+end
+
+function AC_UI.AddCat_BagAdd_LAM:controlDef()
+	-- Add to Bag Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_AC_BUTTON_ADD,
+			tooltip = SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP,
+			func = function()  self:execute() end,
+			disabled = function() return AddCat_SelectRule_LAM:size() == 0 end,
+			width = "half",
+		}
+end
+-- -------------------------------------------------------
+
+local function copyBagToBag(srcBagId, destBagId)
+	saved.bags[destBagId] = SF.deepCopy( saved.bags[srcBagId] )
+end
+
+-- customization of BaseUI for ImpExp_ExportAll_LAM button
+-- -------------------------------------------------------
+function AC_UI.ImpExp_ExportAll_LAM:execute()
+	local selectedBag = getCurrentBagId()
+	for bagId = 1, 6 do
+		if bagId ~= selectedBag then
+			copyBagToBag(selectedBag, bagId)
+		end
+	end
+
+	AC_UI.BagSet_SelectRule_LAM:clearIndex()
+	--reset add rule's selection, since all data will be changed.
+	AddCat_SelectRule_LAM:clearIndex()
+
+	AutoCategory.cacheInitialize()
+	AC_UI.RefreshDropdownData()
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.ImpExp_ExportAll_LAM:controlDef()
+	-- Export To All Bags Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS,
+			tooltip = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP,
+			func = function() self:execute() end,
+			width = "full",
+		}
+end
+-- -------------------------------------------------------
+
+
+-- customization of BaseDD for ImpExp_ImportBag_LAM
+-- -------------------------------------------------------
+function AC_UI.ImpExp_ImportBag_LAM:setValue(value)
+	self:select(value)
+end
+
+function AC_UI.ImpExp_ImportBag_LAM:controlDef()
+	-- Import From Bag - AC_DROPDOWN_IMPORTBAG_BAG
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG,
+			scrollable = false,
+			tooltip = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP,
+			choices = self.cvt.choices,
+			choicesValues = self.cvt.choicesValues,
+			choicesTooltips = self.cvt.choicesTooltips,
+
+			getFunc = function() return self:getValue() end,
+			setFunc = function(value) 	self:setValue(value) end,
+			default = AC_BAG_TYPE_BACKPACK,
+			width = "half",
+			reference = self:getControlName(),
+		}
+
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for ImpExp_Import_LAM button
+-- -------------------------------------------------------
+function AC_UI.ImpExp_Import_LAM:execute()
+
+	local bagId = getCurrentBagId()
+	local srcBagId = ImpExp_ImportBag_LAM:getValue()
+	copyBagToBag(srcBagId, bagId)
+
+	BagSet_SelectRule_LAM:clearIndex()
+	--reset add rule's selection, since all data will be changed.
+	AddCat_SelectRule_LAM:clearIndex()
+
+	AutoCategory.cacheInitialize()
+	AC_UI.RefreshDropdownData()
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.ImpExp_Import_LAM:controlDef()
+	-- Import Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_IBS_BUTTON_IMPORT,
+			tooltip = SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP,
+			func = function() self:execute() end,
+			disabled = function()
+				return getCurrentBagId() == ImpExp_ImportBag_LAM:getValue()
+			end,
+			width = "half",
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseDD for CatSet_SelectTag_LAM
+-- -------------------------------------------------------
+function AC_UI.CatSet_SelectTag_LAM:setValue(value)
+	local oldvalue = self:getValue()
+	if oldvalue == value then return end
+
+	self:select(value)
+
+	CatSet_SelectRule_LAM:assign(cache.rulesByTag_cvt[value])
+	if currentRule.tag == value then
+		CatSet_SelectRule_LAM:select(currentRule.name)
+	end
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:updateControl()
+
+	AddCat_SelectTag_LAM:assign({choices=cache.tags})
+	AddCat_SelectTag_LAM:updateControl()
+
+	AddCat_SelectRule_LAM:updateControl()
+end
+
+-- refresh the value of the cvt lists for CatSet_SelectTag_LAM from the 
+-- current contents of the cache.tags list.
+function AC_UI.CatSet_SelectTag_LAM:refresh()
+	if self:getValue() == nil then
+		self:select(cache.tags)
+	end
+end
+
+function AC_UI.CatSet_SelectTag_LAM:controlDef()
+	return
+		-- Tags - AC_DROPDOWN_EDITRULE_TAG
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_CS_DROPDOWN_TAG,
+			tooltip = SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP,
+			scrollable = true,
+			choices = self.cvt.choices,
+			sort = "name-up",
+
+			getFunc = function()
+				return self:getValue()
+			end,
+
+			setFunc = function(value) self:setValue(value) end,
+			width = "half",
+			disabled = function() return CatSet_SelectTag_LAM:size() == 0 end,
+			reference = self:getControlName(),
+		}
+end
+-- -------------------------------------------------------
+
+
+-- customization of BaseDD for CatSet_SelectRule_LAM
+-- -------------------------------------------------------
+function AC_UI.CatSet_SelectRule_LAM:getValue()
+	AC.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+  	return self.cvt.indexValue
+end
+
+-- refresh the contents and value of the cvt lists for CatSet_SelectRule_LAM from the 
+-- current contents of the cache.rulesByTag_cvt[tag] list.
+function AC_UI.CatSet_SelectRule_LAM:refresh()
+	local ltag = CatSet_SelectTag_LAM:getValue()
+	if not ltag then return end
+
+	-- dropdown lists for Edit Rule (Category) selection (AC_DROPDOWN_EDITRULE_RULE)
+	local dataCurrentRules_EditRule = CVT:New(nil,nil,CVT.USE_TOOLTIPS)
+	local oldndx = self:getValue()
+	if cache.rulesByTag_cvt[ltag] then
+		dataCurrentRules_EditRule:assign(cache.rulesByTag_cvt[ltag])
+	end
+	self:assign(dataCurrentRules_EditRule)
+	if oldndx then
+		self:select(oldndx)
+	end
+	if self:getValue() == nil then
+		self:select({})	-- select first
+	end
+end
+
+function AC_UI.CatSet_SelectRule_LAM:setValue(value)
+	self:select(value)
+	currentRule = AC.GetRuleByName(value)
+	AC_UI.checkCurrentRule()
+end
+
+function AC_UI.CatSet_SelectRule_LAM:controlDef()
+	-- Categories - AC_DROPDOWN_EDITRULE_RULE
+	return
+		{
+			type = "dropdown",
+			name = SI_AC_MENU_CS_DROPDOWN_CATEGORY,
+			scrollable = true,
+			choices = self.cvt.choices,
+			choicesTooltips =  self.cvt.choicesTooltips,
+			sort = "name-up",
+
+			getFunc = function()
+				currentRule = AC.GetRuleByName(self:getValue())
+				return self:getValue()
+			end,
+			setFunc = function(value) self:setValue(value) end,
+			disabled = function() return self:size() == 0 end,
+			width = "half",
+			reference = self:getControlName(),
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for CatSet_NewCat_LAM button
+-- -------------------------------------------------------
+function AC_UI.CatSet_NewCat_LAM:execute()
+	local newName = AC.GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
+	local tag = CatSet_SelectTag_LAM:getValue()
+	if tag == "" then
+		tag = AC_EMPTY_TAG_NAME
+	end
+	local newRule = AC.CreateNewRule(newName, tag)
+	cache.AddRule(newRule)
+
+	currentRule = newRule
+
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(currentRule.name)
+	CatSet_SelectRule_LAM:updateControl()
+
+	CatSet_SelectTag_LAM:setValue(currentRule.tag)
+	CatSet_SelectTag_LAM:refresh()
+	CatSet_SelectTag_LAM:updateControl()
+
+	AddCat_SelectTag_LAM:setValue(currentRule.tag)
+	AddCat_SelectRule_LAM:assign(AddCat_SelectRule_LAM.filterRules(getCurrentBagId(),currentRule.tag))
+	AddCat_SelectTag_LAM:refresh()
+	AddCat_SelectRule_LAM:updateControl()
+	AddCat_SelectTag_LAM:updateControl()
+
+	--AC_UI.RefreshDropdownData()
+	AutoCategory.RecompileRules(AC.rules)
+end
+
+function AC_UI.CatSet_NewCat_LAM:controlDef()
+	-- New Category Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
+			tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
+			func = function() self:execute() end,
+			width = "half",
+		}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for CatSet_CopyCat_LAM button
+-- -------------------------------------------------------
+function AC_UI.CatSet_CopyCat_LAM:execute()
+	local ruleName = CatSet_SelectRule_LAM:getValue()	-- source
+	local tag = CatSet_SelectTag_LAM:getValue()
+	if tag == "" then
+		tag = AC_EMPTY_TAG_NAME
+	end
+
+	local srcRule = AC.GetRuleByName(ruleName)
+	if not srcRule then return end
+
+	local newRule = AC.CopyFrom(srcRule)
+	cache.AddRule(newRule)
+
+	currentRule = newRule
+
+	CatSet_SelectTag_LAM:setValue(currentRule.tag)
+	CatSet_SelectTag_LAM:refresh()
+
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(currentRule.name)
+	CatSet_SelectRule_LAM:updateControl()
+	AC_UI.checkCurrentRule()
+
+
+	AutoCategory.RecompileRules(AC.rules)
+end
+
+function AC_UI.CatSet_CopyCat_LAM:controlDef()
+	-- Copy Category/Rule Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,
+			tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
+			func = function() self:execute() end,
+			disabled = function() return currentRule == nil end,
+			width = "half",
+		}
+
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for CatSet_NameEdit_LAM editbox
+-- -------------------------------------------------------
+function AC_UI.CatSet_NameEdit_LAM:getValue()
+	if currentRule then
+		return currentRule.name
+	end
+	return ""
+end
+
+function AC_UI.CatSet_NameEdit_LAM:setValue(value)
+	local oldName = CatSet_SelectRule_LAM:getValue()
+	if oldName == value then
+		return
+	end
+	if value == "" then
+		warningDuplicatedName.warningMessage = L(
+			SI_AC_WARNING_CATEGORY_NAME_EMPTY)
+		value = oldName
+		return
+	end
+
+	local isDuplicated = cache.rulesByName[value] ~= nil
+	if isDuplicated then
+		warningDuplicatedName.warningMessage = string.format(
+			L(SI_AC_WARNING_CATEGORY_NAME_DUPLICATED),
+			value, AC.GetUsableRuleName(value))
+		value = oldName
+		--change editbox's value
+		local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_NAME")
+		control.editbox:SetText(value)
+		return
+	end
+
+	AC.renameRule(currentRule.name, value)
+
+	--Update drop downs
+	AutoCategory.cacheInitialize()
+	AC_UI.RefreshDropdownData()
+
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(currentRule.name)
+	CatSet_SelectRule_LAM:updateControl()
+
+	BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:setValue(currentRule.name)
+	BagSet_SelectRule_LAM:updateControl()
+end
+
+function AC_UI.CatSet_NameEdit_LAM:controlDef()
+	return
+		-- Name EditBox - AC_EDITBOX_EDITRULE_NAME
+		{
+			type = "editbox",
+			name = SI_AC_MENU_EC_EDITBOX_NAME,
+			tooltip = SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP,
+			getFunc = function() return self:getValue() end,
+			warning = function()
+				return warningDuplicatedName.warningMessage
+			end,
+			setFunc = function(value) self:setValue(value) end,
+			isMultiline = false,
+			disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+			width = "half",
+			reference = self:getControlName(),
+		}
+
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for CatSet_TagEdit_LAM editbox
+-- -------------------------------------------------------
+-- when a rule changes the tag name, we need to update the various lists tracking tags vs rules
+-- returns the rule name, and a list of rules that belong to newtag.
+-- When parameters are bad, return nil,nil
+function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
+	-- bad parameters
+	if not rule or not rule.name or not newtag then return nil,nil end
+
+	-- nothing needs changing?
+	if oldtag == newtag then return rule.name, cache.rulesByTag_cvt[rule.tag] end
+
+	-- if tag is new, then update tags lists
+	if not ZO_IsElementInNumericallyIndexedTable(cache.tags, newtag) then
+		cache.tags[#cache.tags+1] = newtag
+		-- create a new tag list if necessary
+		cache.rulesByTag_cvt[newtag] = CVT:New(nil,nil,CVT.USE_TOOLTIPS)	--uses choicesTooltips
+	end
+
+	-- add the rule to the new tag list
+	cache.rulesByTag_cvt[newtag]:append(rule.name, nil, rule:getDesc())
+	-- remove the current rule from the oldtag list
+	if oldtag and cache.rulesByTag_cvt[oldtag] then
+		cache.rulesByTag_cvt[oldtag]:removeItemChoiceValue(rule.name)
+		if cache.rulesByTag_cvt[oldtag]:size() == 0 then
+			local ndx = ZO_IndexOfElementInNumericallyIndexedTable(cache.tags, oldtag)
+			if ndx then
+				table.remove(cache.tags, ndx)
+			end
+		end
+	end
+	rule.tag = newtag
+	return rule.name, cache.rulesByTag_cvt[newtag]
+end
+
+
+function AC_UI.CatSet_TagEdit_LAM:getValue()
+	if not currentRule then return "" end
+
+	return currentRule.tag
+end
+
+function AC_UI.CatSet_TagEdit_LAM:setValue(value)
+	if not currentRule then return end
+
+	local oldtag = currentRule.tag
+
+	if value == "" then
+		value = L(AC_EMPTY_TAG_NAME)
+		local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_TAG")
+		control.editbox:SetText(value)
+	end
+	local _, rbyt = CatSet_TagEdit_LAM.changeTag(currentRule, oldtag, value)
+	CatSet_SelectTag_LAM:select(currentRule.tag)
+	CatSet_SelectRule_LAM:assign(rbyt)
+	CatSet_SelectRule_LAM:select(currentRule.name)
+	AddCat_SelectTag_LAM:select(currentRule.tag)
+	AddCat_SelectRule_LAM:assign(AddCat_SelectRule_LAM.filterRules(getCurrentBagId(), value))
+	AddCat_SelectRule_LAM:select(currentRule.name)
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.CatSet_TagEdit_LAM:controlDef()
+	-- Tag EditBox - AC_EDITBOX_EDITRULE_TAG
+	return
+	{
+		type = "editbox",
+		name = SI_AC_MENU_EC_EDITBOX_TAG,
+		tooltip = SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP,
+		getFunc = function() return self:getValue() end,
+		setFunc = function(value) self:setValue(value) end,
+		isMultiline = false,
+		disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+		width = "half",
+		reference = self:getControlName(),
+	}
+end
+-- -------------------------------------------------------
+
+-- customization of BaseUI for CatSet_DeleteCat_LAM button
+-- -------------------------------------------------------
+function AC_UI.CatSet_DeleteCat_LAM:execute()
+	local oldRuleName = CatSet_SelectRule_LAM:getValue()
+	local ndx = cache.rulesByName[oldRuleName]
+	if ndx then
+		table.remove(AC.rules,ndx)
+		-- remove from the rule list that gets saved
+		for i,_ in pairs(AC.acctRules.rules) do
+			if AC.acctRules.rules[i].name == oldRuleName then
+				table.remove(AC.acctRules.rules,i)
+				break
+			end
+		end
+		AC.cacheRuleInitialize()
+		--AC_UI.RefreshDropdownData()
+	end
+
+	if oldRuleName == AddCat_SelectRule_LAM:getValue() then
+		--rule removed, clean selection in add rule menu if selected
+		AddCat_SelectRule_LAM:clearIndex()
+	end
+
+	-- removing the rule from any bags
+	local bagId
+	for bagId = 1,6 do
+		local savedbag = saved.bags[bagId]
+		for i = 1, #savedbag.rules do
+			local bagEntry = savedbag.rules[i]
+			if bagEntry.name == oldRuleName then
+				table.remove(savedbag.rules, i)
+				break
+			end
+		end
+	end
+	BagSet_SelectRule_LAM.cvt:removeItemChoiceValue(oldRuleName)
+	if BagSet_SelectRule_LAM:getValue() == nil and BagSet_SelectRule_LAM:size() > 0 then
+		BagSet_SelectRule_LAM:select({}) 	-- select first
+	end
+	BagSet_SelectRule_LAM:refresh()
+
+
+	currentRule = nil
+	CatSet_SelectRule_LAM:clearIndex()
+	if CatSet_SelectRule_LAM:size() > 0 then
+		CatSet_SelectRule_LAM:select({})
+	end
+
+	AutoCategory.cacheBagInitialize()
+	--if currentRule.tag == value then
+	--	CatSet_SelectRule_LAM:select(currentRule.name)
+	--end
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:updateControl()
+
+	AddCat_SelectRule_LAM:refresh()
+	AddCat_SelectRule_LAM:updateControl()
+
+	CatSet_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:setValue(currentRule.name)
+	CatSet_SelectRule_LAM:updateControl()
+
+	BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:setValue(currentRule.name)
+	BagSet_SelectRule_LAM:updateControl()
+
+	AddCat_SelectRule_LAM:refresh()
+	--AC_UI.RefreshDropdownData()
+	AC_UI.RefreshControls()
+end
+
+function AC_UI.CatSet_DeleteCat_LAM:controlDef()
+	-- Delete Category/Rule Button
+	return
+		{
+			type = "button",
+			name = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,
+			tooltip = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,
+			isDangerous = true,
+			func = function()  self:execute() end,
+			width = "half",
+			disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+		}
+end
+-- -------------------------------------------------------
+
 
 local function editCat_getPredef()
     if currentRule and currentRule.pred == 1 then
@@ -144,48 +1321,44 @@ local function checkKeywords(str)
             end
         end
         if found == false then
-            table.insert(result, w)
+			result[#result+1] = w
+            --table.insert(result, w)
         end
     end
    return result
 end
 
-local function checkCurrentRule()
+function AC_UI.checkCurrentRule()
     ruleCheckStatus.err = nil
     ruleCheckStatus.good = nil
     if currentRule == nil then
         return
     end
-    
+
     if currentRule.rule == nil or currentRule.rule == "" then
 		currentRule:setError(true,"Rule definition cannot be empty")
 		ruleCheckStatus.err = currentRule.err
         return
     end
-    
-    local func, err = zo_loadstring("return("..currentRule.rule..")")
+
+    local _, err = zo_loadstring("return("..currentRule.rule..")")
     if err then
 		ruleCheckStatus.err = err
-        currentRule.damaged = true 
+        currentRule.damaged = true
 		currentRule.err = err
-		
+
     else
         local errt = checkKeywords(currentRule.rule)
         if #errt == 0 then
             ruleCheckStatus.good = true
             currentRule.damaged = nil
-			
+
         else
             ruleCheckStatus.err = table.concat(errt,", ")
-            currentRule.damaged = nil 
+            currentRule.damaged = nil
         end
     end
 end
-
---warning message
-local warningDuplicatedName = {
-	warningMessage = nil,
-}
 
 local function UpdateDuplicateNameWarning()
 	local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_NAME", "")
@@ -195,6 +1368,42 @@ local function UpdateDuplicateNameWarning()
 end
 
 -- -------------------------------------------------------
+-- Call refresh() on all BaseDD controls
+function AC_UI.RefreshDropdownData()
+
+	-- refresh selections
+	BagSet_SelectBag_LAM:refresh()
+	AddCat_SelectTag_LAM:refresh()
+	CatSet_SelectTag_LAM:refresh()
+
+	--refresh current dropdown rules
+	BagSet_SelectRule_LAM:refresh()
+	AddCat_SelectRule_LAM:refresh()
+	CatSet_SelectRule_LAM:refresh()
+end
+
+-- updates the LAM cvt lists from our BaseDD objects
+local RCpending = false
+function AC_UI.RefreshControls()
+	local waittime = 500
+	if RCPending then return end
+
+	RCpending = true
+
+	zo_callLater(function()
+		BagSet_SelectRule_LAM:updateControl()
+
+		AddCat_SelectTag_LAM:updateControl()
+		AddCat_SelectRule_LAM:updateControl()
+
+		CatSet_SelectTag_LAM:updateControl()
+		CatSet_SelectRule_LAM:updateControl()
+		RCPending = false
+	end, waitTime)
+end
+
+
+-- ------------------------------------------------------
 
 local function RefreshPanel()
 	UpdateDuplicateNameWarning()
@@ -202,7 +1411,7 @@ local function RefreshPanel()
 	--restore warning
 	warningDuplicatedName.warningMessage = nil
 
-end 
+end
 
 local doneOnce = false
 function AutoCategory.LengthenRuleBox()
@@ -212,18 +1421,17 @@ function AutoCategory.LengthenRuleBox()
 	local MIN_HEIGHT = 24
 	local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_RULE", "")
 	if control == nil or control.container == nil then return false end
-	
+
 	doneOnce = true
-    local container = control.container
-	local editbox = control.editbox
-	
+	local container = control.container
+
 	container:SetHeight(MIN_HEIGHT * lines)
-    control:SetHeight((MIN_HEIGHT * lines) + control.label:GetHeight())
+	control:SetHeight((MIN_HEIGHT * lines) + control.label:GetHeight())
 
 	return true
 end
 
-local function ToggleSubmenu(typeString, open)
+function AC_UI.ToggleSubmenu(typeString, open)
 	local control = WINDOW_MANAGER:GetControlByName(typeString, "")
 	if control then
 		control.open = open
@@ -232,161 +1440,17 @@ local function ToggleSubmenu(typeString, open)
 
 		else
 			control.animation:PlayFromEnd()
-		end	
-	end
-end
-
-local function RefreshControls()
-	fieldData.editRuleCat:updateControl()
-	fieldData.editBagRule:updateControl()
-	fieldData.addCatRule:updateControl()
-
-end
-
-local function UpdateChoices(controlname, data)
-	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(controlname)
-    if dropdownCtrl == nil then
-        return
-    end
-	dropdownCtrl:UpdateChoices(data.choices, data.choicesValues, 
-		data.choicesTooltips)  
-end
-
-local function RefreshDropdownData()
-	 
-	--update tag & bag selection first
-	if fieldData.addCatTag.indexValue == nil and #cache.tags > 0 then
-		fieldData.addCatTag.indexValue = cache.tags[1]
-	end
-    
-	if fieldData.editRuleTag.indexValue == nil and #cache.tags > 0 then
-		fieldData.editRuleTag.indexValue = cache.tags[1]
-	end
-
-	if fieldData.editBag_cvt.indexValue == nil and #cache.bags_svt.choicesValues > 0 then
-		fieldData.editBag_cvt.indexValue = cache.bags_svt.choicesValues[1]
-	end
-
-	--refresh current dropdown rules
-	local dataCurrentRules_EditRule = newCVT()
-    local ltag = fieldData.editRuleTag.indexValue
-	if ltag and cache.rulesByTag_svt[ltag] then 
-		dataCurrentRules_EditRule.choices = cache.rulesByTag_svt[ltag].choices
-		dataCurrentRules_EditRule.choicesValues    = cache.rulesByTag_svt[ltag].choicesValues
-		dataCurrentRules_EditRule.choicesTooltips  = cache.rulesByTag_svt[ltag].choicesTooltips
-	end	
-	fieldData.editRuleCat.choices         = SF.safeTable(dataCurrentRules_EditRule.choices)
-	fieldData.editRuleCat.choicesValues   = SF.safeTable(dataCurrentRules_EditRule.choicesValues)
-	fieldData.editRuleCat.choicesTooltips = SF.safeTable(dataCurrentRules_EditRule.choicesTooltips)
-	if fieldData.editRuleCat.indexValue == nil and #dataCurrentRules_EditRule.choicesValues > 0 then
-		fieldData.editRuleCat.indexValue = dataCurrentRules_EditRule.choicesValues[1]
-	end
-    UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
-
-	local dataCurrentRules_EditBag = newCVT()
-    local lbag = fieldData.editBag_cvt.indexValue
-	if lbag and cache.entriesByBag[lbag] then 
-		dataCurrentRules_EditBag.choices = cache.entriesByBag[lbag].choices
-		dataCurrentRules_EditBag.choicesValues = cache.entriesByBag[lbag].choicesValues
-		dataCurrentRules_EditBag.choicesTooltips = cache.entriesByBag[lbag].choicesTooltips
-	end
-	fieldData.editBagRule.choices         = dataCurrentRules_EditBag.choices
-	fieldData.editBagRule.choicesValues   = dataCurrentRules_EditBag.choicesValues
-	fieldData.editBagRule.choicesTooltips = dataCurrentRules_EditBag.choicesTooltips
-	if fieldData.editBagRule.indexValue == nil and #dataCurrentRules_EditBag.choicesValues > 0 then
-		fieldData.editBagRule.indexValue = dataCurrentRules_EditBag.choicesValues[1]
-	end
-    UpdateChoices("AC_DROPDOWN_EDITBAG_RULE", fieldData.editBagRule)
-
-	local dataCurrentRules_AddCategory = {choices = {}, choicesValues = {}, choicesTooltips = {}, }
-    local latag = fieldData.addCatTag.indexValue
-	if latag and cache.rulesByTag_svt[latag] then 
-		--remove the rules alreadly in bag
-		for i = 1, #cache.rulesByTag_svt[latag].choicesValues do
-			local value = cache.rulesByTag_svt[latag].choicesValues[i]
-			if lbag and cache.entriesByName[lbag][value] == nil then
-				--add the rule if not in bag
-				table.insert(dataCurrentRules_AddCategory.choices, cache.rulesByTag_svt[latag].choices[i])
-				table.insert(dataCurrentRules_AddCategory.choicesValues, cache.rulesByTag_svt[latag].choicesValues[i])
-				table.insert(dataCurrentRules_AddCategory.choicesTooltips, cache.rulesByTag_svt[latag].choicesTooltips[i])
-			end
 		end
 	end
-	fieldData.addCatRule.choices         = dataCurrentRules_AddCategory.choices
-	fieldData.addCatRule.choicesValues   = dataCurrentRules_AddCategory.choicesValues
-	fieldData.addCatRule.choicesTooltips = dataCurrentRules_AddCategory.choicesTooltips
-	if fieldData.addCatRule.indexValue == nil 
-			and #dataCurrentRules_AddCategory.choicesValues > 0 then
-		fieldData.addCatRule.indexValue = dataCurrentRules_AddCategory.choicesValues[1]
-	end
-    UpdateChoices("AC_DROPDOWN_ADDCATEGORY_RULE", fieldData.addCatRule)
-end
- 
-local function RemoveDropDownItem(dataArray, removeItem, emptyCallback)
-	local removeIndex = -1
-    if not dataArray or not dataArray.choices then return end
-	local num = #dataArray.choices
-	for i = 1, num do
-		if removeItem == dataArray.choices[i] then
-			removeIndex = i
-			table.remove(dataArray.choices, removeIndex)
-			break
-		end
-	end
-	
-    if removeIndex <= 0 then return end
-	
-	if num == 1 then
-		--select none
-		dataArray.indexValue = nil
-		if emptyCallback then
-			emptyCallback(dataArray)
-		end
-		
-	elseif removeIndex == num then
-		--no next one, select previous one
-		dataArray.indexValue = dataArray.choicesValues[num-1]
-		
-	else
-		--select next one
-		dataArray.indexValue = dataArray.choicesValues[removeIndex]
-	end
-	
 end
 
-
-local function IsRuleNameUsed(name)
-	return cache.rulesByName[name] ~= nil
-end
-
+-- aliases
 local GetUsableRuleName = AC.GetUsableRuleName
 local CreateNewRule = AC.CreateNewRule
-
---[[
-local function GetUsableRuleName(name)
-	local testName = name
-	local index = 1
-	while cache.rulesByName[testName] ~= nil do
-		testName = name .. index
-		index = index + 1
-	end
-	return testName
-end
-
-local CreateNewRule = AC.CreateNewRule
---]]
-
-local function CreateNewBagRuleEntry(name)
-	local entry = {
-		name = name,
-		priority = 1000,
-	}
-	return entry	
-end
+local CreateNewBagRule = AC.CreateNewBagRule
 
 -- -------------------------------------------------------
 local function CreatePanel()
-	AC.ebrlc = AC.ebr_le()
 	return {
 		type = "panel",
 		name = AutoCategory.settingName,
@@ -396,229 +1460,73 @@ local function CreatePanel()
         slashCommand = "/ac",
 		registerForRefresh = true,
 		registerForDefaults = true,
-		resetFunc = function() 
+		resetFunc = function()
 			AutoCategory.ResetToDefaults()
 			AutoCategory.UpdateCurrentSavedVars()
-			AutoCategory.cacheInitialize() 
-			
-            fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
-			fieldData.editBagRule.indexValue = nil
-			fieldData.addCatTag.indexValue = nil
-			fieldData.addCatRule.indexValue = nil
-			fieldData.editRuleTag.indexValue = nil
-			fieldData.editRuleCat.indexValue = nil
-			
-			RefreshDropdownData()
+			AutoCategory.cacheInitialize()
+
+			BagSet_SelectBag_LAM:select(AC_BAG_TYPE_BACKPACK)
+			BagSet_SelectRule:clearIndex()
+			AddCat_SelectTag_LAM:clearIndex()
+			AddCat_SelectRule_LAM:clearIndex()
+			CatSet_SelectTag_LAM:clearIndex()
+			CatSet_SelectRule_LAM:clearIndex()
+
+			AC_UI.RefreshDropdownData()
+			AC_UI.RefreshControls()
 		end,
 	}
 end
 
 
--- -------------------------------------------------
--- function to create list entries for an orderedlistbox
---    used by BagSet_OrderRule
-function AC.ebr_le()
-	local entries = {}
-	local i = 1
-	--AC.logger:Info("Creating list entries")
-	for k,v in pairs(fieldData.editBagRule.choicesValues) do
-		local ent = {}
-		ent.uniqueKey = i
-		ent.value = v
-		if fieldData.editBagRule.choices then
-			ent.text = fieldData.editBagRule.choices[k]
-		end
-		if fieldData.editBagRule.choicesTooltips then
-			ent.tooltip = fieldData.editBagRule.choicesTooltips[k]
-		end
-		i = i + 1
-		table.insert(entries, ent)
-		--AC.logger:Info(SF.dTable(ent,1,"ListEntry"))
-	end
-	return entries
-end
 
--- create the info for the ordered rule set listbox
-local function BagSet_OrderRule()
-	--AC.logger:Info("Running BagSet_OrderRule")
-	
-	local orderlistbox = {
-		type = "orderlistbox",
-		name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
-		tooltip = "The order in which rules are evaluated. Very important because the first rule that matches is the category that is selected.",
-		getFunc = function() return AC.ebrlc end,
-		setFunc = function(currentSortedListEntries)  AC.ebrlc = currentSortedListEntries end,
-		listEntries = entries,
-		--disabled = function() return #fieldData.editBagRule.choices == 0 end,
-		width = "half",
-		isExtraWide = true,
-		reference = "AC_ORDERLIST_EDITBAG_RULE",
-		--showPosition = true,
-	}
-	--[[
-	listEntries = {
-		[1] = {
-			value = "Value of the entry", -- or number or boolean or function returning the value of this entry
-			uniqueKey = 1, --number of the unique key of this list entry. This will not change if the order changes. Will be used to identify the entry uniquely
-			text  = "Text of this entry", -- or string id or function returning a string (optional)
-			tooltip = "Tooltip text shown at this entry", -- or string id or function returning a string (optional)
-		},
-		[2] = {...},
-		...
-	},
-	getFunc = function() return db.currentSortedListEntries end,
-	setFunc = function(currentSortedListEntries) db.currentSortedListEntries = currentSortedListEntries doStuff() end,
-	tooltip = "OrderListBox's tooltip text.", -- or string id or function returning a string (optional)
-	width = "full", -- or "half" (optional)
-	isExtraWide = false, -- or function returning a boolean (optional). Show the listBox as extra wide box
-	minHeight = function() return db.minHeightNumber end, --or number for the minimum height of this control. Default: 125 (optional)
-	maxHeight = function() return db.maxHeightNumber end, --or number for the maximum height of this control. Default: value of minHeight (optional)
-	rowHeight = function() return db.rowHeightNumber end, --or number for the height of the row of the entries in listEntries. Default: 25 (optional)
-	rowTemplate = "LAM2_OrderListBox_Widget_Scrolllist_Row", --String defining the XML virtual template control for a row of the listEntries (optional)
-	rowFont = "ZoFontWinH4", --or function returning a String of the font to use for the row (optional),
-	rowMaxLineCount = 1, --or function returning a number of the maximum text lines within the row. 1 = Only 1 text line, no wrapping, get#s truncated. (optional)
-	rowSelectionTemplate = "ZO_ThinListHighlight", --String defining the XML virtual template control for the selection at a row of the listEntries (optional)
-	rowSelectedCallback = function doStuffOnSelection(rowControl, previouslySelectedData, selectedData, reselectingDuringRebuild) end, --An optional callback function when a row of the listEntries got selected (optional)
-	rowHideCallback = function doStuffOnHide(rowControl, currentRowData) end, --An optional callback function when a row of the listEntries got hidden (optional)
-	dataTypeSelectSound = SOUNDS["NONE"], --or function returning a String of a sound from the global SOUNDS table. Will be played as any row containing the datatype (1) of the orderListBox will be selected (optional)
-	dataTypeResetControlCallback = function doStuffOnReset(control) end, --An optional callback function when the datatype control gets reset. (optional)
-	disableDrag = false, -- or function returning a boolean (optional). Disable the drag&drop of the rows
-	disableButtons = false, -- or function returning a boolean (optional). Disable the move up/move down/move to top/move to bottom buttons
-	showPosition = false, -- or function returning a boolean (optional). Show the position number in front of the list entry
-	showValue = false, -- or function returning a boolean (optional). Show the value of the entry after the list entry text, surrounded by []
-	showValueAtTooltip = false, -- or function returning a boolean (optional). Show the value of the entry after the tooltip text, surrounded by []
-	disabled = function() return db.someBooleanSetting end, -- or boolean (optional)
-	warning = "May cause permanent awesomeness.", -- or string id or function returning a string (optional)
-	requiresReload = false, -- boolean, if set to true, the warning text will contain a notice that changes are only applied after an UI reload and any change to the value will make the "Apply Settings" button appear on the panel which will reload the UI when pressed (optional)
-	default = defaults.var, -- default value or function that returns the default value (optional)
-	helpUrl = "https://www.esoui.com/portal.php?id=218&a=faq", -- a string URL or a function that returns the string URL (optional)
-	reference = "MyAddonOrderListBox" -- function returning String, or String unique global reference to control (optional)
-	--]]
-	--AC.logger:Debug("orderlistbox = "..SF.str(type(orderlistbox)))
-	--AC.logger:Debug("listEntries = "..SF.str(type(orderlistbox.listEntries)))
-	return orderlistbox
-end
-	
-AutoCategory.BSOR = BagSet_OrderRule
-
--- dropdown of names of rules assigned to a particular bag
-local function BagSet_EditRule()
-	-- Rule name   - AC_DROPDOWN_EDITBAG_RULE
-	return
-		{		
-			type = "dropdown",
-			name = SI_AC_MENU_BS_DROPDOWN_CATEGORIES,
-			tooltip = "The combination of category and priority determine order in which rules are evaluated (Highest number goes first). Very important because the first rule that matches is the category that is selected.",
-			scrollable = true,
-			choices         = fieldData.editBagRule.choices,
-			choicesValues   = fieldData.editBagRule.choicesValues,
-			choicesTooltips = fieldData.editBagRule.choicesTooltips,
-			
-			getFunc = function() 
-				return fieldData.editBagRule.indexValue
-			end,
-			setFunc = function(value) 			 
-				fieldData.editBagRule.indexValue = value
-			end, 
-			disabled = function() return #fieldData.editBagRule.choices == 0 end,
-			--default = "",
-			width = "half",
-			reference = "AC_DROPDOWN_EDITBAG_RULE",
-		}
-
-end
-
--- the dropdown of all of the bags that we can deal with. You have to choose a bag to deal with what's inside it.
-local function BagSet_EditBag()
-	-- Bag     - AC_DROPDOWN_EDITBAG_BAG
-	return                 
-		{		
-			type = "dropdown",
-			name = SI_AC_MENU_BS_DROPDOWN_BAG,
-			scrollable = false,
-			tooltip = L(SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP),
-			choices         = fieldData.editBag_cvt.choices,
-			choicesValues   = fieldData.editBag_cvt.choicesValues,
-			choicesTooltips = fieldData.editBag_cvt.choicesTooltips,
-			
-			getFunc = function()  
-				return fieldData.editBag_cvt.indexValue
-			end,
-			setFunc = function(value)
-				fieldData.editBag_cvt.indexValue = value
-				fieldData.editBagRule.indexValue = nil
-				--reset add rule's selection, since all data will be changed.
-				fieldData.addCatRule.indexValue = nil
-				 
-				RefreshDropdownData() 
-			end, 
-			default = AC_BAG_TYPE_BACKPACK,
-			width = "half",
-			reference = "AC_DROPDOWN_EDITBAG_BAG",
-		}
-
-end
-
-	
 function AutoCategory.AddonMenuInit()
     AC.cacheInitialize()
-    
+
     -- initialize tables
-	fieldData.editBag_cvt.choices = cache.bags_svt.choices
-	fieldData.editBag_cvt.choicesValues = cache.bags_svt.choicesValues
-    fieldData.editBag_cvt.choicesTooltips = cache.bags_svt.choicesTooltips
-	
-	fieldData.addCatTag.choices = cache.tags
-	fieldData.addCatTag.choicesValues = cache.tags
-	fieldData.addCatTag.choicesTooltips = cache.tags
-    
-    -- addCatRule will get populated by RefreshDropdownData()
-    fieldData.addCatRule.choices = {}
-    fieldData.addCatRule.choicesValues = {}
-    fieldData.addCatRule.choicesTooltips = {}
-	
-	fieldData.editRuleTag.choices = cache.tags
-	fieldData.editRuleTag.choicesValues = cache.tags
-	fieldData.editRuleTag.choicesTooltips = cache.tags
-	
-	fieldData.importBag.choices = cache.bags_svt.choices
-	fieldData.importBag.choicesValues = cache.bags_svt.choicesValues
-	fieldData.importBag.choicesTooltips = cache.bags_svt.choicesTooltips
-	 
-	RefreshDropdownData() 
- 
+	BagSet_SelectBag_LAM:assign(cache.bags_cvt)
+	--BagSet_SelectBag_LAM:select(cache.bags_cvt.choicesValues)
+	AddCat_SelectTag_LAM:assign( { choices=cache.tags })
+
+    -- AddCat_SelectRule_LAM will get populated by RefreshDropdownData()
+	AddCat_SelectRule_LAM:clear()
+
+	CatSet_SelectTag_LAM:assign( { choices=cache.tags})
+
+	ImpExp_ImportBag_LAM:assign(cache.bags_cvt)
+
+	AC_UI.RefreshDropdownData()
+	AC_UI.RefreshControls()
+
 	local panelData = CreatePanel()
 
-	
-	local optionsTable = { 
+
+	local optionsTable = {
         -- Account Wide
         {
             type = "checkbox",
             name = SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING,
             tooltip = SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP,
-            getFunc = function() 
+            getFunc = function()
                 return AutoCategory.charSaved.accountWide
             end,
-            setFunc = function(value) 
+            setFunc = function(value)
                 AutoCategory.charSaved.accountWide = value
                 AutoCategory.UpdateCurrentSavedVars()
-                
-                fieldData.editBag_cvt.indexValue = AC_BAG_TYPE_BACKPACK
-                fieldData.editBagRule.indexValue = nil
-                fieldData.addCatTag.indexValue = nil
-                fieldData.addCatRule.indexValue = nil
-                fieldData.editRuleTag.indexValue = nil
-                fieldData.editRuleCat.indexValue = nil
+
+				BagSet_SelectBag_LAM:select(AC_BAG_TYPE_BACKPACK)
+				BagSet_SelectRule_LAM:clearIndex()
+                AddCat_SelectTag_LAM:clearIndex()
+                AddCat_SelectRule_LAM:clearIndex()
+                CatSet_SelectTag_LAM:clearIndex()
+                CatSet_SelectRule_LAM:clearIndex()
                 ruleCheckStatus.err = nil
                 ruleCheckStatus.good = nil
-                
-                RefreshDropdownData()
-                
-                UpdateChoices("AC_DROPDOWN_EDITBAG_BAG",     fieldData.editBag_cvt)
-                UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
-                UpdateChoices("AC_DROPDOWN_EDITRULE_TAG",    fieldData.editRuleTag)
+
+                AC_UI.RefreshDropdownData()
+				AC_UI.RefreshControls()
             end,
-        },			
+        },
         divider(),
         -- Bag Settings
 		{
@@ -627,251 +1535,42 @@ function AutoCategory.AddonMenuInit()
 			reference = "AC_SUBMENU_BAG_SETTING",
 		    controls = {
 				-- Select bag
-				BagSet_EditBag(),
-                -- Hide ungrouped in bag
-				{
-					type = "checkbox",
-					name = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN,
-					tooltip = SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP,
-					getFunc = function()					
-						local bag = fieldData.editBag_cvt.indexValue
-						if not bag then return false end
-						return saved.bags[bag].isUngroupedHidden
-					end,
-					setFunc = function(value)  
-						local bag = fieldData.editBag_cvt.indexValue
-						if not bag then return end
-						saved.bags[bag].isUngroupedHidden = value
-					end,
-					width = "half",
-				},			
+				BagSet_SelectBag_LAM:controlDef(),
+
+                -- Hide ungrouped in bag Checkbox
+				BagSet_HideOther_LAM:controlDef(),
+
                 divider(),
-				-- testing
-				--BagSet_OrderRule(),
-                --Show/select the list of categories assigned to the bag
-				BagSet_EditRule(),	
-                -- Priority
-				{
-					type = "slider",
-					name = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY,
-					tooltip = SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP,
-					min = 0,
-					max = 1000,
-					getFunc = function() 
-						local bag = fieldData.editBag_cvt.indexValue
-						local bagrule = fieldData.editBagRule.indexValue
-						if bag and bagrule and cache.entriesByName[bag][bagrule] then
-							return cache.entriesByName[bag][bagrule].priority
-						end
-						return 0
-					end, 
-					setFunc = function(value) 
-						local bag = fieldData.editBag_cvt.indexValue
-						local rule = fieldData.editBagRule.indexValue
-						if cache.entriesByName[bag][rule] then
-							cache.entriesByName[bag][rule].priority = value 
-							AutoCategory.cacheInitialize()
-							RefreshDropdownData()
-						end
-					end,
-					disabled = function() 
-						if fieldData.editBagRule.indexValue == nil then
-							return true
-						end 
-						if #fieldData.editBagRule.choices == 0 then
-							return true
-						end
-						return false
-					end,
-                    default = 0,
-					width = "half",
-				},
-                -- Hide Category
-				{
-					type = "checkbox",
-					name = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN,
-					tooltip = SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP,
-					getFunc = function()					
-						local bag = fieldData.editBag_cvt.indexValue
-						local rule = fieldData.editBagRule.indexValue
-						if bag and rule and cache.entriesByName[bag][rule] then
-							return cache.entriesByName[bag][rule].isHidden or false
-						end
-						return 0
-					end,
-					setFunc = function(value)  
-						local bag = fieldData.editBag_cvt.indexValue
-						local rule = fieldData.editBagRule.indexValue
-						if cache.entriesByName[bag][rule] then
-							cache.entriesByName[bag][rule].isHidden = value or nil
-							AutoCategory.cacheInitialize()
-							RefreshDropdownData()
-						end
-					end,
-					disabled = function() 
-						if fieldData.editBagRule.indexValue == nil then
-							return true
-						end 
-						if #fieldData.editBagRule.choices == 0 then
-							return true
-						end
-						return false
-					end,
-                    default = false,
-					width = "half",
-				},
-				-- blank pad for Hide Category button
+
+				-- Rule name   - AC_DROPDOWN_EDITBAG_RULE
+				BagSet_SelectRule_LAM:controlDef(),
+
+				-- Priority Slider
+				BagSet_Priority_LAM:controlDef(),
+
+                -- Hide Category Checkbox
+				BagSet_HideCat_LAM:controlDef(),
+				-- blank "pad" for Hide Category button
 				{
 					type = "custom",
 					width = "half",
 				},
+
                 -- Edit Category Button
-				{
-					type = "button",
-					name = SI_AC_MENU_BS_BUTTON_EDIT,
-					tooltip = SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP,
-					func = function()
-						local ruleName = fieldData.editBagRule.indexValue
-						local rule = AC.GetRuleByName(ruleName)
-						if rule then
-							fieldData.editRuleTag.indexValue = rule.tag
-							fieldData.editRuleCat.indexValue = rule.name
-                            currentRule = rule
-                            checkCurrentRule()
-							RefreshDropdownData()
-							ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
-							ToggleSubmenu("AC_SUBMENU_CATEGORY_SETTING", true)
-						end
-					end,
-					disabled = function() return #fieldData.editBagRule.choices == 0 end,
-					width = "half",
-				},
+				BagSet_EditCat_LAM:controlDef(),
                 -- Remove Category from Bag Button
-				{
-					type = "button",
-					name = SI_AC_MENU_BS_BUTTON_REMOVE,
-					tooltip = SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP,
-					func = function()  
-						local bagId = fieldData.editBag_cvt.indexValue
-						local ruleName = fieldData.editBagRule.indexValue
-						for i = 1, #saved.bags[bagId].rules do
-							local bagEntry = saved.bags[bagId].rules[i]
-							if bagEntry.name == ruleName then
-								table.remove(saved.bags[bagId].rules, i)
-								break
-							end
-						end
-						RemoveDropDownItem("AC_DROPDOWN_EDITBAG_RULE", fieldData.editBagRule.choicesValues, ruleName)
-						if fieldData.editBagRule.indexValue == nil and #fieldData.editBagRule.choices > 0 then
-                            fieldData.editBagRule.indexValue = fieldData.editBagRule.choicesValues[1]
-                        end
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						if #fieldData.editBagRule.choices > 0 then
-                            fieldData.editBagRule.indexValue = fieldData.editBagRule.choicesValues[1]
-                        end
-					end,
-					disabled = function() return #fieldData.editBagRule.choices == 0 end,
-					width = "half",
-				},
+				BagSet_RemoveCat_LAM:controlDef(),
                 -- Add Category to Bag Section
 				header(SI_AC_MENU_HEADER_ADD_CATEGORY),
-                -- Tag Dropdown - AC_DROPDOWN_ADDCATEGORY_TAG
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_AC_DROPDOWN_TAG,
-					scrollable = true,
-					choices         = fieldData.addCatTag.choices, 
-					choicesValues   = fieldData.addCatTag.choicesValues,
-					choicesTooltips = fieldData.addCatTag.choicesTooltips,
-                    sort = "name-up",
-					
-					getFunc = function() 
-						return fieldData.addCatTag.indexValue
-					end,
-					setFunc = function(value)
-                        local oldvalue = fieldData.addCatTag.indexValue
-                        if oldvalue == value then return end
-                        
-						fieldData.addCatTag.indexValue = value
-						fieldData.addCatRule.indexValue = nil
-						RefreshDropdownData() 
-					end, 
-					width = "half",
-					disabled = function() return #fieldData.addCatTag.choicesValues == 0 end,
-					reference = "AC_DROPDOWN_ADDCATEGORY_TAG",
-				},
+                -- Select Tag Dropdown - AC_DROPDOWN_ADDCATEGORY_TAG
+				AddCat_SelectTag_LAM:controlDef(),
                 -- Categories currently unused dropdown - AC_DROPDOWN_ADDCATEGORY_RULE
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_AC_DROPDOWN_CATEGORY,
-					scrollable = true,
-					choices = fieldData.addCatRule.choices, 
-					choicesValues = fieldData.addCatRule.choicesValues,
-					choicesTooltips = fieldData.addCatRule.choicesTooltips,
-                    sort = "name-up",
-					
-					getFunc = function() 
-						return fieldData.addCatRule.indexValue 
-					end,
-					setFunc = function(value) 			
-						fieldData.addCatRule.indexValue = value
-					end, 
-					disabled = function() return #fieldData.addCatRule.choices == 0 end,
-					width = "half",
-					reference = "AC_DROPDOWN_ADDCATEGORY_RULE",
-				},
+				AddCat_SelectRule_LAM:controlDef(),
                 -- Edit Rule Category Button
-				{
-					type = "button",
-					name = SI_AC_MENU_AC_BUTTON_EDIT,
-					tooltip = SI_AC_MENU_AC_BUTTON_EDIT_TOOLTIP,
-					func = function()
-						local ruleName = fieldData.addCatRule.indexValue
-						local rule = AC.GetRuleByName(ruleName)
-						if rule then
-							fieldData.editRuleTag.indexValue = rule.tag
-							fieldData.editRuleCat.indexValue = rule.name
-                            currentRule = rule
-                            checkCurrentRule()
-							RefreshDropdownData()
-							ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
-							ToggleSubmenu("AC_SUBMENU_CATEGORY_SETTING", true)
-						end
-					end,
-					disabled = function() return #fieldData.addCatRule.choicesValues == 0 end,
-					width = "half",
-				},
+				AddCat_EditRule_LAM:controlDef(),
                 -- Add to Bag Button
-				{
-					type = "button",
-					name = SI_AC_MENU_AC_BUTTON_ADD,
-					tooltip = SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP,
-					func = function()  
-						local bagId = fieldData.editBag_cvt.indexValue
-						local ruleName = fieldData.addCatRule.indexValue
-						assert(cache.entriesByName[bagId][ruleName] == nil, "Bag(" .. bagId .. ") already has the rule: ".. ruleName)
-					 
-                        if cache.entriesByName[bagId][ruleName] == nil then
-							local entry = CreateNewBagRuleEntry(ruleName)
-							table.insert(saved.bags[bagId].rules, entry) 
-							fieldData.editBagRule.indexValue = ruleName
-							RemoveDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE", fieldData.addCatRule.choicesValues, ruleName)
-							 
-							AutoCategory.cacheInitialize()
-							RefreshDropdownData()
-                        end
-                        
-                        fieldData.editBagRule.indexValue = ruleName
-						RemoveDropDownItem("AC_DROPDOWN_ADDCATEGORY_RULE",fieldData.addCatRule.choicesValues, ruleName)
-						if #fieldData.addCatRule.choices > 0 then
-                            fieldData.addCatRule.indexValue = 	
-								fieldData.addCatRule.choicesValues[1]
-                        end
-					end,
-					disabled = function() return #fieldData.addCatRule.choices == 0 end,
-					width = "half",
-				}, 
+				AddCat_BagAdd_LAM:controlDef(),
+
 				divider(),
                 -- Import/Export Bag Settings
 				{
@@ -880,71 +1579,19 @@ function AutoCategory.AddonMenuInit()
 					reference = "SI_AC_MENU_SUBMENU_IMPORT_EXPORT",
 					controls = {
 						header(SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS),
-						-- Export To All Button
-						{
-							type = "button",
-							name = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS,
-							tooltip = SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP,
-							func = function() 
-								local selectedBag = saved.bags[fieldData.editBag_cvt.indexValue]
-								for i = 1, 5 do
-									saved.bags[i] = SF.deepCopy(selectedBag)
-								end
-                                
-                                fieldData.editBagRule.indexValue = nil
-								--reset add rule's selection, since all data will be changed.
-								fieldData.addCatRule.indexValue = nil
-								 
-								--RefreshCache()
-								RefreshDropdownData() 
-							end, 
-							width = "full",
-						},				
+						-- Export To All Bags Button
+						ImpExp_ExportAll_LAM:controlDef(),
 						header(SI_AC_MENU_HEADER_IMPORT_BAG_SETTING),
-                        --  - AC_DROPDOWN_IMPORTBAG_BAG
-						{
-							type = "dropdown",
-							name = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG,
-							scrollable = false,
-							tooltip = SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP,
-							choices = fieldData.importBag.choices,
-							choicesValues = fieldData.importBag.choicesValues,
-							choicesTooltips = fieldData.importBag.choicesTooltips,
-							
-							getFunc = function()  
-								return fieldData.importBag.indexValue
-							end,
-							setFunc = function(value) 	
-								fieldData.importBag.indexValue = value
-							end, 
-							width = "half",
-							reference = "AC_DROPDOWN_IMPORTBAG_BAG",
-						},
-                        -- Import Button
-						{
-							type = "button",
-							name = SI_AC_MENU_IBS_BUTTON_IMPORT,
-							tooltip = SI_AC_MENU_IBS_BUTTON_IMPORT_TOOLTIP,
-							func = function() 
+                        -- Import From Bag - AC_DROPDOWN_IMPORTBAG_BAG
+						ImpExp_ImportBag_LAM:controlDef(),
 
-								saved.bags[fieldData.editBag_cvt.indexValue] = SF.deepCopy( saved.bags[fieldData.importBag.indexValue] )
-                                fieldData.editBagRule.indexValue = nil
-								--reset add rule's selection, since all data will be changed.
-								fieldData.addCatRule.indexValue = nil
-								 
-								AutoCategory.cacheInitialize()
-								RefreshDropdownData() 
-							end,
-							disabled = function()
-								return fieldData.editBag_cvt.indexValue == fieldData.importBag.indexValue
-							end,
-							width = "half",
-						},	 
+                        -- Import Button
+						ImpExp_Import_LAM:controlDef(),
 					},
-				}, 
+				},
 				divider(),
                 -- Need Help button
-				{			
+				{
 					type = "button",
 					name = SI_AC_MENU_AC_BUTTON_NEED_HELP,
 					func = function() RequestOpenUnsafeURL("https://github.com/Shadowfen/AutoCategory/wiki/Tutorial") end,
@@ -958,233 +1605,32 @@ function AutoCategory.AddonMenuInit()
 		    name = SI_AC_MENU_SUBMENU_CATEGORY_SETTING,
 			reference = "AC_SUBMENU_CATEGORY_SETTING",
 		    controls = {
-                -- Select Existing
-                {
-                    type = "description",
-                    text = "Select Existing Category:", -- or string id or function returning a string
-                    width = "full", --or "half" (optional)
-                },
+                -- Select Existing Description
+				description("Select Existing Category:"),
                 -- Tags - AC_DROPDOWN_EDITRULE_TAG
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_CS_DROPDOWN_TAG,
-					scrollable = true,
-					tooltip = SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP,
-					choices = fieldData.editRuleTag.choices, 
-					choicesValues = fieldData.editRuleTag.choicesValues, 
-					choicesTooltips = fieldData.editRuleTag.choicesTooltips, 
-                    sort = "name-up",
-					
-					getFunc = function() 
-						return fieldData.editRuleTag.indexValue
-					end,
-					setFunc = function(value) 			
-                        fieldData.editRuleTag.indexValue = value
-                        fieldData.editRuleCat.indexValue = nil
-                        currentRule = nil
-						AC.logger:Debug("EDITRUlE_TAG: Refreshing dropdowns after tag changed to "..value)
-                        RefreshDropdownData() 
-                        UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
-					end, 
-					width = "half",
-					disabled = function() return #fieldData.editRuleTag.choices == 0 end,
-					reference = "AC_DROPDOWN_EDITRULE_TAG",
-				},
+				CatSet_SelectTag_LAM:controlDef(),
                 -- Categories - AC_DROPDOWN_EDITRULE_RULE
-				{		
-					type = "dropdown",
-					name = SI_AC_MENU_CS_DROPDOWN_CATEGORY, 
-					scrollable = true,
-					choices = fieldData.editRuleCat.choices, 
-					choicesValues =  fieldData.editRuleCat.choicesValues, 
-					choicesTooltips =  fieldData.editRuleCat.choicesTooltips, 
-                    sort = "name-up",
-					
-					getFunc = function() 
-                        currentRule = AC.GetRuleByName(fieldData.editRuleCat.indexValue)
-						return fieldData.editRuleCat.indexValue 
-					end,
-					setFunc = function(value)
-                        fieldData.editRuleCat.indexValue = value
-                        currentRule = AC.GetRuleByName(value)
-                        checkCurrentRule()
-                   end, 
-					disabled = function() return #fieldData.editRuleCat.choices == 0 end,
-					width = "half",
-					reference = "AC_DROPDOWN_EDITRULE_RULE",
-				},
-                -- Create New
-                {
-                    type = "description",
-                    text = "Create/Copy a new Category:", -- or string id or function returning a string
-                    --title = SI_AC_MENU_EC_BUTTON_PREDEFINED, -- or string id or function returning a string (optional)
-                    width = "full", --or "half" (optional)
-                },
-                --[[ New Category Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
-					func = function() 
-						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
-						local tag = fieldData.editRuleTag.indexValue
-						if tag == "" then
-							tag = AC_EMPTY_TAG_NAME
-						end
-						local newRule = CreateNewRule(newName, tag)
-						cache.AddRule(newRule)
-                        currentRule = newRule
-											
-						fieldData.editRuleCat.indexValue = newName
-						fieldData.editRuleTag.indexValue = newRule.tag
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						fieldData.addCatTag:updateControl()
-						fieldData.editRuleTag:updateControl()
-						AutoCategory.RecompileRules(AC.rules)
-						--AutoCategory.RecompileRules(saved.rules)
-					end,
-					width = "half",
-				},
-                -- Copy Category/Rule Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
-					func = function() 
-						local ruleName = fieldData.editRuleCat.indexValue
-						local newName = GetUsableRuleName(currentRule.name)
-						local tag = fieldData.editRuleTag.indexValue
-						if tag == "" then
-							tag = AC_EMPTY_TAG_NAME
-						end
-						local newRule = AC.CopyFrom(currentRule)
-                        currentRule = newRule
-						cache.AddRule(newRule)
-											
-						fieldData.editRuleCat.indexValue = newName
-						fieldData.editRuleTag.indexValue = newRule.tag
-                        checkCurrentRule()
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						fieldData.addCatTag:updateControl()
-						fieldData.addCatRule:updateControl()
-						fieldData.editRuleTag:updateControl()
-						fieldData.editRuleCat:updateControl()
-                        AutoCategory.RecompileRules(AC.rules)
-                        --AutoCategory.RecompileRules(saved.rules)
-					end,
-					disabled = function() return currentRule == nil end,
-					width = "half",
-				},
-				--]]
+				CatSet_SelectRule_LAM:controlDef(),
+                -- Create/Copy a New Category Description
+				description("Create/Copy a new Category:"),
+
                 -- New Category Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP,
-					func = function() 
-						local newName = GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
-						local tag = fieldData.editRuleTag.indexValue
-						if tag == "" then
-							tag = AC_EMPTY_TAG_NAME
-						end
-						local newRule = CreateNewRule(newName, tag)
-						cache.AddRule(newRule)
-                        fieldData.currentRule = newRule
-											
-						fieldData.editRuleCat.indexValue = newName
-						fieldData.editRuleTag.indexValue = newRule.tag
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						UpdateChoices("AC_DROPDOWN_EDITRULE_TAG", fieldData.editRuleTag)
-						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
-						AutoCategory.RecompileRules(AC.rules)
-					end,
-					width = "half",
-				},
+				CatSet_NewCat_LAM:controlDef(),
 				-- Copy Category/Rule Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP,
-					func = function() 
-						local ruleName = fieldData.editRuleCat.indexValue
-						local newName = GetUsableRuleName(currentRule.name)
-						local tag = fieldData.editRuleTag.indexValue
-						if tag == "" then
-							tag = AC_EMPTY_TAG_NAME
-						end
-						local newRule = CreateNewRule(newName, tag)
-                        local copyFrom = AC.GetRuleByName(ruleName)
-                        if not copyFrom then return end
-						newRule.description = copyFrom.description
-						newRule.rule = copyFrom.rule
-                        newRule.damaged = copyFrom.damaged
-						newRule.err = copyFrom.err
-                        fieldData.currentRule = newRule
-						cache.AddRule(newRule)
-											
-						fieldData.editRuleCat.indexValue = newName
-						fieldData.editRuleTag.indexValue = newRule.tag
-                        checkCurrentRule()
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						UpdateChoices("AC_DROPDOWN_EDITRULE_TAG", fieldData.editRuleTag)
-						UpdateChoices("AC_DROPDOWN_EDITRULE_RULE", fieldData.editRuleCat)
-						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_RULE", fieldData.addCatRule)
-						UpdateChoices("AC_DROPDOWN_ADDCATEGORY_TAG", fieldData.addCatTag)
-                        AutoCategory.RecompileRules(AC.rules)
-					end,
-					disabled = function() return currentRule == nil end,
-					width = "half",
-				},
+				CatSet_CopyCat_LAM:controlDef(),
 
                 -- Learn Rules button
-				{			
+				{
 					type = "button",
 					name = SI_AC_MENU_EC_BUTTON_LEARN_RULES,
 					func = function() RequestOpenUnsafeURL("https://github.com/Shadowfen/AutoCategory/wiki/Creating-Custom-Categories") end,
 					width = "half",
 				},
                 -- Delete Category/Rule Button
-				{
-					type = "button",
-					name = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY,
-					tooltip = SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP,
-                    isDangerous = true,
-					func = function()  
-						local oldRuleName = fieldData.editRuleCat.indexValue
-						local oldTagName = fieldData.editRuleTag.indexValue
-                        local ndx = cache.rulesByName[oldRuleName]
-                        if ndx then
-                            table.remove(AC.rules,ndx)
-                            AC.cacheInitialize()
-                            RefreshDropdownData()
-                        end
-						
-						if oldRuleName == fieldData.addCatRule.indexValue then
-							--rule removed, clean selection in add rule menu if selected
-							fieldData.addCatRule.indexValue = nil
-						end
-						
-                        fieldData.currentRule = nil
-                        checkCurrentRule()
-                        fieldData.editRuleCat.indexValue = nil
-                        if #fieldData.editRuleCat.choicesValues > 0 then
-                            fieldData.editRuleCat.indexValue = fieldData.editRuleCat.choicesValues[1]
-                        end
-					end,
-					width = "half",
-					disabled = function() return fieldData.currentRule == nil end,
-				},
+				AC_UI.CatSet_DeleteCat_LAM:controlDef(),
                 -- Edit Category Title
 				header(SI_AC_MENU_HEADER_EDIT_CATEGORY),
-                -- Predefined Text
+                -- Predefined Text Description
                 {
                     type = "description",
                     text = editCat_getPredef, -- or string id or function returning a string
@@ -1192,97 +1638,9 @@ function AutoCategory.AddonMenuInit()
                     width = "full", --or "half" (optional)
                 },
                 -- Name EditBox - AC_EDITBOX_EDITRULE_NAME
-                {
-					type = "editbox",
-					name = SI_AC_MENU_EC_EDITBOX_NAME,
-					tooltip = SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP,
-					getFunc = function()  
-                        if currentRule then
-                            return currentRule.name
-                        end
-                        return ""
-					end,
-					warning = function()
-						return warningDuplicatedName.warningMessage
-					end,
-					setFunc = function(value) 
-                        local oldName = fieldData.editRuleCat.indexValue
-						if oldName == value then 
-							return
-						end
-						if value == "" then
-							warningDuplicatedName.warningMessage = L(
-								SI_AC_WARNING_CATEGORY_NAME_EMPTY)
-							value = oldName
-                            return
-						end
-						
-						local isDuplicated = IsRuleNameUsed(value)
-						if isDuplicated then
-							warningDuplicatedName.warningMessage = string.format(
-								L(SI_AC_WARNING_CATEGORY_NAME_DUPLICATED), 
-								value, GetUsableRuleName(value))
-							value = oldName
-                            --change editbox's value
-                            local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_NAME", "")
-                            control.editbox:SetText(value)
-                            return
-						end
-
-						fieldData.editRuleCat.indexValue = value
-                        currentRule.name = value
-                        
-						--Update bags so that every entry has the same name, should be changed to new name.
-						for i = 1, #saved.bags do
-							local bag = saved.bags[i]
-							local rules = bag.rules
-							for j = 1, #rules do
-								local rule = rules[j]
-								if rule.name == oldName then
-									rule.name = value
-								end
-							end
-						end
-						--Update drop downs
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-					end,
-					isMultiline = false,
-					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
-					width = "half",
-					reference = "AC_EDITBOX_EDITRULE_NAME",
-				},
+				CatSet_NameEdit_LAM:controlDef(),
                 -- Tag EditBox - AC_EDITBOX_EDITRULE_TAG
-				{
-					type = "editbox",
-					name = SI_AC_MENU_EC_EDITBOX_TAG,
-					tooltip = SI_AC_MENU_EC_EDITBOX_TAG_TOOLTIP,
-					getFunc = function() 
-						if currentRule then
-                            return currentRule.tag
-                        end
-                        return ""
-					end, 
-				 	setFunc = function(value) 
-                        local oldtag = currentRule.tag
-						if value == "" then
-							value = AC_EMPTY_TAG_NAME
-                            local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_TAG", "")
-                            control.editbox:SetText(value)
-						end
-                        
-                        currentRule.tag = value
-						
-						AutoCategory.cacheInitialize()
-						RefreshDropdownData()
-						fieldData.editRuleTag.indexValue = currentRule.tag
-						fieldData.editRuleCat.indexValue = currentRule.name
-					end,
-					isMultiline = false,
-					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
-					width = "half",
-					reference = "AC_EDITBOX_EDITRULE_TAG",
-				},
+				CatSet_TagEdit_LAM:controlDef(),
                 --Description EditBox
 				{
 					type = "editbox",
@@ -1293,40 +1651,42 @@ function AutoCategory.AddonMenuInit()
                             return currentRule.description
                         end
                         return ""
-					end, 
-					setFunc = function(value) 
+					end,
+					setFunc = function(value)
                         local oldval = currentRule.description
                         currentRule.description = value
                         if oldval ~= value then
                             AC.cacheInitialize() -- reset tooltips to new value
-                            RefreshDropdownData()
+                            AC_UI.RefreshDropdownData()
+							AC_UI.RefreshControls()
                         end
 					end,
 					isMultiline = false,
 					isExtraWide = true,
 					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "full",
+					reference = "AC_EDITBOX_EDITRULE_DESC",
 				},
                 -- Rule EditBox
 				{
 					type = "editbox",
 					name = SI_AC_MENU_EC_EDITBOX_RULE,
 					tooltip = SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP,
-					getFunc = function() 
+					getFunc = function()
                         if currentRule then
                             return currentRule.rule
                         end
                         ruleCheckStatus.err = nil
                         ruleCheckStatus.good = nil
                         return ""
-					end, 
-					setFunc = function(value) 
+					end,
+					setFunc = function(value)
                         currentRule.rule = value
                         ruleCheckStatus.err = currentRule:compile()
                         if ruleCheckStatus.err == "" then
                             ruleCheckStatus.err = nil
                             ruleCheckStatus.good = true
-							
+
                         else
                             ruleCheckStatus.good = nil
                         end
@@ -1345,19 +1705,19 @@ function AutoCategory.AddonMenuInit()
                     width = "half", --or "half" (optional)
                 },
                 -- RuleCheck Button
-				{			
+				{
 					type = "button",
 					name = SI_AC_MENU_EC_BUTTON_CHECK_RULE,
                     tooltip = SI_AC_MENU_EC_BUTTON_CHECK_RULE_TOOLTIP,
 					func = function()
-                        local ruleName = currentRule.name
-                        checkCurrentRule()
+                        --local ruleName = currentRule.name
+                        AC_UI.checkCurrentRule()
                     end,
 					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
 					width = "half",
 				},
 		    },
-			
+
 		},
         -- General Settings
         {
@@ -1377,13 +1737,13 @@ function AutoCategory.AddonMenuInit()
                 {
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,
-                    tooltip = 
+                    tooltip =
 						SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
-                    getFunc = function() 
-						return saved.general["SHOW_CATEGORY_ITEM_COUNT"] 
+                    getFunc = function()
+						return saved.general["SHOW_CATEGORY_ITEM_COUNT"]
 						end,
-                    setFunc = function(value) 
-						saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value 
+                    setFunc = function(value)
+						saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
 						end,
                 },
                 -- Show category collapse icon
@@ -1391,14 +1751,14 @@ function AutoCategory.AddonMenuInit()
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP,
-                    getFunc = function() 
-						return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] 
+                    getFunc = function()
+						return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"]
 						end,
-                    setFunc = function(value) 
-                    	saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value 
+                    setFunc = function(value)
+                    	saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value
                     	AutoCategory.RefreshCurrentList(true)
                     end,
-                },                
+                },
                 -- Save category collapse status
                 {
                     type = "checkbox",
@@ -1414,8 +1774,8 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
                     getFunc = function() return saved.general["SHOW_CATEGORY_SET_TITLE"] end,
-                    setFunc = function(value) 
-						saved.general["SHOW_CATEGORY_SET_TITLE"] = value 
+                    setFunc = function(value)
+						saved.general["SHOW_CATEGORY_SET_TITLE"] = value
 						AutoCategory.ResetCollapse(saved)
 					end,
                 },
@@ -1426,11 +1786,8 @@ function AutoCategory.AddonMenuInit()
             type = "submenu",
             name = SI_AC_MENU_SUBMENU_APPEARANCE_SETTING,
             reference = "AC_SUBMENU_APPEARANCE_SETTING",
-            controls = { 
-                {
-                    type = "description",
-                    text = SF.ColorText(L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), SF.hex.mocassin),
-                },
+            controls = {
+				description(SF.ColorText(L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), SF.hex.mocassin)),
                 divider(),
                 -- Category Text Font
                 {
@@ -1497,7 +1854,7 @@ function AutoCategory.AddonMenuInit()
                         saved.appearance["CATEGORY_FONT_COLOR"][1] = r
                         saved.appearance["CATEGORY_FONT_COLOR"][2] = g
                         saved.appearance["CATEGORY_FONT_COLOR"][3] = b
-                        saved.appearance["CATEGORY_FONT_COLOR"][4] = a 
+                        saved.appearance["CATEGORY_FONT_COLOR"][4] = a
                     end,
                     widgetRightAlign		= true,
                     widgetPositionAndResize	= -15,
@@ -1513,7 +1870,7 @@ function AutoCategory.AddonMenuInit()
                         saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][1] = r
                         saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][2] = g
                         saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][3] = b
-                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][4] = a 
+                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][4] = a
                     end,
                     widgetRightAlign		= true,
                     widgetPositionAndResize	= -15,
@@ -1523,10 +1880,10 @@ function AutoCategory.AddonMenuInit()
                     type = "editbox",
                     name = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE,
                     tooltip = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP,
-                    getFunc = function() 
+                    getFunc = function()
                         return saved.appearance["CATEGORY_OTHER_TEXT"]
-                    end, 
-                    setFunc = function(value) saved.appearance["CATEGORY_OTHER_TEXT"] = value end,  
+                    end,
+                    setFunc = function(value) saved.appearance["CATEGORY_OTHER_TEXT"] = value end,
                     width = "full",
                 },
                 -- Category Header Height
@@ -1545,17 +1902,14 @@ function AutoCategory.AddonMenuInit()
                     warning = SI_AC_WARNING_NEED_RELOAD_UI,
                 },
             },
-        }, 
+        },
 		-- Gamepad settings
 		{
             type = "submenu",
             name = SI_AC_MENU_SUBMENU_GAMEPAD_SETTING,
             reference = "AC_SUBMENU_GAMEPAD_SETTING",
-            controls = { 
-                {
-                    type = "description",
-                    text = SF.ColorText(L(SI_AC_MENU_GMS_DESCRIPTION_TIP), SF.hex.mocassin),
-                },
+            controls = {
+				description(SF.ColorText(L(SI_AC_MENU_GMS_DESCRIPTION_TIP), SF.hex.mocassin)),
                 divider(),
                 {
                     type = "checkbox",

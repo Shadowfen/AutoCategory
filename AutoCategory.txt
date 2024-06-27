@@ -1,12 +1,12 @@
 ## Title: AutoCategory
-## APIVersion: 101042 101041
+## APIVersion: 101042 101043
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 3.6.7
-## AddOnVersion: 94
+## Version: 4.0
+## AddOnVersion: 95
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=36 LibCustomMenu LibSFUtils>=52 LibMediaProvider-1.0>=28 LibDebugLogger
-## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
+## DependsOn: LibAddonMenu-2.0>=36 LibCustomMenu LibSFUtils>=52 LibMediaProvider-1.0>=30 LibDebugLogger>=263
+## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker>=75 MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
 
 ; LibAddonMenuOrderListBox  
 
@@ -25,14 +25,14 @@ AutoCategory.lua
 AddonMenu.lua
 AutoCategory_RuleFunc.lua
 AutoCategory_API.lua
-Misc_Plugins.lua
+plugins/Misc_Plugins.lua
 
 ; new style addon plugin files
-ItemMarker_Plugin.lua
-ItemSaver_Plugin.lua
-FCOIS_Plugin.lua
-Iakoni_GearChanger_Plugin.lua
-UnknownTracker_Plugin.lua
+plugins/ItemMarker_Plugin.lua
+plugins/ItemSaver_Plugin.lua
+plugins/FCOIS_Plugin.lua
+plugins/Iakoni_GearChanger_Plugin.lua
+plugins/UnknownTracker_Plugin.lua
 
 ; old integration with other addons files
 AutoCategory_Integrations_QuickMenu.lua

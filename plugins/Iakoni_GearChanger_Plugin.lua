@@ -265,7 +265,8 @@ local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
 					for _,u in pairs(GearChangerByIakoni.WornArray) do
 						if itemID==a[i][u] then
 							--find gear in set i
-							table.insert(result, i)
+                            result[#result+1] = i
+							--table.insert(result, i)
 						end
 					end
 				end

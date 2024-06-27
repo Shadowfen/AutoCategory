@@ -1,5 +1,6 @@
 --====API====--
 local SF = LibSFUtils
+local AC = AutoCategory
 
 -- For use by bulk updaters of inventory (ESPECIALLY the Guild Bank)
 -- to not perform sorting for a specific period of time (until the
@@ -109,7 +110,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local bag_type_id = convert2BagTypeId(bagId, specialType)
 	if not bag_type_id then
 		-- invalid bag
-		logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
+		--logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
 		return false, "", 0, nil, nil
 	end
 	
@@ -145,39 +146,41 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	
 	local bag = AutoCategory.saved.bags[bag_type_id]
 	if not bag then
-		logger:Error("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
+		--AutoCategory.logger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
 		return  false, "", 0, nil, nil
 	end
 	if not bag.rules then
-		logger:Error("[MatchCategoryRules] bag.rules was nil")
+		--AutoCategory.logger:Warning("[MatchCategoryRules] bag.rules was nil")
 		return  false, "", 0, nil, nil
 	end
 	for i = 1, #bag.rules do
-		local entry = bag.rules[i] 
-		local rule = AutoCategory.GetRuleByName(entry.name)
-		if checkValidRule(entry.name, rule) then
-			local ruleCode = AutoCategory.compiledRules[entry.name]
-			if ruleCode then
-				setfenv( ruleCode, AutoCategory.Environment )
-				AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
-				local exec_ok, res = pcall( ruleCode )
-				if exec_ok then
-					local catname = adjustName(rule.name,
-											AutoCategory.AdditionCategoryName)
-					AutoCategory.SetCategoryCollapsed(bag_type_id, catname,
-						AutoCategory.IsCategoryCollapsed(bag_type_id, catname))
-					if res == true then
-						return true, 
-							catname, 
-							entry.priority, 
-							bag_type_id, 
-							entry.isHidden
+		local entry = bag.rules[i]
+		if entry.name then
+			local rule = AutoCategory.GetRuleByName(entry.name)
+			if rule and checkValidRule(entry.name, rule) then
+				local ruleCode = AutoCategory.compiledRules[entry.name]
+				if ruleCode then
+					setfenv( ruleCode, AutoCategory.Environment )
+					AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
+					local exec_ok, res = pcall( ruleCode )
+					if exec_ok then
+						local catname = adjustName(rule.name,
+												AutoCategory.AdditionCategoryName)
+						AutoCategory.SetCategoryCollapsed(bag_type_id, catname,
+							AutoCategory.IsCategoryCollapsed(bag_type_id, catname))
+						if res == true then
+							return true, 
+								catname, 
+								entry.priority, 
+								bag_type_id, 
+								entry.isHidden
+						end
+						
+					else
+						AutoCategory.logger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
+						rule:setError(true, res)
+						AutoCategory.compiledRules[entry.name] = nil
 					end
-					
-				else
-					logger:Error("Error2: " .. entry.name.. " - ".. res)
-					rule:setError(true, res)
-					AutoCategory.compiledRules[entry.name] = nil
 				end
 			end
 		end
