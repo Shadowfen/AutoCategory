@@ -285,6 +285,10 @@ function AutoCategory.renameBagRule(oldName, newName)
 	--Update bags so that every entry has the same name, should be changed to new name.
 	for i = 1, 6 do --#saved.bags do	-- for all bags
 		local bag = saved.bags[i]
+		if not bag then 
+			bag = { rules = {}, }
+			saved.bags[i] = bag
+		end
 		local rules = bag.rules
 		for j = 1, #rules do   -- for all bagrules in the bag
 			local rule = rules[j]
