@@ -86,7 +86,6 @@ local sortKeys = {
 }
 
 local CATEGORY_HEADER = 998
-local CATEGORY_SUBHEADER = 997
 
 -- convenience function
 local function NilOrLessThan(value1, value2)
@@ -102,10 +101,10 @@ local function NilOrLessThan(value1, value2)
 		end
 		return false
 
-    else 
+    else
         return value1 < value2
     end
-end 
+end
 
 local function buildHashString(...)
 	return SF.dstr(":",...)
@@ -138,27 +137,27 @@ local function getHeaderFace()
 	if header_face ~= nil then
 		return header_face
 	end
-	local appearance = AutoCategory.acctSaved.appearance
-	--logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	local appearance = AC.acctSaved.appearance
+	--AC.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	--logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	--AC.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
 	return header_face
 end
 
 -- setup function for category header type to be added to the scroll list
 local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	--set header
-	local appearance = AutoCategory.acctSaved.appearance
-	local headerLabel = rowControl:GetNamedChild("HeaderName")	
+	local appearance = AC.acctSaved.appearance
+	local headerLabel = rowControl:GetNamedChild("HeaderName")
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
-	headerLabel:SetFont(string.format('%s|%d|%s', 
+	headerLabel:SetFont(string.format('%s|%d|%s',
 			getHeaderFace(), 
-			appearance["CATEGORY_FONT_SIZE"], 
+			appearance["CATEGORY_FONT_SIZE"],
 			appearance["CATEGORY_FONT_STYLE"]))
 
 	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
 	local data = slot.dataEntry.data
-	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, "Unknown")
+	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"])
 	local cateName = data.AC_categoryName
 	data.AC_bagTypeId = SF.nilDefault(data.AC_bagTypeId, 0)
 	local bagTypeId = data.AC_bagTypeId
@@ -167,7 +166,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
-	if bagTypeId and cateName and cache.entriesByName[bagTypeId][cateName] then
+	if cache.entriesByName[bagTypeId][cateName] then
 		if cache.entriesByName[bagTypeId][cateName].isHidden then
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
@@ -278,7 +277,6 @@ end
 local function runRulesOnEntry(itemEntry, specialType)
 	--only match on items(not headers)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
-	if itemEntry.typeId == CATEGORY_SUBHEADER then return end
 
 	local data = itemEntry.data
 	local bagId = data.bagId
@@ -488,7 +486,7 @@ local function createNewScrollData(scrollData, sortfn)
 	for _, itemEntry in ipairs(scrollData) do 
 		-- add visible non-header rows to the new scrollData table
 		if not isHiddenEntry(itemEntry) then
-			if itemEntry.typeId ~= CATEGORY_HEADER and itemEntry.typeId ~= CATEGORY_SUBHEADER and not isCollapsed(itemEntry) then 
+			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
 				-- add item if visible
 				table.insert(newScrollData, itemEntry)
 			end
@@ -578,7 +576,7 @@ local function prehookSort(self, inventoryType)
 	-- add header rows
 	--> rebuild scrollData with headers and visible items
 	list.data = createNewScrollData(scrollData, zo_inventory.sortFn) 
-	--table.sort(list.data, zo_inventory.sortFn)  
+	--table.sort(list.data, zo_inventory.sortFn)
 	ZO_ScrollList_Commit(list)
 	return false
 end
