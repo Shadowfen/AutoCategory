@@ -13,7 +13,7 @@ In order to reduce the impact of the add-on:
 		without having to re-execute all the rules every time.
 		However, 'itemEntry.data' will not persist forever and will be reset 
 		at some point, and rules will need to be re-executed, but this is not much of an issue.
-		
+
 	2 - A change detection strategy is used to re-execute rules when necessary.
 		A hash for each item is used to trigger re-execution of rules for a single item based on:
 			- Time, as a safety net, in case a change were missed for any reason: 
@@ -21,7 +21,7 @@ In order to reduce the impact of the add-on:
 			- Base game data: test various variables like isPlayerLocked, brandNew, 
 				isInArmory etc.
 			- FCOIS data: test if item's marks have changed
-			
+
 		Some API events are monitored:
 			- A hook on PLAYER_INVENTORY:OnInventorySlotUpdated triggers re-execution of rules for a single item
 			- A callback on LAM-PanelClosed triggers re-execution of rules (due to potential rule changes)
@@ -92,16 +92,16 @@ local CATEGORY_SUBHEADER = 997
 local function NilOrLessThan(value1, value2)
     if value1 == nil then
         return true
-		
+
     elseif value2 == nil then
         return false
-		
+
 	elseif type(value1) == "boolean" then
 		if value1 == false then 
 			return true 
 		end
 		return false
-		
+
     else 
         return value1 < value2
     end
@@ -155,7 +155,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			getHeaderFace(), 
 			appearance["CATEGORY_FONT_SIZE"], 
 			appearance["CATEGORY_FONT_STYLE"]))
-	
+
 	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
 	local data = slot.dataEntry.data
 	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, "Unknown")
@@ -164,14 +164,14 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	local bagTypeId = data.AC_bagTypeId
 	data.AC_catCount = SF.nilDefault(data.AC_catCount, 0)
 	local num = data.AC_catCount
-	
+
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
 	if bagTypeId and cateName and cache.entriesByName[bagTypeId][cateName] then
 		if cache.entriesByName[bagTypeId][cateName].isHidden then
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
-		
+
 	elseif AC.saved.bags[bagTypeId].isUngroupedHidden and
 			cateName == AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] then
 		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
@@ -180,7 +180,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 						 appearance[headerColor][2], 
 						 appearance[headerColor][3], 
 						 appearance[headerColor][4])
-	
+
 	-- Add count to category name if selected in options
     if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
@@ -189,11 +189,11 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			appearance[headerColor][2],
 			appearance[headerColor][3], 
 			appearance[headerColor][4])
-			
+
     else
         headerLabel:SetText(cateName)
     end	
-		
+
 	-- set the collapse marker
 	local marker = rowControl:GetNamedChild("CollapseMarker")
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
@@ -202,17 +202,17 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 		if collapsed then
 			-- is collapsed, so (+)
 			marker:SetTexture("EsoUI/Art/Buttons/plus_up.dds")
-			
+
 		else
 			-- is not collapsed so (-)
 			marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
 		end
 		AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, collapsed)
-		
+
 	else
 		marker:SetHidden(true)
 	end
-	
+
 	rowControl:SetHeight(
 		AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
 	rowControl.slot = slot
@@ -222,7 +222,7 @@ end
 local function AddTypeToList(rowHeight, datalist, inven_ndx, headerType) 
 	if datalist == nil then return end
 	if headerType == nil then headerType = CATEGORY_HEADER end
-	
+
 	local templateName = "AC_InventoryItemRowHeader"
 	local setupFunc = setup_InventoryItemRowHeader
 	local resetCB = ZO_InventorySlot_OnPoolReset
@@ -256,22 +256,22 @@ end
 
 local function isHiddenEntry(itemEntry)
 	if not itemEntry or not itemEntry.data then return false end
-	
+
 	local data = itemEntry.data
 	if data.AC_isHidden or data.AC_bagTypeId == nil then return true end
 	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then 
 		return true 
 	end
-	
+
 	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
 end
 
 local function isCollapsed(itemEntry)
 	if not itemEntry or not itemEntry.data then return false end
-	
+
 	local data = itemEntry.data
 	if data.AC_bagTypeId == nil then return true end
-	
+
 	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
 end
 
@@ -279,11 +279,11 @@ local function runRulesOnEntry(itemEntry, specialType)
 	--only match on items(not headers)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
 	if itemEntry.typeId == CATEGORY_SUBHEADER then return end
-	
+
 	local data = itemEntry.data
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
-	
+
 	local matched, categoryName, categoryPriority, bagTypeId, isHidden 
 				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
 	data.AC_matched = matched
@@ -291,7 +291,7 @@ local function runRulesOnEntry(itemEntry, specialType)
 		data.AC_categoryName = categoryName
 		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
 		data.AC_isHidden = isHidden
-		
+
 	else
 		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 		data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
@@ -300,7 +300,7 @@ local function runRulesOnEntry(itemEntry, specialType)
 	end
 	data.AC_bagTypeId = bagTypeId
 	data.AC_isHeader = false
-		
+
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
@@ -315,10 +315,10 @@ local function sortInventoryFn(inven, left, right, key, order)
 		return ZO_TableOrderingFunction(left.data, right.data, 
 			inven.currentSortKey, sortKeys, inven.currentSortOrder)
 	end
-	
+
 	local ldata = left.data
 	local rdata = right.data
-	
+
 	if AutoCategory.Enabled then
 		if rdata.AC_sortPriorityName ~= ldata.AC_sortPriorityName then
 			return NilOrLessThan(ldata.AC_sortPriorityName, rdata.AC_sortPriorityName)
@@ -327,17 +327,17 @@ local function sortInventoryFn(inven, left, right, key, order)
 			return NilOrLessThan(rdata.AC_isHeader, ldata.AC_isHeader)
 		end
 	end
-	
+
 	--compatible with quality sort
 	if type(inven.sortKey) == "function" then 
 		if inven.sortOrder == ZO_SORT_ORDER_UP then
 			return inven.sortKey(left.data, right.data)
-			
+
 		else
 			return inven.sortKey(right.data, left.data)
 		end
 	end
-	
+
 	if key == nil or sortKeys[key] == nil then
 		-- possible fix for Arkadius' Trading Tools sort bug
 		key =  "statValue"
@@ -371,15 +371,15 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	local data = itemEntry.data
 	local changeDetected = false
 	local currentTime = os.clock()
-	
+
 	local function setChange(val)
 		if val == false then return false end
-		
+
 		data.AC_lastUpdateTime = currentTime
 		changeDetected = true
 		return true
 	end
-	
+
 	if needReload == true then
 		return setChange(true)
 	end
@@ -393,7 +393,7 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	--- Test last update time, triggers update if more than 4s
 	if data.AC_lastUpdateTime == nil then
 		return setChange(true)
-		
+
 	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 4 then
 		return setChange(true)
 	end
@@ -418,11 +418,11 @@ end
 local function handleRules(scrollData, needsReload, specialType)
 	-- keep track of if any changes to rule results occurred
 	local updateCount = 0 
-	
+
 	-- at craft stations scrollData seems to be reset every time, 
 	-- so need to always reload
 	local reloadAll = needsReload or false 
-	
+
 	for _, itemEntry in ipairs(scrollData) do
 		if itemEntry.typeId ~= CATEGORY_HEADER then 
 			local newHash = constructEntryHash(itemEntry)
@@ -456,13 +456,13 @@ end
 local function createNewScrollData(scrollData, sortfn)
 	local newScrollData = {} --- output, entries sorted with category headers
 	local bagTypeId = getListBagID(scrollData)
-	
+
 	-- --------------------
 	-- The categoryList info is collected and then each entry is passed
 	-- to createHeaderEntry() to make a header row
 	local categoryList = {} -- [name] {AC_catCount, AC_sortPriorityName,
 							--         AC_categoryName, AC_bagTypeId }
-							
+
 	local function addCount(name)
 		categoryList[name] = SF.safeTable(categoryList[name])
 		if categoryList[name].AC_catCount == nil then
@@ -508,11 +508,11 @@ local function createNewScrollData(scrollData, sortfn)
 			} 
 		end
 		local catInfo = categoryList[AC_categoryName]
-		
+
 		if itemEntry.typeId ~= CATEGORY_HEADER then 
 			-- this is an item, start new count
 			addCount(AC_categoryName)
-			
+
 		elseif itemEntry.typeId == CATEGORY_HEADER 
 			and AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, AC_categoryName) then 
 			-- this is a collapsed category --> reuse previous count, since
@@ -520,7 +520,7 @@ local function createNewScrollData(scrollData, sortfn)
 			setCount(data.AC_bagTypeId, AC_categoryName, data.AC_catCount)
 		end	
 	end
-	
+
 	-- Create headers and append to newScrollData
 	for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
@@ -542,7 +542,7 @@ local function prehookSort(self, inventoryType)
 	-- inventory info from esoui/ingame/inventory/inventory.lua
 	local zo_inventory = self.inventories[inventoryType]
 					or self.inventories[self.selectedTabType]
-	
+
 	--change sort function
 	zo_inventory.sortFn =  function(left, right) 
 			return sortInventoryFn(zo_inventory, left, right,
@@ -567,15 +567,15 @@ local function prehookSort(self, inventoryType)
 	local list = zo_inventory.listView 
 	local scrollData = ZO_ScrollList_GetDataList(list) 
 	local bagId = getListBagID(scrollData)
-	
+
 	local needsReload = true
 	if scene == "bank" or scene == "guildBank" then
 		needsReload = false
 	end
 	handleRules(scrollData, needsReload) --> update rules' results if necessary
 
-	
-	-- add header rows	   
+
+	-- add header rows
 	--> rebuild scrollData with headers and visible items
 	list.data = createNewScrollData(scrollData, zo_inventory.sortFn) 
 	--table.sort(list.data, zo_inventory.sortFn)  
@@ -626,34 +626,34 @@ end
 function AutoCategory.HookKeyboardMode()
 	--Add a new header row data type
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
-	
+
     AddTypeToList(rowHeight, ZO_PlayerInventoryList,  INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
-	
+
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)
-	
+
     AddTypeToList(rowHeight,
 		ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack, nil )
-	
+
 	--- sort hooks
 	ZO_PreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
     ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
     ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
     ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
 													   "SortData",  prehookCraftSort)
-	
+
 	--- changes detection events/hooks (anticipate if rules results may have changed)
 	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
-	
+
 	-- Other events that cause a full refresh
 	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", 
 		refresh, true)
-	
+
 	AC.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
 
 end
