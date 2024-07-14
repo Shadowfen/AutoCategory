@@ -1,6 +1,19 @@
+
+[COLOR="DeepSkyBlue"]4.1.1 (98)[/COLOR]:
+[LIST]
+[*] Fixed lack of tags in dropdowns.
+[*] Fixed rule duplication in conversion from 3.6.7.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.1 (97)[/COLOR]:
+[LIST]
+[*] Integration with GridList returns!!
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.0.2 (96)[/COLOR]:
 [LIST]
 [*] Fix a problem in rule conversion where a bag is missing from the saved variables. (Reported as: AutoCategory.lua:288: attempt to index a nil value)
+[/LIST]
 
 [COLOR="DeepSkyBlue"]4.0 (95)[/COLOR]:
 [COLOR="Red"]WARNING: BEFORE YOU UPGRADE - [/COLOR] be sure to back up (make a copy of) your SavedVariables\AutoCategory.lua file. The way that your category rules are stored has changed. This backup will preserve your old rules for you to be able to refer to if necessary.

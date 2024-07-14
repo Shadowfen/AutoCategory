@@ -184,15 +184,12 @@ function AutoCategory.CVT:append(choice, value, tooltip)
 	if not choice then return false end
 
 	self.dirty = 1
-	self.choices[#self.choices+1] = choice
-	--table.insert(self.choices, choice)
+	self.choices[#self.choices+1] = choice -- (required)
 	if value and self.choicesValues then
-		self.choicesValues[#self.choicesValues+1] = value
-		--table.insert(self.choicesValues, value)
+		self.choicesValues[#self.choicesValues+1] = value	-- (optional)
 	end
 	if tooltip and self.choicesTooltips then
-		self.choicesTooltips[#self.choicesTooltips+1] = tooltip
-		--table.insert(self.choicesTooltips, tooltip)
+		self.choicesTooltips[#self.choicesTooltips+1] = tooltip	-- (optional)
 	end
 	return true
 end
@@ -428,17 +425,51 @@ function AutoCategory.GetUsableRuleName(name)
 	return testName
 end
 
+-- check that all required fields are set
+-- returns err (t/f), errmsg (string)
+function AutoCategory.isValidRule(ruledef)
+    --make sure rule is well-formed
+	-- validate rule name
+    if (not ruledef or not ruledef.name
+			or type(ruledef.name) ~= "string" or ruledef.name == "") then
+        return false, "name is required"
+    end
+	-- validate rule text
+    if (not ruledef.rule or type(ruledef.rule) ~= "string" or ruledef.rule == "") then
+		ruledef.error = true
+        return false, "rule text is required"
+    end
+	-- validate optional rule description
+    if ruledef.description then -- description is optional
+        if (type(ruledef.description) ~= "string") then
+            return false, "non-nil description must be a string"
+        end
+    end
+	-- validate optional rule tag
+    if ruledef.tag then -- tag is optional
+        if (type(ruledef.tag) ~= "string") then
+            return false, "non-nil tag must be a string"
+        end
+    end
+    return true
+end
+
 -- -------------------------------------------------
 -- collected functions to be applied to a rule
 --
 -- This will be set as the metatable for each rule structure loaded in or created
--- because the metatable does not count against the stricture of no functions 
+-- because the metatable does not count against the stricture of no functions
 -- within saved variables.
 AC.rulefuncs = {
 	-- check if rule def is valid (required keys all present)
 	isValid = function(r)
 			return AutoCategory.isValidRule(r)
-		end,
+	end,
+
+	--determine if a rule is marked as pre-defined
+	isPredefined = function(r)
+	    return r.pred and r.pred ==1
+	end,
 
 	-- return the description if the rule has one, otherwise return the name
 	getDesc = function(r)
@@ -449,7 +480,7 @@ AC.rulefuncs = {
 			return tt
 		end,
 
-	-- handle error marking for a rule	
+	-- handle error marking for a rule
 	setError = function(r,dmg,errm)
 			r.damaged = dmg
 			r.err = errm

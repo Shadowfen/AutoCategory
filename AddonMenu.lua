@@ -1,16 +1,22 @@
+-- aliases
 local LAM = LibAddonMenu2
 local LMP = LibMediaProvider
-
-local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
+
+local L = GetString
+
+local CVT = AutoCategory.CVT
+
+local cache = AutoCategory.cache
+local saved = AutoCategory.saved
+
+
+-- variables
 
 AC_UI = {}
 
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
-
-local cache = AutoCategory.cache
-local saved = AutoCategory.saved
 
 --cache data for dropdown: 
 cache.bags_cvt.choices = {
@@ -37,6 +43,8 @@ cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
 }
+
+-- -------------------------------------------------------
 
 local function divider()
 	return {
@@ -66,8 +74,6 @@ local function description(textId, titleId)
 end
 
 
--- aliases
-local CVT = AutoCategory.CVT
 
 -- -------------------------------------------------------
 
@@ -547,7 +553,7 @@ end
 -- refresh the selection value of the cvt lists for AddCat_SelectTag_LAM from the 
 -- current contents of the cache.tags list.
 function AC_UI.AddCat_SelectTag_LAM:refresh()
-	if self:getValue() == nil then
+	if self:getValue() == nil or self:getValue() == "" then
 		self:select(cache.tags)
 	end
 end
@@ -570,7 +576,7 @@ function AC_UI.AddCat_SelectTag_LAM:controlDef()
 			type = "dropdown",
 			name = SI_AC_MENU_AC_DROPDOWN_TAG,
 			scrollable = true,
-			choices         = self.cvt.choices,
+			choices = self.cvt.choices,
 			sort = "name-up",
 
 			getFunc = function()
@@ -641,7 +647,6 @@ function AC_UI.AddCat_SelectRule_LAM:controlDef()
 			name = SI_AC_MENU_AC_DROPDOWN_CATEGORY,
 			scrollable = true,
 			choices = self.cvt.choices,
-			--choicesValues = self.cvt.choicesValues,
 			choicesTooltips = self.cvt.choicesTooltips,
 			sort = "name-up",
 
@@ -890,7 +895,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function AC_UI.CatSet_SelectRule_LAM:getValue()
-	AC.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	--AC.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
@@ -1093,7 +1098,7 @@ function AC_UI.CatSet_NameEdit_LAM:controlDef()
 			end,
 			setFunc = function(value) self:setValue(value) end,
 			isMultiline = false,
-			disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+			disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 			width = "half",
 			reference = self:getControlName(),
 		}
@@ -1173,7 +1178,7 @@ function AC_UI.CatSet_TagEdit_LAM:controlDef()
 		getFunc = function() return self:getValue() end,
 		setFunc = function(value) self:setValue(value) end,
 		isMultiline = false,
-		disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+		disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 		width = "half",
 		reference = self:getControlName(),
 	}
@@ -1261,14 +1266,14 @@ function AC_UI.CatSet_DeleteCat_LAM:controlDef()
 			isDangerous = true,
 			func = function()  self:execute() end,
 			width = "half",
-			disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+			disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 		}
 end
 -- -------------------------------------------------------
 
 
 local function editCat_getPredef()
-    if currentRule and currentRule.pred == 1 then
+    if currentRule and currentRule:isPredefined() then
         return L(SI_AC_MENU_EC_BUTTON_PREDEFINED)
 
     else
@@ -1462,7 +1467,7 @@ local function CreatePanel()
 		registerForDefaults = true,
 		resetFunc = function()
 			AutoCategory.ResetToDefaults()
-			AutoCategory.UpdateCurrentSavedVars()
+			AutoCategory.UpdateCurrentSavedVars()	-- needed if swap acctwide on/off
 			AutoCategory.cacheInitialize()
 
 			BagSet_SelectBag_LAM:select(AC_BAG_TYPE_BACKPACK)
@@ -1479,19 +1484,33 @@ local function CreatePanel()
 end
 
 
+function AutoCategory.debugBagTags()
+	AddCat_SelectTag_LAM:assign( { choices=cache.tags })
+	d("AddCat_SelectTag_LAM:")
+	for k, v in pairs(AddCat_SelectTag_LAM.cvt.choices) do
+		if type(v) == "table" then
+			for k1,v1 in pairs(v) do
+				d("k = "..k.."   k1="..k1.."  v1="..SF.str(v1))
+			end
+		else
+		    d("k = "..k.." v= "..SF.str(v))
+		end
+	end
+end
+
 
 function AutoCategory.AddonMenuInit()
     AC.cacheInitialize()
 
     -- initialize tables
 	BagSet_SelectBag_LAM:assign(cache.bags_cvt)
-	--BagSet_SelectBag_LAM:select(cache.bags_cvt.choicesValues)
-	AddCat_SelectTag_LAM:assign( { choices=cache.tags })
+	AddCat_SelectTag_LAM:assign( { choices=cache.tags } )
+	CatSet_SelectTag_LAM:assign( { choices=cache.tags} )
+
+	BagSet_SelectBag_LAM:select({}) --cache.bags_cvt.choicesValues)
 
     -- AddCat_SelectRule_LAM will get populated by RefreshDropdownData()
 	AddCat_SelectRule_LAM:clear()
-
-	CatSet_SelectTag_LAM:assign( { choices=cache.tags})
 
 	ImpExp_ImportBag_LAM:assign(cache.bags_cvt)
 
@@ -1512,7 +1531,7 @@ function AutoCategory.AddonMenuInit()
             end,
             setFunc = function(value)
                 AutoCategory.charSaved.accountWide = value
-                AutoCategory.UpdateCurrentSavedVars()
+                AutoCategory.UpdateCurrentSavedVars()	-- needed if swap acctwide on/off
 
 				BagSet_SelectBag_LAM:select(AC_BAG_TYPE_BACKPACK)
 				BagSet_SelectRule_LAM:clearIndex()
@@ -1663,7 +1682,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					isMultiline = false,
 					isExtraWide = true,
-					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+					disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 					width = "full",
 					reference = "AC_EDITBOX_EDITRULE_DESC",
 				},
@@ -1693,7 +1712,7 @@ function AutoCategory.AddonMenuInit()
                         end,
 					isMultiline = true,
 					isExtraWide = true,
-					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+					disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 					width = "full",
 					reference = "AC_EDITBOX_EDITRULE_RULE",
 				},
@@ -1710,10 +1729,9 @@ function AutoCategory.AddonMenuInit()
 					name = SI_AC_MENU_EC_BUTTON_CHECK_RULE,
                     tooltip = SI_AC_MENU_EC_BUTTON_CHECK_RULE_TOOLTIP,
 					func = function()
-                        --local ruleName = currentRule.name
                         AC_UI.checkCurrentRule()
                     end,
-					disabled = function() return currentRule == nil or currentRule.pred == 1 end,
+					disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 					width = "half",
 				},
 		    },

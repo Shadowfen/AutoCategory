@@ -561,16 +561,14 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.IsInCurrentZone( ... )
 	local fn = "isinzone"
-	
+
 	local itemName = string.lower(GetItemLinkName(AC.checkingItemLink))
-	
-	local logger = LibDebugLogger("AutoCategory")
 	local zoneName = string.lower(ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex())))
 	if( string.find(zoneName,"alik'r") ~= nil ) then
 		-- because maps never say "Alik'r Desert"
 		zoneName = "alik'r"	
 	end
-	
+
 	if string.find(itemName,zoneName) ~= nil then
 		return true
 	end

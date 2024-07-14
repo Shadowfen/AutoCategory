@@ -226,24 +226,17 @@ function AutoCategory_Iakoni.LoadLanguage(defaultlang)
     AutoCategory.LoadLanguage(localization_strings,"en")
 end
 
-function AutoCategory_Iakoni.Initialize(loadpred)
+function AutoCategory_Iakoni.Initialize()
 	if not GearChangerByIakoni then
         AutoCategory.AddRuleFunc("setindex", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("inset", AutoCategory.dummyRuleFunc)
         return
     end
-    
+
 	AutoCategory.logger:Warn("Initializing Iakoni Gear Changer plugin integration")
     -- reinitialize strings
     AutoCategory.LoadLanguage(localization_strings,"en")
-    
-    -- load predefinedRules
-	--if loadpred then
-		AutoCategory.logger:Info("Loading pre-defines for Iakoni Gear Changer - "..#AutoCategory_Iakoni.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
-		AutoCategory.AddPredefinedRules(AutoCategory_Iakoni.predefinedRules)
-		AutoCategory.logger:Info("Finsihed loading pre-defines for Iakoni Gear Changer - "..#AutoCategory_Iakoni.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
-	--end
-    
+
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("setindex", AutoCategory_Iakoni.RuleFunc.SetIndex)
     AutoCategory.AddRuleFunc("inset", AutoCategory_Iakoni.RuleFunc.InSet)

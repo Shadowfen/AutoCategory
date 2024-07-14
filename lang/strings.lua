@@ -6,7 +6,6 @@
 AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
 
 AutoCategory_localization_strings["en"] = {
-    -- Bags strings
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Backpack",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "Bank",
     SI_AC_BAGTYPE_SHOWNAME_GUILDBANK = "Guild Bank",
@@ -20,28 +19,22 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION = "Destruct/Improvement in Craft Station", 
     SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK = "Home Storage Chests", 
 
-    -- Text Alignment Option strings
     SI_AC_ALIGNMENT_LEFT = "Left",
     SI_AC_ALIGNMENT_CENTER = "Center",
     SI_AC_ALIGNMENT_RIGHT = "Right",
 
-    --
     SI_AC_DEFAULT_NAME_EMPTY_TAG = "<Empty>",
     SI_AC_DEFAULT_NAME_CATEGORY_OTHER = "Others",
     SI_AC_DEFAULT_NAME_NEW_CATEGORY = "NewCategory",
 
-    -- warning strings
     SI_AC_WARNING_CATEGORY_MISSING = "This category is missing, please make sure the category with this name exist.",
     SI_AC_WARNING_CATEGORY_NAME_EMPTY = "Category name cannot be empty.",
     SI_AC_WARNING_CATEGORY_NAME_DUPLICATED = "Name '%s' is duplicated, you can try '%s'.",
     SI_AC_WARNING_NEED_RELOAD_UI = "Need Reload UI",
 
-    -- Account-wide Settings strings
     SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Account-wide Setting",
     SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP = "Use account-wide setting instead of character setting",
-    SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
 
-    -- Bag Settings strings
     SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Bag Setting]|r",
     SI_AC_MENU_BS_DROPDOWN_BAG = "Bag",
     SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP = "Select a bag to modify categories that are being used",
@@ -68,7 +61,6 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP = "Add selected category to the bag",
     SI_AC_MENU_AC_BUTTON_NEED_HELP = "Need Help?",
 
-    -- Import Bag Settings strings
     SI_AC_MENU_HEADER_IMPORT_BAG_SETTING = "Import Bag Setting",
     SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG = "Import From Bag",
     SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP = "Select a bag setting to import from.",
@@ -78,16 +70,15 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_HEADER_UNIFY_BAG_SETTINGS = "Unify All Bag Settings",
     SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS = "Export to all bags",
     SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP = "Will replace all the bag settings with current bag setting!",
-    SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
 
-    -- Category Settings strings
     SI_AC_MENU_SUBMENU_CATEGORY_SETTING = "|c0066FF[Category Setting]|r",
     SI_AC_MENU_CS_DROPDOWN_TAG = "Tag",
     SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP = "Tag the category and make them organized.",
     SI_AC_MENU_CS_DROPDOWN_CATEGORY = "Category",
 
     SI_AC_MENU_HEADER_EDIT_CATEGORY = "Edit Category",
-    SI_AC_MENU_EC_BUTTON_PREDEFINED = "|cFF0000Pre-defined. Read-only|r",
+    SI_AC_MENU_EC_BUTTON_PREDEFINED = "Pre-defined. Read-Only.",
+    --SI_AC_MENU_EC_BUTTON_PREDEFINED_TOOLTIP = "Predefined rules cannot be changed or deleted. You must copy it into a new rule and change that one.",
     SI_AC_MENU_EC_EDITBOX_NAME = "Name",
     SI_AC_MENU_EC_EDITBOX_NAME_TOOLTIP = "Name cannot be duplicated.",
     SI_AC_MENU_EC_EDITBOX_TAG = "Tag",
@@ -98,20 +89,19 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_EC_EDITBOX_RULE_TOOLTIP = "Rules will be applied to bags to categorize items",
     SI_AC_MENU_EC_BUTTON_LEARN_RULES = "Learn Rules",
     SI_AC_MENU_EC_BUTTON_LEARN_RULES_TOOLTIP = "Open on-line rule Help URL",
+    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY = "New",
+    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP = "Create a new category with selected tag",
     SI_AC_MENU_EC_BUTTON_CHECK_RULE = "Check",
     SI_AC_MENU_EC_BUTTON_CHECK_RESULT_GOOD = "|c2DC50EGood|r",
     SI_AC_MENU_EC_BUTTON_CHECK_RESULT_ERROR = "|cFF0000Error in rule|r",
     SI_AC_MENU_EC_BUTTON_CHECK_RESULT_WARNING = "|cEECA00Warning - Unrecognized:|r",
     SI_AC_MENU_EC_BUTTON_CHECK_RULE_TOOLTIP = "Check if the rule has errors",
     SI_AC_MENU_EC_BUTTON_COPY_CATEGORY = "Copy",
-    SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP = "Make a new copy of selected category. (The copy of a predefined-category is no longer predefined and can be modified.)",
+    SI_AC_MENU_EC_BUTTON_COPY_CATEGORY_TOOLTIP = "Make a new copy of selected category",
     SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY = "Delete",
-    SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP = "Delete selected category. Note that a predefined category cannot be deleted.",
-    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY = "New",
-    SI_AC_MENU_EC_BUTTON_NEW_CATEGORY_TOOLTIP = "Create a new category with selected tag",
+    SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP = "Delete selected category",
 
-    -- Appearance Settings strings
-    SI_AC_MENU_SUBMENU_APPEARANCE_SETTING = "|c0066FF[Appearance Setting]|r |c65000b(Keyboard-only)|r",
+    SI_AC_MENU_SUBMENU_APPEARANCE_SETTING = "|c0066FF[Appearance Setting]|r",
     SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP = "Change the header text's appearance. Do not need to reload ui, you can just swap tabs to refresh them. *ONLY work in keyboard mode*",
     SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT = "Category Text Font",
     SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE = "Category Text Style",
@@ -124,7 +114,6 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT = "Category Header Height",
     SI_AC_MENU_EC_BUTTON_RELOAD_UI = "Reload UI",
 
-    -- General Settings strings
     SI_AC_MENU_SUBMENU_GENERAL_SETTING = "|c0066FF[General Setting]|r",
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE = "Show Message When Toggle",
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP = "Will show a message in chat when toggling this add-on.",
@@ -137,20 +126,20 @@ AutoCategory_localization_strings["en"] = {
 	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE = "Show 'Set(name)' for autosets",
 	SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP = "Show 'Set(name)' instead of 'name' in inventory for autosets",
 
-    -- Gamepad Settings strings
-    SI_AC_MENU_SUBMENU_GAMEPAD_SETTING = "|c0066FF[Gamepad Settings]|r |c65000b(Gamepad-only)|r",
+    SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Import & Export]|r",
+    SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Account Wide Setting",
+
+    SI_AC_MENU_SUBMENU_GAMEPAD_SETTING = "|c0066FF[Gamepad Settings]|r",
     SI_AC_MENU_GMS_DESCRIPTION_TIP = "Only works in gamepad mode",
 	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD = "Enable inventory support",
 	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP = "Categories and rules will be applied to gamepad inventory.",
     SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES = "Enable extended Supplies category",
     SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP = "Supplies category will contain all items from inventory. Default Materials, Furnishings and Slottable items categories will be hidden.",
 
-    -- default Category Tags
     SI_AC_DEFAULT_TAG_GEARS= "Gears",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "General Items",
     SI_AC_DEFAULT_TAG_MATERIALS= "Materials",
 
-    -- default Category Names
     SI_AC_DEFAULT_CATEGORY_ARMOR= "Armor",
     SI_AC_DEFAULT_CATEGORY_BOE= "BoE",
     SI_AC_DEFAULT_CATEGORY_BOE_DESC= "BoE gears for selling",
@@ -211,12 +200,9 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_DEFAULT_CATEGORY_WOODWORKING= "Woodworking",
     SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC= "",
 
-    --
     SI_BINDING_NAME_TOGGLE_AUTO_CATEGORY= "Toggle Auto Category",
     SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON="Auto Category: ON",
     SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF="Auto Category: OFF",
-    
-    -- Collapses context menu
     SI_CONTEXT_MENU_EXPAND = "Expand",
     SI_CONTEXT_MENU_COLLAPSE = "Collapse",
     SI_CONTEXT_MENU_EXPAND_ALL = "Expand All",

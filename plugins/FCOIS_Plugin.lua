@@ -599,7 +599,7 @@ function AutoCategory_FCOIS.LoadLanguage(defaultlang)
 end
 
 --Initialize plugin for Auto Category - FCOIS
-function AutoCategory_FCOIS.Initialize(loadpred)
+function AutoCategory_FCOIS.Initialize()
 	if FCOIS == nil then
         AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
         AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
@@ -613,14 +613,7 @@ function AutoCategory_FCOIS.Initialize(loadpred)
     
     -- initialize strings
     AutoCategory_FCOIS.LoadLanguage("en")
-    
-    -- load predefinedRules
-	--if loadpred then
-		AutoCategory.logger:Info("Loading pre-defines for FCOIS - "..#AutoCategory_FCOIS.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
-		AutoCategory.AddPredefinedRules(AutoCategory_FCOIS.predefinedRules)
-		AutoCategory.logger:Info("Finsihed loading pre-defines for FCOIS - "..#AutoCategory_FCOIS.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
-	--end
-    
+
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
     AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)

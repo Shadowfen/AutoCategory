@@ -23,7 +23,7 @@ end
 function AutoCategory.AddRuleFunc(name, func)
     if func == nil then
         AutoCategory.Environment[name] = AutoCategory.dummyRuleFunc
-		
+
     else
         AutoCategory.Environment[name] = func
     end
@@ -42,42 +42,6 @@ function AutoCategory.LoadLanguage(stringtable, default_language)
     SF.LoadLanguage(stringtable, default_language)
 end
 
--- Add predefined rules to the saved list. Will not overwrite a rule that
--- already exists in the saved variables rules list.
---
--- Parameters: ruletable - (table) a table of rule entries, each rule entry being a table
---                   containing a name, tag, rule, description, and (optional) lua function
---                   to execute to evaluate the rule. Do NOT use zo_LoadString here!
-function AutoCategory.AddPredefinedRules( ruletable )
-    local added = 0
-    if ruletable == nil or #ruletable == 0 then 
-        return 0, {"rule table was nil or empty"}
-    end
-    local errtbl = {}
-    for i,r in pairs(ruletable) do
-        local ruledef = r
-        local rslt, err = AC.isValidRule(r) -- can't use r:isValid because only added by later AddRule()
-        if rslt then
-            local rl = {name=r.name, tag=r.tag, rule=r.rule, description=r.description, pred=1}
-            AC.predefinedRules[#AC.predefinedRules+1] = r1
-            --table.insert(AutoCategory.predefinedRules, rl)
-            local err = AutoCategory.cache.AddRule(rl)
-            if err then
-                errtbl[#errtbl+1] = err
-                --table.insert(errtbl,err)
-				
-            else
-                added = added + 1
-            end
-			
-        else
-            errtbl[#errtbl+1] = "Rule was invalid. ("..err..")"
-            --table.insert(errtbl,"Rule was invalid. ("..err..")")
-        end
-    end
-    return added, errtbl
-end
-
 -- Register the plugin with AutoCategory so that it will be initialized along with
 -- everything else on addon startup.
 -- (If you don't do this, you don't exist to AutoCategory!)
@@ -88,10 +52,16 @@ end
 --
 function AutoCategory.RegisterPlugin(name, initfunc, predefined)
 	if not initfunc then return end
-    
+
     local entry = {}
 	if type(initfunc) == "function" then
         entry.init = initfunc
+	end
+
+    if predefined then
+        for k=#predefined,1,-1 do
+            predefined[k].pred=1
+        end
     end
     entry.predef = predefined
     AutoCategory.Plugins[name] = entry

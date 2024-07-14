@@ -88,12 +88,6 @@ function AutoCategory_UnknownTracker.Initialize()
         AutoCategory.AddRuleFunc("isstyleunknown", AutoCategory.dummyRuleFunc)
         return
     end
-    
-    -- load predefinedRules
-    --AutoCategory.logger:Info("Loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." into predefinedRules "..#AutoCategory.predefinedRules)
-    AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
-    --AutoCategory.logger:Info("Finsihed loading pre-defines for UnknownTracker - "..#AutoCategory_UnknownTracker.predefinedRules.." now predefinedRules "..#AutoCategory.predefinedRules)
-    AutoCategory.AddPredefinedRules(AutoCategory_UnknownTracker.predefinedRules)
 
     -- load supporting rule functions
     AutoCategory.AddRuleFunc("isunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown)
@@ -101,7 +95,6 @@ function AutoCategory_UnknownTracker.Initialize()
     AutoCategory.AddRuleFunc("isfurnishingunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsFurnishingUnknown)
     AutoCategory.AddRuleFunc("ismotifunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown)
     AutoCategory.AddRuleFunc("isstyleunknown", AutoCategory_UnknownTracker.RuleFunc.UT_IsStyleUnknown)
-    
 end
 
 local valid_itemtypes = {
@@ -152,7 +145,7 @@ local function lookupItem(itemLink, characters)
         -- not looking for particular character
         return true
     end
-    
+
     -- check against parameter list of toon names
     -- looking for specific toons that don't know
     for charname,v in pairs(unknowers) do
@@ -169,14 +162,14 @@ local function getCharList(...)
 	local ac = select( '#', ... ) 
 	local characters = {}
 	for ax = 1, ac do
-		
+
 		local arg = select( ax, ... )
 		if not arg then
             break
 		end
         if arg == "me" then
             characters[zo_strformat("<<1>>", GetRawUnitName("player"))] = true
-			
+
         else
             characters[arg]=true
         end
@@ -188,14 +181,14 @@ end
 function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
 	local fn = "isunknown"
 	if UnknownTracker == nil then return false end
-	
+
     local isunknown = false
     local characters = getCharList(...)
-    
+
     -- find out who knows it (if UT display setting is true)
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if not itemLink then return false end
-	
+
 	-- it is an item that can be learned
     local itemType,sptype = GetItemLinkItemType(itemLink)
     local islearnable = false
@@ -203,18 +196,18 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
         islearnable = true
     end
     if not islearnable then return false end
-	
+
     return lookupItem(itemLink, characters)
 end
 
 function AutoCategory_UnknownTracker.RuleFunc.UT_IsRecipeUnknown( ... )
 	local fn = "isrecipeunknown"
 	if UnknownTracker == nil then return false end
-	
+
     local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
-    
+
     -- are we interested in the item?
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if not itemLink then return false end
@@ -230,11 +223,11 @@ end
 function AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown( ... )
 	local fn = "ismotifunknown"
 	if UnknownTracker == nil then return false end
-	
+
     local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
-    
+
     -- are we interested in the item?
     local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     if not itemLink then return false end

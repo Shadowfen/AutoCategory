@@ -33,7 +33,7 @@ local LMP = LibMediaProvider
 local SF = LibSFUtils
 local AC = AutoCategory
 
-
+-- aliases
 local logger = AutoCategory.logger
 
 -- uniqueIDs of items that have been updated (need rule re-execution), 
@@ -138,9 +138,9 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AC.acctSaved.appearance
-	--AC.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	--logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	--AC.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	--logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
 	return header_face
 end
 
@@ -233,10 +233,13 @@ local function AddTypeToList(rowHeight, datalist, inven_ndx, headerType)
 	    rowHeight, setupFunc, hiddenCB, nil, resetCB)
 end
 
-local function createHeaderEntry(catInfo, headerType)
-	if headerType == nil then headerType = CATEGORY_HEADER end
+-- create a list entry for a category header.
+-- will return nil, if catInfo is nil
+local function createHeaderEntry(catInfo) --, headerType)
+	if not catInfo then return {} end
+	--if headerType == nil then headerType = CATEGORY_HEADER end
 
-	local headerEntry = ZO_ScrollList_CreateDataEntry(headerType, { 
+	local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, { 
 			AC_categoryName = catInfo.AC_categoryName,
 			AC_sortPriorityName = catInfo.AC_sortPriorityName,
 			AC_bagTypeId = catInfo.AC_bagTypeId,
@@ -259,10 +262,9 @@ local function isHiddenEntry(itemEntry)
 	local data = itemEntry.data
 	if data.AC_isHidden or data.AC_bagTypeId == nil then return true end
 	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then 
-		return true 
+		return true
 	end
-
-	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
+	return false
 end
 
 local function isCollapsed(itemEntry)
@@ -435,6 +437,7 @@ local function handleRules(scrollData, needsReload, specialType)
 	return updateCount
 end
 
+--[[
 -- look for the bag ID associated with the scrollData list
 --
 -- may return nil if there is no (non-header) data in the scrollData list
@@ -449,11 +452,11 @@ local function getListBagID(scrollData)
 	end
 	return bagId
 end
+--]]
 
 --- Create list with visible items and headers (performs category count).
-local function createNewScrollData(scrollData, sortfn)
+local function createNewScrollData(scrollData) --, sortfn)
 	local newScrollData = {} --- output, entries sorted with category headers
-	local bagTypeId = getListBagID(scrollData)
 
 	-- --------------------
 	-- The categoryList info is collected and then each entry is passed
@@ -463,19 +466,16 @@ local function createNewScrollData(scrollData, sortfn)
 
 	local function addCount(name)
 		categoryList[name] = SF.safeTable(categoryList[name])
-		if categoryList[name].AC_catCount == nil then
-			categoryList[name].AC_catCount = 0
-		end
+		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0)
 		categoryList[name].AC_catCount = categoryList[name].AC_catCount + 1
 	end
 
-	local function getCount(name)
+	--[[local function getCount(name)
 		categoryList[name] = SF.safeTable(categoryList[name])
-		if categoryList[name].AC_catCount == nil then
-			categoryList[name].AC_catCount = 0
-		end
+		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0)
 		return categoryList[name].AC_catCount
 	end
+	--]]
 
 	local function setCount(bagTypeId, name, count)
 		categoryList[name] = SF.safeTable(categoryList[name])
@@ -483,7 +483,7 @@ local function createNewScrollData(scrollData, sortfn)
 	end
 	-- --------------------
 	-- create newScrollData with headers and only non hidden items. No sorting here!
-	for _, itemEntry in ipairs(scrollData) do 
+	for k, itemEntry in ipairs(scrollData) do 
 		-- add visible non-header rows to the new scrollData table
 		if not isHiddenEntry(itemEntry) then
 			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
@@ -496,23 +496,22 @@ local function createNewScrollData(scrollData, sortfn)
 		-- or else create an entry with count = 1
 		local data = itemEntry.data
 		local AC_categoryName = data.AC_categoryName
-		if not categoryList[AC_categoryName] then 		
+		if not categoryList[AC_categoryName] then
 			-- keep track of categories and required data
 			categoryList[AC_categoryName] =  {
 				AC_sortPriorityName = data.AC_sortPriorityName,
-				AC_categoryName = AC_categoryName, 
-				AC_bagTypeId = data.AC_bagTypeId, 
-				AC_catCount = 0, 
-			} 
+				AC_categoryName = AC_categoryName,
+				AC_bagTypeId = data.AC_bagTypeId,
+				AC_catCount = 0,
+			}
 		end
-		local catInfo = categoryList[AC_categoryName]
 
-		if itemEntry.typeId ~= CATEGORY_HEADER then 
+		if itemEntry.typeId ~= CATEGORY_HEADER then
 			-- this is an item, start new count
 			addCount(AC_categoryName)
 
 		elseif itemEntry.typeId == CATEGORY_HEADER 
-			and AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, AC_categoryName) then 
+			and AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, AC_categoryName) then
 			-- this is a collapsed category --> reuse previous count, since
 			--   the content is not available in scrollData
 			setCount(data.AC_bagTypeId, AC_categoryName, data.AC_catCount)
@@ -520,14 +519,15 @@ local function createNewScrollData(scrollData, sortfn)
 	end
 
 	-- Create headers and append to newScrollData
-	for _, catInfo in pairs(categoryList) do ---> add tracked categories
+		for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
+			--logger:Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
 			local headerEntry = createHeaderEntry(catInfo)
-			table.insert(newScrollData, headerEntry)
+			--logger:Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
+			if headerEntry then
+				table.insert(newScrollData, headerEntry)
+			end
 		end
-	end
-	if sortfn then
-		table.sort(newScrollData, sortfn)
 	end
 	return newScrollData
 end
@@ -562,22 +562,24 @@ local function prehookSort(self, inventoryType)
 	end	
 	-- end nogetrandom recommend 
 
-	local list = zo_inventory.listView 
-	local scrollData = ZO_ScrollList_GetDataList(list) 
-	local bagId = getListBagID(scrollData)
+	--local bagId = getListBagID(scrollData)
 
 	local needsReload = true
 	if scene == "bank" or scene == "guildBank" then
 		needsReload = false
 	end
-	handleRules(scrollData, needsReload) --> update rules' results if necessary
 
 
 	-- add header rows
 	--> rebuild scrollData with headers and visible items
-	list.data = createNewScrollData(scrollData, zo_inventory.sortFn) 
-	--table.sort(list.data, zo_inventory.sortFn)
-	ZO_ScrollList_Commit(list)
+	local list = zo_inventory.listView 
+	local scrollData = ZO_ScrollList_GetDataList(list)
+
+	if scrollData then
+		handleRules(scrollData, needsReload) --> update rules' results if necessary
+		list.data = createNewScrollData(scrollData) --, zo_inventory.sortFn) 
+		ZO_ScrollList_Commit(list)
+	end
 	return false
 end
 
@@ -595,8 +597,8 @@ local function prehookCraftSort(self)
 		-- rerun rules for all items (always for craftstations)
 		handleRules(scrollData, true, AC_BAG_TYPE_CRAFTSTATION)
 
-		-- add header rows	    
-		self.list.data = createNewScrollData(scrollData, self.sortFunction)
+		-- add header rows
+		self.list.data = createNewScrollData(scrollData) --, self.sortFunction)
 		--table.sort(self.list.data, self.sortFunction)
 		ZO_ScrollList_Commit(self.list)
 	end
@@ -625,7 +627,7 @@ function AutoCategory.HookKeyboardMode()
 	--Add a new header row data type
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 
-    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	   INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
@@ -649,8 +651,7 @@ function AutoCategory.HookKeyboardMode()
 	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
 
 	-- Other events that cause a full refresh
-	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", 
-		refresh, true)
+	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", refresh, true)
 
 	AC.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
 

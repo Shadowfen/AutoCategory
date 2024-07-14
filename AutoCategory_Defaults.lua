@@ -892,6 +892,7 @@ AutoCategory.defaultCharSettings = {
 
 AutoCategory.defaultAcctSettings = {
 	bags = AutoCategory.defaultAcctBagSettings.bags,
+	collapses = AutoCategory.defaultCollapses,
 	appearance = {
 		["CATEGORY_FONT_NAME"] = "Univers 67",
 		["CATEGORY_FONT_STYLE"] = "soft-shadow-thin",
@@ -919,7 +920,6 @@ AutoCategory.defaultAcctSettings = {
 		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
 		["SHOW_CATEGORY_SET_TITLE"] = true,
 	},
-	collapses = AutoCategory.defaultCollapses,
 }
 	
 AutoCategory.default_rules = {
