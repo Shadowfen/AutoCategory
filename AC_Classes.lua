@@ -4,6 +4,9 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
+local RuleApi = AC.RuleApi
+local BagRuleApi = AC.BagRuleApi
+
 -- -------------------------------------------------------
 -- The CVT class manages the choices, choicesValues, and
 -- choicesTooltips list for a particular dropdown control.
@@ -457,10 +460,203 @@ end
 -- -------------------------------------------------
 -- collected functions to be applied to a rule
 --
--- This will be set as the metatable for each rule structure loaded in or created
--- because the metatable does not count against the stricture of no functions
--- within saved variables.
-AC.rulefuncs = {
+
+-- factory for creating new rules
+function AutoCategory.CreateNewRule(name, tag)
+	local rule = {
+		name = name,
+		description = "",
+		rule = "true",
+		tag = tag,
+	}
+	return rule
+end
+
+-- factory for making copies of rules
+function AutoCategory.CopyFrom(copyFrom)
+	if not copyFrom then return end
+
+	local ruleName = copyFrom.name
+	-- get a unique name based on the old rule name
+	local newName = AC.GetUsableRuleName(ruleName)
+	local tag = copyFrom.tag
+	if tag == "" then
+		tag = AC_EMPTY_TAG_NAME
+	end
+
+	local newRule = AC.CreateNewRule(newName, tag)
+	newRule.description = copyFrom.description
+	newRule.rule = copyFrom.rule
+	newRule.damaged = copyFrom.damaged
+	newRule.err = copyFrom.err
+	newRule.pred = nil		-- defaults to not pre-defined, because copies are user-defined rules
+	return newRule
+end
+
+-- The BagRule class assists in the definition, management, and formatting of
+-- bag rules for the collection of them in the Bag Settings Categories dropdown.
+-- The minimum that a bagrule has is { name, priority }.
+-- -------------------------------------------------------
+-- helper functions for BagRules (for bag settings)
+
+-- --------------------------------------------
+-- Create a new Bag Entry (factory)
+-- Rule parameter is required, priority is optional.
+-- If a priority is not provided, default to 1000
+-- Returns a table {name=, priority=} or nil
+--
+function AutoCategory.CreateNewBagRule(rule, priority)
+	local rulename = nil
+	local ruleprior = nil
+	if not rule then
+		return nil
+	end
+	if type(rule) == "string" then
+		rulename = rule
+		rule = AC.GetRuleByName(rulename)
+
+	elseif not rule.name then
+		return nil
+
+	else
+		rulename = rule.name
+	end
+
+	if rulename then
+		if priority == nil then
+			ruleprior = 1000
+
+		else
+			ruleprior = priority
+		end
+
+		local bagrule = {
+			name = rulename,
+			priority = ruleprior,
+		}
+		return bagrule
+	end
+	return nil
+end
+
+-- -------------------------------------------------
+-- collected functions to be applied to a rule list
+--
+AutoCategory.RuleList = ZO_Object:Subclass()
+
+function AutoCategory.RuleList:New(...)
+    local obj = ZO_Object.New(self)
+    obj:initialize(...)
+    return obj
+end
+
+function AutoCategory.RuleList:initialize(rules)
+	self.ruleList = rules
+	self.lkRules = {}
+	local arrules = self.ruleList
+	for k = #arrules,1,-1 do
+		if not self.lkRules[arrules[k].name ] then
+			self.lkRules[arrules[k].name] = k
+		end
+	end
+end
+
+function AutoCategory.RuleList.size(self)
+	return #self.ruleList
+end
+
+function AutoCategory.RuleList.addRule(self, newRule, overwriteFlag)
+	if not newRule or not newRule.name then return end
+
+	local ndx = self.lkRules[newRule.name]
+	if ndx then
+		if overwriteFlag then
+			self.ruleList[ndx] = newRule
+		end
+		return
+	end
+
+	self.ruleList[#self.ruleList+1] = newRule
+	self.lkRules[newRule.name] = #self.ruleList
+end
+
+function AutoCategory.RuleList.removeRuleByName(self, ruleName)
+	local ndx = self.lkRules[ruleName]
+	if ndx then
+		self.lkRules[ruleName] = nil
+		table.remove(self.ruleList, ndx)
+	end
+end
+
+function AutoCategory.RuleList.removeRule(self, ndx)
+	if not ndx then return end
+	local name = self.ruleList[ndx]
+	self.lkRules[name] = nil
+	table.remove(self.ruleList, ndx)
+end
+
+function AutoCategory.RuleList.getRuleByName(self, ruleName)
+	if not ruleName then return nil end
+	local ndx = self.lkRules[ruleName]
+	if not ndx then return nil end
+	return self.ruleList[ndx]
+end
+
+function AutoCategory.RuleList.clear(self)
+	SF.safeClearTable(self.ruleList)
+end
+
+function AutoCategory.RuleList.getLookup(self)
+	return self.lkRules
+end
+
+-- -------------------------------------------------
+-- collected functions to be applied to a bagrule list
+--
+AutoCategory.BagRuleList = ZO_Object:Subclass()
+
+function AutoCategory.RuleList:New(...)
+    local obj = ZO_Object.New(self)
+    obj:initialize(...)
+    return obj
+end
+
+function AutoCategory.BagRuleList:initialize(bagrules)
+	self.bagrule = bagrules
+	self.ruleList = bagrules.rules
+	self.lkRules = {}
+	local arrules = self.ruleList
+	for k = #arrules,1,-1 do
+		if not self.lkRules[arrules[k].name ] then
+			self.lkRules[arrules[k].name] = k
+		end
+	end
+end
+
+function AutoCategory.BagRuleList.size(self)
+	return #self.ruleList
+end
+
+function AutoCategory.BagRuleList.addBagRule(self, newRule, overwriteFlag)
+	if not newRule or not newRule.name then return end
+
+	local ndx = self.lkRules[newRule.name]
+	if ndx then
+		if overwriteFlag then
+			self.ruleList[ndx] = newRule
+		end
+		return
+	end
+
+	self.ruleList[#self.ruleList+1] = newRule
+	self.lkRules[newRule.name] = #self.ruleList
+end
+
+-- -------------------------------------------------
+-- collected functions to be applied to a rule
+--
+-- This functions to be used with rule structures loaded in or created.
+AC.RuleApi = {
 	-- check if rule def is valid (required keys all present)
 	isValid = function(r)
 			return AutoCategory.isValidRule(r)
@@ -485,6 +681,7 @@ AC.rulefuncs = {
 			r.damaged = dmg
 			r.err = errm
 		end,
+
 	clearError = function(r)
 			r.damaged = nil
 			r.err = nil
@@ -519,83 +716,31 @@ AC.rulefuncs = {
 			end
 			AC.compiledRules = SF.safeTable(AC.compiledRules)
 
-			rule:clearError()
-			AC.compiledRules[rule:key()] = nil
+			AC.RuleApi.clearError(rule)
+			AC.compiledRules[AC.RuleApi.key(rule)] = nil
 
 			if rule.rule == nil or rule.rule == "" then
-				rule:setError(true,"Missing rule definition")
+				AC.RuleApi.setError(rule, true,"Missing rule definition")
 				return rule.err
 			end
 
 			local rulestr = "return(" .. rule.rule .. ")"
 			local compiledfunc, err = zo_loadstring(rulestr)
 			if not compiledfunc then
-				rule:setError(true, err)
-				AC.compiledRules[rule:key()] = nil
+				AC.RuleApi.setError(rule, true, err)
+				AC.compiledRules[RuleApi.key(rule)] = nil
 				return err
 			end
-			AC.compiledRules[rule:key()] = compiledfunc
+			AC.compiledRules[AC.RuleApi.key(rule)] = compiledfunc
 			return ""
 		end,
-
 }
 
--- Associate an existing (raw) Rule (loaded from saved
--- variables) with the Rule functions in a metatable.
---
-function AutoCategory.AssociateRule(rule)
-	if rule == nil then return end
-
-	local mt = { __index = AC.rulefuncs, }
-	setmetatable(rule,mt)
-end
-
--- factory for creating new rules
-function AutoCategory.CreateNewRule(name, tag)
-	local rule = {
-		name = name,
-		description = "",
-		rule = "true",
-		tag = tag,
-	}
-	AC.AssociateRule(rule)
-	return rule
-end
-
--- factory for making copies of rules
-function AutoCategory.CopyFrom(copyFrom)
-	if not copyFrom then return end
-
-	local ruleName = copyFrom.name
-	-- get a unique name based on the old rule name
-	local newName = AC.GetUsableRuleName(ruleName)
-	local tag = copyFrom.tag
-	if tag == "" then
-		tag = AC_EMPTY_TAG_NAME
-	end
-
-	local newRule = AC.CreateNewRule(newName, tag)
-	newRule.description = copyFrom.description
-	newRule.rule = copyFrom.rule
-	newRule.damaged = copyFrom.damaged
-	newRule.err = copyFrom.err
-	newRule.pred = nil		-- defaults to not pre-defined, because copies are user-defined rules
-	return newRule
-end
-
--- The BagRule class assists in the definition, management, and formatting of
--- bag rules for the collection of them in the Bag Settings Categories dropdown.
--- The minimum that a bagrule has is { name, priority }.
--- -------------------------------------------------------
--- helper functions for BagRules (for bag settings)
 
 -- -------------------------------------------------
--- collected functions to be applied to a bagrule
+-- collected functions to be applied to a BagRule
 --
--- This will be set as the metatable for each bagrule structure loaded in or created
--- because the metatable does not count against the stricture of no functions 
--- within saved variables.
-AC.bagrulefuncs = {
+AC.BagRuleApi = {
 	isValid = function (bagrule)
 			if not bagrule.name or bagrule.name == "" then
 				return false
@@ -614,7 +759,7 @@ AC.bagrulefuncs = {
 	-- disappeared (i.e the bag rule is now invalid).
 	formatShow	= function (bagrule)
 			local sn = nil
-			local rule = bagrule:getBackingRule()
+			local rule = AC.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
 				sn = string.format("|cFF4444(!)|r %s (%d)", bagrule.name, bagrule.priority)
@@ -638,13 +783,13 @@ AC.bagrulefuncs = {
 	-- soon be released for LAM.
 	formatTooltip = function (bagrule)
 			local tt = nil
-			local rule = bagrule:getBackingRule()
+			local rule = AC.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
 				tt = L(SI_AC_WARNING_CATEGORY_MISSING)
 
 			else
-				tt = rule:getDesc()
+				tt = AC.RuleApi.getDesc(rule)
 			end
 			return tt
 		end,
@@ -697,54 +842,3 @@ AC.bagrulefuncs = {
 		return bagrule.isHidden
 	end,
 }
-
--- --------------------------------------------
--- Create a new Bag Entry (factory)
--- Rule parameter is required, priority is optional.
--- If a priority is not provided, default to 1000
--- Returns a table {name=, priority=} or nil
---
-function AutoCategory.CreateNewBagRule(rule, priority)
-	local rulename = nil
-	local ruleprior = nil
-	if not rule then
-		return nil
-	end
-	if type(rule) == "string" then
-		rulename = rule
-		rule = AC.GetRuleByName(rulename)
-
-	elseif not rule.name then
-		return nil
-
-	else
-		rulename = rule.name
-	end
-
-	if rulename then
-		if priority == nil then
-			ruleprior = 1000
-
-		else
-			ruleprior = priority
-		end
-
-		local bagrule = {
-			name = rulename,
-			priority = ruleprior,
-		}
-		AC.AssociateBagRule(bagrule)
-		return bagrule
-	end
-	return nil
-end
-
--- Associate an existing (raw) BagRule (loaded from saved
--- variables) with the BagRule functions in a metatable.
---
-function AutoCategory.AssociateBagRule(bagrule)
-	if bagrule == nil then return end
-
-	local mt = { __index = AC.bagrulefuncs, }
-	setmetatable(bagrule,mt)
-end

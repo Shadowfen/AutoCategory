@@ -599,7 +599,7 @@ local function prehookCraftSort(self)
 
 		-- add header rows
 		self.list.data = createNewScrollData(scrollData) --, self.sortFunction)
-		--table.sort(self.list.data, self.sortFunction)
+		table.sort(self.list.data, self.sortFunction)
 		ZO_ScrollList_Commit(self.list)
 	end
 	-- continue on to run follow-on hooks

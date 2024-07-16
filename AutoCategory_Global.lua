@@ -46,13 +46,7 @@ setmetatable(printLibDebug,  { __call = function(self, name)
     })
 
 -- initialize the logger for AutoCategory
-if LibDebugLogger then
-  AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
-  AutoCategory.logger:SetEnabled(true)
-  
-else
-  AutoCategory.logger = printLibDebug
-end
+AutoCategory.logger = printLibDebug
 
 -- checks the versions of libraries (where possible) and warn in
 -- debug logger if we detect out of date libraries.

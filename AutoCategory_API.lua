@@ -1,6 +1,7 @@
 --====API====--
 local SF = LibSFUtils
 local AC = AutoCategory
+local RuleApi = AC.RuleApi
 
 -- aliases
 local saved = AutoCategory.saved
@@ -64,18 +65,18 @@ function AutoCategory.validateACBagRules(acBagType)
 	local function checkValidRule(name, rule)
 		if rule == nil or name == nil then return end
 		if rule.name ~= name then 
-			rule:setError(true,"name mismatch between bagrule and backing rule")
+			RuleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
 			return
 		end
 
 		local isValid = true
 		if rule.rule == nil then
-			rule:setError(true,"missing rule definition")
+			RuleApi.setError(rule,true,"missing rule definition")
 			return
 		end
 		local ruleCode = AutoCategory.compiledRules[rule.name]
 		if not ruleCode or type(ruleCode) ~= "function" then
-			rule:setError(true,"invalid compiled rule function")
+			RuleApi.setError(rule, true,"invalid compiled rule function")
 			AutoCategory.compiledRules[rule.name] = nil
 			return
 		end
@@ -87,8 +88,7 @@ function AutoCategory.validateACBagRules(acBagType)
 	local bag = saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
-		local rule = entry:getBackingRule()
-		--local rule = AutoCategory.GetRuleByName(entry.name)
+		local rule = BagRuleApi.getBackingRule(entry)
 		checkValidRule(entry.name, rule)
 	end
 end
@@ -179,7 +179,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 
 					else
 						logger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
-						rule:setError(true, res)
+						RuleApi.setError(rule, true, res)
 						AutoCategory.compiledRules[entry.name] = nil
 					end
 				end
