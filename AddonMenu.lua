@@ -7,9 +7,10 @@ local AC = AutoCategory
 local L = GetString
 
 local CVT = AutoCategory.CVT
-local RuleApi = AC.RuleApi
-local BagRuleApi = AC.BagRuleApi
-local ARW = AC.ARW
+local aclogger = AutoCategory.logger
+local RuleApi = AutoCategory.RuleApi
+local BagRuleApi = AutoCategory.BagRuleApi
+local ARW = AutoCategory.ARW
 
 local cache = AutoCategory.cache
 local saved = AutoCategory.saved
@@ -364,12 +365,12 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	AC.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	aclogger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
 		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and cache.entriesByBag[currentBag] then
-			AC.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			aclogger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
 			dataCurrentRules_EditBag:assign(cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
@@ -380,7 +381,7 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	AC.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	aclogger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -390,10 +391,10 @@ function AC_UI.BagSet_SelectRule_LAM:setValue(val)
 	self:select(val)
 	currentBagRule = val
 	local bagrule = cache.entriesByName[getCurrentBagId()][val]
-	--AC.logger:Debug("bagule = "..type(bagrule))
-	--AC.logger:Debug("retrieving bagrule for name "..tostring(val))
-	--AC.logger:Debug("bagule.name = "..tostring(bagrule.name))
-	--AC.logger:Debug("bagule.priority = "..tostring(bagrule.priority))
+	--aclogger:Debug("bagule = "..type(bagrule))
+	--aclogger:Debug("retrieving bagrule for name "..tostring(val))
+	--aclogger:Debug("bagule.name = "..tostring(bagrule.name))
+	--aclogger:Debug("bagule.priority = "..tostring(bagrule.priority))
 	if bagrule and bagrule.priority then
 		BagSet_Priority_LAM:setValue(bagrule.priority)
 	end
@@ -518,11 +519,11 @@ function AC_UI.BagSet_RemoveCat_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
 	local savedbag = saved.bags[bagId]
-	AC.logger:Debug("Removing rule name "..ruleName)
+	aclogger:Debug("Removing rule name "..ruleName)
 	for i = 1, #savedbag.rules do
 		local bagEntry = savedbag.rules[i]
 		if bagEntry.name == ruleName then
-			AC.logger:Debug("Found it! - "..ruleName)
+			aclogger:Debug("Found it! - "..ruleName)
 			table.remove(savedbag.rules, i)
 			break
 		end
@@ -900,7 +901,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function AC_UI.CatSet_SelectRule_LAM:getValue()
-	--AC.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	--aclogger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
@@ -1518,7 +1519,7 @@ function AutoCategory.AddonMenuInit()
 	AddCat_SelectTag_LAM:assign( { choices=cache.tags } )
 	CatSet_SelectTag_LAM:assign( { choices=cache.tags} )
 
-	BagSet_SelectBag_LAM:select({}) --cache.bags_cvt.choicesValues)
+	BagSet_SelectBag_LAM:select({})
 
     -- AddCat_SelectRule_LAM will get populated by RefreshDropdownData()
 	AddCat_SelectRule_LAM:clear()

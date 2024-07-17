@@ -5,7 +5,7 @@ local RuleApi = AC.RuleApi
 
 -- aliases
 local saved = AutoCategory.saved
-local logger = AutoCategory.logger
+local aclogger = AutoCategory.logger
 
 -- For use by bulk updaters of inventory (ESPECIALLY the Guild Bank)
 -- to not perform sorting for a specific period of time (until the
@@ -15,11 +15,12 @@ local logger = AutoCategory.logger
 -- It is hoped that by entering into bulk mode that we do not perform
 -- server requests for the guild bank 
 function AutoCategory.EnterBulkMode()
-	AutoCategory.BulkMode(true)
+	AutoCategory.BulkMode = true
 end
 function AutoCategory.ExitBulkMode()
-	AutoCategory.BulkMode(false)
+	AutoCategory.BulkMode = false
 end
+
 
 
 -- Convert a ZOS bagId into AutoCategory bag_type_id
@@ -51,7 +52,7 @@ end
 function AutoCategory.validateBagRules(bagId, acprimary)
 	return AutoCategory.validateACBagRules(convert2BagTypeId(bagId, acprimary))
 end
-	
+
 -- Make sure that all of the rules for this bag are valid/undamaged
 -- Do this by bag rather than by rule to avoid repeating this unnecessarily
 -- as the bag of rules is evaluated per each item in the bag.
@@ -88,7 +89,7 @@ function AutoCategory.validateACBagRules(acBagType)
 	local bag = saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
-		local rule = BagRuleApi.getBackingRule(entry)
+		local rule = AC.BagRuleApi.getBackingRule(entry)
 		checkValidRule(entry.name, rule)
 	end
 end
@@ -113,7 +114,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local bag_type_id = convert2BagTypeId(bagId, specialType)
 	if not bag_type_id then
 		-- invalid bag
-		--logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
+		--aclogger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
 		return false, "", 0, nil, nil
 	end
 
@@ -147,11 +148,11 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 
 	local bag = saved.bags[bag_type_id]
 	if not bag then
-		--logger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
+		--aclogger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
 		return  false, "", 0, nil, nil
 	end
 	if not bag.rules then
-		--logger:Warning("[MatchCategoryRules] bag.rules was nil")
+		--aclogger:Warning("[MatchCategoryRules] bag.rules was nil")
 		return  false, "", 0, nil, nil
 	end
 	for i = 1, #bag.rules do
@@ -178,7 +179,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						end
 
 					else
-						logger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
+						aclogger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
 						RuleApi.setError(rule, true, res)
 						AutoCategory.compiledRules[entry.name] = nil
 					end

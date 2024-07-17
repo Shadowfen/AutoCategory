@@ -4,8 +4,9 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local RuleApi = AC.RuleApi
-local BagRuleApi = AC.BagRuleApi
+local aclogger = AutoCategory.logger
+local RuleApi = AutoCategory.RuleApi
+local BagRuleApi = AutoCategory.BagRuleApi
 
 -- -------------------------------------------------------
 -- The CVT class manages the choices, choicesValues, and
@@ -84,20 +85,17 @@ function AutoCategory.CVT:getControlName()
 end
 
 -- assign the choices, choicesValues, and choicesTooltips from tblB to self
-function AutoCategory.CVT:assign(tblB, nm)
+function AutoCategory.CVT:assign(tblB)
 	if not tblB then return end
 
 	if self.choicesValues and not tblB.choicesValues then
-		--AC.logger:Debug("don't have choicesValues for src tables in assign "..tostring(self.controlName))
+		--aclogger:Debug("don't have choicesValues for src tables in assign "..tostring(self.controlName))
 		return
 	end
 	if self.choicesTooltips and not tblB.choicesTooltips then
-		--AC.logger:Debug("don't have choicesTooltips for dest tables in assign "..tostring(self.controlName))
+		--aclogger:Debug("don't have choicesTooltips for dest tables in assign "..tostring(self.controlName))
 		return
 	end
-
-	--local namestr = self.controlName or nm
-	--namestr = tostring(namestr)
 
 	local ndx = self.indexValue
 	self.dirty = 1
@@ -182,9 +180,9 @@ end
 -- append a row selection to the cvt tables
 -- returns whether or not it succeeded
 function AutoCategory.CVT:append(choice, value, tooltip)
-	if not value and self.choicesValues then return false end
-	if not tooltip and self.choicesTooltips then return false end
-	if not choice then return false end
+	if not value and self.choicesValues then return false end	-- value required when have choicesValues
+	if not tooltip and self.choicesTooltips then return false end	-- tooltip required when have choicesTooltips
+	if not choice then return false end	-- choice is mandatory
 
 	self.dirty = 1
 	self.choices[#self.choices+1] = choice -- (required)
@@ -197,7 +195,7 @@ function AutoCategory.CVT:append(choice, value, tooltip)
 	return true
 end
 
--- set the name of the associated control for these lists (if there is one)
+-- set the name of the associated control for these lists (if there is one)	--	not currently used
 function AutoCategory.CVT:setControlName(fld)
 	self.controlName = fld
 end
@@ -221,13 +219,13 @@ function AutoCategory.CVT:updateControl()
 		return
 	end
 
-	--AC.logger:Debug("CVT:updateControl: getting control for "..tostring(self.controlName))
+	--aclogger:Debug("CVT:updateControl: getting control for "..tostring(self.controlName))
 	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(self.controlName)
     if dropdownCtrl == nil then
         return
     end
 
-	--AC.logger:Debug("CVT:updateControl: lists changed - need to update "..tostring(self.controlName))
+	--aclogger:Debug("CVT:updateControl: lists changed - need to update "..tostring(self.controlName))
 	dropdownCtrl:UpdateChoices(self.choices, self.choicesValues,
 		self.choicesTooltips)
 end
@@ -236,7 +234,7 @@ end
 -- returns the new (maybe new) index value
 function AutoCategory.CVT:removeItemChoice(removeItem)
 	local removeIndex = -1
-    if not self.choices then
+    if not self.choices then	-- corrupt cvt
 		self.dirty = 1
 		self.choices = {}
 		self.indexValue = nil
@@ -244,23 +242,23 @@ function AutoCategory.CVT:removeItemChoice(removeItem)
 	end
 
 	-- find the choice to remove
-	local num = #self.choices
-	for i = num, 1, -1 do
-		if removeItem == self.choices[i] then
-			self.dirty = 1
-			removeIndex = i
-			-- remove it
-			table.remove(self.choices, removeIndex)
-			if self.choicesValues and #self.choicesValues > 0 then
-				table.remove(self.choicesValues, removeIndex)
-			end
-			if self.choicesTooltips and #self.choicesTooltips > 0 then
-				table.remove(self.choicesTooltips, removeIndex)
-			end
-			break
-		end
+	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(self.choices, removeItem)
+	if not ndx then return self.indexValue end		-- nothing to remove
+
+	removeIndex = ndx
+	self.dirty = 1
+	local num = #self.choices		-- value BEFORE removal
+
+	-- remove it from lists
+	table.remove(self.choices, removeIndex)
+	if self.choicesValues and #self.choicesValues > 0 then
+		table.remove(self.choicesValues, removeIndex)
+	end
+	if self.choicesTooltips and #self.choicesTooltips > 0 then
+		table.remove(self.choicesTooltips, removeIndex)
 	end
 
+	-- choose what the new indexValue (selection) will be
     if removeIndex <= 0 then return self.indexValue end
 	if num == 1 then
 		--select none
@@ -283,23 +281,20 @@ function AutoCategory.CVT:removeItemChoiceValue(removeItem)
 	local removeIndex = -1
     if not self.choicesValues then return nil end
 
-	-- find the choice to remove
-	local num = #self.choicesValues
-	for i = num, 1, -1 do
-		if removeItem == self.choicesValues[i] then
-			self.dirty = 1
-			removeIndex = i
-			-- remove it
-			table.remove(self.choicesValues, removeIndex)
-			table.remove(self.choices, removeIndex)		-- not optional
-			if #self.choicesTooltips then
-				table.remove(self.choicesTooltips, removeIndex)
-			end
-			break
-		end
+	-- find the choiceValue to remove
+	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(self.choicesValues, removeItem)
+	if not ndx then return self.indexValue end		-- nothing to remove
+	self.dirty = 1
+	removeIndex = ndx
+	local num = #self.choicesValues		-- value BEFORE removal
+	-- remove it
+	table.remove(self.choicesValues, removeIndex)
+	table.remove(self.choices, removeIndex)		-- not optional
+	if #self.choicesTooltips then
+		table.remove(self.choicesTooltips, removeIndex)
 	end
 
-    if removeIndex <= 0 then return end
+	-- find the choice to remove
 	if num == 1 then
 		--select none
 		self:clearIndex()
@@ -337,13 +332,13 @@ function AutoCategory.BaseUI:updateValue()
 	local val = self:getValue()
 	if not val then return end
 
-	--AC.logger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
+	--aclogger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
 	local uiCtrl = WINDOW_MANAGER:GetControlByName(self.controlName)
     if uiCtrl == nil then
         return
     end
 
-	--AC.logger:Debug("updateValue: value changed - need to update "..tostring(self.controlName))
+	--aclogger:Debug("updateValue: value changed - need to update "..tostring(self.controlName))
 	uiCtrl:UpdateValue(false, val)
 end
 
@@ -383,14 +378,14 @@ end
 function AutoCategory.BaseDD:updateControl()
 	if not self.cvt.controlName then return end
 
-	--AC.logger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
+	--aclogger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
 	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(self.cvt.controlName)
     if dropdownCtrl == nil then
         return
     end
 
 	if self.cvt.dirty == 1 then		-- only do this if cvt lists have been modified
-		--AC.logger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
+		--aclogger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
 		-- only update the choices if we know that the lists contents changed
 		self.cvt.dirty = nil
 		dropdownCtrl:UpdateChoices(self.cvt.choices, self.cvt.choicesValues,
@@ -398,7 +393,7 @@ function AutoCategory.BaseDD:updateControl()
 	end
 
 	if self.cvt.indexValue then
-		--AC.logger:Debug("updateControl: value changed - need to update "..tostring(self.cvt.controlName))
+		--aclogger:Debug("updateControl: value changed - need to update "..tostring(self.cvt.controlName))
 		dropdownCtrl:UpdateValue(false, self.cvt.indexValue)
 	end
 
@@ -522,34 +517,33 @@ function AutoCategory.CreateNewBagRule(rule, priority)
 		rulename = rule.name
 	end
 
-	if rulename then
-		if priority == nil then
-			ruleprior = 1000
+	if priority == nil then
+		ruleprior = 1000
 
-		else
-			ruleprior = priority
-		end
-
-		local bagrule = {
-			name = rulename,
-			priority = ruleprior,
-		}
-		return bagrule
+	else
+		ruleprior = priority
 	end
-	return nil
+
+	local bagrule = {
+		name = rulename,
+		priority = ruleprior,
+	}
+	return bagrule
 end
 
 -- -------------------------------------------------
--- collected functions to be applied to a rule list
+-- collected (wrapper) functions to be applied to a rule list
 --
 AutoCategory.RuleList = ZO_Object:Subclass()
 
+-- creates a rule list wrapper with a numeric-sequenced list of rules (not under a .rules!)
 function AutoCategory.RuleList:New(...)
     local obj = ZO_Object.New(self)
     obj:initialize(...)
     return obj
 end
 
+-- rule list wrapper adds a name lookup to accompany the base list of rules
 function AutoCategory.RuleList:initialize(rules)
 	self.ruleList = rules
 	self.lkRules = {}
@@ -561,6 +555,7 @@ function AutoCategory.RuleList:initialize(rules)
 	end
 end
 
+-- return number of entries in the base rule list
 function AutoCategory.RuleList.size(self)
 	return #self.ruleList
 end
@@ -590,8 +585,12 @@ end
 
 function AutoCategory.RuleList.removeRule(self, ndx)
 	if not ndx then return end
-	local name = self.ruleList[ndx]
-	self.lkRules[name] = nil
+	local rl = self.ruleList[ndx]
+	if not rl then return end
+	local name = rl.name
+	if name then
+		self.lkRules[name] = nil
+	end
 	table.remove(self.ruleList, ndx)
 end
 
@@ -606,16 +605,18 @@ function AutoCategory.RuleList.clear(self)
 	SF.safeClearTable(self.ruleList)
 end
 
+-- returns the name lookup table used by the wrapper (temporary measure)
 function AutoCategory.RuleList.getLookup(self)
 	return self.lkRules
 end
-
+--[[
+-- not currently used (and not complete)
 -- -------------------------------------------------
 -- collected functions to be applied to a bagrule list
 --
 AutoCategory.BagRuleList = ZO_Object:Subclass()
 
-function AutoCategory.RuleList:New(...)
+function AutoCategory.BagRuleList:New(...)
     local obj = ZO_Object.New(self)
     obj:initialize(...)
     return obj
@@ -651,6 +652,7 @@ function AutoCategory.BagRuleList.addBagRule(self, newRule, overwriteFlag)
 	self.ruleList[#self.ruleList+1] = newRule
 	self.lkRules[newRule.name] = #self.ruleList
 end
+--]]
 
 -- -------------------------------------------------
 -- collected functions to be applied to a rule
@@ -728,7 +730,7 @@ AC.RuleApi = {
 			local compiledfunc, err = zo_loadstring(rulestr)
 			if not compiledfunc then
 				AC.RuleApi.setError(rule, true, err)
-				AC.compiledRules[RuleApi.key(rule)] = nil
+				AC.compiledRules[AC.RuleApi.key(rule)] = nil
 				return err
 			end
 			AC.compiledRules[AC.RuleApi.key(rule)] = compiledfunc
@@ -799,38 +801,6 @@ AC.BagRuleApi = {
 			if not bagrule.name then return nil end
 			local rule = AC.GetRuleByName(bagrule.name)
 			return rule
-		end,
-
-	-- When a rule changes names, referencees to it in the bag rules also need to change
-	renameBagRule = function(bagrule, newName)
-			bagrule.name = newName
-		end,
-
-	-- returns priority, rulename from a formatted BagRule text entry
-	splitValue = function (value)
-			return string.find(value, "%((%d+)%) (%a+)")
-		end,
-
-	-- comparison function used to sort bag rules by priority and then by name
-	-- returns true if a is greater than b
-	-- returns false if a is less than b
-	sortByPriority = function (a, b)
-			if b == nil then return true end
-
-			-- b is not nil
-			if a == nil then return false end
-
-			local result = false
-			-- a is not nil
-			if a.priority and b.priority and a.priority ~= b.priority then
-				result = a.priority > b.priority
-
-			else
-				if a.name == nil then return false end
-				if b.name == nil then return true end
-				result = a.name < b.name
-			end
-			return result
 		end,
 
 	-- Allows setting the isHidden value for the bag rule

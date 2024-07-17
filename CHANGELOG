@@ -1,6 +1,7 @@
 
 [COLOR="DeepSkyBlue"]4.1.1 (98)[/COLOR]:
 [LIST]
+[*] Fixed the sptype("script") convenience match to properly match against any affix, focus, or signature scripts.
 [*] Fix saving newly created categories.
 [*] Fixed lack of tags in dropdowns.
 [*] Fixed rule duplication in conversion from 3.6.7.

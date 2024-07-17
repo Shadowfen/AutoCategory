@@ -1,3 +1,4 @@
+local SF = LibSFUtils
 local AC = AutoCategory
 
 
@@ -111,7 +112,7 @@ local specializedItemTypeMap = {
 	["recipe_provisioning_standard_food"] = SPECIALIZED_ITEMTYPE_RECIPE_PROVISIONING_STANDARD_FOOD,
 	["recipe_woodworking_blueprint_furnishing"] = 
 		SPECIALIZED_ITEMTYPE_RECIPE_WOODWORKING_BLUEPRINT_FURNISHING,
-	["script"] = SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY,
+	--["script"] = SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY,
 	["script_focus"] = SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_PRIMARY,
 	["script_signature"] = SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_SECONDARY,
 	["script_affix"] = SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_TERTIARY,
@@ -155,6 +156,11 @@ local specializedItemTypeMap = {
 	["woodworking_raw_material"] = SPECIALIZED_ITEMTYPE_WOODWORKING_RAW_MATERIAL,
 }
 -- add in convenience specialized combos
+specializedItemTypeMap.script = { 
+    [SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_PRIMARY] = true, 
+    [SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_SECONDARY] = true, 
+    [SPECIALIZED_ITEMTYPE_CRAFTED_ABILITY_SCRIPT_TERTIARY] = true, 
+}
 specializedItemTypeMap.glyph = { 
     [SPECIALIZED_ITEMTYPE_GLYPH_ARMOR] = true, 
     [SPECIALIZED_ITEMTYPE_GLYPH_JEWELRY] = true, 

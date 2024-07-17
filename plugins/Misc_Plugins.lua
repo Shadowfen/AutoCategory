@@ -208,6 +208,7 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
   return false  
 end
 
+--[[
 local function getCharId( charname )
 	local sv = {}
 	for i = 1, GetNumCharacters() do
@@ -219,6 +220,7 @@ local function getCharId( charname )
 	end
 	return nil
 end
+--]]
 
 -- Get a list of all characters on all local accounts
 local function initChars()

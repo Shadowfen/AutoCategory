@@ -1,3 +1,6 @@
+local SF = LibSFUtils
+local AC = AutoCategory
+
 --
 -- ref to ingame/crafting/gamepad/gamepadcraftinginventory.lua
 local ZGCI = ZO_GamepadCraftingInventory
