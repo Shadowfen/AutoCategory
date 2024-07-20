@@ -560,7 +560,7 @@ end
 -- current contents of the cache.tags list.
 function AC_UI.AddCat_SelectTag_LAM:refresh()
 	if self:getValue() == nil or self:getValue() == "" then
-		self:select(cache.tags)
+		self:select(AutoCategory.RulesW.tags)
 	end
 end
 
@@ -609,12 +609,12 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	-- filter out already-in-use rules from the "add category" list for bag rules
 	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(),nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	dataCurrentRules_AddCategory.dirty = 1
-	if not cache.rulesByTag_cvt[tag] then
+	if not AutoCategory.RulesW.tagGroups[tag] then
 		-- no rules available for tag
 		return dataCurrentRules_AddCategory
 	end
 
-	local rbyt = cache.rulesByTag_cvt[tag]
+	local rbyt = AutoCategory.RulesW.tagGroups[tag]
 	for i = 1, rbyt:size() do
 		local value = rbyt.choices[i]
 		if value and cache.entriesByName[bagId][value] == nil then
@@ -853,24 +853,24 @@ function AC_UI.CatSet_SelectTag_LAM:setValue(value)
 
 	self:select(value)
 
-	CatSet_SelectRule_LAM:assign(cache.rulesByTag_cvt[value])
+	CatSet_SelectRule_LAM:assign(AutoCategory.RulesW.tagGroups[value])
 	if currentRule.tag == value then
 		CatSet_SelectRule_LAM:select(currentRule.name)
 	end
 	CatSet_SelectRule_LAM:refresh()
 	CatSet_SelectRule_LAM:updateControl()
 
-	AddCat_SelectTag_LAM:assign({choices=cache.tags})
+	AddCat_SelectTag_LAM:assign({choices=AutoCategory.RulesW.tags})
 	AddCat_SelectTag_LAM:updateControl()
 
 	AddCat_SelectRule_LAM:updateControl()
 end
 
 -- refresh the value of the cvt lists for CatSet_SelectTag_LAM from the 
--- current contents of the cache.tags list.
+-- current contents of the AutoCategory.RulesW.tags list.
 function AC_UI.CatSet_SelectTag_LAM:refresh()
 	if self:getValue() == nil then
-		self:select(cache.tags)
+		self:select(AutoCategory.RulesW.tags)
 	end
 end
 
@@ -906,7 +906,7 @@ function AC_UI.CatSet_SelectRule_LAM:getValue()
 end
 
 -- refresh the contents and value of the cvt lists for CatSet_SelectRule_LAM from the 
--- current contents of the cache.rulesByTag_cvt[tag] list.
+-- current contents of the AutoCategory.RulesW.tagGroups[tag] list.
 function AC_UI.CatSet_SelectRule_LAM:refresh()
 	local ltag = CatSet_SelectTag_LAM:getValue()
 	if not ltag then return end
@@ -914,8 +914,8 @@ function AC_UI.CatSet_SelectRule_LAM:refresh()
 	-- dropdown lists for Edit Rule (Category) selection (AC_DROPDOWN_EDITRULE_RULE)
 	local dataCurrentRules_EditRule = CVT:New(nil,nil,CVT.USE_TOOLTIPS)
 	local oldndx = self:getValue()
-	if cache.rulesByTag_cvt[ltag] then
-		dataCurrentRules_EditRule:assign(cache.rulesByTag_cvt[ltag])
+	if AutoCategory.RulesW.tagGroups[ltag] then
+		dataCurrentRules_EditRule:assign(AutoCategory.RulesW.tagGroups[ltag])
 	end
 	self:assign(dataCurrentRules_EditRule)
 	if oldndx then
@@ -985,7 +985,7 @@ function AC_UI.CatSet_NewCat_LAM:execute()
 	AddCat_SelectTag_LAM:updateControl()
 
 	--AC_UI.RefreshDropdownData()
-	AutoCategory.RecompileRules(AutoCategory.rules)
+	AutoCategory.RecompileRules(AutoCategory.RulesW.ruleList)
 end
 
 function AC_UI.CatSet_NewCat_LAM:controlDef()
@@ -1028,7 +1028,7 @@ function AC_UI.CatSet_CopyCat_LAM:execute()
 	AC_UI.checkCurrentRule()
 
 
-	AutoCategory.RecompileRules(AutoCategory.rules)
+	AutoCategory.RecompileRules(AutoCategory.RulesW.ruleList)
 end
 
 function AC_UI.CatSet_CopyCat_LAM:controlDef()
@@ -1067,7 +1067,7 @@ function AC_UI.CatSet_NameEdit_LAM:setValue(value)
 		return
 	end
 
-	local isDuplicated = cache.rulesByName[value] ~= nil
+	local isDuplicated = AutoCategory.RulesW.ruleNames[value] ~= nil
 	if isDuplicated then
 		warningDuplicatedName.warningMessage = string.format(
 			L(SI_AC_WARNING_CATEGORY_NAME_DUPLICATED),
@@ -1125,29 +1125,29 @@ function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 	if not rule or not rule.name or not newtag then return nil,nil end
 
 	-- nothing needs changing?
-	if oldtag == newtag then return rule.name, cache.rulesByTag_cvt[rule.tag] end
+	if oldtag == newtag then return rule.name, AutoCategory.RulesW.tagGroups[rule.tag] end
 
 	-- if tag is new, then update tags lists
-	if not ZO_IsElementInNumericallyIndexedTable(cache.tags, newtag) then
-		cache.tags[#cache.tags+1] = newtag
+	if not ZO_IsElementInNumericallyIndexedTable(AutoCategory.RulesW.tags, newtag) then
+		AutoCategory.RulesW.tags[#AutoCategory.RulesW.tags+1] = newtag
 		-- create a new tag list if necessary
-		cache.rulesByTag_cvt[newtag] = CVT:New(nil,nil,CVT.USE_TOOLTIPS)	--uses choicesTooltips
+		AutoCategory.RulesW.tagGroups[newtag] = CVT:New(nil,nil,CVT.USE_TOOLTIPS)	--uses choicesTooltips
 	end
 
 	-- add the rule to the new tag list
-	cache.rulesByTag_cvt[newtag]:append(rule.name, nil, RuleApi.getDesc(rule))
+	AutoCategory.RulesW.tagGroups[newtag]:append(rule.name, nil, RuleApi.getDesc(rule))
 	-- remove the current rule from the oldtag list
-	if oldtag and cache.rulesByTag_cvt[oldtag] then
-		cache.rulesByTag_cvt[oldtag]:removeItemChoiceValue(rule.name)
-		if cache.rulesByTag_cvt[oldtag]:size() == 0 then
-			local ndx = ZO_IndexOfElementInNumericallyIndexedTable(cache.tags, oldtag)
+	if oldtag and AutoCategory.RulesW.tagGroups[oldtag] then
+		AutoCategory.RulesW.tagGroups[oldtag]:removeItemChoiceValue(rule.name)
+		if AutoCategory.RulesW.tagGroups[oldtag]:size() == 0 then
+			local ndx = ZO_IndexOfElementInNumericallyIndexedTable(AutoCategory.RulesW.tags, oldtag)
 			if ndx then
-				table.remove(cache.tags, ndx)
+				table.remove(AutoCategory.RulesW.tags, ndx)
 			end
 		end
 	end
 	rule.tag = newtag
-	return rule.name, cache.rulesByTag_cvt[newtag]
+	return rule.name, AutoCategory.RulesW.tagGroups[newtag]
 end
 
 
@@ -1198,9 +1198,9 @@ end
 -- -------------------------------------------------------
 function AC_UI.CatSet_DeleteCat_LAM:execute()
 	local oldRuleName = CatSet_SelectRule_LAM:getValue()
-	local ndx = cache.rulesByName[oldRuleName]
+	local ndx = AutoCategory.RulesW.ruleNames[oldRuleName]
 	if ndx then
-		table.remove(AutoCategory.rules,ndx)
+		table.remove(AutoCategory.RulesW.ruleList,ndx)
 		-- remove from the rule list that gets saved
 		AutoCategory.ARW:removeRuleByName(oldRuleName)
 		AutoCategory.cacheRuleInitialize()
@@ -1489,7 +1489,7 @@ end
 
 
 function AutoCategory.debugBagTags()
-	AddCat_SelectTag_LAM:assign( { choices=cache.tags })
+	AddCat_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags })
 	d("AddCat_SelectTag_LAM:")
 	for k, v in pairs(AddCat_SelectTag_LAM.cvt.choices) do
 		if type(v) == "table" then
@@ -1508,8 +1508,8 @@ function AutoCategory.AddonMenuInit()
 
     -- initialize tables
 	BagSet_SelectBag_LAM:assign(cache.bags_cvt)
-	AddCat_SelectTag_LAM:assign( { choices=cache.tags } )
-	CatSet_SelectTag_LAM:assign( { choices=cache.tags} )
+	AddCat_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags } )
+	CatSet_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags} )
 
 	BagSet_SelectBag_LAM:select({})
 

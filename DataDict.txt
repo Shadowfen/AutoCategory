@@ -29,6 +29,14 @@ AutoCategory.cache = {
 AutoCategory.BagRuleEntry = {name, priority, isHidden}	-- bagRule
 BagRule = { name, priority, isHidden } 
 
+AutoCategory.RulesW = {
+    ruleList,   --  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+    ruleNames,    -- [name] rule# (index from ruleList)
+    compiled,   -- [name] function
+    tags,       -- [#] tagname
+    tagGroups,      -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
+}
+
 AutoCategory.CVT = {controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue, dirty}
 
 AC.rulefuncs -- metatable for rules with functions to manipulate them

@@ -4,7 +4,7 @@ SF=LibSFUtils
 
 
 function onLogout()
-    
+
     for id, savedVarsManager in pairs(registry) do
         if savedVarsManager.isDefaultsTrimmingEnabled then
             local rawDataTable, _, _, rawSavedVarsTablePath = LSV_SavedVarsManager.LoadRawTableData(savedVarsManager)

@@ -1,4 +1,9 @@
 
+[COLOR="DeepSkyBlue"]4.? (?)[/COLOR]:
+[LIST]
+[*] 
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.1.4 (101)[/COLOR]:
 [LIST]
 [*] After consideration, I've added the variable AutoCategory.Inited to the AutoCategory_API.lua to signify that it is protected from deletion the next time that I'm cleaning out unused code. Addon developers can now rely on it continuing to exist.
