@@ -36,10 +36,10 @@ AutoCategory.CVT.USE_VALUES = 1
 AutoCategory.CVT.USE_TOOLTIPS = 3
 AutoCategory.CVT.USE_ALL = 4
 
-local USE_NONE = AC.CVT.USE_NONE
-local USE_VALUES = AC.CVT.USE_VALUES
-local USE_TOOLTIPS = AC.CVT.USE_TOOLTIPS
-local USE_ALL = AC.CVT.USE_ALL
+local USE_NONE = AutoCategory.CVT.USE_NONE
+local USE_VALUES = AutoCategory.CVT.USE_VALUES
+local USE_TOOLTIPS = AutoCategory.CVT.USE_TOOLTIPS
+local USE_ALL = AutoCategory.CVT.USE_ALL
 
 function AutoCategory.CVT:New(...)
     local obj = ZO_Object.New(self)
@@ -352,7 +352,7 @@ function AutoCategory.BaseDD:New(...)
 end
 
 function AutoCategory.BaseDD:initialize(ctlname, ndx, usesFlags)
-	self.cvt = AC.CVT:New(ctlname, ndx, usesFlags)
+	self.cvt = AutoCategory.CVT:New(ctlname, ndx, usesFlags)
 end
 
 function AutoCategory.BaseDD:getControlName()
@@ -416,7 +416,7 @@ end
 function AutoCategory.GetUsableRuleName(name)
 	local testName = name
 	local index = 1
-	while AC.cache.rulesByName[testName] ~= nil do
+	while AutoCategory.cache.rulesByName[testName] ~= nil do
 		testName = name .. index
 		index = index + 1
 	end
@@ -473,13 +473,13 @@ function AutoCategory.CopyFrom(copyFrom)
 
 	local ruleName = copyFrom.name
 	-- get a unique name based on the old rule name
-	local newName = AC.GetUsableRuleName(ruleName)
+	local newName = AutoCategory.GetUsableRuleName(ruleName)
 	local tag = copyFrom.tag
 	if tag == "" then
 		tag = AC_EMPTY_TAG_NAME
 	end
 
-	local newRule = AC.CreateNewRule(newName, tag)
+	local newRule = AutoCategory.CreateNewRule(newName, tag)
 	newRule.description = copyFrom.description
 	newRule.rule = copyFrom.rule
 	newRule.damaged = copyFrom.damaged
@@ -508,7 +508,7 @@ function AutoCategory.CreateNewBagRule(rule, priority)
 	end
 	if type(rule) == "string" then
 		rulename = rule
-		rule = AC.GetRuleByName(rulename)
+		rule = AutoCategory.GetRuleByName(rulename)
 
 	elseif not rule.name then
 		return nil
@@ -658,7 +658,7 @@ end
 -- collected functions to be applied to a rule
 --
 -- This functions to be used with rule structures loaded in or created.
-AC.RuleApi = {
+AutoCategory.RuleApi = {
 	-- check if rule def is valid (required keys all present)
 	isValid = function(r)
 			return AutoCategory.isValidRule(r)
@@ -711,29 +711,29 @@ AC.RuleApi = {
 	-- Return a string that is either empty (good compile)
 	-- or an error string returned from the compile
 	--
-	-- Stores the compiled rule into AC.compiledRules table
+	-- Stores the compiled rule into AutoCategory.compiledRules table
 	compile = function(rule)
 			if rule == nil or rule.name == nil or rule.name == "" then
 				return
 			end
-			AC.compiledRules = SF.safeTable(AC.compiledRules)
+			AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
 
-			AC.RuleApi.clearError(rule)
-			AC.compiledRules[AC.RuleApi.key(rule)] = nil
+			AutoCategory.RuleApi.clearError(rule)
+			AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = nil
 
 			if rule.rule == nil or rule.rule == "" then
-				AC.RuleApi.setError(rule, true,"Missing rule definition")
+				AutoCategory.RuleApi.setError(rule, true,"Missing rule definition")
 				return rule.err
 			end
 
 			local rulestr = "return(" .. rule.rule .. ")"
 			local compiledfunc, err = zo_loadstring(rulestr)
 			if not compiledfunc then
-				AC.RuleApi.setError(rule, true, err)
-				AC.compiledRules[AC.RuleApi.key(rule)] = nil
+				AutoCategory.RuleApi.setError(rule, true, err)
+				AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = nil
 				return err
 			end
-			AC.compiledRules[AC.RuleApi.key(rule)] = compiledfunc
+			AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = compiledfunc
 			return ""
 		end,
 }
@@ -742,7 +742,7 @@ AC.RuleApi = {
 -- -------------------------------------------------
 -- collected functions to be applied to a BagRule
 --
-AC.BagRuleApi = {
+AutoCategory.BagRuleApi = {
 	isValid = function (bagrule)
 			if not bagrule.name or bagrule.name == "" then
 				return false
@@ -761,7 +761,7 @@ AC.BagRuleApi = {
 	-- disappeared (i.e the bag rule is now invalid).
 	formatShow	= function (bagrule)
 			local sn = nil
-			local rule = AC.BagRuleApi.getBackingRule(bagrule)
+			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
 				sn = string.format("|cFF4444(!)|r %s (%d)", bagrule.name, bagrule.priority)
@@ -785,13 +785,13 @@ AC.BagRuleApi = {
 	-- soon be released for LAM.
 	formatTooltip = function (bagrule)
 			local tt = nil
-			local rule = AC.BagRuleApi.getBackingRule(bagrule)
+			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
 				tt = L(SI_AC_WARNING_CATEGORY_MISSING)
 
 			else
-				tt = AC.RuleApi.getDesc(rule)
+				tt = AutoCategory.RuleApi.getDesc(rule)
 			end
 			return tt
 		end,
@@ -799,7 +799,7 @@ AC.BagRuleApi = {
 	-- Get the rule structure (if it exists) for the bag rule name
 	getBackingRule = function (bagrule)
 			if not bagrule.name then return nil end
-			local rule = AC.GetRuleByName(bagrule.name)
+			local rule = AutoCategory.GetRuleByName(bagrule.name)
 			return rule
 		end,
 

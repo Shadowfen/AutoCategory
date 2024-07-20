@@ -86,7 +86,7 @@ local fieldData = {
 	importBag =   CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
 }
 
-local currentRule = AC.CreateNewRule("","")
+local currentRule = AutoCategory.CreateNewRule("","")
 local currentBagRule = nil
 
 
@@ -183,7 +183,7 @@ end
 local function getCurrentBagId()
 	return BagSet_SelectBag_LAM:getValue()
 end
-AC.getCurrentBagId = getCurrentBagId   -- make available
+AutoCategory.getCurrentBagId = getCurrentBagId   -- make available
 
 --warning message
 local warningDuplicatedName = {
@@ -490,7 +490,7 @@ end
 -- ------------------------------------------------
 function AC_UI.BagSet_EditCat_LAM:execute()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
-	local rule = AC.GetRuleByName(ruleName)
+	local rule = AutoCategory.GetRuleByName(ruleName)
 	if rule then
 		CatSet_DisplayRule(rule)
 		AC_UI.ToggleSubmenu("AC_SUBMENU_BAG_SETTING", false)
@@ -533,7 +533,7 @@ function AC_UI.BagSet_RemoveCat_LAM:execute()
 		BagSet_SelectRule_LAM:select({}) 	-- select first
 	end
 
-	AC.cacheBagInitialize()
+	AutoCategory.cacheBagInitialize()
 	BagSet_SelectRule_LAM:refresh()
 	AddCat_SelectRule_LAM:refresh()
 	AC_UI.RefreshControls()
@@ -670,7 +670,7 @@ end
 -- ----------------------------------------------------------
 function AC_UI.AddCat_EditRule_LAM:execute()
 	local ruleName = AddCat_SelectRule_LAM:getValue()
-	local rule = AC.GetRuleByName(ruleName)
+	local rule = AutoCategory.GetRuleByName(ruleName)
 	if not rule then return end
 
 	CatSet_DisplayRule(rule)
@@ -714,7 +714,7 @@ function AC_UI.AddCat_BagAdd_LAM:execute()
 
 	if cache.entriesByName[bagId][ruleName] then return end
 
-	local entry = AC.CreateNewBagRule(ruleName)
+	local entry = AutoCategory.CreateNewBagRule(ruleName)
 	saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
 	currentBagRule = entry.name
 
@@ -928,7 +928,7 @@ end
 
 function AC_UI.CatSet_SelectRule_LAM:setValue(value)
 	self:select(value)
-	currentRule = AC.GetRuleByName(value)
+	currentRule = AutoCategory.GetRuleByName(value)
 	AC_UI.checkCurrentRule()
 end
 
@@ -944,7 +944,7 @@ function AC_UI.CatSet_SelectRule_LAM:controlDef()
 			sort = "name-up",
 
 			getFunc = function()
-				currentRule = AC.GetRuleByName(self:getValue())
+				currentRule = AutoCategory.GetRuleByName(self:getValue())
 				return self:getValue()
 			end,
 			setFunc = function(value) self:setValue(value) end,
@@ -963,9 +963,9 @@ function AC_UI.CatSet_NewCat_LAM:execute()
 	if tag == "" then
 		tag = AC_EMPTY_TAG_NAME
 	end
-	local newRule = AC.CreateNewRule(newName, tag)
-	AC.ARW:addRule(newRule)
-	--AC.acctRules.rules[#AC.acctRules.rules+1] = newRule
+	local newRule = AutoCategory.CreateNewRule(newName, tag)
+	AutoCategory.ARW:addRule(newRule)
+	--AutoCategory.acctRules.rules[#AutoCategory.acctRules.rules+1] = newRule
 	cache.AddRule(newRule)
 
 	currentRule = newRule
@@ -985,7 +985,7 @@ function AC_UI.CatSet_NewCat_LAM:execute()
 	AddCat_SelectTag_LAM:updateControl()
 
 	--AC_UI.RefreshDropdownData()
-	AutoCategory.RecompileRules(AC.rules)
+	AutoCategory.RecompileRules(AutoCategory.rules)
 end
 
 function AC_UI.CatSet_NewCat_LAM:controlDef()
@@ -1010,11 +1010,11 @@ function AC_UI.CatSet_CopyCat_LAM:execute()
 		tag = AC_EMPTY_TAG_NAME
 	end
 
-	local srcRule = AC.GetRuleByName(ruleName)
+	local srcRule = AutoCategory.GetRuleByName(ruleName)
 	if not srcRule then return end
 
-	local newRule = AC.CopyFrom(srcRule)
-	AC.ARW:addRule(newRule)
+	local newRule = AutoCategory.CopyFrom(srcRule)
+	AutoCategory.ARW:addRule(newRule)
 	cache.AddRule(newRule)
 
 	currentRule = newRule
@@ -1028,7 +1028,7 @@ function AC_UI.CatSet_CopyCat_LAM:execute()
 	AC_UI.checkCurrentRule()
 
 
-	AutoCategory.RecompileRules(AC.rules)
+	AutoCategory.RecompileRules(AutoCategory.rules)
 end
 
 function AC_UI.CatSet_CopyCat_LAM:controlDef()
@@ -1071,7 +1071,7 @@ function AC_UI.CatSet_NameEdit_LAM:setValue(value)
 	if isDuplicated then
 		warningDuplicatedName.warningMessage = string.format(
 			L(SI_AC_WARNING_CATEGORY_NAME_DUPLICATED),
-			value, AC.GetUsableRuleName(value))
+			value, AutoCategory.GetUsableRuleName(value))
 		value = oldName
 		--change editbox's value
 		local control = WINDOW_MANAGER:GetControlByName("AC_EDITBOX_EDITRULE_NAME")
@@ -1079,7 +1079,7 @@ function AC_UI.CatSet_NameEdit_LAM:setValue(value)
 		return
 	end
 
-	AC.renameRule(currentRule.name, value)
+	AutoCategory.renameRule(currentRule.name, value)
 
 	--Update drop downs
 	AutoCategory.cacheInitialize()
@@ -1200,18 +1200,10 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 	local oldRuleName = CatSet_SelectRule_LAM:getValue()
 	local ndx = cache.rulesByName[oldRuleName]
 	if ndx then
-		table.remove(AC.rules,ndx)
+		table.remove(AutoCategory.rules,ndx)
 		-- remove from the rule list that gets saved
-		AC.ARW:removeRuleByName(oldRuleName)
-		--[[
-		for i,_ in pairs(AC.acctRules.rules) do
-			if AC.acctRules.rules[i].name == oldRuleName then
-				table.remove(AC.acctRules.rules,i)
-				break
-			end
-		end
-		--]]
-		AC.cacheRuleInitialize()
+		AutoCategory.ARW:removeRuleByName(oldRuleName)
+		AutoCategory.cacheRuleInitialize()
 		--AC_UI.RefreshDropdownData()
 	end
 
@@ -1278,7 +1270,7 @@ function AC_UI.CatSet_DeleteCat_LAM:controlDef()
 			isDangerous = true,
 			func = function()  self:execute() end,
 			width = "half",
-			disabled = function() return currentRule == nil or AC.RuleApi.isPredefined(currentRule) end,
+			disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 		}
 end
 -- -------------------------------------------------------
@@ -1326,12 +1318,12 @@ local function checkKeywords(str)
    local result = {}
     for w in string.gmatch(str, "[a-zA-Z0-9_/]+") do
         local found = false
-        if AC.Environment[w] then
+        if AutoCategory.Environment[w] then
             found = true
 
         else
-            for i=1, #AC.dictionary do
-                if AC.dictionary[i][w] then
+            for i=1, #AutoCategory.dictionary do
+                if AutoCategory.dictionary[i][w] then
                     found = true
                     break;
                 end
@@ -1462,9 +1454,9 @@ function AC_UI.ToggleSubmenu(typeString, open)
 end
 
 -- aliases
-local GetUsableRuleName = AC.GetUsableRuleName
-local CreateNewRule = AC.CreateNewRule
-local CreateNewBagRule = AC.CreateNewBagRule
+local GetUsableRuleName = AutoCategory.GetUsableRuleName
+local CreateNewRule = AutoCategory.CreateNewRule
+local CreateNewBagRule = AutoCategory.CreateNewBagRule
 
 -- -------------------------------------------------------
 local function CreatePanel()
@@ -1512,7 +1504,7 @@ end
 
 
 function AutoCategory.AddonMenuInit()
-    AC.cacheInitialize()
+    AutoCategory.cacheInitialize()
 
     -- initialize tables
 	BagSet_SelectBag_LAM:assign(cache.bags_cvt)
@@ -1687,7 +1679,7 @@ function AutoCategory.AddonMenuInit()
                         local oldval = currentRule.description
                         currentRule.description = value
                         if oldval ~= value then
-                            AC.cacheInitialize() -- reset tooltips to new value
+                            AutoCategory.cacheInitialize() -- reset tooltips to new value
                             AC_UI.RefreshDropdownData()
 							AC_UI.RefreshControls()
                         end
@@ -1829,7 +1821,7 @@ function AutoCategory.AddonMenuInit()
                     end,
                     setFunc = function(v)
                         saved.appearance["CATEGORY_FONT_NAME"] = v
-						AC.resetface()
+						AutoCategory.resetface()
                     end,
                     scrollable = 7,
                 },
@@ -1965,5 +1957,5 @@ function AutoCategory.AddonMenuInit()
 	LAM:RegisterAddonPanel("AC_CATEGORY_SETTINGS", panelData)
 	LAM:RegisterOptionControls("AC_CATEGORY_SETTINGS", optionsTable)
 	CALLBACK_MANAGER:RegisterCallback("LAM-RefreshPanel", RefreshPanel)
-	CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", AC.LengthenRuleBox)
+	CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", AutoCategory.LengthenRuleBox)
 end

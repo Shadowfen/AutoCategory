@@ -1,11 +1,16 @@
 --====API====--
 local SF = LibSFUtils
 local AC = AutoCategory
-local RuleApi = AC.RuleApi
+local RuleApi = AutoCategory.RuleApi
 
 -- aliases
 local saved = AutoCategory.saved
 local aclogger = AutoCategory.logger
+
+-- For use to tell if AutoCategory has finished its initialization process and
+-- is ready for business. The following variable is nil if AutoCategory is
+-- still initializing, and changes to true when the initialization is finished.
+AutoCategory.Inited = AutoCategory.Inited
 
 -- For use by bulk updaters of inventory (ESPECIALLY the Guild Bank)
 -- to not perform sorting for a specific period of time (until the
@@ -89,7 +94,7 @@ function AutoCategory.validateACBagRules(acBagType)
 	local bag = saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
-		local rule = AC.BagRuleApi.getBackingRule(entry)
+		local rule = AutoCategory.BagRuleApi.getBackingRule(entry)
 		checkValidRule(entry.name, rule)
 	end
 end
@@ -122,7 +127,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	-- an enhancement (set name) and if SHOW_CATEGORY_SET_TITLE is enabled
 	local function adjustName(name, enhancement)
 		if name == nil or name == "" then 
-			name  = AC.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+			name  = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 			return name
 		end
 		if enhancement == "" then

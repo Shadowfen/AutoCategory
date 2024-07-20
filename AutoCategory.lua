@@ -4,20 +4,20 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local CVT = AC.CVT
+local CVT = AutoCategory.CVT
 local aclogger = AutoCategory.logger
-local RuleApi = AC.RuleApi
-local BagRuleApi = AC.BagRuleApi
+local RuleApi = AutoCategory.RuleApi
+local BagRuleApi = AutoCategory.BagRuleApi
 local ARW = AutoCategory.ARW
 
 ----------------------
 -- Lists and variables
 
-AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
-AutoCategory.compiledRules = SF.safeTable(AC.compiledRules)
-AutoCategory.ARW = SF.safeTable(AC.ARW)
+AutoCategory.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
+AutoCategory.ARW = SF.safeTable(AutoCategory.ARW)
 
--- AC.saved contains table references from the appropriate saved variables - either acctSaved or charSaved
+-- AutoCategory.saved contains table references from the appropriate saved variables - either acctSaved or charSaved
 -- depending on the setting of charSaved.accountWide
 AutoCategory.saved = {
     rules = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err} -- obsolete
@@ -30,7 +30,7 @@ AutoCategory.saved = {
 AutoCategory.cache = {
     rulesByName = {}, -- [name] rule#
     rulesByTag_cvt = {}, -- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
-    compiledRules = AC.compiledRules, -- [name] function
+    compiledRules = AutoCategory.compiledRules, -- [name] function
     tags = {}, -- [#] tagname
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
@@ -47,10 +47,10 @@ local cache = AutoCategory.cache
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 function AutoCategory.debugCache()
-    d("User rules: " .. AC.ARW:size()) --#AC.acctRules.rules)
+    d("User rules: " .. AutoCategory.ARW:size()) --#AutoCategory.acctRules.rules)
     d("Saved rules: " .. #saved.rules)						-- should be 0 after conversion
-    d("Predefined rules: " .. #AC.predefinedRules)			-- predefined rules from base and plugins
-    d("Combined rules: " .. #AC.rules)						-- complete list of user rules and predefined rules
+    d("Predefined rules: " .. #AutoCategory.predefinedRules)			-- predefined rules from base and plugins
+    d("Combined rules: " .. #AutoCategory.rules)						-- complete list of user rules and predefined rules
     d("Compiled rules: " .. SF.GetSize(cache.compiledRules))
     d("Rules by Name: " .. SF.GetSize(cache.rulesByName))	-- lookup table for rules by rule name
     d("Rules by Tag: " .. SF.GetSize(cache.rulesByTag_cvt))	-- actually returns the # of Tags defined
@@ -160,12 +160,12 @@ function AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.charSaved.appearance = nil	-- fix old data corruption error
 
 	-- rule definitions are always account-wide
-	-- AC.acctRules only has user-defined rules
-	-- AC.rules will have acctRules plus the predefined rules
+	-- AutoCategory.acctRules only has user-defined rules
+	-- AutoCategory.rules will have acctRules plus the predefined rules
 
 	-- assign functions to rules
-    table.sort(AC.rules, RuleSortingFunction)
-	local ruletbl = AC.rules
+    table.sort(AutoCategory.rules, RuleSortingFunction)
+	local ruletbl = AutoCategory.rules
 
     AutoCategory.RecompileRules(ruletbl)
 
@@ -180,7 +180,7 @@ function AutoCategory.UpdateCurrentSavedVars()
     end
 	if saved.bags[7] then saved.bags[7] = nil end -- fix old data corruption
 
-    AC.cacheInitialize()
+    AutoCategory.cacheInitialize()
 end
 
 -- -----------------------------------------------------------
@@ -189,7 +189,7 @@ end
 function AutoCategory.LoadCollapse()
     if not AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
-        AutoCategory.ResetCollapse(AC.saved)
+        AutoCategory.ResetCollapse(AutoCategory.saved)
     end
 end
 
@@ -217,12 +217,12 @@ function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 end
 -- -----------------------------------------------------------
 
--- will need to rebuild AC.rules after this
+-- will need to rebuild AutoCategory.rules after this
 function AutoCategory.ResetToDefaults()
 
-	AC.ARW.clear()
+	AutoCategory.ARW.clear()
 	ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.rules, AutoCategory.acctRules.rules)
-	AC.ARW = AC.RuleList:New(AC.acctRules.rules)
+	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
 
 	AutoCategory.acctSaved.rules = nil	-- no longer used
 	AutoCategory.charSaved.rules = nil	-- no longer used
@@ -254,13 +254,13 @@ end
 function AutoCategory.renameRule(oldName, newName)
 	if oldName == newName then return end
 
-	local rule = AC.GetRuleByName(oldName)
+	local rule = AutoCategory.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
 
 	local oldrndx = cache.rulesByName[oldName]
 	cache.rulesByName[oldName] = nil
 
-	newName = AC.GetUsableRuleName(newName)
+	newName = AutoCategory.GetUsableRuleName(newName)
 
 	rule.name = newName
 	cache.rulesByName[rule.name] = oldrndx
@@ -289,7 +289,7 @@ function AutoCategory.renameBagRule(oldName, newName)
 	end
 end
 
--- initialize the rulesByName, rulesByTag_cvt, and the cache.tags tables from AC.rules
+-- initialize the rulesByName, rulesByTag_cvt, and the cache.tags tables from AutoCategory.rules
 function AutoCategory.cacheRuleInitialize()
 	-- initialize the rules-based lookups
     cache.rulesByName = SF.safeClearTable(cache.rulesByName)
@@ -297,12 +297,9 @@ function AutoCategory.cacheRuleInitialize()
     cache.tags = SF.safeClearTable(cache.tags)
 
 	-- fill the rules-based lookups
-	local ruletbl = AC.rules
+	local ruletbl = AutoCategory.rules
     table.sort(ruletbl, RuleDataSortingFunction ) -- already sorted by name
     for ndx = 1, #ruletbl do
-		-- associate rule functions with a rule struct
-		--AC.AssociateRule(ruletbl[ndx])
-
 		-- add rule to rulesByName lookup
         local rule = ruletbl[ndx]
         local name = rule.name
@@ -317,7 +314,7 @@ function AutoCategory.cacheRuleInitialize()
         --update tag grouping lookups
         if not cache.rulesByTag_cvt[tag] then
 			cache.tags[#cache.tags+1] = tag
-            cache.rulesByTag_cvt[tag] = AC.CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+            cache.rulesByTag_cvt[tag] = AutoCategory.CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
         end
         cache.rulesByTag_cvt[tag]:append(name, nil, RuleApi.getDesc(rule))
     end
@@ -337,7 +334,7 @@ function AutoCategory.cacheInitBag(bagId)
 	cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId])
     ZO_ClearTable(cache.entriesByName[bagId])
 
-	cache.entriesByBag[bagId] = AC.CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+	cache.entriesByBag[bagId] = AutoCategory.CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, priority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
@@ -354,7 +351,6 @@ function AutoCategory.cacheInitBag(bagId)
 	for entry = 1, #svdbag.rules do
 		local bagrule = svdbag.rules[entry] -- BagRule {name, priority, isHidden}
 		if not bagrule then break end
-		--AC.AssociateBagRule(bagrule)
 
 		local ruleName = bagrule.name
 		aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
@@ -387,7 +383,7 @@ end
 
 
 -- ----------------------------------------------------
--- assumes that AC.rules and saved.bags have entries but
+-- assumes that AutoCategory.rules and saved.bags have entries but
 -- some or all of the cache tables need (re)initializing
 --
 function AutoCategory.cacheInitialize()
@@ -410,10 +406,10 @@ function AutoCategory.GetRuleByName(name)
     end
 
     --return saved.rules[ndx]
-    return AC.rules[ndx]
+    return AutoCategory.rules[ndx]
 end
 
--- when we add a new rule to AC.rules, also add it to the various lookups and dropdowns
+-- when we add a new rule to AutoCategory.rules, also add it to the various lookups and dropdowns
 -- returns nil on success or error message
 function AutoCategory.cache.AddRule(rule)
     if not rule or not rule.name then
@@ -432,12 +428,12 @@ function AutoCategory.cache.AddRule(rule)
     if rule_ndx then
 		-- rule already exists
 		-- overwrite rule with new one
-		AC.rules[rule_ndx] = rule
+		AutoCategory.rules[rule_ndx] = rule
 
 	else
 		-- add the new rule
-		AC.rules[#AC.rules+1] = rule
-		rule_ndx = #AC.rules
+		AutoCategory.rules[#AutoCategory.rules+1] = rule
+		rule_ndx = #AutoCategory.rules
 		cache.rulesByName[rule.name] = rule_ndx
 		cache.rulesByTag_cvt[rule.tag]:append(rule.name, nil, RuleApi.getDesc(rule))
     end
@@ -483,25 +479,25 @@ end
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --
 local function addTableRules(tbl, tblname, ispredef)
-	if not tbl.rules or tbl.rules == AC.rules then return end
+	if not tbl.rules or tbl.rules == AutoCategory.rules then return end
 
 	aclogger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
 	-- create name lookup for acctRules
-	--local lkacctRules = AC.ARW:getLookup()
+	--local lkacctRules = AutoCategory.ARW:getLookup()
 	local newName
 
 	-- add a rule to the combined rules list and the name-lookup
 	local function addCombinedRule(rl)
-		AC.rules = SF.safeTable(AC.rules)
+		AutoCategory.rules = SF.safeTable(AutoCategory.rules)
 		local n = cache.rulesByName[rl.name]
 		if not n then
-			AC.rules[#AC.rules+1] = rl
-			--aclogger:Info("Adding rule "..rl.name.." to AC.rules ndx="..#AC.rules)
-			cache.rulesByName[rl.name] = #AC.rules
+			AutoCategory.rules[#AutoCategory.rules+1] = rl
+			--aclogger:Info("Adding rule "..rl.name.." to AC.rules ndx="..#AutoCategory.rules)
+			cache.rulesByName[rl.name] = #AutoCategory.rules
 			return true
 		else
-			AC.rules[n] = rl
+			AutoCategory.rules[n] = rl
 			--aclogger:Info("Overwriting rule "..rl.name.." to AC.rules ndx="..n)
 			cache.rulesByName[rl.name] = n
 		end
@@ -510,15 +506,15 @@ local function addTableRules(tbl, tblname, ispredef)
 
 	local function addPredef(tbl, rule)
 		-- add to predefinedRules list
-		if tbl.rules ~= AC.predefinedRules then
-			AC.predefinedRules[#AC.predefinedRules+1] = rule
+		if tbl.rules ~= AutoCategory.predefinedRules then
+			AutoCategory.predefinedRules[#AutoCategory.predefinedRules+1] = rule
 		end
 	end
 
 	local function addUserRule(tbl, rule)
 		-- add to acctRules list
-		if tbl.rules ~= AC.acctRules.rules then
-			AC.ARW:addRule(rule)
+		if tbl.rules ~= AutoCategory.acctRules.rules then
+			AutoCategory.ARW:addRule(rule)
 		end
 	end
 
@@ -530,7 +526,7 @@ local function addTableRules(tbl, tblname, ispredef)
 			v.pred=1
 		end
 
-		r = AC.GetRuleByName(v.name)
+		r = AutoCategory.GetRuleByName(v.name)
 		if r then
 			aclogger:Warn("Found duplicate rule name - "..v.name)
 			-- already have one
@@ -541,13 +537,13 @@ local function addTableRules(tbl, tblname, ispredef)
 			else
 				local oldname = v.name
 				-- rename different rule
-				newName = AC.GetUsableRuleName(v.name)
+				newName = AutoCategory.GetUsableRuleName(v.name)
 				v.name = newName
 				aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
 				addCombinedRule(v)
-				AC.renameBagRule(oldname, newName)
-				if AC.RuleApi.isPredefined(v) then 
+				AutoCategory.renameBagRule(oldname, newName)
+				if AutoCategory.RuleApi.isPredefined(v) then 
 					addPredef(tbl, v)
 
 				else
@@ -559,10 +555,10 @@ local function addTableRules(tbl, tblname, ispredef)
 
 		else
 			-- brand new (never seen) rule
-			-- add it to the combined (AC.rule) list
+			-- add it to the combined (AutoCategory.rule) list
 			addCombinedRule(v)
 
-			if AC.RuleApi.isPredefined(v) then 
+			if AutoCategory.RuleApi.isPredefined(v) then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
 				aclogger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
@@ -578,22 +574,22 @@ end
 
 local function pruneUserRules()
 	aclogger:Debug ("Executing pruneUserRules ")
-	local arrules = AC.ARW.ruleList --AC.acctRules.rules
-	local lkacctRules = AC.ARW:getLookup()
+	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
+	local lkacctRules = AutoCategory.ARW:getLookup()
 	for k = #arrules,1,-1 do
 		local ndx = lkacctRules[arrules[k].name]
 		if  ndx and k ~= ndx then
 			aclogger:Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
-			AC.ARW.removeRule(ndx)
+			AutoCategory.ARW.removeRule(ndx)
 			--table.remove(arrules, k)
 		end
 	end
 
 	-- remove predefined rules from acctRules
-	for k = #AC.predefinedRules,1,-1 do
-		local ndx = lkacctRules[AC.predefinedRules[k].name]
-		aclogger:Debug ("Removing predefined rule ".. AC.predefinedRules[k].name.." from acctRules")
-		AC.ARW:removeRule(ndx)
+	for k = #AutoCategory.predefinedRules,1,-1 do
+		local ndx = lkacctRules[AutoCategory.predefinedRules[k].name]
+		aclogger:Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
+		AutoCategory.ARW:removeRule(ndx)
 		--table.remove(arrules, k)
 	end
 end
@@ -611,7 +607,7 @@ local function loadPluginPredefines()
 		end
 	end
 	aclogger:Debug ("Done xecuting loadPluginPredefines ")
-	aclogger:Debug("2.5 predefined "..SF.GetSize(AC.predefinedRules))
+	aclogger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
  end
 
 
@@ -622,17 +618,17 @@ function AutoCategory.onLoad(event, addon)
     end
 
 	-- make sure we are not called again
-	AC.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
+	AutoCategory.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
 
-    AC.checkLibraryVersions()
+    AutoCategory.checkLibraryVersions()
 
     -- load our saved variables (no longer loads pre-defined rules)
-    AC.acctSaved, AC.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
-		1.1, AC.defaultAcctSettings, AC.defaultCharSettings)
+    AutoCategory.acctSaved, AutoCategory.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
+		1.1, AutoCategory.defaultAcctSettings, AutoCategory.defaultCharSettings)
 
 	-- There are no char-level variables for AutoCatRules!
-    AC.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCategory.default_rules)
-	AC.ARW = AutoCategory.RuleList:New(AC.acctRules.rules)
+    AutoCategory.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCategory.default_rules)
+	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
 
 	AutoCategory.LoadCollapse()
 
@@ -646,18 +642,18 @@ end
 
 -- --------------------------------------------------------------------
 -- keep track of registered events for AutoCategory
-AC.evtmgr = SF.EvtMgr:New("AutoCategory")
+AutoCategory.evtmgr = SF.EvtMgr:New("AutoCategory")
 
 -- only runs once
 -- continues initialization after all addons are loaded into the game
 function AutoCategory.onPlayerActivated()
-	local evtmgr = AC.evtmgr
+	local evtmgr = AutoCategory.evtmgr
 
 	-- make sure we are only called once
 	evtmgr:unregEvt(EVENT_PLAYER_ACTIVATED)
 
-	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AC.BulkMode = false end)
-	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AC.BulkMode = false end)
+	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCategory.BulkMode = false end)
+	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCategory.BulkMode = false end)
 
 	--capabilities with other (older) add-ons
 	IntegrateQuickMenu()
@@ -668,33 +664,34 @@ function AutoCategory.onPlayerActivated()
 		aclogger = AutoCategory.logger
 	end
 
-	AC.meta = SF.safeTable(AC.meta)
-	SF.addonMeta(AC.meta,"AutoCategory")
+	AutoCategory.meta = SF.safeTable(AutoCategory.meta)
+	SF.addonMeta(AutoCategory.meta,"AutoCategory")
 
 	-- add plugin predefined rules to the combined rules and name-lookup
 	loadPluginPredefines()
-	local pd = { rules = AC.predefinedRules, }
+	local pd = { rules = AutoCategory.predefinedRules, }
 	addTableRules(pd, ".predefinedRules", true)
 	--pruneUserRules()
 
-	addTableRules(AC.acctRules, ".acctRules", false)
-	addTableRules(AC.acctSaved, ".acctSaved", false)
+	addTableRules(AutoCategory.acctRules, ".acctRules", false)
+	addTableRules(AutoCategory.acctSaved, ".acctSaved", false)
 	AutoCategory.acctSaved.rules = nil	-- no longer used
-	addTableRules(AC.charSaved, ".charSaved", false)
+	addTableRules(AutoCategory.charSaved, ".charSaved", false)
 	AutoCategory.charSaved.rules = nil	-- no longer used
 
-	aclogger:Debug("2.5 predefined "..SF.GetSize(AC.predefinedRules))
+	aclogger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
 
     AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.initializePlugins()
-	AC.cacheInitialize()
+	AutoCategory.cacheInitialize()
 	AutoCategory.AddonMenuInit()
+	AutoCategory.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
 end
 
 do
 	-- register our event handler function to be called to do initialization
-	AC.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 		AutoCategory.onLoad)
-	AC.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCategory.onPlayerActivated)
+	AutoCategory.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 		AutoCategory.onLoad)
+	AutoCategory.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCategory.onPlayerActivated)
 end
 
 

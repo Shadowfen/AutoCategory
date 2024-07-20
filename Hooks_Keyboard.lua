@@ -125,7 +125,7 @@ local header_face = nil
 -- Provides a function to clear the current fetched font face
 -- for AddonMenu.lua to use when the user changes the header
 -- text font.
-function AC.resetface()
+function AutoCategory.resetface()
 	header_face = nil
 end
 
@@ -139,7 +139,7 @@ local function getHeaderFace()
 	if header_face ~= nil then
 		return header_face
 	end
-	local appearance = AC.acctSaved.appearance
+	local appearance = AutoCategory.acctSaved.appearance
 	aclogger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
 	aclogger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
@@ -149,7 +149,7 @@ end
 -- setup function for category header type to be added to the scroll list
 local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	--set header
-	local appearance = AC.acctSaved.appearance
+	local appearance = AutoCategory.acctSaved.appearance
 	local headerLabel = rowControl:GetNamedChild("HeaderName")
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
 	headerLabel:SetFont(string.format('%s|%d|%s',
@@ -173,7 +173,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
 
-	elseif AC.saved.bags[bagTypeId].isUngroupedHidden and
+	elseif AutoCategory.saved.bags[bagTypeId].isUngroupedHidden and
 			cateName == AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] then
 		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 	end
@@ -438,23 +438,6 @@ local function handleRules(scrollData, needsReload, specialType)
 	return updateCount
 end
 
---[[
--- look for the bag ID associated with the scrollData list
---
--- may return nil if there is no (non-header) data in the scrollData list
-local function getListBagID(scrollData)
-	local bagId = nil
-	for i, entry in ipairs(scrollData) do
-		if entry.typeId ~= CATEGORY_HEADER then
-			local slotData = entry.data
-			bagId = slotData.bagId
-			break
-		end
-	end
-	return bagId
-end
---]]
-
 --- Create list with visible items and headers (performs category count).
 local function createNewScrollData(scrollData) --, sortfn)
 	local newScrollData = {} --- output, entries sorted with category headers
@@ -470,13 +453,6 @@ local function createNewScrollData(scrollData) --, sortfn)
 		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0)
 		categoryList[name].AC_catCount = categoryList[name].AC_catCount + 1
 	end
-
-	--[[local function getCount(name)
-		categoryList[name] = SF.safeTable(categoryList[name])
-		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0)
-		return categoryList[name].AC_catCount
-	end
-	--]]
 
 	local function setCount(bagTypeId, name, count)
 		categoryList[name] = SF.safeTable(categoryList[name])
@@ -562,8 +538,6 @@ local function prehookSort(self, inventoryType)
 		end
 	end	
 	-- end nogetrandom recommend 
-
-	--local bagId = getListBagID(scrollData)
 
 	local needsReload = true
 	if scene == "bank" or scene == "guildBank" then
@@ -654,7 +628,7 @@ function AutoCategory.HookKeyboardMode()
 	-- Other events that cause a full refresh
 	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", refresh, true)
 
-	AC.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
+	AutoCategory.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
 
 end
 

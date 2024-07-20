@@ -1,4 +1,21 @@
 
+[COLOR="DeepSkyBlue"]4.1.4 (101)[/COLOR]:
+[LIST]
+[*] After consideration, I've added the variable AutoCategory.Inited to the AutoCategory_API.lua to signify that it is protected from deletion the next time that I'm cleaning out unused code. Addon developers can now rely on it continuing to exist.
+[*] Fix error thrown when deleting a category.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.1.3 (100)[/COLOR]:
+[LIST]
+[*] Fix typo.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.1.2 (99)[/COLOR]:
+[LIST]
+[*] Adds back in the AutoCategory.Inited variable for BetterUI users even though AutoCategory does not use it itself. Credit to Daeymon for finding this.
+[*] Refactoring.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.1.1 (98)[/COLOR]:
 [LIST]
 [*] Fixed the sptype("script") convenience match to properly match against any affix, focus, or signature scripts.

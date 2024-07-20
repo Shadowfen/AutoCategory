@@ -65,9 +65,5 @@ function AutoCategory.RegisterPlugin(name, initfunc, predefined)
     end
     entry.predef = predefined
     AutoCategory.Plugins[name] = entry
-	if AutoCategory.Inited then 
-        -- AutoCategory is already loaded so go ahead and load plugin
-        initfunc()
-    end
 end
 
