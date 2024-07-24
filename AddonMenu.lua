@@ -6,14 +6,15 @@ local AC = AutoCategory
 
 local L = GetString
 
-local CVT = AutoCategory.CVT
-local aclogger = AutoCategory.logger
-local RuleApi = AutoCategory.RuleApi
-local BagRuleApi = AutoCategory.BagRuleApi
-local ARW = AutoCategory.ARW
+--local CVT = AutoCategory.CVT
+--local aclogger = AutoCategory.logger
+--local RuleApi = AutoCategory.RuleApi
+--local ARW = AutoCategory.ARW
+--local RulesW = AutoCategory.RulesW
 
-local cache = AutoCategory.cache
-local saved = AutoCategory.saved
+
+--local cache = AutoCategory.cache
+--local saved = AutoCategory.saved
 
 
 -- variables
@@ -23,7 +24,7 @@ AC_UI = {}
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 --cache data for dropdown: 
-cache.bags_cvt.choices = {
+AutoCategory.cache.bags_cvt.choices = {
 	L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK),
 	L(SI_AC_BAGTYPE_SHOWNAME_BANK),
 	L(SI_AC_BAGTYPE_SHOWNAME_GUILDBANK),
@@ -31,7 +32,7 @@ cache.bags_cvt.choices = {
 	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
 }
-cache.bags_cvt.choicesValues = {
+AutoCategory.cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_BACKPACK,
 	AC_BAG_TYPE_BANK,
 	AC_BAG_TYPE_GUILDBANK,
@@ -39,7 +40,7 @@ cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
 }
-cache.bags_cvt.choicesTooltips = {
+AutoCategory.cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK),
 	L(SI_AC_BAGTYPE_TOOLTIP_BANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_GUILDBANK),
@@ -83,7 +84,7 @@ end
 
 -- CVT containers for the dropdowns that we use
 local fieldData = {
-	importBag =   CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
+	importBag =   AutoCategory.CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
 }
 
 local currentRule = AutoCategory.CreateNewRule("","")
@@ -104,13 +105,13 @@ dropdownFontAlignment.choices = {
 dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 -- This is not a "class"! It is more of a singleton instance.
-AC_UI.BagSet_SelectBag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+AC_UI.BagSet_SelectBag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
 local BagSet_SelectBag_LAM = AC_UI.BagSet_SelectBag_LAM
 
 AC_UI.BagSet_HideOther_LAM = AC.BaseUI:New("AC_CHECKBOX_HIDEOTHER")	-- checkbox
 local BagSet_HideOther_LAM = AC_UI.BagSet_HideOther_LAM
 
-AC_UI.BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+AC_UI.BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
 local BagSet_SelectRule_LAM = AC_UI.BagSet_SelectRule_LAM
 
 AC_UI.BagSet_Priority_LAM = AC.BaseUI:New()		-- slider
@@ -128,7 +129,7 @@ local BagSet_RemoveCat_LAM = AC_UI.BagSet_RemoveCat_LAM
 AC_UI.AddCat_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_TAG")	-- only uses choices
 local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
 
-AC_UI.AddCat_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_RULE",nil ,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+AC_UI.AddCat_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_RULE",nil ,AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
 local AddCat_SelectRule_LAM = AC_UI.AddCat_SelectRule_LAM
 
 AC_UI.AddCat_EditRule_LAM = AC.BaseUI:New()	-- button
@@ -140,7 +141,7 @@ local AddCat_BagAdd_LAM = AC_UI.AddCat_BagAdd_LAM
 AC_UI.ImpExp_ExportAll_LAM = AC.BaseUI:New()	-- button
 local ImpExp_ExportAll_LAM = AC_UI.ImpExp_ExportAll_LAM
 
-AC_UI.ImpExp_ImportBag_LAM = AC.BaseDD:New("AC_DROPDOWN_IMPORTBAG_BAG", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+AC_UI.ImpExp_ImportBag_LAM = AC.BaseDD:New("AC_DROPDOWN_IMPORTBAG_BAG", nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
 local ImpExp_ImportBag_LAM = AC_UI.ImpExp_ImportBag_LAM
 
 AC_UI.ImpExp_Import_LAM = AC.BaseUI:New()	-- button
@@ -149,7 +150,7 @@ local ImpExp_Import_LAM = AC_UI.ImpExp_Import_LAM
 AC_UI.CatSet_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_TAG") -- only uses choices
 local CatSet_SelectTag_LAM = AC_UI.CatSet_SelectTag_LAM
 
-AC_UI.CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  CVT.USE_TOOLTIPS) -- uses choicesTooltips
+AC_UI.CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
 local CatSet_SelectRule_LAM = AC_UI.CatSet_SelectRule_LAM
 
 AC_UI.CatSet_NewCat_LAM = AC.BaseUI:New() 	-- button
@@ -195,6 +196,7 @@ local warningDuplicatedName = {
 -- bagSetting table = {isOtherHidden, {rules{name, priority, isHidden}} }
 local function getBagSettings(bagId)
 	if not bagId then bagId = getCurrentBagId() end
+	local saved = AutoCategory.saved
 	if saved and saved.bags then
 		return saved.bags[bagId]	-- still might be nil
 	end
@@ -210,7 +212,7 @@ AC_UI.BagSet_SelectBag_LAM.defaultVal = AC_BAG_TYPE_BACKPACK
 -- current contents of the cache.bags_cvt list.
 function AC_UI.BagSet_SelectBag_LAM:refresh()
 	if self:getValue() == nil then
-		self:select(cache.bags_cvt.choicesValues)
+		self:select(AutoCategory.cache.bags_cvt.choicesValues)
 	end
 end
 
@@ -310,8 +312,8 @@ end
 function AC_UI.BagSet_HideCat_LAM:getValue()
 	local bag = getCurrentBagId()
 	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
-	if bag and ruleNm and cache.entriesByName[bag][ruleNm] then
-		return cache.entriesByName[bag][ruleNm].isHidden or false
+	if bag and ruleNm and AutoCategory.cache.entriesByName[bag][ruleNm] then
+		return AutoCategory.cache.entriesByName[bag][ruleNm].isHidden or false
 	end
 	return 0
 end
@@ -319,12 +321,12 @@ end
 function AC_UI.BagSet_HideCat_LAM:setValue(value)
 	local bag = getCurrentBagId()
 	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
-	if cache.entriesByName[bag][ruleNm] then
-		local isHidden = cache.entriesByName[bag][ruleNm].isHidden or false
+	if AutoCategory.cache.entriesByName[bag][ruleNm] then
+		local isHidden = AutoCategory.cache.entriesByName[bag][ruleNm].isHidden or false
 		if isHidden ~= value then
 			if not value then value = nil end
 
-			cache.entriesByName[bag][ruleNm].isHidden = value
+			AutoCategory.cache.entriesByName[bag][ruleNm].isHidden = value
 			AutoCategory.cacheBagInitialize()
 			AC_UI.RefreshDropdownData()
 			BagSet_SelectRule_LAM:setValue(ruleNm)
@@ -365,13 +367,13 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	aclogger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	AutoCategory.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
-		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
-		if currentBag and cache.entriesByBag[currentBag] then
-			aclogger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
-			dataCurrentRules_EditBag:assign(cache.entriesByBag[currentBag])
+		local dataCurrentRules_EditBag = AutoCategory.CVT:New(self.controlName,nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
+		if currentBag and AutoCategory.cache.entriesByBag[currentBag] then
+			AutoCategory.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			dataCurrentRules_EditBag:assign(AutoCategory.cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
 	end
@@ -381,7 +383,7 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	aclogger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	AutoCategory.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -390,11 +392,11 @@ function AC_UI.BagSet_SelectRule_LAM:setValue(val)
 	--if self:getValue() == val then return end
 	self:select(val)
 	currentBagRule = val
-	local bagrule = cache.entriesByName[getCurrentBagId()][val]
-	--aclogger:Debug("bagule = "..type(bagrule))
-	--aclogger:Debug("retrieving bagrule for name "..tostring(val))
-	--aclogger:Debug("bagule.name = "..tostring(bagrule.name))
-	--aclogger:Debug("bagule.priority = "..tostring(bagrule.priority))
+	local bagrule = AutoCategory.cache.entriesByName[getCurrentBagId()][val]
+	--AutoCategory.logger:Debug("bagule = "..type(bagrule))
+	--AutoCategory.logger:Debug("retrieving bagrule for name "..tostring(val))
+	--AutoCategory.logger:Debug("bagule.name = "..tostring(bagrule.name))
+	--AutoCategory.logger:Debug("bagule.priority = "..tostring(bagrule.priority))
 	if bagrule and bagrule.priority then
 		BagSet_Priority_LAM:setValue(bagrule.priority)
 	end
@@ -429,8 +431,8 @@ AC_UI.BagSet_Priority_LAM.minVal = 0
 function AC_UI.BagSet_Priority_LAM:getValue()
 	local bag = getCurrentBagId()
 	local bagrule = currentBagRule --BagSet_SelectRule_LAM:getValue()
-	if bag and bagrule and cache.entriesByName[bag][bagrule] then
-		return cache.entriesByName[bag][bagrule].priority
+	if bag and bagrule and AutoCategory.cache.entriesByName[bag][bagrule] then
+		return AutoCategory.cache.entriesByName[bag][bagrule].priority
 	end
 	return self.minVal
 end
@@ -447,11 +449,11 @@ function AC_UI.BagSet_Priority_LAM:setValue(value)
 	local ruleName = currentBagRule or AC_UI.BagSet_SelectRule_LAM:getValue()
 	if ruleName == nil then return end
 
-	if cache.entriesByName[bag][ruleName] then
-		if cache.entriesByName[bag][ruleName].priority == value then return end
-		--local bagrule = cache.entriesByName[bag][ruleName]
-		cache.entriesByName[bag][ruleName].priority = value
-		AC.cacheInitialize()
+	if AutoCategory.cache.entriesByName[bag][ruleName] then
+		if AutoCategory.cache.entriesByName[bag][ruleName].priority == value then return end
+		--local bagrule = AutoCategory.cache.entriesByName[bag][ruleName]
+		AutoCategory.cache.entriesByName[bag][ruleName].priority = value
+		AutoCategory.cacheInitialize()
 		CatSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:refresh()
@@ -518,12 +520,12 @@ end
 function AC_UI.BagSet_RemoveCat_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
-	local savedbag = saved.bags[bagId]
-	aclogger:Debug("Removing rule name "..ruleName)
+	local savedbag = AutoCategory.saved.bags[bagId]
+	AutoCategory.logger:Debug("Removing rule name "..ruleName)
 	for i = 1, #savedbag.rules do
 		local bagEntry = savedbag.rules[i]
 		if bagEntry.name == ruleName then
-			aclogger:Debug("Found it! - "..ruleName)
+			AutoCategory.logger:Debug("Found it! - "..ruleName)
 			table.remove(savedbag.rules, i)
 			break
 		end
@@ -557,7 +559,7 @@ end
 -- customization of BaseDD for AddCat_SelectTag_LAM
 -- ----------------------------------------------------------
 -- refresh the selection value of the cvt lists for AddCat_SelectTag_LAM from the 
--- current contents of the cache.tags list.
+-- current contents of the RulesW.tags list.
 function AC_UI.AddCat_SelectTag_LAM:refresh()
 	if self:getValue() == nil or self:getValue() == "" then
 		self:select(AutoCategory.RulesW.tags)
@@ -601,13 +603,14 @@ end
 
 -- will return empty CVT if no rules match the filter
 function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
+	local cache = AutoCategory.cache
 	if not bagId or not tag then return nil end
 	if not cache.entriesByName[bagId] then
 		cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId] )
 	end
 
 	-- filter out already-in-use rules from the "add category" list for bag rules
-	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(),nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+	local dataCurrentRules_AddCategory = AutoCategory.CVT:New(AddCat_SelectRule_LAM:getControlName(), nil, AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	dataCurrentRules_AddCategory.dirty = 1
 	if not AutoCategory.RulesW.tagGroups[tag] then
 		-- no rules available for tag
@@ -710,10 +713,11 @@ end
 function AC_UI.AddCat_BagAdd_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = AddCat_SelectRule_LAM:getValue()
-	assert(cache.entriesByName[bagId][ruleName] == nil, "Bag(" .. bagId .. ") already has the rule: ".. ruleName)
+	assert(AutoCategory.cache.entriesByName[bagId][ruleName] == nil, "Bag(" .. bagId .. ") already has the rule: ".. ruleName)
 
-	if cache.entriesByName[bagId][ruleName] then return end
+	if AutoCategory.cache.entriesByName[bagId][ruleName] then return end
 
+	local saved = AutoCategory.saved
 	local entry = AutoCategory.CreateNewBagRule(ruleName)
 	saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
 	currentBagRule = entry.name
@@ -748,7 +752,7 @@ end
 -- -------------------------------------------------------
 
 local function copyBagToBag(srcBagId, destBagId)
-	saved.bags[destBagId] = SF.deepCopy( saved.bags[srcBagId] )
+	AutoCategory.saved.bags[destBagId] = SF.deepCopy( AutoCategory.saved.bags[srcBagId] )
 end
 
 -- customization of BaseUI for ImpExp_ExportAll_LAM button
@@ -901,7 +905,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function AC_UI.CatSet_SelectRule_LAM:getValue()
-	--aclogger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	--AutoCategory.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
@@ -912,7 +916,7 @@ function AC_UI.CatSet_SelectRule_LAM:refresh()
 	if not ltag then return end
 
 	-- dropdown lists for Edit Rule (Category) selection (AC_DROPDOWN_EDITRULE_RULE)
-	local dataCurrentRules_EditRule = CVT:New(nil,nil,CVT.USE_TOOLTIPS)
+	local dataCurrentRules_EditRule = AutoCategory.CVT:New(nil,nil,AutoCategory.CVT.USE_TOOLTIPS)
 	local oldndx = self:getValue()
 	if AutoCategory.RulesW.tagGroups[ltag] then
 		dataCurrentRules_EditRule:assign(AutoCategory.RulesW.tagGroups[ltag])
@@ -958,15 +962,14 @@ end
 -- customization of BaseUI for CatSet_NewCat_LAM button
 -- -------------------------------------------------------
 function AC_UI.CatSet_NewCat_LAM:execute()
-	local newName = AC.GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
+	local newName = AutoCategory.GetUsableRuleName(L(SI_AC_DEFAULT_NAME_NEW_CATEGORY))
 	local tag = CatSet_SelectTag_LAM:getValue()
 	if tag == "" then
 		tag = AC_EMPTY_TAG_NAME
 	end
 	local newRule = AutoCategory.CreateNewRule(newName, tag)
 	AutoCategory.ARW:addRule(newRule)
-	--AutoCategory.acctRules.rules[#AutoCategory.acctRules.rules+1] = newRule
-	cache.AddRule(newRule)
+	AutoCategory.cache.AddRule(newRule)
 
 	currentRule = newRule
 
@@ -1015,7 +1018,7 @@ function AC_UI.CatSet_CopyCat_LAM:execute()
 
 	local newRule = AutoCategory.CopyFrom(srcRule)
 	AutoCategory.ARW:addRule(newRule)
-	cache.AddRule(newRule)
+	AutoCategory.cache.AddRule(newRule)
 
 	currentRule = newRule
 
@@ -1107,7 +1110,7 @@ function AC_UI.CatSet_NameEdit_LAM:controlDef()
 			end,
 			setFunc = function(value) self:setValue(value) end,
 			isMultiline = false,
-			disabled = function() return currentRule == nil or RuleApi.isPredefined(currentRule) end,
+			disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 			width = "half",
 			reference = self:getControlName(),
 		}
@@ -1128,14 +1131,10 @@ function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 	if oldtag == newtag then return rule.name, AutoCategory.RulesW.tagGroups[rule.tag] end
 
 	-- if tag is new, then update tags lists
-	if not ZO_IsElementInNumericallyIndexedTable(AutoCategory.RulesW.tags, newtag) then
-		AutoCategory.RulesW.tags[#AutoCategory.RulesW.tags+1] = newtag
-		-- create a new tag list if necessary
-		AutoCategory.RulesW.tagGroups[newtag] = CVT:New(nil,nil,CVT.USE_TOOLTIPS)	--uses choicesTooltips
-	end
+	AutoCategory.RulesW.AddTag(newtag)
 
 	-- add the rule to the new tag list
-	AutoCategory.RulesW.tagGroups[newtag]:append(rule.name, nil, RuleApi.getDesc(rule))
+	AutoCategory.RulesW.tagGroups[newtag]:append(rule.name, nil, AutoCategory.RuleApi.getDesc(rule))
 	-- remove the current rule from the oldtag list
 	if oldtag and AutoCategory.RulesW.tagGroups[oldtag] then
 		AutoCategory.RulesW.tagGroups[oldtag]:removeItemChoiceValue(rule.name)
@@ -1187,7 +1186,7 @@ function AC_UI.CatSet_TagEdit_LAM:controlDef()
 		getFunc = function() return self:getValue() end,
 		setFunc = function(value) self:setValue(value) end,
 		isMultiline = false,
-		disabled = function() return currentRule == nil or RuleApi.isPredefined(currentRule) end,
+		disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 		width = "half",
 		reference = self:getControlName(),
 	}
@@ -1277,7 +1276,7 @@ end
 
 
 local function editCat_getPredef()
-    if currentRule and RuleApi.isPredefined(currentRule) then
+    if currentRule and AutoCategory.RuleApi.isPredefined(currentRule) then
         return L(SI_AC_MENU_EC_BUTTON_PREDEFINED)
 
     else
@@ -1345,7 +1344,7 @@ function AC_UI.checkCurrentRule()
     end
 
     if currentRule.rule == nil or currentRule.rule == "" then
-		RuleApi.setError(currentRule, true,"Rule definition cannot be empty")
+		AutoCategory.RuleApi.setError(currentRule, true,"Rule definition cannot be empty")
 		ruleCheckStatus.err = currentRule.err
         return
     end
@@ -1507,7 +1506,7 @@ function AutoCategory.AddonMenuInit()
     AutoCategory.cacheInitialize()
 
     -- initialize tables
-	BagSet_SelectBag_LAM:assign(cache.bags_cvt)
+	BagSet_SelectBag_LAM:assign(AutoCategory.cache.bags_cvt)
 	AddCat_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags } )
 	CatSet_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags} )
 
@@ -1516,7 +1515,7 @@ function AutoCategory.AddonMenuInit()
     -- AddCat_SelectRule_LAM will get populated by RefreshDropdownData()
 	AddCat_SelectRule_LAM:clear()
 
-	ImpExp_ImportBag_LAM:assign(cache.bags_cvt)
+	ImpExp_ImportBag_LAM:assign(AutoCategory.cache.bags_cvt)
 
 	AC_UI.RefreshDropdownData()
 	AC_UI.RefreshControls()
@@ -1686,7 +1685,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					isMultiline = false,
 					isExtraWide = true,
-					disabled = function() return currentRule == nil or RuleApi.isPredefined(currentRule) end,
+					disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 					width = "full",
 					reference = "AC_EDITBOX_EDITRULE_DESC",
 				},
@@ -1705,7 +1704,7 @@ function AutoCategory.AddonMenuInit()
 					end,
 					setFunc = function(value)
                         currentRule.rule = value
-                        ruleCheckStatus.err = RuleApi.compile(currentRule)
+                        ruleCheckStatus.err = AutoCategory.RuleApi.compile(currentRule)
                         if ruleCheckStatus.err == "" then
                             ruleCheckStatus.err = nil
                             ruleCheckStatus.good = true
@@ -1716,7 +1715,7 @@ function AutoCategory.AddonMenuInit()
                         end,
 					isMultiline = true,
 					isExtraWide = true,
-					disabled = function() return currentRule == nil or RuleApi.isPredefined(currentRule) end,
+					disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 					width = "full",
 					reference = "AC_EDITBOX_EDITRULE_RULE",
 				},
@@ -1735,7 +1734,7 @@ function AutoCategory.AddonMenuInit()
 					func = function()
                         AC_UI.checkCurrentRule()
                     end,
-					disabled = function() return currentRule == nil or RuleApi.isPredefined(currentRule) end,
+					disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
 					width = "half",
 				},
 		    },
@@ -1752,8 +1751,8 @@ function AutoCategory.AddonMenuInit()
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP,
-                    getFunc = function() return saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
-                    setFunc = function(value) saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value end,
+                    getFunc = function() return AutoCategory.saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
+                    setFunc = function(value) AutoCategory.saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value end,
                 },
                 -- Show category item count
                 {
@@ -1762,10 +1761,10 @@ function AutoCategory.AddonMenuInit()
                     tooltip =
 						SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
                     getFunc = function()
-						return saved.general["SHOW_CATEGORY_ITEM_COUNT"]
+						return AutoCategory.saved.general["SHOW_CATEGORY_ITEM_COUNT"]
 						end,
                     setFunc = function(value)
-						saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
+						AutoCategory.saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
 						end,
                 },
                 -- Show category collapse icon
@@ -1774,10 +1773,10 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP,
                     getFunc = function()
-						return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"]
+						return AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"]
 						end,
                     setFunc = function(value)
-                    	saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value
+                    	AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value
                     	AutoCategory.RefreshCurrentList(true)
                     end,
                 },
@@ -1786,19 +1785,19 @@ function AutoCategory.AddonMenuInit()
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,
-                    getFunc = function() return saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-                    setFunc = function(value) saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
-                    disabled = function() return saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
+                    getFunc = function() return AutoCategory.saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
+                    setFunc = function(value) AutoCategory.saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
+                    disabled = function() return AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
                 },
                 -- Show category "SET ()"
                 {
                     type = "checkbox",
                     name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
                     tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
-                    getFunc = function() return saved.general["SHOW_CATEGORY_SET_TITLE"] end,
+                    getFunc = function() return AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] end,
                     setFunc = function(value)
-						saved.general["SHOW_CATEGORY_SET_TITLE"] = value
-						AutoCategory.ResetCollapse(saved)
+						AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] = value
+						AutoCategory.ResetCollapse(AutoCategory.saved)
 					end,
                 },
             }
@@ -1817,10 +1816,10 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT,
                     choices = LMP:List('font'),
                     getFunc = function()
-                        return saved.appearance["CATEGORY_FONT_NAME"]
+                        return AutoCategory.saved.appearance["CATEGORY_FONT_NAME"]
                     end,
                     setFunc = function(v)
-                        saved.appearance["CATEGORY_FONT_NAME"] = v
+                        AutoCategory.saved.appearance["CATEGORY_FONT_NAME"] = v
 						AutoCategory.resetface()
                     end,
                     scrollable = 7,
@@ -1831,10 +1830,10 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE,
                     choices = dropdownFontStyle,
                     getFunc = function()
-                        return saved.appearance["CATEGORY_FONT_STYLE"]
+                        return AutoCategory.saved.appearance["CATEGORY_FONT_STYLE"]
                     end,
                     setFunc = function(v)
-                        saved.appearance["CATEGORY_FONT_STYLE"] = v
+                        AutoCategory.saved.appearance["CATEGORY_FONT_STYLE"] = v
                     end,
                     scrollable = 7,
                 },
@@ -1845,10 +1844,10 @@ function AutoCategory.AddonMenuInit()
                     choices = dropdownFontAlignment.choices,
                     choicesValues = dropdownFontAlignment.choicesValues,
                     getFunc = function()
-                        return saved.appearance["CATEGORY_FONT_ALIGNMENT"]
+                        return AutoCategory.saved.appearance["CATEGORY_FONT_ALIGNMENT"]
                     end,
                     setFunc = function(v)
-                        saved.appearance["CATEGORY_FONT_ALIGNMENT"] = v
+                        AutoCategory.saved.appearance["CATEGORY_FONT_ALIGNMENT"] = v
                     end,
                     scrollable = 7,
                 },
@@ -1859,10 +1858,10 @@ function AutoCategory.AddonMenuInit()
                     min = 8,
                     max = 32,
                     getFunc = function()
-                        return saved.appearance["CATEGORY_FONT_SIZE"]
+                        return AutoCategory.saved.appearance["CATEGORY_FONT_SIZE"]
                     end,
                     setFunc = function(v)
-                        saved.appearance["CATEGORY_FONT_SIZE"] = v
+                        AutoCategory.saved.appearance["CATEGORY_FONT_SIZE"] = v
                     end,
                 },
                 -- Category Text Color
@@ -1870,13 +1869,13 @@ function AutoCategory.AddonMenuInit()
                     type = 'colorpicker',
                     name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR,
                     getFunc = function()
-                        return unpack(saved.appearance["CATEGORY_FONT_COLOR"])
+                        return unpack(AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"])
                     end,
                     setFunc = function(r, g, b, a)
-                        saved.appearance["CATEGORY_FONT_COLOR"][1] = r
-                        saved.appearance["CATEGORY_FONT_COLOR"][2] = g
-                        saved.appearance["CATEGORY_FONT_COLOR"][3] = b
-                        saved.appearance["CATEGORY_FONT_COLOR"][4] = a
+                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][1] = r
+                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][2] = g
+                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][3] = b
+                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][4] = a
                     end,
                     widgetRightAlign		= true,
                     widgetPositionAndResize	= -15,
@@ -1886,13 +1885,13 @@ function AutoCategory.AddonMenuInit()
                     type = 'colorpicker',
                     name = SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR,
                     getFunc = function()
-                        return unpack(saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
+                        return unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
                     end,
                     setFunc = function(r, g, b, a)
-                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][1] = r
-                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][2] = g
-                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][3] = b
-                        saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][4] = a
+                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][1] = r
+                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][2] = g
+                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][3] = b
+                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][4] = a
                     end,
                     widgetRightAlign		= true,
                     widgetPositionAndResize	= -15,
@@ -1903,9 +1902,9 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE,
                     tooltip = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP,
                     getFunc = function()
-                        return saved.appearance["CATEGORY_OTHER_TEXT"]
+                        return AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"]
                     end,
-                    setFunc = function(value) saved.appearance["CATEGORY_OTHER_TEXT"] = value end,
+                    setFunc = function(value) AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] = value end,
                     width = "full",
                 },
                 -- Category Header Height
@@ -1916,10 +1915,10 @@ function AutoCategory.AddonMenuInit()
                     max = 100,
                     requiresReload = true,
                     getFunc = function()
-                        return saved.appearance["CATEGORY_HEADER_HEIGHT"]
+                        return AutoCategory.saved.appearance["CATEGORY_HEADER_HEIGHT"]
                     end,
                     setFunc = function(v)
-                        saved.appearance["CATEGORY_HEADER_HEIGHT"] = v
+                        AutoCategory.saved.appearance["CATEGORY_HEADER_HEIGHT"] = v
                     end,
                     warning = SI_AC_WARNING_NEED_RELOAD_UI,
                 },
@@ -1938,17 +1937,17 @@ function AutoCategory.AddonMenuInit()
                     name = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD,
                     tooltip = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP,
                     requiresReload = true,
-                    getFunc = function() return saved.general["ENABLE_GAMEPAD"] end,
-                    setFunc = function(value) saved.general["ENABLE_GAMEPAD"] = value end,
+                    getFunc = function() return AutoCategory.saved.general["ENABLE_GAMEPAD"] end,
+                    setFunc = function(value) AutoCategory.saved.general["ENABLE_GAMEPAD"] = value end,
                 },
 				{
                     type = "checkbox",
                     name = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES,
                     tooltip = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP,
                     requiresReload = false,
-                    getFunc = function() return saved.general["EXTENDED_GAMEPAD_SUPPLIES"] end,
-                    setFunc = function(value) saved.general["EXTENDED_GAMEPAD_SUPPLIES"] = value end,
-					disabled = function() return saved.general["ENABLE_GAMEPAD"] == false end,
+                    getFunc = function() return AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] end,
+                    setFunc = function(value) AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] = value end,
+					disabled = function() return AutoCategory.saved.general["ENABLE_GAMEPAD"] == false end,
                 },
 			},
 		},

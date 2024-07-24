@@ -1,7 +1,8 @@
 
-[COLOR="DeepSkyBlue"]4.? (?)[/COLOR]:
+[COLOR="DeepSkyBlue"]4.1.5 (102)[/COLOR]:
 [LIST]
-[*] 
+[*] Update version number displayed on addon Settings page.
+[*] Releasing this version because in testing, categories remain "removed" from bag settings after logout or reloadui. (I think that the problem was fixed in v4.1.4, but I know it's not in this version.)
 [/LIST]
 
 [COLOR="DeepSkyBlue"]4.1.4 (101)[/COLOR]:

@@ -4,11 +4,12 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local CVT = AutoCategory.CVT
-local aclogger = AutoCategory.logger
-local RuleApi = AutoCategory.RuleApi
-local BagRuleApi = AutoCategory.BagRuleApi
-local ARW = AutoCategory.ARW
+--local CVT = AutoCategory.CVT
+--local aclogger = AutoCategory.logger
+--local RuleApi = AutoCategory.RuleApi
+--local BagRuleApi = AutoCategory.BagRuleApi
+--local ARW = AutoCategory.ARW
+--local RulesW = AutoCategory.RulesW
 
 ----------------------
 -- Lists and variables
@@ -28,11 +29,11 @@ AutoCategory.saved = {
 }
 
 AutoCategory.cache = {
-    rulesByName = {}, -- [name] rule#
-    rulesByTag_cvt = {}, -- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
-    compiledRules = AutoCategory.compiledRules, -- [name] function
-    tags = {}, -- [#] tagname
-    bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
+    --rulesByName = {}, -- [name] rule#
+    --rulesByTag_cvt = {}, -- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
+    --compiledRules = AutoCategory.compiledRules, -- [name] function
+    --tags = {}, -- [#] tagname
+    bags_cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
     entriesByName = {}, -- [bagId][rulename]  (BagRule){ name, priority, isHidden }
@@ -47,23 +48,24 @@ local cache = AutoCategory.cache
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 function AutoCategory.debugCache()
+	local RulesW = AutoCategory.RulesW
     d("User rules: " .. AutoCategory.ARW:size()) --#AutoCategory.acctRules.rules)
-    d("Saved rules: " .. #saved.rules)						-- should be 0 after conversion
+    d("Saved rules: " .. #AutoCategory.saved.rules)						-- should be 0 after conversion
     d("Predefined rules: " .. #AutoCategory.predefinedRules)			-- predefined rules from base and plugins
-    d("Combined rules: " .. #AutoCategory.RulesW.ruleList)						-- complete list of user rules and predefined rules
-    d("Compiled rules: " .. SF.GetSize(cache.compiledRules))
-    d("Rules by Name: " .. SF.GetSize(AutoCategory.RulesW.ruleNames))	-- lookup table for rules by rule name
-    d("Rules by Tag: " .. SF.GetSize(AutoCategory.RulesW.tagGroups))	-- actually returns the # of Tags defined
-    d("Tags: " .. SF.GetSize(AutoCategory.RulesW.tags))					-- returns the # of Tags defined
-    d("Saved bags: " .. #saved.bags)						-- returns # of bags, collections of bagrules by bagId
-    d("Cache bags: " .. SF.GetSize(cache.bags_cvt))			-- CVT of bags for bag id dropdowns, returns 3 for CVT
-    d("Entries by Bag: " .. SF.GetSize(cache.entriesByBag))		-- CVT of bagrules by bagid, so always returns # bags
-    d("Entries by Name: " .. SF.GetSize(cache.entriesByName))	-- bagrules lookup by bagid and rule name, returns # bags
+    d("Combined rules: " .. #RulesW.ruleList)						-- complete list of user rules and predefined rules
+    d("Compiled rules: " .. SF.GetSize(RulesW.compiled))
+    d("Rules by Name: " .. SF.GetSize(RulesW.ruleNames))	-- lookup table for rules by rule name
+    d("Rules by Tag: " .. SF.GetSize(RulesW.tagGroups))	-- actually returns the # of Tags defined
+    d("Tags: " .. SF.GetSize(RulesW.tags))					-- returns the # of Tags defined
+    d("Saved bags: " .. #AutoCategory.saved.bags)						-- returns # of bags, collections of bagrules by bagId
+    d("Cache bags: " .. AutoCategory.cache.bags_cvt:size())			-- CVT of bags for bag id dropdowns, returns 3 for CVT
+    d("Entries by Bag: " .. SF.GetSize(AutoCategory.cache.entriesByBag))		-- CVT of bagrules by bagid, so always returns # bags
+    d("Entries by Name: " .. SF.GetSize(AutoCategory.cache.entriesByName))	-- bagrules lookup by bagid and rule name, returns # bags
 end
 
 --unused (debug) - Not sure why called "EBT" since it uses entriesByName!!
 function AutoCategory.debugEBT()
-	for k, v in pairs(cache.entriesByName[1]) do
+	for k, v in pairs(AutoCategory.cache.entriesByName[1]) do
 		d("k = "..k)
 		if type(v) == "table" then
 			for k1,v1 in pairs(v) do
@@ -77,7 +79,7 @@ end
 
 --unused (debug)
 function AutoCategory.debugTags()
-	d("AutoCategory.RulesW.tags:")
+	d("RulesW.tags:")
 	for k, v in pairs(AutoCategory.RulesW.tags) do
 		if type(v) == "table" then
 			for k1,v1 in pairs(v) do
@@ -92,11 +94,21 @@ end
 AutoCategory.RulesW = { 
 	ruleList= {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
 	ruleNames={},		-- [name] rule#
-	compiled = {},	-- [name] function
+	compiled = AutoCategory.compiledRules,	-- [name] function
 
 	tags = {},		-- [#] tagname
 	tagGroups={},	-- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
 }
+
+-- Add a tag if it is not already in the list(s)
+function AutoCategory.RulesW.AddTag(name)
+	local RulesW = AutoCategory.RulesW
+	if not name then return end
+	if not RulesW.tagGroups[name] then
+		RulesW.tags[#RulesW.tags+1] = name
+		RulesW.tagGroups[name] = AutoCategory.CVT:New(nil,nil,AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
+	end
+end
 
 --[[
 -- return number of entries in the base rule list
@@ -137,7 +149,7 @@ function AutoCategory.RecompileRules(ruleset)
 	-- compile and store each of the rules in the ruleset
     for j = 1, #ruleset do
         if ruleset[j] then
-            RuleApi.compile(ruleset[j])
+            AutoCategory.RuleApi.compile(ruleset[j])
         end
     end
 end
@@ -185,33 +197,34 @@ end
 
 -- swap between account-wide and char-wide settings
 function AutoCategory.UpdateCurrentSavedVars()
+	local RulesW = AutoCategory.RulesW
     -- general, and appearance are always accountWide
-    saved.general = AutoCategory.acctSaved.general
-    saved.appearance = AutoCategory.acctSaved.appearance
+    AutoCategory.saved.general = AutoCategory.acctSaved.general
+    AutoCategory.saved.appearance = AutoCategory.acctSaved.appearance
 
 	AutoCategory.charSaved.general = nil	-- fix old data corruption error
 	AutoCategory.charSaved.appearance = nil	-- fix old data corruption error
 
 	-- rule definitions are always account-wide
 	-- AutoCategory.acctRules only has user-defined rules
-	-- AutoCategory.RulesW.ruleList will have acctRules plus the predefined rules
+	-- RulesW.ruleList will have acctRules plus the predefined rules
 
 	-- assign functions to rules
-    table.sort(AutoCategory.RulesW.ruleList, RuleSortingFunction)
-	local ruletbl = AutoCategory.RulesW.ruleList
+    table.sort(RulesW.ruleList, RuleSortingFunction)
+	local ruletbl = RulesW.ruleList
 
     AutoCategory.RecompileRules(ruletbl)
 
 	-- bags/collapses might or might not be acct wide
     if not AutoCategory.charSaved.accountWide then
-        saved.bags = AutoCategory.charSaved.bags
-        saved.collapses = AutoCategory.charSaved.collapses
+        AutoCategory.saved.bags = AutoCategory.charSaved.bags
+        AutoCategory.saved.collapses = AutoCategory.charSaved.collapses
 
     else
-        saved.bags = AutoCategory.acctSaved.bags
-        saved.collapses = AutoCategory.acctSaved.collapses
+        AutoCategory.saved.bags = AutoCategory.acctSaved.bags
+        AutoCategory.saved.collapses = AutoCategory.acctSaved.collapses
     end
-	if saved.bags[7] then saved.bags[7] = nil end -- fix old data corruption
+	if AutoCategory.saved.bags[7] then AutoCategory.saved.bags[7] = nil end -- fix old data corruption
 
     AutoCategory.cacheInitialize()
 end
@@ -239,18 +252,18 @@ end
 function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
 	if bagTypeId == nil or categoryName == nil then return false end
 
-	local collapsetbl = SF.safeTable(saved.collapses[bagTypeId])
+	local collapsetbl = SF.safeTable(AutoCategory.saved.collapses[bagTypeId])
     return collapsetbl[categoryName] or false
 end
 
 
 function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 	if not categoryName then return end
-	saved.collapses[bagTypeId][categoryName] = collapsed
+	AutoCategory.saved.collapses[bagTypeId][categoryName] = collapsed
 end
 -- -----------------------------------------------------------
 
--- will need to rebuild AAutoCategory.RulesW.ruleList after this
+-- will need to rebuild RulesW.ruleList after this
 function AutoCategory.ResetToDefaults()
 
 	AutoCategory.ARW.clear()
@@ -285,18 +298,19 @@ end
 
 -- rename a rule, updates the cache lookups and bagsets too
 function AutoCategory.renameRule(oldName, newName)
+	local RulesW = AutoCategory.RulesW
 	if oldName == newName then return end
 
 	local rule = AutoCategory.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
 
-	local oldrndx = AutoCategory.RulesW.ruleNames[oldName]
-	AutoCategory.RulesW.ruleNames[oldName] = nil
+	local oldrndx = RulesW.ruleNames[oldName]
+	RulesW.ruleNames[oldName] = nil
 
 	newName = AutoCategory.GetUsableRuleName(newName)
 
 	rule.name = newName
-	AutoCategory.RulesW.ruleNames[rule.name] = oldrndx
+	RulesW.ruleNames[rule.name] = oldrndx
 
 	AutoCategory.renameBagRule(oldName, newName)
 end
@@ -306,11 +320,11 @@ function AutoCategory.renameBagRule(oldName, newName)
 	if oldName == newName then return end
 
 	--Update bags so that every entry has the same name, should be changed to new name.
-	for i = 1, 6 do --#saved.bags do	-- for all bags
-		local bag = saved.bags[i]
+	for i = 1, 6 do --#AutoCategory.saved.bags do	-- for all bags
+		local bag = AutoCategory.saved.bags[i]
 		if not bag then 
 			bag = { rules = {}, }
-			saved.bags[i] = bag
+			AutoCategory.saved.bags[i] = bag
 		end
 		local rules = bag.rules
 		for j = 1, #rules do   -- for all bagrules in the bag
@@ -322,21 +336,22 @@ function AutoCategory.renameBagRule(oldName, newName)
 	end
 end
 
--- initialize the rulesByName, AutoCategory.RulesW.tagGroups, and the AutoCategory.RulesW.tags tables from AutoCategory.RulesW.ruleList
+-- initialize the RulesW.ruleNames, RulesW.tagGroups, and the RulesW.tags tables from RulesW.ruleList
 function AutoCategory.cacheRuleInitialize()
+	local RulesW = AutoCategory.RulesW
 	-- initialize the rules-based lookups
-    AutoCategory.RulesW.ruleNames = SF.safeClearTable(AutoCategory.RulesW.ruleNames)
-    AutoCategory.RulesW.tagGroups = SF.safeClearTable(AutoCategory.RulesW.tagGroups)
-    AutoCategory.RulesW.tags = SF.safeClearTable(AutoCategory.RulesW.tags)
+    RulesW.ruleNames = SF.safeClearTable(RulesW.ruleNames)
+    RulesW.tagGroups = SF.safeClearTable(RulesW.tagGroups)
+    RulesW.tags = SF.safeClearTable(RulesW.tags)
 
 	-- fill the rules-based lookups
-	local ruletbl = AutoCategory.RulesW.ruleList
+	local ruletbl = RulesW.ruleList
     --table.sort(ruletbl, RuleDataSortingFunction ) -- sort by tag and name
     for ndx = 1, #ruletbl do
-		-- add rule to rulesByName lookup
+		-- add rule to RulesW.ruleNames lookup
         local rule = ruletbl[ndx]
         local name = rule.name
-        AutoCategory.RulesW.ruleNames[name] = ndx
+        RulesW.ruleNames[name] = ndx
 
 		-- ensure tag value is valid
         local tag = rule.tag
@@ -345,11 +360,8 @@ function AutoCategory.cacheRuleInitialize()
         end
 
         --update tag grouping lookups
-        if not AutoCategory.RulesW.tagGroups[tag] then
-			AutoCategory.RulesW.tags[#AutoCategory.RulesW.tags+1] = tag
-            AutoCategory.RulesW.tagGroups[tag] = AutoCategory.CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
-        end
-        AutoCategory.RulesW.tagGroups[tag]:append(name, nil, RuleApi.getDesc(rule))
+		RulesW.AddTag(tag)
+        RulesW.tagGroups[tag]:append(name, nil, AutoCategory.RuleApi.getDesc(rule))
     end
 end
 
@@ -367,32 +379,33 @@ function AutoCategory.cacheInitBag(bagId)
 	cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId])
     ZO_ClearTable(cache.entriesByName[bagId])
 
-	cache.entriesByBag[bagId] = AutoCategory.CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+	local CVT = AutoCategory.CVT
+	cache.entriesByBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, priority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by priority high-to-low) into the dropdown
-	if saved.bags[bagId] == nil then
-		saved.bags[bagId] = {rules={}}
+	if AutoCategory.saved.bags[bagId] == nil then
+		AutoCategory.saved.bags[bagId] = {rules={}}
 	end
-	local svdbag = saved.bags[bagId]
+	local svdbag = AutoCategory.saved.bags[bagId]
 	table.sort(svdbag.rules, BagRuleSortingFunction)
 
-	aclogger:Debug("Initializing bag "..bagId.." with bagrules")
+	AutoCategory.logger:Debug("Initializing bag "..bagId.." with bagrules")
 	for entry = 1, #svdbag.rules do
 		local bagrule = svdbag.rules[entry] -- BagRule {name, priority, isHidden}
 		if not bagrule then break end
 
 		local ruleName = bagrule.name
-		aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
+		AutoCategory.logger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
 		if not ename[ruleName] then
 			ename[ruleName] = bagrule
-			ebag.choicesValues[#ebag.choicesValues+1] = BagRuleApi.formatValue(bagrule)
+			ebag.choicesValues[#ebag.choicesValues+1] = AutoCategory.BagRuleApi.formatValue(bagrule)
 
-			local sn = BagRuleApi.formatShow(bagrule)
-			local tt = BagRuleApi.formatTooltip(bagrule)
+			local sn = AutoCategory.BagRuleApi.formatShow(bagrule)
+			local tt = AutoCategory.BagRuleApi.formatTooltip(bagrule)
 			ebag.choices[#ebag.choices+1] = sn
 			ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
         else
@@ -409,14 +422,14 @@ function AutoCategory.cacheBagInitialize()
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by priority high-to-low) into the dropdown
-    for bagId = 1, 6 do --#saved.bags do
+    for bagId = 1, 6 do --#AutoCategory.saved.bags do
 		AutoCategory.cacheInitBag(bagId)
     end
 end
 
 
 -- ----------------------------------------------------
--- assumes that AutoCategory.RulesW.ruleList and saved.bags have entries but
+-- assumes that RulesW.ruleList and saved.bags have entries but
 -- some or all of the cache tables need (re)initializing
 --
 function AutoCategory.cacheInitialize()
@@ -433,17 +446,21 @@ function AutoCategory.GetRuleByName(name)
         return nil
     end
 
-    local ndx = AutoCategory.RulesW.ruleNames[name]
+	local RulesW = AutoCategory.RulesW
+    local ndx = RulesW.ruleNames[name]
     if not ndx then
         return nil
     end
 
-    return AutoCategory.RulesW.ruleList[ndx]
+    return RulesW.ruleList[ndx]
 end
 
--- when we add a new rule to AutoCategory.RulesW.ruleList, also add it to the various lookups and dropdowns
+-- when we add a new rule to RulesW.ruleList, also add it to the various lookups and dropdowns
 -- returns nil on success or error message
 function AutoCategory.cache.AddRule(rule)
+	local RulesW = AutoCategory.RulesW
+	local CVT = AutoCategory.CVT
+
     if not rule or not rule.name then
         return "AddRule: Rule or name of rule was nil"
     end -- can't use a nil rule
@@ -452,25 +469,25 @@ function AutoCategory.cache.AddRule(rule)
         rule.tag = AC_EMPTY_TAG_NAME
     end
 
-    if AutoCategory.RulesW.tagGroups[rule.tag] == nil then
-        AutoCategory.RulesW.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
+    if RulesW.tagGroups[rule.tag] == nil then
+        RulesW.tagGroups[rule.tag] = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	local rule_ndx = AutoCategory.RulesW.ruleNames[rule.name]
+	local rule_ndx = RulesW.ruleNames[rule.name]
     if rule_ndx then
 		-- rule already exists
 		-- overwrite rule with new one
-		AutoCategory.RulesW.ruleList[rule_ndx] = rule
+		RulesW.ruleList[rule_ndx] = rule
 
 	else
 		-- add the new rule
-		AutoCategory.RulesW.ruleList[#AutoCategory.RulesW.ruleList+1] = rule
-		rule_ndx = #AutoCategory.RulesW.ruleList
-		AutoCategory.RulesW.ruleNames[rule.name] = rule_ndx
-		AutoCategory.RulesW.tagGroups[rule.tag]:append(rule.name, nil, RuleApi.getDesc(rule))
+		RulesW.ruleList[#RulesW.ruleList+1] = rule
+		rule_ndx = #RulesW.ruleList
+		RulesW.ruleNames[rule.name] = rule_ndx
+		RulesW.tagGroups[rule.tag]:append(rule.name, nil, AutoCategory.RuleApi.getDesc(rule))
     end
 
-	RuleApi.compile(rule)
+	AutoCategory.RuleApi.compile(rule)
 end
 
 -- Set up the context menu item for AutoCategory
@@ -511,9 +528,10 @@ end
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --
 local function addTableRules(tbl, tblname, ispredef)
-	if not tbl.rules or tbl.rules == AutoCategory.RulesW.ruleList then return end
+	local RulesW = AutoCategory.RulesW
+	if not tbl.rules or tbl.rules == RulesW.ruleList then return end
 
-	aclogger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
+	AutoCategory.logger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
 	-- create name lookup for acctRules
 	--local lkacctRules = AutoCategory.ARW:getLookup()
@@ -521,17 +539,17 @@ local function addTableRules(tbl, tblname, ispredef)
 
 	-- add a rule to the combined rules list and the name-lookup
 	local function addCombinedRule(rl)
-		AutoCategory.RulesW.ruleList = SF.safeTable(AutoCategory.RulesW.ruleList)
-		local n = AutoCategory.RulesW.ruleNames[rl.name]
+		RulesW.ruleList = SF.safeTable(RulesW.ruleList)
+		local n = RulesW.ruleNames[rl.name]
 		if not n then
-			AutoCategory.RulesW.ruleList[#AutoCategory.RulesW.ruleList+1] = rl
-			--aclogger:Info("Adding rule "..rl.name.." to AutoCategory.RulesW.ruleList ndx="..#AAutoCategory.RulesW.ruleList)
-			AutoCategory.RulesW.ruleNames[rl.name] = #AutoCategory.RulesW.ruleList
+			RulesW.ruleList[#RulesW.ruleList+1] = rl
+			--AutoCategory.logger:Info("Adding rule "..rl.name.." to RulesW.ruleList ndx="..#ARulesW.ruleList)
+			RulesW.ruleNames[rl.name] = #RulesW.ruleList
 			return true
 		else
-			AutoCategory.RulesW.ruleList[n] = rl
-			--aclogger:Info("Overwriting rule "..rl.name.." to AutoCategory.RulesW.ruleList ndx="..n)
-			AutoCategory.RulesW.ruleNames[rl.name] = n
+			RulesW.ruleList[n] = rl
+			--AutoCategory.logger:Info("Overwriting rule "..rl.name.." to RulesW.ruleList ndx="..n)
+			RulesW.ruleNames[rl.name] = n
 		end
 		return false
 	end
@@ -560,18 +578,18 @@ local function addTableRules(tbl, tblname, ispredef)
 
 		r = AutoCategory.GetRuleByName(v.name)
 		if r then
-			aclogger:Warn("Found duplicate rule name - "..v.name)
+			AutoCategory.logger:Warn("Found duplicate rule name - "..v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so don't add it again
-				aclogger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
+				AutoCategory.logger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
 
 			else
 				local oldname = v.name
 				-- rename different rule
 				newName = AutoCategory.GetUsableRuleName(v.name)
 				v.name = newName
-				aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
+				AutoCategory.logger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
 				addCombinedRule(v)
 				AutoCategory.renameBagRule(oldname, newName)
@@ -581,7 +599,7 @@ local function addTableRules(tbl, tblname, ispredef)
 				else
 					-- add to acctRules
 					addUserRule(tbl, v)
-					aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+					AutoCategory.logger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 				end
 			end
 
@@ -593,25 +611,25 @@ local function addTableRules(tbl, tblname, ispredef)
 			if AutoCategory.RuleApi.isPredefined(v) then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
-				aclogger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				AutoCategory.logger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 
 		    else
 				-- it's a user rule
 				addUserRule(tbl, v)
-				aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				AutoCategory.logger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 			end
         end
     end
 end
 
 local function pruneUserRules()
-	aclogger:Debug ("Executing pruneUserRules ")
+	AutoCategory.logger:Debug ("Executing pruneUserRules ")
 	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
 	local lkacctRules = AutoCategory.ARW:getLookup()
 	for k = #arrules,1,-1 do
 		local ndx = lkacctRules[arrules[k].name]
 		if  ndx and k ~= ndx then
-			aclogger:Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
+			AutoCategory.logger:Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
 			AutoCategory.ARW.removeRule(ndx)
 			--table.remove(arrules, k)
 		end
@@ -620,7 +638,7 @@ local function pruneUserRules()
 	-- remove predefined rules from acctRules
 	for k = #AutoCategory.predefinedRules,1,-1 do
 		local ndx = lkacctRules[AutoCategory.predefinedRules[k].name]
-		aclogger:Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
+		AutoCategory.logger:Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
 		AutoCategory.ARW:removeRule(ndx)
 		--table.remove(arrules, k)
 	end
@@ -628,18 +646,18 @@ end
 
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
-	aclogger:Debug ("Executing loadPluginPredefines ")
+	AutoCategory.logger:Debug ("Executing loadPluginPredefines ")
 	-- add plugin predefined rules to the base predefined rules
 	for name, plugin in pairs(AutoCategory.Plugins) do
 		if plugin.predef then
-			aclogger:Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
+			AutoCategory.logger:Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
 
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
 		end
 	end
-	aclogger:Debug ("Done xecuting loadPluginPredefines ")
-	aclogger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCategory.logger:Debug ("Done xecuting loadPluginPredefines ")
+	AutoCategory.logger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
  end
 
 
@@ -693,7 +711,6 @@ function AutoCategory.onPlayerActivated()
 	if LibDebugLogger then
 		AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
 		AutoCategory.logger:SetEnabled(true)
-		aclogger = AutoCategory.logger
 	end
 
 	AutoCategory.meta = SF.safeTable(AutoCategory.meta)
@@ -711,7 +728,7 @@ function AutoCategory.onPlayerActivated()
 	addTableRules(AutoCategory.charSaved, ".charSaved", false)
 	AutoCategory.charSaved.rules = nil	-- no longer used
 
-	aclogger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCategory.logger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
 
     AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.initializePlugins()
@@ -907,7 +924,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_EXPAND_ALL),
         function()
-            for k, _ in pairs(saved.collapses[bagTypeId]) do
+            for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
 				AutoCategory.SetCategoryCollapsed(bagTypeId,k,false)
             end
             AutoCategory.RefreshCurrentList()
@@ -918,10 +935,10 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_COLLAPSE_ALL),
         function()
-            for k, _ in pairs(saved.collapses[bagTypeId]) do
+            for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
 				AutoCategory.SetCategoryCollapsed(bagTypeId,k,true)
             end
-			AutoCategory.SetCategoryCollapsed(bagTypeId,saved.appearance["CATEGORY_OTHER_TEXT"],true)
+			AutoCategory.SetCategoryCollapsed(bagTypeId,AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"],true)
             AutoCategory.RefreshCurrentList()
         end
     )

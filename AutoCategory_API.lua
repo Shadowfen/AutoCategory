@@ -1,11 +1,11 @@
 --====API====--
-local SF = LibSFUtils
-local AC = AutoCategory
-local RuleApi = AutoCategory.RuleApi
+--local SF = LibSFUtils
+--local AC = AutoCategory
+--local RuleApi = AutoCategory.RuleApi
 
 -- aliases
-local saved = AutoCategory.saved
-local aclogger = AutoCategory.logger
+--local saved = AutoCategory.saved
+--local aclogger = AutoCategory.logger
 
 -- For use to tell if AutoCategory has finished its initialization process and
 -- is ready for business. The following variable is nil if AutoCategory is
@@ -71,18 +71,18 @@ function AutoCategory.validateACBagRules(acBagType)
 	local function checkValidRule(name, rule)
 		if rule == nil or name == nil then return end
 		if rule.name ~= name then 
-			RuleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
+			AutoCategory.RuleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
 			return
 		end
 
 		local isValid = true
 		if rule.rule == nil then
-			RuleApi.setError(rule,true,"missing rule definition")
+			AutoCategory.RuleApi.setError(rule,true,"missing rule definition")
 			return
 		end
 		local ruleCode = AutoCategory.compiledRules[rule.name]
 		if not ruleCode or type(ruleCode) ~= "function" then
-			RuleApi.setError(rule, true,"invalid compiled rule function")
+			AutoCategory.RuleApi.setError(rule, true,"invalid compiled rule function")
 			AutoCategory.compiledRules[rule.name] = nil
 			return
 		end
@@ -91,7 +91,7 @@ function AutoCategory.validateACBagRules(acBagType)
 	end
 
 	-- Make sure all of the rules in the bag are evaluated if damaged and marked appropriately
-	local bag = saved.bags[acBagType]
+	local bag = AutoCategory.saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
 		local rule = AutoCategory.BagRuleApi.getBackingRule(entry)
@@ -119,7 +119,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local bag_type_id = convert2BagTypeId(bagId, specialType)
 	if not bag_type_id then
 		-- invalid bag
-		--aclogger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
+		--AutoCategory.logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
 		return false, "", 0, nil, nil
 	end
 
@@ -134,7 +134,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			-- just use declared category name
 			return name
 
-		elseif saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
+		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
 			-- just use the set name without the category name
 			return enhancement
 
@@ -151,13 +151,13 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		return true
 	end
 
-	local bag = saved.bags[bag_type_id]
+	local bag = AutoCategory.saved.bags[bag_type_id]
 	if not bag then
-		--aclogger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
+		--AutoCategory.logger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
 		return  false, "", 0, nil, nil
 	end
 	if not bag.rules then
-		--aclogger:Warning("[MatchCategoryRules] bag.rules was nil")
+		--AutoCategory.logger:Warning("[MatchCategoryRules] bag.rules was nil")
 		return  false, "", 0, nil, nil
 	end
 	for i = 1, #bag.rules do
@@ -184,8 +184,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						end
 
 					else
-						aclogger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
-						RuleApi.setError(rule, true, res)
+						AutoCategory.logger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
+						AutoCategory.RuleApi.setError(rule, true, res)
 						AutoCategory.compiledRules[entry.name] = nil
 					end
 				end

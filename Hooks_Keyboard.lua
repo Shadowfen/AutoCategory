@@ -33,8 +33,6 @@ local LMP = LibMediaProvider
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local aclogger = AutoCategory.logger
-
 -- uniqueIDs of items that have been updated (need rule re-execution), 
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
 local forceRuleReloadByUniqueIDs = {} 
@@ -140,9 +138,9 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	aclogger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	aclogger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	AutoCategory.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
 	return header_face
 end
 
@@ -498,9 +496,9 @@ local function createNewScrollData(scrollData) --, sortfn)
 	-- Create headers and append to newScrollData
 		for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
-			--aclogger:Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
+			--AutoCategory.logger:Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
 			local headerEntry = createHeaderEntry(catInfo)
-			--aclogger:Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
+			--AutoCategory.logger:Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
 			if headerEntry then
 				table.insert(newScrollData, headerEntry)
 			end
