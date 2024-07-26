@@ -1,4 +1,14 @@
 
+[COLOR="DeepSkyBlue"]4.1.7 (104)[/COLOR]:
+[LIST]
+[*] Added back in the HooksGamepad.lua file that somehow disappeared from the last (broken) release package.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.1.6 (103)[/COLOR]:
+[LIST]
+[*] Default bag settings will not be loaded in as long as you already have bag settings in your saved variables.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.1.5 (102)[/COLOR]:
 [LIST]
 [*] Update version number displayed on addon Settings page.

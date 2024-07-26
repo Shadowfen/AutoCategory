@@ -886,12 +886,12 @@ AutoCategory.defaultAcctBagSettings = {
 }
 
 AutoCategory.defaultCharSettings = {
-	bags = AutoCategory.defaultAcctBagSettings.bags, 
+	bags = {}, 
     collapses = AutoCategory.defaultCollapses,
 }
 
 AutoCategory.defaultAcctSettings = {
-	bags = AutoCategory.defaultAcctBagSettings.bags,
+	bags = {},
 	collapses = AutoCategory.defaultCollapses,
 	appearance = {
 		["CATEGORY_FONT_NAME"] = "Univers 67",

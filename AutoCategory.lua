@@ -675,9 +675,18 @@ function AutoCategory.onLoad(event, addon)
     -- load our saved variables (no longer loads pre-defined rules)
     AutoCategory.acctSaved, AutoCategory.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
 		1.1, AutoCategory.defaultAcctSettings, AutoCategory.defaultCharSettings)
+	if SF.isEmpty(AutoCategory.acctSaved.bags) then 
+		SF.defaultMissing(AutoCategory.acctSaved.bags, AutoCategory.defaultAcctBagSettings.bags)
+	end
+	if SF.isEmpty(AutoCategory.charSaved.bags) then
+		SF.defaultMissing(AutoCategory.charSaved.bags, AutoCategory.defaultAcctBagSettings.bags)
+	end
 
-	-- There are no char-level variables for AutoCatRules!
+		-- There are no char-level variables for AutoCatRules!
     AutoCategory.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCategory.default_rules)
+	--if SF.isEmpty(AutoCategory.acctRules) then
+	--	SF.defaultMissing(AutoCategory.acctRules,AutoCategory.default_rules)
+	--end
 	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
 
 	AutoCategory.LoadCollapse()
