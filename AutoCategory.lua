@@ -29,10 +29,6 @@ AutoCategory.saved = {
 }
 
 AutoCategory.cache = {
-    --rulesByName = {}, -- [name] rule#
-    --rulesByTag_cvt = {}, -- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
-    --compiledRules = AutoCategory.compiledRules, -- [name] function
-    --tags = {}, -- [#] tagname
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
@@ -155,28 +151,6 @@ end
 --]]
 -- ---------------------end RulesW  -------------------------------
 
-
---[[
--- -----------------------------------------------------
--- Compile all of the rules that we know (if necessary)
--- Mark those that failed to compile as damaged
---
-function AutoCategory.RecompileRules(ruleset)
-	-- reset AutoCategory.compiledRules to empty, creating only if necessary
-	AutoCategory.compiledRules = SF.safeClearTable(AutoCategory.compiledRules)
-
-    if ruleset == nil then
-		-- there are no rules to compile
-		return
-    end
-	-- compile and store each of the rules in the ruleset
-    for j = 1, #ruleset do
-        if ruleset[j] then
-            AutoCategory.RuleApi.compile(ruleset[j])
-        end
-    end
-end
---]]
 
 -- ----------------------------- Sorting comparators ------------------
 -- for sorting rules by name

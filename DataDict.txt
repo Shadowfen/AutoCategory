@@ -3,8 +3,10 @@ AutoCategory structures and objects
 AutoCategory = {} -- includes general, accountwide, appearance, bags, rules, collapses, version, meta, acctRules, acctSaved, charSaved
 
 -- not saved in SV - combo of all sets of rules, user and predef and plugin predef
-AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
-AutoCategory.compiledRules -- [name] compiledFunction
+local ac_rules = AutoCategory.RulesW    -- ruleList, name lookup, compiled, tags, tagGroups
+
+--AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+--AutoCategory.compiledRules -- [name] compiledFunction
 
 --saved in SV
 AutoCategory.saved = {
@@ -16,10 +18,6 @@ AutoCategory.saved = {
 AC.acctRules  = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err}
 
 AutoCategory.cache = {
-    rulesByName = {},    -- [name] rule# (index from AC.rules)
-    rulesByTag_cvt = {}, -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
-    compiledRules = AC.compiledRules, -- [name] function
-    tags = {}, -- [#] tagname
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
     entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
@@ -39,7 +37,8 @@ AutoCategory.RulesW = {
     tagGroups,      -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
 
     -- methods
-    function addTag(tagname)
+    function AddTag(tagname)
+    function CompileAll(self)
 }
 
 AutoCategory.CVT = {controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue, dirty}
