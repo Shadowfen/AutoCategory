@@ -29,12 +29,17 @@ AutoCategory.cache = {
 AutoCategory.BagRuleEntry = {name, priority, isHidden}	-- bagRule
 BagRule = { name, priority, isHidden } 
 
+-- consolidation of tables relating to the master rules 
 AutoCategory.RulesW = {
+    -- tables
     ruleList,   --  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
     ruleNames,    -- [name] rule# (index from ruleList)
     compiled,   -- [name] function
     tags,       -- [#] tagname
     tagGroups,      -- [tag] {choices{rule.name}, choicesTooltips{rule.desc/name}}
+
+    -- methods
+    function addTag(tagname)
 }
 
 AutoCategory.CVT = {controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue, dirty}

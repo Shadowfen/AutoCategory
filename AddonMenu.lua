@@ -988,7 +988,7 @@ function AC_UI.CatSet_NewCat_LAM:execute()
 	AddCat_SelectTag_LAM:updateControl()
 
 	--AC_UI.RefreshDropdownData()
-	AutoCategory.RecompileRules(AutoCategory.RulesW.ruleList)
+    AutoCategory.RulesW.CompileAll(AutoCategory.RulesW)
 end
 
 function AC_UI.CatSet_NewCat_LAM:controlDef()
@@ -1031,7 +1031,7 @@ function AC_UI.CatSet_CopyCat_LAM:execute()
 	AC_UI.checkCurrentRule()
 
 
-	AutoCategory.RecompileRules(AutoCategory.RulesW.ruleList)
+    AutoCategory.RulesW.CompileAll(AutoCategory.RulesW)
 end
 
 function AC_UI.CatSet_CopyCat_LAM:controlDef()

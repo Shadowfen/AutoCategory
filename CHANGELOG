@@ -1,4 +1,9 @@
 
+[COLOR="DeepSkyBlue"]4.1.8 (105)[/COLOR]:
+[LIST]
+[*] Fix German name formatting for combined_autoset().
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.1.7 (104)[/COLOR]:
 [LIST]
 [*] Added back in the HooksGamepad.lua file that somehow disappeared from the last (broken) release package.

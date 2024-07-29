@@ -1044,7 +1044,7 @@ function AutoCategory.RuleFunc.CombinedAutoSetName( ... )
 	
 	local nonperf = GetItemSetUnperfectedSetId(setId)
 	if nonperf and nonperf>0 and nonperf ~= setId then
-		AutoCategory.AdditionCategoryName = GetItemSetName(nonperf)
+		AutoCategory.AdditionCategoryName = string.gsub( GetItemSetName(nonperf) , "%^.*", "")
 		
 	else
 		-- add in the category (set name) if necessary and assign item to it
