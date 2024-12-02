@@ -9,7 +9,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "4.1.8",
+    version = "4.3",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice, Friday_the13_rus",
@@ -18,10 +18,10 @@ AutoCategory.settingDisplayName = SF.colors.gold:Colorize(AutoCategory.settingDi
 AutoCategory.version = SF.colors.gold:Colorize(AutoCategory.version)
 AutoCategory.author = SF.colors.purple:Colorize(AutoCategory.author)
 
-AutoCategory.RuleFunc = {}
-AutoCategory.Plugins = {}
-AutoCategory.Inited = false
-AutoCategory.Enabled = true
+AutoCategory.RuleFunc = {}  -- internal and plugin rule functions
+AutoCategory.Plugins = {}   -- registered plugins
+AutoCategory.Inited = false -- provided for the API so that external users can tell when initialization is completed
+AutoCategory.Enabled = true -- flag to tell if AutoCategory is turned on or off
 
 -- load in localization strings
 SF.LoadLanguage(AutoCategory_localization_strings, "en")

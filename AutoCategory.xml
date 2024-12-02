@@ -52,8 +52,7 @@
                 </Control>
 				
 				
-                <Label name="$(parent)SellPrice" inherits="ZO_CurrencyTemplate" hidden="true">
-                </Label>
+                <Label name="$(parent)SellPrice" hidden="true"  inherits="ZO_CurrencyTemplate" />
             </Controls>
         </Control>
     </Controls>
