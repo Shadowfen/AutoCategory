@@ -6,8 +6,8 @@ local AC = AutoCategory
 
 local L = GetString
 
---local CVT = AutoCategory.CVT
---local aclogger = AutoCategory.logger
+local CVT = AutoCategory.CVT
+local aclogger = AutoCategory.logger
 --local RuleApi = AutoCategory.RuleApi
 --local ARW = AutoCategory.ARW
 --local RulesW = AutoCategory.RulesW
@@ -84,7 +84,7 @@ end
 
 -- CVT containers for the dropdowns that we use
 local fieldData = {
-	importBag =   AutoCategory.CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
+	importBag =   CVT:New("AC_DROPDOWN_IMPORTBAG_BAG", AC_BAG_TYPE_BACKPACK),
 }
 
 local currentRule = AutoCategory.CreateNewRule("","")
@@ -105,13 +105,13 @@ dropdownFontAlignment.choices = {
 dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 -- This is not a "class"! It is more of a singleton instance.
-AC_UI.BagSet_SelectBag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
+AC_UI.BagSet_SelectBag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 local BagSet_SelectBag_LAM = AC_UI.BagSet_SelectBag_LAM
 
 AC_UI.BagSet_HideOther_LAM = AC.BaseUI:New("AC_CHECKBOX_HIDEOTHER")	-- checkbox
 local BagSet_HideOther_LAM = AC_UI.BagSet_HideOther_LAM
 
-AC_UI.BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
+AC_UI.BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 local BagSet_SelectRule_LAM = AC_UI.BagSet_SelectRule_LAM
 
 AC_UI.BagSet_Priority_LAM = AC.BaseUI:New()		-- slider
@@ -129,7 +129,7 @@ local BagSet_RemoveCat_LAM = AC_UI.BagSet_RemoveCat_LAM
 AC_UI.AddCat_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_TAG")	-- only uses choices
 local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
 
-AC_UI.AddCat_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_RULE",nil ,AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
+AC_UI.AddCat_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_RULE",nil ,CVT.USE_TOOLTIPS) -- uses choicesTooltips
 local AddCat_SelectRule_LAM = AC_UI.AddCat_SelectRule_LAM
 
 AC_UI.AddCat_EditRule_LAM = AC.BaseUI:New()	-- button
@@ -141,7 +141,7 @@ local AddCat_BagAdd_LAM = AC_UI.AddCat_BagAdd_LAM
 AC_UI.ImpExp_ExportAll_LAM = AC.BaseUI:New()	-- button
 local ImpExp_ExportAll_LAM = AC_UI.ImpExp_ExportAll_LAM
 
-AC_UI.ImpExp_ImportBag_LAM = AC.BaseDD:New("AC_DROPDOWN_IMPORTBAG_BAG", nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
+AC_UI.ImpExp_ImportBag_LAM = AC.BaseDD:New("AC_DROPDOWN_IMPORTBAG_BAG", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 local ImpExp_ImportBag_LAM = AC_UI.ImpExp_ImportBag_LAM
 
 AC_UI.ImpExp_Import_LAM = AC.BaseUI:New()	-- button
@@ -150,7 +150,7 @@ local ImpExp_Import_LAM = AC_UI.ImpExp_Import_LAM
 AC_UI.CatSet_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_TAG") -- only uses choices
 local CatSet_SelectTag_LAM = AC_UI.CatSet_SelectTag_LAM
 
-AC_UI.CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
+AC_UI.CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  CVT.USE_TOOLTIPS) -- uses choicesTooltips
 local CatSet_SelectRule_LAM = AC_UI.CatSet_SelectRule_LAM
 
 AC_UI.CatSet_NewCat_LAM = AC.BaseUI:New() 	-- button
@@ -367,12 +367,12 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	AutoCategory.logger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	aclogger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
-		local dataCurrentRules_EditBag = AutoCategory.CVT:New(self.controlName,nil, AutoCategory.CVT.USE_VALUES + AutoCategory.CVT.USE_TOOLTIPS)
+		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and AutoCategory.cache.entriesByBag[currentBag] then
-			AutoCategory.logger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			aclogger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
 			dataCurrentRules_EditBag:assign(AutoCategory.cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
@@ -383,7 +383,7 @@ function AC_UI.BagSet_SelectRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	AutoCategory.logger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	aclogger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -393,10 +393,10 @@ function AC_UI.BagSet_SelectRule_LAM:setValue(val)
 	self:select(val)
 	currentBagRule = val
 	local bagrule = AutoCategory.cache.entriesByName[getCurrentBagId()][val]
-	--AutoCategory.logger:Debug("bagule = "..type(bagrule))
-	--AutoCategory.logger:Debug("retrieving bagrule for name "..tostring(val))
-	--AutoCategory.logger:Debug("bagule.name = "..tostring(bagrule.name))
-	--AutoCategory.logger:Debug("bagule.priority = "..tostring(bagrule.priority))
+	--aclogger:Debug("bagule = "..type(bagrule))
+	--aclogger:Debug("retrieving bagrule for name "..tostring(val))
+	--aclogger:Debug("bagule.name = "..tostring(bagrule.name))
+	--aclogger:Debug("bagule.priority = "..tostring(bagrule.priority))
 	if bagrule and bagrule.priority then
 		BagSet_Priority_LAM:setValue(bagrule.priority)
 	end
@@ -521,11 +521,11 @@ function AC_UI.BagSet_RemoveCat_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
 	local savedbag = AutoCategory.saved.bags[bagId]
-	AutoCategory.logger:Debug("Removing rule name "..ruleName)
+	aclogger:Debug("Removing rule name "..ruleName)
 	for i = 1, #savedbag.rules do
 		local bagEntry = savedbag.rules[i]
 		if bagEntry.name == ruleName then
-			AutoCategory.logger:Debug("Found it! - "..ruleName)
+			aclogger:Debug("Found it! - "..ruleName)
 			table.remove(savedbag.rules, i)
 			break
 		end
@@ -610,7 +610,7 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	end
 
 	-- filter out already-in-use rules from the "add category" list for bag rules
-	local dataCurrentRules_AddCategory = AutoCategory.CVT:New(AddCat_SelectRule_LAM:getControlName(), nil, AutoCategory.CVT.USE_TOOLTIPS) -- uses choicesTooltips
+	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(), nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	dataCurrentRules_AddCategory.dirty = 1
 	if not AutoCategory.RulesW.tagGroups[tag] then
 		-- no rules available for tag
@@ -852,13 +852,14 @@ end
 -- customization of BaseDD for CatSet_SelectTag_LAM
 -- -------------------------------------------------------
 function AC_UI.CatSet_SelectTag_LAM:setValue(value)
+	if not value then return end
 	local oldvalue = self:getValue()
 	if oldvalue == value then return end
 
 	self:select(value)
 
 	CatSet_SelectRule_LAM:assign(AutoCategory.RulesW.tagGroups[value])
-	if currentRule.tag == value then
+	if currentRule and currentRule.tag == value then
 		CatSet_SelectRule_LAM:select(currentRule.name)
 	end
 	CatSet_SelectRule_LAM:refresh()
@@ -905,7 +906,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function AC_UI.CatSet_SelectRule_LAM:getValue()
-	--AutoCategory.logger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	--aclogger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
@@ -916,7 +917,7 @@ function AC_UI.CatSet_SelectRule_LAM:refresh()
 	if not ltag then return end
 
 	-- dropdown lists for Edit Rule (Category) selection (AC_DROPDOWN_EDITRULE_RULE)
-	local dataCurrentRules_EditRule = AutoCategory.CVT:New(nil,nil,AutoCategory.CVT.USE_TOOLTIPS)
+	local dataCurrentRules_EditRule = CVT:New(nil,nil,CVT.USE_TOOLTIPS)
 	local oldndx = self:getValue()
 	if AutoCategory.RulesW.tagGroups[ltag] then
 		dataCurrentRules_EditRule:assign(AutoCategory.RulesW.tagGroups[ltag])
@@ -1214,7 +1215,7 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 	-- removing the rule from any bags
 	local bagId
 	for bagId = 1,6 do
-		local savedbag = saved.bags[bagId]
+		local savedbag = AutoCategory.saved.bags[bagId]
 		for i = 1, #savedbag.rules do
 			local bagEntry = savedbag.rules[i]
 			if bagEntry.name == oldRuleName then
@@ -1247,11 +1248,11 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 	AddCat_SelectRule_LAM:updateControl()
 
 	CatSet_SelectRule_LAM:refresh()
-	CatSet_SelectRule_LAM:setValue(currentRule.name)
+	--CatSet_SelectRule_LAM:setValue(currentRule.name)
 	CatSet_SelectRule_LAM:updateControl()
 
 	BagSet_SelectRule_LAM:refresh()
-	BagSet_SelectRule_LAM:setValue(currentRule.name)
+	--BagSet_SelectRule_LAM:setValue(currentRule.name)
 	BagSet_SelectRule_LAM:updateControl()
 
 	AddCat_SelectRule_LAM:refresh()
@@ -1503,6 +1504,7 @@ end
 
 
 function AutoCategory.AddonMenuInit()
+	aclogger = AutoCategory.logger
     AutoCategory.cacheInitialize()
 
     -- initialize tables

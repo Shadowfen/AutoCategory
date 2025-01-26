@@ -4,7 +4,7 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
---local aclogger = AutoCategory.logger
+local aclogger = AutoCategory.logger
 --local RuleApi = AutoCategory.RuleApi
 --local BagRuleApi = AutoCategory.BagRuleApi
 
@@ -89,11 +89,11 @@ function AutoCategory.CVT:assign(tblB)
 	if not tblB then return end
 
 	if self.choicesValues and not tblB.choicesValues then
-		--AutoCategory.logger:Debug("don't have choicesValues for src tables in assign "..tostring(self.controlName))
+		--aclogger:Debug("don't have choicesValues for src tables in assign "..tostring(self.controlName))
 		return
 	end
 	if self.choicesTooltips and not tblB.choicesTooltips then
-		--AutoCategory.logger:Debug("don't have choicesTooltips for dest tables in assign "..tostring(self.controlName))
+		--aclogger:Debug("don't have choicesTooltips for dest tables in assign "..tostring(self.controlName))
 		return
 	end
 
@@ -219,13 +219,13 @@ function AutoCategory.CVT:updateControl()
 		return
 	end
 
-	--AutoCategory.logger:Debug("CVT:updateControl: getting control for "..tostring(self.controlName))
+	--aclogger:Debug("CVT:updateControl: getting control for "..tostring(self.controlName))
 	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(self.controlName)
     if dropdownCtrl == nil then
         return
     end
 
-	--AutoCategory.logger:Debug("CVT:updateControl: lists changed - need to update "..tostring(self.controlName))
+	--aclogger:Debug("CVT:updateControl: lists changed - need to update "..tostring(self.controlName))
 	dropdownCtrl:UpdateChoices(self.choices, self.choicesValues,
 		self.choicesTooltips)
 end
@@ -332,13 +332,13 @@ function AutoCategory.BaseUI:updateValue()
 	local val = self:getValue()
 	if not val then return end
 
-	--AutoCategory.logger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
+	--aclogger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
 	local uiCtrl = WINDOW_MANAGER:GetControlByName(self.controlName)
     if uiCtrl == nil then
         return
     end
 
-	--AutoCategory.logger:Debug("updateValue: value changed - need to update "..tostring(self.controlName))
+	--aclogger:Debug("updateValue: value changed - need to update "..tostring(self.controlName))
 	uiCtrl:UpdateValue(false, val)
 end
 
@@ -378,14 +378,14 @@ end
 function AutoCategory.BaseDD:updateControl()
 	if not self.cvt.controlName then return end
 
-	--AutoCategory.logger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
+	--aclogger:Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
 	local dropdownCtrl = WINDOW_MANAGER:GetControlByName(self.cvt.controlName)
     if dropdownCtrl == nil then
         return
     end
 
 	if self.cvt.dirty == 1 then		-- only do this if cvt lists have been modified
-		--AutoCategory.logger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
+		--aclogger:Debug("updateControl: dropdown lists changed - updating "..tostring(self.cvt.controlName))
 		-- only update the choices if we know that the lists contents changed
 		self.cvt.dirty = nil
 		dropdownCtrl:UpdateChoices(self.cvt.choices, self.cvt.choicesValues,
@@ -393,7 +393,7 @@ function AutoCategory.BaseDD:updateControl()
 	end
 
 	if self.cvt.indexValue then
-		--AutoCategory.logger:Debug("updateControl: value changed - need to update "..tostring(self.cvt.controlName))
+		--aclogger:Debug("updateControl: value changed - need to update "..tostring(self.cvt.controlName))
 		dropdownCtrl:UpdateValue(false, self.cvt.indexValue)
 	end
 

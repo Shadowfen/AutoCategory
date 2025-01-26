@@ -33,7 +33,7 @@ to output the messages.
 
 Generally used for out-of-game testing.
 --]]
-local printLibDebug = {
+--[[local printLibDebug = {
     Error = function(self,...)  print("ERROR: "..string.format(...)) end,
     Warn = function(self,...)  print("WARN: "..string.format(...)) end,
     Info = function(self,...)  print("INFO: "..string.format(...)) end,
@@ -44,25 +44,24 @@ setmetatable(printLibDebug,  { __call = function(self, name)
             return self
         end
     })
-
+--]]
 -- initialize the logger for AutoCategory
-AutoCategory.logger = printLibDebug
+--AutoCategory.logger = printLibDebug
 
 -- checks the versions of libraries (where possible) and warn in
 -- debug logger if we detect out of date libraries.
 function AutoCategory.checkLibraryVersions()
-    if not LibDebugLogger then return end
-
-    local addonName = AutoCategory.name
-    local vc = SF.VersionChecker(addonName)
-    local logger = LibDebugLogger.Create(addonName)
-    vc:Enable(logger)
+    --[[local addonName = AutoCategory.name
+    local vc = SF.VersionChecker(addonName, AutoCategory.logger)
+--    local aclogger = AutoCategory.logger
+--    vc:Enable(aclogger)
     vc:CheckVersion("LibAddonMenu-2.0", 36)
     vc:CheckVersion("LibMediaProvider-1.0", 30)
     vc:CheckVersion("LibDebugLogger",263)
-    vc:CheckVersion("LibSFUtils",52)
+    vc:CheckVersion("LibSFUtils",54)
 
     if UnknownTracker then
         vc:CheckVersion("UnknownTracker",75)
     end
+    --]]
 end

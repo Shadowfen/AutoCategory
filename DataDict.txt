@@ -1,10 +1,10 @@
 AutoCategory structures and objects
-
+-------------------------------------
 AutoCategory = {} -- includes general, accountwide, appearance, bags, rules, collapses, version, meta, acctRules, acctSaved, charSaved
+AC_UI = {} -- user interface namespace containing controls and methods working with them
 
 -- not saved in SV - combo of all sets of rules, user and predef and plugin predef
 local ac_rules = AutoCategory.RulesW    -- ruleList, name lookup, compiled, tags, tagGroups
-
 --AC.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
 --AutoCategory.compiledRules -- [name] compiledFunction
 
@@ -39,18 +39,106 @@ AutoCategory.RulesW = {
     -- methods
     function AddTag(tagname)
     function CompileAll(self)
+    function sizeRules(self)
+    function sizeTags(self)
 }
 
-AutoCategory.CVT = {controlName, choices{}, choicesValues{}, choicesTooltips{}, indexValue, dirty}
+AutoCategory.CVT = {
+    controlName, 
+    choices{}, 
+    choicesValues{}, 
+    choicesTooltips{}, 
+    indexValue, 
+    dirty,
 
-AC.rulefuncs -- metatable for rules with functions to manipulate them
+    function CVT:New(...)
+    function CVT:initialize(ctlname, ndx, usesFlags)
+    function CVT:clear()
+    function CVT:getControlName()
+    function CVT:assign(tblB)
+    function CVT:select(value)
+    function CVT:clearIndex()
+    function CVT:append(choice, value, tooltip)
+    function CVT:setControlName(fld)
+    function CVT:size()
+    function CVT:updateControl()
+    function CVT:removeItemChoice(removeItem)
+    function CVT:removeItemChoiceValue(removeItem)
+}
+
+AutoCategory.BaseUI = {
+    function BaseUI:New(...)
+    function BaseUI:initialize(ctlname, ...)
+    function BaseUI:getControlName()
+    function BaseUI:updateValue()
+}
+
+AutoCategory.BaseDD = {
+	cvt,
+
+    function BaseDD:New(...)
+    function BaseDD:initialize(ctlname, ndx, usesFlags)
+    function BaseDD:getControlName()
+    function BaseDD:select(val)
+    function BaseDD:clearIndex()
+    function BaseDD:clear()
+    function BaseDD:assign(cvtTbl)
+    function BaseDD:updateControl()
+    function BaseDD:size()
+    function BaseDD:getValue()
+}
+
+-- methods for rules
+AutoCategory.RuleApi = {
+    isValid = function(rule)
+    isPredefined = function(rule)
+    getDesc = function(rule)
+    setError = function(rule,dmg,errm)
+    clearError = function(rule)
+    key = function(rule)
+    isequiv = function(rule, a)
+    compile = function(rule)
+}
+
+-- methods for bagrules
+AutoCategory.BagRuleApi = {
+    isValid = function (bagrule)
+    formatShow	= function (bagrule)
+    formatTooltip = function (bagrule)
+    getBackingRule = function (bagrule)
+    setHidden = function (bagrule, isHidden)
+}
 
 AC_UI members:
-AddCat_SelectTag_LAM - BaseDD - { choices = cache.tags }
-AddCat_SelectRule_LAM - BaseDD - {choices{rule.name}, choicesTooltips{rule.desc/name}}
-BagSet_SelectBag_LAM - BaseDD - (bags_cvt) {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
-BagSet_SelectRule_LAM - BaseDD - {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} 
-CatSet_SelectRule_LAM - BaseDD - { choices, choicesTooltips }
-CatSet_SelectTag_LAM - BaseDD - { choices = cache.tags }
-ImpExp_ImportBag_LAM - BaseDD - (bags_cvt)  {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
 
+BagSet_SelectBag_LAM = BaseDD - "AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, CVT.USE_VALUES + CVT.USE_TOOLTIPS
+                              - (bags_cvt) {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
+BagSet_HideOther_LAM = BaseUI - "AC_CHECKBOX_HIDEOTHER"	-- checkbox
+BagSet_SelectRule_LAM = BaseDD - "AC_DROPDOWN_EDITBAG_RULE", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS
+                               - {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} 
+BagSet_Priority_LAM = BaseUI - 		-- slider
+BagSet_HideCat_LAM = BaseUI - 		-- checkbox
+BagSet_EditCat_LAM = BaseUI - 	-- button
+BagSet_RemoveCat_LAM = BaseUI - 	-- button
+
+AddCat_SelectTag_LAM = BaseDD - "AC_DROPDOWN_ADDCATEGORY_TAG"	-- only uses choices
+                              - { choices = cache.tags }
+AddCat_SelectRule_LAM = BaseDD - "AC_DROPDOWN_ADDCATEGORY_RULE",nil ,CVT.USE_TOOLTIPS -- uses choicesTooltips
+                               - {choices{rule.name}, choicesTooltips{rule.desc/name}}
+AddCat_EditRule_LAM = BaseUI - 	-- button
+AddCat_BagAdd_LAM = BaseUI - 	-- button
+
+ImpExp_ExportAll_LAM = BaseUI - 	-- button
+ImpExp_ImportBag_LAM = BaseDD - "AC_DROPDOWN_IMPORTBAG_BAG", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS
+                              - (bags_cvt)  {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}}
+ImpExp_Import_LAM = BaseUI - 	-- button
+
+CatSet_SelectTag_LAM = BaseDD - "AC_DROPDOWN_EDITRULE_TAG" -- only uses choices
+                              - { choices = cache.tags }
+CatSet_SelectRule_LAM = BaseDD - "AC_DROPDOWN_EDITRULE_RULE", nil,  CVT.USE_TOOLTIPS -- uses choicesTooltips
+                               - { choices, choicesTooltips }
+CatSet_NewCat_LAM = BaseUI -  	-- button
+CatSet_CopyCat_LAM = BaseUI -  	-- button
+CatSet_DeleteCat_LAM = BaseUI - 	-- button
+CatSet_NameEdit_LAM = BaseUI - "AC_EDITBOX_EDITRULE_NAME" -- editbox
+CatSet_TagEdit_LAM = BaseUI - "AC_EDITBOX_EDITRULE_TAG"	-- editbox

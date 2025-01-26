@@ -5,7 +5,7 @@
 
 -- aliases
 --local saved = AutoCategory.saved
---local aclogger = AutoCategory.logger
+local aclogger = AutoCategory.logger
 
 -- For use to tell if AutoCategory has finished its initialization process and
 -- is ready for business. The following variable is nil if AutoCategory is
@@ -119,7 +119,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local bag_type_id = convert2BagTypeId(bagId, specialType)
 	if not bag_type_id then
 		-- invalid bag
-		--AutoCategory.logger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
+		--aclogger:Error("[MatchCategoryRules] invalid bag_type_id for bagId "..bagId.." special type "..(specialType or "nil"))
 		return false, "", 0, nil, nil
 	end
 
@@ -153,11 +153,11 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 
 	local bag = AutoCategory.saved.bags[bag_type_id]
 	if not bag then
-		--AutoCategory.logger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
+		--aclogger:Warning("[MatchCategoryRules] bag for bag_type_id ("..bag_type_id..") was nil")
 		return  false, "", 0, nil, nil
 	end
 	if not bag.rules then
-		--AutoCategory.logger:Warning("[MatchCategoryRules] bag.rules was nil")
+		--aclogger:Warning("[MatchCategoryRules] bag.rules was nil")
 		return  false, "", 0, nil, nil
 	end
 	for i = 1, #bag.rules do
@@ -184,7 +184,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						end
 
 					else
-						AutoCategory.logger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
+						aclogger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
 						AutoCategory.RuleApi.setError(rule, true, res)
 						AutoCategory.compiledRules[entry.name] = nil
 					end

@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../LibSFUtils"
+		},
+		{
+			"path": "D:/Fen/eso source code/esoui-10.0.8/esoui-live/esoui"
+		}
+	],
+	"settings": {}
+}
