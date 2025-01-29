@@ -1,6 +1,7 @@
 
 [COLOR="DeepSkyBlue"]4.3 (108)[/COLOR]:
 [LIST]
+[*] Removed the doubled category name "CatName (CatName)" from all categories that are using the FCOIS plugin's fcois_ismarked() function in a rule. Requested by Federale and after reproducing it I agree that it is really annoying.
 [*] Fixed some errors thrown when deleting rules.
 [*] Convert to using logger from LibSFUtils. Now requires LibSFUtils v55.
 [/LIST]
