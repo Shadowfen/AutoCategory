@@ -738,16 +738,16 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	local checkIconIds = {}
 	local additionalName = ""
 	for ax = 1, ac do
-		
+
 		local arg = select( ax, ... )
-		
+
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		 
+
 		if type( arg ) == "number" then
 			table.insert(checkIconIds, arg)
-			
+
 		elseif type( arg ) == "string" then
 			local v = markedTypeMap[string.lower( arg )]
 			if v then
@@ -757,26 +757,29 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 			error( string.format("error: %s(): argument is error." , fn ) )
 		end
 	end
+			--[[
 	if #checkIconIds ~= 0 then  
+
 		for i = 1, #checkIconIds do
 			local v = checkIconIds[i]
 			local iconText = GetFCOISIconText(v)
-			if iconText and iconText ~= "" then
+            if iconText and iconText ~= "" then
 				additionalName = additionalName .. iconText
 				if i ~= #checkIconIds then
 					additionalName = additionalName .. ", "
 				end
 			end
 		end
-	end
-	
+    end
+            --]]
+
 	if additionalName ~= "" then
 		AutoCategory.AdditionCategoryName = additionalName
 	end
-	
+
 	if #checkIconIds > 0 then
 		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, checkIconIds)
-		
+
 	else
 		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, -1)
 	end

@@ -178,6 +178,7 @@ end
 
 -- for sorting rules by tag and name
 -- returns true if the a should come before b
+-- unused
 local function RuleDataSortingFunction(a, b)
     local result = false
     if a.tag ~= b.tag then
