@@ -1,4 +1,9 @@
 
+[COLOR="DeepSkyBlue"]4.3.1 (109)[/COLOR]:
+[LIST]
+[*] Fixed error at AutoCategory_API.lua:187 reported by TaxTalis.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3 (108)[/COLOR]:
 [LIST]
 [*] Removed the doubled category name "CatName (CatName)" from all categories that are using the FCOIS plugin's fcois_ismarked() function in a rule. Requested by Federale and after reproducing it I agree that it is really annoying.

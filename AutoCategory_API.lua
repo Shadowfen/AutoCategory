@@ -184,7 +184,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						end
 
 					else
-						aclogger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
+						--aclogger:Error("Error2: " .. tostring(entry.name).. " - ".. tostring(res))
 						AutoCategory.RuleApi.setError(rule, true, res)
 						AutoCategory.compiledRules[entry.name] = nil
 					end
