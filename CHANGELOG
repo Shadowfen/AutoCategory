@@ -1,4 +1,10 @@
 
+[COLOR="DeepSkyBlue"]4.3.2 (110/COLOR]
+[LIST]
+[*] Commented put the AutoCategory.AddRuleFunc() from AutoCategory_RuleFunc.lua that DakJaniels also found in Plugin_API.lua. Embarassing, but non-critical. The newer Plugin_API version had additional safety checking against external plugins, but the RuleFunc version was simpler and less careful. It overwrote the Plugin version before anything would try to execute it. However it could not cause lagging perceived slowdowns because it would simply crash trying to execute a nil instead of a function.In my testing, the change had no detectable (to me) change to opening containers either in the enventory or in the backpack.
+[*] Reverted the change to the version 4.3 FCOIS plugin doubled category name change from version 4.3, to work as before, while I consider another way to do what Federale wanted. Apologies.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.1 (109)[/COLOR]:
 [LIST]
 [*] Fixed error at AutoCategory_API.lua:187 reported by TaxTalis.

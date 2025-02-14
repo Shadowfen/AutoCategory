@@ -1394,8 +1394,15 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	end
 
 	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
-	local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then return false end
+	local _, _, _, _, _, equipType, itemStyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	
+	--local st =zo_strlower(GetItemStyleName(itemstyle))
+	--if st~= nil then
+	--	d(st)
+	--end
+	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then 
+				return false 
+		end
 
 	-- Retrieve a list of armory builds this item is part of
 	local armoryBuildListNames = { GetItemArmoryBuildList(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
@@ -1642,10 +1649,13 @@ function AutoCategory.RuleFunc.AcctName(...)
 	return false
 end
 
+-- commented out due to comflict with version of the same function inside AutoCategory_RuleFunc
+--
+--[[
 function AutoCategory.AddRuleFunc(name, func)
     AutoCategory.Environment[name] = func
 end
-
+--]]
 AutoCategory.Environment = {
 	-- rule functions
 	zone       = AutoCategory.RuleFunc.CurrentZone,

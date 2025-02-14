@@ -757,7 +757,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 			error( string.format("error: %s(): argument is error." , fn ) )
 		end
 	end
-			--[[
+	
 	if #checkIconIds ~= 0 then  
 
 		for i = 1, #checkIconIds do
@@ -771,7 +771,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 			end
 		end
     end
-            --]]
+    
 
 	if additionalName ~= "" then
 		AutoCategory.AdditionCategoryName = additionalName
