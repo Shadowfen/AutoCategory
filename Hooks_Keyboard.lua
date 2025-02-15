@@ -249,8 +249,6 @@ local function createHeaderEntry(catInfo)
 			stackLaunderPrice = 0})
 	return headerEntry
 end
-
-
 -- ---------------------------------------------------
 
 local function isUngroupedHidden(bagTypeId)
@@ -265,7 +263,9 @@ local function isHiddenEntry(itemEntry)
 	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then 
 		return true
 	end
-	return false
+	--return false
+	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
+
 end
 
 local function isCollapsed(itemEntry)
@@ -450,8 +450,8 @@ local function createNewScrollData(scrollData) --, sortfn)
 
 	local function addCount(name)
 		categoryList[name] = SF.safeTable(categoryList[name])
-		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0)
-		categoryList[name].AC_catCount = categoryList[name].AC_catCount + 1
+		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0) + 1
+		--categoryList[name].AC_catCount = categoryList[name].AC_catCount + 1
 	end
 
 	local function setCount(bagTypeId, name, count)
@@ -589,8 +589,9 @@ local function refresh(forceRuleReload)
 end
 
 --prehook 
-local function onInventorySlotUpdated(self, bagId, slotIndex)
-	if not AutoCategory.Enabled then return false end
+local function onInventorySlotUpdated(evCode, bagId, slotIndex, isNewItem)
+	if not AutoCategory.Enabled then return true end
+	if isNewItem == false then return true end
 
 	-- mark the slot as needing rule re-evaluation
 	table.insert(forceRuleReloadByUniqueIDs, GetItemUniqueId(bagId, slotIndex))
@@ -631,6 +632,7 @@ function AutoCategory.HookKeyboardMode()
 	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
 
 	-- Other events that cause a full refresh
+	-- required to apply current rules after rule changes made from Settings
 	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", refresh, true)
 
 	AutoCategory.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)

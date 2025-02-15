@@ -1,4 +1,10 @@
 
+[COLOR="DeepSkyBlue"]4.3.3 (111)[/COLOR]:
+[LIST]
+[*] Fixed error at AutoCategory_API.lua:187 reported by robayche.
+[*] Changed onInventorySlotUpdated to check the provided isNewItem to reduce processing on inventory (i.e. make it faster).
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.2 (110/COLOR]
 [LIST]
 [*] Commented put the AutoCategory.AddRuleFunc() from AutoCategory_RuleFunc.lua that DakJaniels also found in Plugin_API.lua. Embarassing, but non-critical. The newer Plugin_API version had additional safety checking against external plugins, but the RuleFunc version was simpler and less careful. It overwrote the Plugin version before anything would try to execute it. However it could not cause lagging perceived slowdowns because it would simply crash trying to execute a nil instead of a function.In my testing, the change had no detectable (to me) change to opening containers either in the enventory or in the backpack.

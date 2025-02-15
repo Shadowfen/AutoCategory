@@ -1,12 +1,19 @@
 {
 	"folders": [
 		{
+			"name": "AutoCategory",
 			"path": "."
 		},
 		{
+			"name": "LibSFUtils",
 			"path": "../LibSFUtils"
 		},
 		{
+			"name": "LibAddonMenu-2.0",
+			"path": "../LibAddonMenu-2.0"
+		},
+		{
+			"name": "esoui",
 			"path": "D:/eso src/esoui-live-1.1.7/esoui"
 		}
 	],
