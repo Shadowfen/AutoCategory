@@ -1,4 +1,22 @@
 
+[COLOR="DeepSkyBlue"]4.3.6 (114)[/COLOR]:
+[LIST]
+[*] Removed change that broke the ability to define a new category.
+[*] Partially fixed a problem with adding new categories to bags. Once the category is created, you may need to change the selected tag under "Add to Bag" to something else and then change it back for your new category name to appear in the category dropdown list. (But it's better than doing a reloadui to reload the dropdowns!)
+[*] Created a preliminary plugin for the addon Dressing Room 2018. This adds the function [COLOR="MediumSeaGreen"]drm_inset(...)[/COLOR] where the argument(s) is the number of the Dressing Room set to look in. This is still a BETA plugin, so if you run Dressing Room 2018 with AutoCategory, please try out the new drm_inset() in one of your categories and report back your results.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.3.5 (113)[/COLOR]:
+[LIST]
+[*] Reduced number of times that rules are run on the inventories to speed up processing.
+[*] Look for changes in rule configurations to control how much work must be done.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.3.4 (112)[/COLOR]:
+[LIST]
+[*] Modified operation of callback for LAM_PanelClose to reduce processing.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.3 (111)[/COLOR]:
 [LIST]
 [*] Fixed error at AutoCategory_API.lua:187 reported by robayche.

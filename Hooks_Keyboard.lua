@@ -9,7 +9,7 @@ This process involves executing all active rules for each items, and can be
 triggered multiple times in a row, notably for bank transfers (more than ten calls)
 In order to reduce the impact of the add-on:
 	1 - The results of rules' execution are stored in 'itemEntry.data'.
- 		As 'itemEntry.data' is persistent, results can be reused directly 
+		As 'itemEntry.data' is persistent, results can be reused directly 
 		without having to re-execute all the rules every time.
 		However, 'itemEntry.data' will not persist forever and will be reset 
 		at some point, and rules will need to be re-executed, but this is not much of an issue.
@@ -35,7 +35,7 @@ local AC = AutoCategory
 
 -- uniqueIDs of items that have been updated (need rule re-execution), 
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
-local forceRuleReloadByUniqueIDs = {} 
+local forceRuleReloadByUniqueIDs = {}
 
 AutoCategory.dataCount = {}
 
@@ -496,7 +496,7 @@ local function createNewScrollData(scrollData) --, sortfn)
 	end
 
 	-- Create headers and append to newScrollData
-		for _, catInfo in pairs(categoryList) do ---> add tracked categories
+	for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
 			--AutoCategory.logger:Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
 			local headerEntry = createHeaderEntry(catInfo)
@@ -583,11 +583,6 @@ local function prehookCraftSort(self)
 	return false
 end
 
--- perform refresh of list - callback
-local function refresh(forceRuleReload)
-	AutoCategory.RefreshCurrentList(forceRuleReload)
-end
-
 --prehook 
 local function onInventorySlotUpdated(evCode, bagId, slotIndex, isNewItem)
 	if not AutoCategory.Enabled then return true end
@@ -632,9 +627,7 @@ function AutoCategory.HookKeyboardMode()
 	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
 
 	-- Other events that cause a full refresh
-	-- required to apply current rules after rule changes made from Settings
-	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", refresh, true)
-
+	-- user can force a refresh with stack key
 	AutoCategory.evtmgr:registerEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
 
 end

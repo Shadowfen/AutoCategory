@@ -191,7 +191,7 @@ local function GearChangerByIakoni_DoRefresh(list)
                 marker = GearChangerByIakoni.CreateControlMarker(v)
             end
             marker:SetHidden(true)
-            
+
             local itemType = GetItemType(bag, slot)
             if itemType == ITEMTYPE_ARMOR or itemType == ITEMTYPE_WEAPON then
                 local founditem = false
@@ -206,7 +206,7 @@ local function GearChangerByIakoni_DoRefresh(list)
                             end
                         end
                     end
-                    
+
                     if founditem then
                         break
                     end
@@ -221,7 +221,7 @@ end
 -- separated out to allow for offline testing since localization_strings is local
 function AutoCategory_Iakoni.LoadLanguage(defaultlang)
     if defaultlang == nil then defaultlang = "en" end
-    
+
     -- initialize strings
     AutoCategory.LoadLanguage(localization_strings,"en")
 end
@@ -272,16 +272,16 @@ end
 -- Implement the GearChanger setindex() check function for rules
 function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 	if not GearChangerByIakoni then return false end
-    
+
 	local fn = "setindex"
 	local ac = select( '#', ... )
 	if ac == 0 then
 		error( string.format("error: %s(): require arguments." , fn))
 	end
-	
+
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	for ax = 1, ac do
-		
+
 		local arg = select( ax, ... )
 		local comIndex = -1
 		if not arg then
@@ -289,10 +289,10 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 		end
 		if type( arg ) == "number" then
 			comIndex = arg
-			
+
 		elseif type( arg ) == "string" then
 			comIndex = tonumber(arg)
-			
+
 		else
 			error( string.format("error: %s(): argument is error." , fn ) )
 		end
@@ -303,7 +303,7 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 			end
 		end 
 	end
-	
+
 	return false 
 end
 
@@ -311,7 +311,7 @@ end
 function AutoCategory_Iakoni.RuleFunc.InSet( ... )
 	local fn = "inset"
 	if not GearChangerByIakoni then return false end
-	
+
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return #setIndices ~= 0
 end

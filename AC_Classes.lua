@@ -759,6 +759,14 @@ AutoCategory.RuleApi = {
 			AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = compiledfunc
 			return ""
 		end,
+	
+	-- returns nil if the rule is not compiled, non-nil if it is compiled
+	isCompiled = function(rule)
+		if rule == nil or rule.name == nil or rule.name == "" then
+			return
+		end
+		return AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)]
+	end,
 }
 
 

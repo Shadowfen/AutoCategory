@@ -322,6 +322,7 @@ function AutoCategory.renameRule(oldName, newName)
 	ac_rules.ruleNames[rule.name] = oldrndx
 
 	AutoCategory.renameBagRule(oldName, newName)
+	return newName
 end
 
 -- When a rule changes names, referencees to in the bag rules also need to change
