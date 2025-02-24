@@ -395,14 +395,15 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	if data.AC_lastUpdateTime == nil then
 		return setChange(true)
 
-	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 4 then
-		return setChange(true)
+	--elseif currentTime - tonumber(data.AC_lastUpdateTime) > 4 then
+	--	return setChange(true)
 	end
 
 	--- Test if uniqueID tagged for update
-	for _, uniqueID in ipairs(forceRuleReloadByUniqueIDs) do 
+	for i, uniqueID in ipairs(forceRuleReloadByUniqueIDs) do 
 		-- look for items with changes detected
 		if data.uniqueID == uniqueID then
+			table.remove(forceRuleReloadByUniqueIDs, i)
 			return setChange(true)
 		end
 	end
@@ -512,6 +513,7 @@ end
 -- prehook
 local function prehookSort(self, inventoryType) 
 	if not AutoCategory.Enabled then return false end
+
 	-- revert to default behaviour if safety conditions not met
 	if inventoryType == INVENTORY_QUEST_ITEM then return false end
 
