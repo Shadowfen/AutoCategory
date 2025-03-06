@@ -67,13 +67,5 @@ function AutoCategory_DressingRm.RuleFunc.InSet( ... )
 end
 -----
 
---[[
-local function initialize()
-    if not AutoCategory then return end
-
-    AutoCategory.Environment.dressingroom = dressingroom
-end
---]]
-
 AutoCategory.RegisterPlugin("DressingRoom2018", 
         AutoCategory_DressingRm.Initialize, AutoCategory_DressingRm.predefinedRules)

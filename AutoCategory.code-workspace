@@ -15,6 +15,15 @@
 		{
 			"name": "esoui",
 			"path": "D:/eso src/esoui-live-1.1.7/esoui"
+		},
+		{
+			"path": "../LibMsgWin-1.0"
+		},
+		{
+			"path": "../LibShifterBox"
+		},
+		{
+			"path": "../LibAddonMenuOrderListBox"
 		}
 	],
 	"settings": {}
