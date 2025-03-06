@@ -308,7 +308,7 @@ end
 
 -- rename a rule, updates the cache lookups and bagsets too
 function AutoCategory.renameRule(oldName, newName)
-	if oldName == newName then return end
+	if oldName == newName then return oldname end
 
 	local rule = AutoCategory.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
@@ -558,16 +558,16 @@ local function addTableRules(tbl, tblname, ispredef)
 		return false
 	end
 
-	local function addPredef(tbl, rule)
+	local function addPredef(stbl, rule)
 		-- add to predefinedRules list
-		if tbl.rules ~= AutoCategory.predefinedRules then
+		if stbl.rules ~= AutoCategory.predefinedRules then
 			AutoCategory.predefinedRules[#AutoCategory.predefinedRules+1] = rule
 		end
 	end
 
-	local function addUserRule(tbl, rule)
+	local function addUserRule(stbl, rule)
 		-- add to acctRules list
-		if tbl.rules ~= AutoCategory.acctRules.rules then
+		if stbl.rules ~= AutoCategory.acctRules.rules then
 			AutoCategory.ARW:addRule(rule)
 		end
 	end
