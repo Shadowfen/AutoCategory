@@ -1,4 +1,10 @@
 
+[COLOR="DeepSkyBlue"]4.3.7 (115)[/COLOR]:
+[LIST]
+[*] Speedup rule evaluation on inventory to redunce lagging.
+[*] Fix error reported when adding a new category (reported by artharti), or changing the name of an old category. Also update the add category to bag dropdown list to include the new (or newly-renamed) category.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.6 (114)[/COLOR]:
 [LIST]
 [*] Removed change that broke the ability to define a new category.
