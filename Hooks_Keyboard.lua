@@ -33,7 +33,7 @@ local LMP = LibMediaProvider
 local SF = LibSFUtils
 local AC = AutoCategory
 
--- uniqueIDs of items that have been updated (need rule re-execution), 
+-- uniqueIDs of items that have been updated (need rule re-execution),
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
 local forceRuleReloadByUniqueIDs = {}
 
@@ -177,23 +177,23 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			cateName == AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] then
 		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 	end
-	headerLabel:SetColor(appearance[headerColor][1], 
-						 appearance[headerColor][2], 
-						 appearance[headerColor][3], 
+	headerLabel:SetColor(appearance[headerColor][1],
+						 appearance[headerColor][2],
+						 appearance[headerColor][3],
 						 appearance[headerColor][4])
 
 	-- Add count to category name if selected in options
     if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
         headerLabel:SetColor(
-			appearance[headerColor][1], 
+			appearance[headerColor][1],
 			appearance[headerColor][2],
-			appearance[headerColor][3], 
+			appearance[headerColor][3],
 			appearance[headerColor][4])
 
     else
         headerLabel:SetText(cateName)
-    end	
+    end
 
 	-- set the collapse marker
 	local marker = rowControl:GetNamedChild("CollapseMarker")
@@ -260,7 +260,7 @@ local function isHiddenEntry(itemEntry)
 
 	local data = itemEntry.data
 	if data.AC_isHidden or data.AC_bagTypeId == nil then return true end
-	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then 
+	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then
 		return true
 	end
 	--return false
@@ -285,9 +285,12 @@ local function runRulesOnEntry(itemEntry, specialType)
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
 
-	local matched, categoryName, categoryPriority, bagTypeId, isHidden 
+	local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
 				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
 	data.AC_matched = matched
+	data.AC_bagTypeId = bagTypeId
+	data.AC_isHeader = false
+
 	if matched then
 		data.AC_categoryName = categoryName
 		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
@@ -299,9 +302,6 @@ local function runRulesOnEntry(itemEntry, specialType)
 		-- if was not matched, then the isHidden value that was returned is not valid
 		data.AC_isHidden = isUngroupedHidden(bagTypeId)
 	end
-	data.AC_bagTypeId = bagTypeId
-	data.AC_isHeader = false
-
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
@@ -385,20 +385,6 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 		return setChange(true)
 	end
 
-	--- Update hash and test if changed
-	if data.AC_hash == nil or data.AC_hash ~= newEntryHash then
-		data.AC_hash = newEntryHash
-		return setChange(true)
-	end
-
-	--- Test last update time, triggers update if more than 4s
-	if data.AC_lastUpdateTime == nil then
-		return setChange(true)
-
-	--elseif currentTime - tonumber(data.AC_lastUpdateTime) > 4 then
-	--	return setChange(true)
-	end
-
 	--- Test if uniqueID tagged for update
 	for i, uniqueID in ipairs(forceRuleReloadByUniqueIDs) do 
 		-- look for items with changes detected
@@ -406,6 +392,20 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 			table.remove(forceRuleReloadByUniqueIDs, i)
 			return setChange(true)
 		end
+	end
+
+	--- Update hash and test if changed
+	if data.AC_hash == nil or data.AC_hash ~= newEntryHash then
+		data.AC_hash = newEntryHash
+		return setChange(true)
+	end
+
+	--- Test last update time, triggers update if more than 20s
+	if data.AC_lastUpdateTime == nil then
+		return setChange(true)
+
+	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 20 then
+		return setChange(true)
 	end
 
 	return changeDetected
@@ -452,7 +452,6 @@ local function createNewScrollData(scrollData) --, sortfn)
 	local function addCount(name)
 		categoryList[name] = SF.safeTable(categoryList[name])
 		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0) + 1
-		--categoryList[name].AC_catCount = categoryList[name].AC_catCount + 1
 	end
 
 	local function setCount(bagTypeId, name, count)
@@ -614,7 +613,6 @@ function AutoCategory.HookKeyboardMode()
 
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)
-
     AddTypeToList(rowHeight,
 		ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack, nil )
 
