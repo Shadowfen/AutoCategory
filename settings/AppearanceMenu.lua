@@ -18,7 +18,8 @@ dropdownFontAlignment.choices = {
 dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 
-
+local divider = AC_UI.divider
+--[[
 local function divider()
 	return {
 		type = "divider",
@@ -27,7 +28,10 @@ local function divider()
 		alpha = 0.5,
 	}
 end
+--]]
 
+local description = AC_UI.description
+--[[
 local function description(textId, titleId)
 	return
 		{
@@ -37,6 +41,7 @@ local function description(textId, titleId)
 			width = "full", --or "half" (optional)
 		}
 end
+--]]
 
 
 AC_UI.AppearanceMenu = {

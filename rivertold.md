@@ -1,14 +1,8 @@
-rivertold
-Would it be possible to add Dressing Room 2018 integration for saved gear sets?
-
-There's this integration but it doesn't seem to work.
 ----
 atharti
 Having huge game freezes on opening containers, for example event boxes.
 Also freezing in AddOns menu provided by AutoCategory lag, as well as opening bag after looting new items. Microfreezeing on looting designs.
 And inventory jump issue.
-
-UPD: These lags most likely are caused by issues with GridList integration aswell.
 
 Also isitemid() rule doesnt seem to work, rule is not recognizing ids i get with context menu tool. Such as 203611, archive consumable.
 
@@ -45,3 +39,5 @@ Same problem when using this addon with Grid list addon.
 ----
 
 Could we please have an option to disable the "AC: ItemID" thingy on our rightclick menu?
+
+no

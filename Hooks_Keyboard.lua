@@ -577,7 +577,7 @@ local function prehookCraftSort(self)
 
 		-- add header rows
 		self.list.data = createNewScrollData(scrollData) --, self.sortFunction)
-		table.sort(self.list.data, self.sortFunction)
+		--table.sort(self.list.data, self.sortFunction) -- unneeded
 		ZO_ScrollList_Commit(self.list)
 	end
 	-- continue on to run follow-on hooks
@@ -586,9 +586,10 @@ end
 
 --prehook 
 local function onInventorySlotUpdated(evCode, bagId, slotIndex, isNewItem)
-	if not AutoCategory.Enabled then return true end
-	if isNewItem == false then return true end
-
+	if not AutoCategory.Enabled then return end
+	if isNewItem == false then return end
+	if bagId ~= AC_BAG_TYPE_BACKPACK and bagId ~= BAG_BACKPACK then return end
+	
 	-- mark the slot as needing rule re-evaluation
 	table.insert(forceRuleReloadByUniqueIDs, GetItemUniqueId(bagId, slotIndex))
 end

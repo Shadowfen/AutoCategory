@@ -51,7 +51,7 @@ AutoCategory.cache.bags_cvt.choicesTooltips = {
 
 -- -------------------------------------------------------
 
-local function divider()
+function AC_UI.divider()
 	return {
 		type = "divider",
 		width = "full", --or "half" (optional)
@@ -59,16 +59,18 @@ local function divider()
 		alpha = 0.5,
 	}
 end
+local divider = AC_UI.divider
 
-local function header(strId)
+function AC_UI.header(strId)
 	return {
 		type = "header",
 		name = strId,
 		width = "full",
 	}
 end
+local header = AC_UI.header
 
-local function description(textId, titleId)
+function AC_UI.description(textId, titleId)
 	return
 		{
 			type = "description",
@@ -77,6 +79,7 @@ local function description(textId, titleId)
 			width = "full", --or "half" (optional)
 		}
 end
+local description = AC_UI.description
 
 
 
@@ -1779,241 +1782,13 @@ function AutoCategory.AddonMenuInit()
 
         -- General Settings
 		AC_UI.GeneralMenu,
-        --[[
-		{
-            type = "submenu",
-            name = SI_AC_MENU_SUBMENU_GENERAL_SETTING,
-            reference = "AC_MENU_SUBMENU_GENERAL_SETTING",
-            controls = {
-
-                -- Show message when toggle
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE,
-                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP,
-                    getFunc = function() return AutoCategory.saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] end,
-                    setFunc = function(value) AutoCategory.saved.general["SHOW_MESSAGE_WHEN_TOGGLE"] = value end,
-                },
-
-                -- Show category item count
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT,
-                    tooltip =
-						SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_ITEM_COUNT_TOOLTIP,
-                    getFunc = function()
-						return AutoCategory.saved.general["SHOW_CATEGORY_ITEM_COUNT"]
-						end,
-                    setFunc = function(value)
-						AutoCategory.saved.general["SHOW_CATEGORY_ITEM_COUNT"] = value
-						end,
-                },
-
-                -- Show category collapse icon
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON,
-                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_COLLAPSE_ICON_TOOLTIP,
-                    getFunc = function()
-						return AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"]
-						end,
-                    setFunc = function(value)
-                    	AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] = value
-                    	AutoCategory.RefreshCurrentList(true)
-                    end,
-                },
-
-                -- Save category collapse status
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS,
-                    tooltip = SI_AC_MENU_GS_CHECKBOX_SAVE_CATEGORY_COLLAPSE_STATUS_TOOLTIP,
-                    getFunc = function() return AutoCategory.saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] end,
-                    setFunc = function(value) AutoCategory.saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] = value end,
-                    disabled = function() return AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
-                },
-
-                -- Show category "SET ()"
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
-                    tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
-                    getFunc = function() return AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] end,
-                    setFunc = function(value)
-						AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] = value
-						AutoCategory.ResetCollapse(AutoCategory.saved)
-					end,
-                },
-            }
-        }, 
-		--]]
 
         -- Appearance Settings
-		AC_UI.AppearanceMenu,
-		
-		--[[
-		{
-            type = "submenu",
-            name = SI_AC_MENU_SUBMENU_APPEARANCE_SETTING,
-            reference = "AC_SUBMENU_APPEARANCE_SETTING",
-            controls = {
-				description(SF.ColorText(L(SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP), SF.hex.mocassin)),
-                
-				divider(),
-
-                -- Category Text Font
-                {
-                    type = 'dropdown',
-                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT,
-                    choices = LMP:List('font'),
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_FONT_NAME"]
-                    end,
-                    setFunc = function(v)
-                        AutoCategory.saved.appearance["CATEGORY_FONT_NAME"] = v
-						AutoCategory.resetface()
-                    end,
-                    scrollable = 7,
-                },
-
-                -- Category Text Style
-                {
-                    type = 'dropdown',
-                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_STYLE,
-                    choices = dropdownFontStyle,
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_FONT_STYLE"]
-                    end,
-                    setFunc = function(v)
-                        AutoCategory.saved.appearance["CATEGORY_FONT_STYLE"] = v
-                    end,
-                    scrollable = 7,
-                },
-
-                -- Category Text Alignment
-                {
-                    type = 'dropdown',
-                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_ALIGNMENT,
-                    choices = dropdownFontAlignment.choices,
-                    choicesValues = dropdownFontAlignment.choicesValues,
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_FONT_ALIGNMENT"]
-                    end,
-                    setFunc = function(v)
-                        AutoCategory.saved.appearance["CATEGORY_FONT_ALIGNMENT"] = v
-                    end,
-                    scrollable = 7,
-                },
-
-                -- Category Text Font Size
-                {
-                    type = 'slider',
-                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE,
-                    min = 8,
-                    max = 32,
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_FONT_SIZE"]
-                    end,
-                    setFunc = function(v)
-                        AutoCategory.saved.appearance["CATEGORY_FONT_SIZE"] = v
-                    end,
-                },
-
-                -- Category Text Color
-                {
-                    type = 'colorpicker',
-                    name = SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR,
-                    getFunc = function()
-                        return unpack(AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"])
-                    end,
-                    setFunc = function(r, g, b, a)
-                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][1] = r
-                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][2] = g
-                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][3] = b
-                        AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"][4] = a
-                    end,
-                    widgetRightAlign		= true,
-                    widgetPositionAndResize	= -15,
-                },
-
-                -- Hidden Category Text Color
-                {
-                    type = 'colorpicker',
-                    name = SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR,
-                    getFunc = function()
-                        return unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
-                    end,
-                    setFunc = function(r, g, b, a)
-                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][1] = r
-                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][2] = g
-                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][3] = b
-                        AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"][4] = a
-                    end,
-                    widgetRightAlign		= true,
-                    widgetPositionAndResize	= -15,
-                },
-
-                -- Category Ungrouped Title EditBox
-                {
-                    type = "editbox",
-                    name = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE,
-                    tooltip = SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP,
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"]
-                    end,
-                    setFunc = function(value) AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] = value end,
-                    width = "full",
-                },
-
-                -- Category Header Height
-                {
-                    type = 'slider',
-                    name = SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT,
-                    min = 1,
-                    max = 100,
-                    requiresReload = true,
-                    getFunc = function()
-                        return AutoCategory.saved.appearance["CATEGORY_HEADER_HEIGHT"]
-                    end,
-                    setFunc = function(v)
-                        AutoCategory.saved.appearance["CATEGORY_HEADER_HEIGHT"] = v
-                    end,
-                    warning = SI_AC_WARNING_NEED_RELOAD_UI,
-                },
-            },
-        },
-		--]]
-		
+		AC_UI.AppearanceMenu,		
 
 		-- Gamepad settings
-		{
-            type = "submenu",
-            name = SI_AC_MENU_SUBMENU_GAMEPAD_SETTING,
-            reference = "AC_SUBMENU_GAMEPAD_SETTING",
-            controls = {
-				description(SF.ColorText(L(SI_AC_MENU_GMS_DESCRIPTION_TIP), SF.hex.mocassin)),
-                divider(),
+		AC_UI.GamepadMenu,
 
-                {
-                    type = "checkbox",
-                    name = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD,
-                    tooltip = SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD_TOOLTIP,
-                    requiresReload = true,
-                    getFunc = function() return AutoCategory.saved.general["ENABLE_GAMEPAD"] end,
-                    setFunc = function(value) AutoCategory.saved.general["ENABLE_GAMEPAD"] = value end,
-                },
-
-				{
-                    type = "checkbox",
-                    name = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES,
-                    tooltip = SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP,
-                    requiresReload = false,
-                    getFunc = function() return AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] end,
-                    setFunc = function(value) AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] = value end,
-					disabled = function() return AutoCategory.saved.general["ENABLE_GAMEPAD"] == false end,
-                },
-			},
-		},
 	}
     if not LAM then return end
 	LAM:RegisterAddonPanel("AC_CATEGORY_SETTINGS", panelData)
