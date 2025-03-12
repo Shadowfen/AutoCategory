@@ -588,7 +588,7 @@ end
 local function onInventorySlotUpdated(evCode, bagId, slotIndex, isNewItem)
 	if not AutoCategory.Enabled then return end
 	if isNewItem == false then return end
-	if bagId ~= AC_BAG_TYPE_BACKPACK and bagId ~= BAG_BACKPACK then return end
+	--if bagId ~= AC_BAG_TYPE_BACKPACK and bagId ~= BAG_BACKPACK then return end
 	
 	-- mark the slot as needing rule re-evaluation
 	table.insert(forceRuleReloadByUniqueIDs, GetItemUniqueId(bagId, slotIndex))

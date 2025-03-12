@@ -51,37 +51,9 @@ AutoCategory.cache.bags_cvt.choicesTooltips = {
 
 -- -------------------------------------------------------
 
-function AC_UI.divider()
-	return {
-		type = "divider",
-		width = "full", --or "half" (optional)
-		height = 10,
-		alpha = 0.5,
-	}
-end
 local divider = AC_UI.divider
-
-function AC_UI.header(strId)
-	return {
-		type = "header",
-		name = strId,
-		width = "full",
-	}
-end
 local header = AC_UI.header
-
-function AC_UI.description(textId, titleId)
-	return
-		{
-			type = "description",
-			text = textId, -- text or string id or function returning a string
-			title = titleId, -- or string id or function returning a string (optional)
-			width = "full", --or "half" (optional)
-		}
-end
 local description = AC_UI.description
-
-
 
 -- -------------------------------------------------------
 
@@ -92,20 +64,6 @@ local fieldData = {
 
 local currentRule = AutoCategory.CreateNewRule("","")
 local currentBagRule = nil
-
-
-local dropdownFontStyle	= {
-	'none', 'outline', 'thin-outline', 'thick-outline',
-	'shadow', 'soft-shadow-thin', 'soft-shadow-thick',
-}
-
-local dropdownFontAlignment = {}
-dropdownFontAlignment.choices = {
-	L(SI_AC_ALIGNMENT_LEFT),
-	L(SI_AC_ALIGNMENT_CENTER),
-	L(SI_AC_ALIGNMENT_RIGHT)
-}
-dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 
 -- This is not a "class"! It is more of a singleton instance.
@@ -169,7 +127,7 @@ AC_UI.CatSet_CopyCat_LAM = AC.BaseUI:New() 	-- button
 local CatSet_CopyCat_LAM = AC_UI.CatSet_CopyCat_LAM
 
 AC_UI.CatSet_DeleteCat_LAM = AC.BaseUI:New()	-- button
-local CatSet_DeleteCat_LAM = AC_UI.CatSet_DeleteCat_LAM
+--local CatSet_DeleteCat_LAM = AC_UI.CatSet_DeleteCat_LAM
 
 AC_UI.CatSet_NameEdit_LAM = AC.BaseUI:New("AC_EDITBOX_EDITRULE_NAME") -- editbox
 local CatSet_NameEdit_LAM = AC_UI.CatSet_NameEdit_LAM

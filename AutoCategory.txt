@@ -2,8 +2,8 @@
 ## APIVersion: 101046 101045
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 4.3.8
-## AddOnVersion: 116
+## Version: 4.3.10
+## AddOnVersion: 118
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
 ## DependsOn: LibAddonMenu-2.0>=36 LibCustomMenu LibSFUtils>=55 LibMediaProvider-1.0>=30 LibDebugLogger>=263
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker>=75 MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge
