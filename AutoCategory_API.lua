@@ -75,7 +75,7 @@ function AutoCategory.validateACBagRules(acBagType)
 			return
 		end
 
-		local isValid = true
+		--local isValid = true
 		if rule.rule == nil then
 			AutoCategory.RuleApi.setError(rule,true,"missing rule definition")
 			return
@@ -161,52 +161,41 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 
 	-- call the rules for this bag against the entry, stop when one matches
 	-- return values from pcall internal func
-	local suc = false
-	local ename = ""
-	local rcatname = "" 
-	local priority = 0
-	local shopri = 0
-	local bagtype_id = bag_type_id 
-	local ishidden = nil
-
-	local rs = pcall( function()
-		for i = 1, #bag.rules do
-			local entry = bag.rules[i]
-			shopri = entry.priority
-			priority = entry.priority
-			ishidden = entry.isHidden
-			ename = entry.name
-
-			if ename then
-				local rule = AutoCategory.GetRuleByName(ename)
-				if rule and checkValidRule(ename, rule) then
-					local ruleCode = AutoCategory.compiledRules[ename]
-					if ruleCode then
-						setfenv( ruleCode, AutoCategory.Environment )
-						AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
-						local res = ruleCode()
-						
-						--local exec_ok, res = pcall( ruleCode )
-						if res then
-							rcatname = adjustName(rule.name,
-													AutoCategory.AdditionCategoryName)
-							AutoCategory.SetCategoryCollapsed(bagtype_id, rcatname,
-								AutoCategory.IsCategoryCollapsed(bagtype_id, rcatname))
-							suc = true
-							return
-						--else
-						--	AutoCategory.RuleApi.setError(rule, true, "unknown error in rule "..entry.name)
-						--	AutoCategory.compiledRules[entry.name] = nil
+	local lenv = AutoCategory.Environment
+	local showpri = 0
+	for i = 1, #bag.rules do
+		local entry = bag.rules[i]
+		if entry.name then
+			local rule = AutoCategory.GetRuleByName(entry.name)
+			if rule and checkValidRule(entry.name, rule) then
+				showpri = entry.priority
+				local ruleCode = AutoCategory.compiledRules[entry.name]
+				if ruleCode then
+					setfenv( ruleCode, lenv )
+					AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
+					local exec_ok, res = pcall( ruleCode )
+					if exec_ok then
+						local catname = adjustName(rule.name,
+												AutoCategory.AdditionCategoryName)
+						AutoCategory.SetCategoryCollapsed(bag_type_id, catname,
+							AutoCategory.IsCategoryCollapsed(bag_type_id, catname))
+						if res == true then
+							return true, 
+								catname, 
+								entry.priority, 
+								showpri,
+								bag_type_id, 
+								entry.isHidden
 						end
+
+					else
+						AutoCategory.RuleApi.setError(rule, true, res)
+						AutoCategory.compiledRules[entry.name] = nil
 					end
 				end
 			end
 		end
-	end	-- end of anon function
-	)
-	if suc == true then
-		return true, rcatname, priority,shopri,bagtype_id,ishidden
 	end
 
-	return false, "", 0, 0, bagtype_id, false
+	return false, "", 0, 0, bag_type_id, false
 end 

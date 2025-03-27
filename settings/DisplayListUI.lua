@@ -85,3 +85,12 @@ function AC_UI.BagSet_DisplayCat_LAM:controlDef()
 		}
 
 end
+
+-- ----------------------------------------------------------
+
+function AC_UI.DisplayListInit()
+	aclogger = AutoCategory.logger
+
+end
+
+

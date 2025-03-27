@@ -88,6 +88,7 @@ end
 
 -- ------------------------ RulesW  -------------------------------
 -- not a class - just a structure with functions
+--[[
 AutoCategory.RulesW = {
 	ruleList= {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
 	ruleNames={},		-- [name] rule#
@@ -96,6 +97,7 @@ AutoCategory.RulesW = {
 	tags = {},		-- [#] tagname
 	tagGroups={},	-- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
 }
+--]]
 ac_rules = AutoCategory.RulesW
 
 -- Add a tag if it is not already in the list(s)
@@ -725,11 +727,6 @@ function AutoCategory.onPlayerActivated()
 
 	--capabilities with other (older) add-ons
 	IntegrateQuickMenu()
-
-	--if LibDebugLogger then
-	--	AutoCategory.logger = LibDebugLogger.Create("AutoCategory")
-	--	AutoCategory.logger:SetEnabled(true)
-	--end
 
 	AutoCategory.meta = SF.safeTable(AutoCategory.meta)
 	SF.addonMeta(AutoCategory.meta,"AutoCategory")

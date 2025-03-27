@@ -1,12 +1,4 @@
 ----
-atharti
-Having huge game freezes on opening containers, for example event boxes.
-Also freezing in AddOns menu provided by AutoCategory lag, as well as opening bag after looting new items. Microfreezeing on looting designs.
-And inventory jump issue.
-
-Also isitemid() rule doesnt seem to work, rule is not recognizing ids i get with context menu tool. Such as 203611, archive consumable.
-
-----
 numpy
 I was trying to set up a filter for Companion Gear my wife's EU account on her computer. I had set it up on her NA a while back, and was finally getting around to doing the other server. I had it set up on my accounts on my computer(including the PTS), but none of hers.
 
@@ -33,11 +25,8 @@ Hi ! I have i little bug when I want take or put an item in banks. If the item i
 
 Thank you for your job !
 Sorry but I do not understand your problem report. Please clarify.
+
 Yes sorry, I don't really know how to explain it. When I am on my bank. If I want take 1 item in a category which is very low (for exemple 100) the scroll bar go everytime to the middle of my inventory.
 1 other player in my guild has the same bug.
 Same problem when using this addon with Grid list addon.
 ----
-
-Could we please have an option to disable the "AC: ItemID" thingy on our rightclick menu?
-
-no

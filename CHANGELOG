@@ -1,3 +1,12 @@
+[COLOR="DeepSkyBlue"]4.3.11 (119)[/COLOR]:
+[LIST]
+[*] Added in the Russian translations for the previously hardcoded strings thanks to VChet!
+[*] Moved the hardcoded "Select Existing Category:" and "Create/Copy a new Category:" from "Bag Settings" into the language strings so that they can be translated in other languages.
+[*] Changed the isitemid() function to use the same ZOS api function as the "AC: Get Item Id" menu function so that the itemIds returned should match.
+[*] Revert most rule evaluation speedup changes since noone indicated that they made a difference.
+[*] Revsed code organization for the user interface portion of the code. [B]This should not affect users at all[/B], just make the code easier to work with for me.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.10 (118)[/COLOR]:
 [LIST]
 [*] Fixed list updating for non-Backpack bags that got turned off while experimenting with speedups.

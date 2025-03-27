@@ -9,7 +9,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = "4.3.10",
+    version = "4.3.11",
     settingName = "AutoCategory",
     settingDisplayName = "AutoCategory - Revised",
     author = "Shadowfen, crafty35, RockingDice, Friday_the13_rus",
@@ -24,6 +24,16 @@ AutoCategory.Inited = false -- provided for the API so that external users can t
 AutoCategory.Enabled = true -- flag to tell if AutoCategory is turned on or off
 
 AC_UI = {}
+
+AutoCategory.RulesW = {
+	ruleList= {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+	ruleNames={},		-- [name] rule#
+	compiled = AutoCategory.compiledRules,	-- [name] function
+
+	tags = {},		-- [#] tagname
+	tagGroups={},	-- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
+}
+
 
 -- load in localization strings
 SF.LoadLanguage(AutoCategory_localization_strings, "en")

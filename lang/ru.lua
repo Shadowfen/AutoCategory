@@ -77,6 +77,8 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_CS_DROPDOWN_TAG = "Тег",
     SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP = "Тег позволяет группировать категории.",
     SI_AC_MENU_CS_DROPDOWN_CATEGORY = "Категория",
+    SI_AC_MENU_CS_CATEGORY_DESC = "Выберите существующую категорию:",
+    SI_AC_MENU_CS_CREATENEW_DESC = "Создайте/скопируйте новую категорию:",
 
     SI_AC_MENU_HEADER_EDIT_CATEGORY = "Изменить категорию",
     SI_AC_MENU_EC_BUTTON_PREDEFINED = "|cFF0000Предустановлено. Только для чтения|r",
@@ -110,6 +112,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT_SIZE = "Размер шрифта категории",
     SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_COLOR = "Цвет текста категории",
     SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR = "Цвет текста скрытой категории",
+    SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR_TT = "Названия скрытых категорий будут отображаться в вашем инвентаре с использованием этого цвета, но не будут отображать предметы, которые к ним относятся.",
     SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE = "Название категории без группы",
     SI_AC_MENU_EC_EDITBOX_CATEGORY_UNGROUPED_TITLE_TOOLTIP = "Предметы, не попавшие ни в одну категорию, будут добавлены в эту категорию.",
     SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT = "Высота заголовка категории",

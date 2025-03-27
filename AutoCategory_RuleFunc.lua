@@ -522,7 +522,11 @@ function AutoCategory.RuleFunc.isItemId(...)
 		error( string.format("error: %s(): require arguments." , fn))
 	end
 	
-	local chkId = GetItemLinkItemId(AutoCategory.checkingItemLink)
+	--local chkId = GetItemLinkItemId(AutoCategory.checkingItemLink)
+	local chkId = GetItemId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	--if chkId ~= itemId then
+	--	error("ZOS error: GetItemId and GetItemLinkItemId are returning different values for the same item.")
+	--end
 	for ax = 1, ac do
 		
 		local arg = select( ax, ... )

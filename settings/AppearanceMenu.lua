@@ -19,29 +19,8 @@ dropdownFontAlignment.choicesValues = {0, 1, 2}
 
 
 local divider = AC_UI.divider
---[[
-local function divider()
-	return {
-		type = "divider",
-		width = "full", --or "half" (optional)
-		height = 10,
-		alpha = 0.5,
-	}
-end
---]]
-
 local description = AC_UI.description
---[[
-local function description(textId, titleId)
-	return
-		{
-			type = "description",
-			text = textId, -- text or string id or function returning a string
-			title = titleId, -- or string id or function returning a string (optional)
-			width = "full", --or "half" (optional)
-		}
-end
---]]
+
 
 
 AC_UI.AppearanceMenu = {
@@ -132,6 +111,7 @@ AC_UI.AppearanceMenu = {
         {
             type = 'colorpicker',
             name = SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR,
+            tooltip = SI_AC_MENU_EC_DROPDOWN_HIDDEN_CATEGORY_TEXT_COLOR_TT,
             getFunc = function()
                 return unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
             end,

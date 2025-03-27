@@ -2,6 +2,8 @@
 local AC = AutoCategory
 local SF = LibSFUtils
 
+local aclogger
+
 AC_UI.BagSet_OrderCat_LAM = AC.BaseUI:New()
 
 -- customization of BaseUI for BagSet_OrderCat_LAM Button
@@ -60,5 +62,12 @@ function AC_UI.BagSet_OrderCat_LAM:controlDef()
 			--default = defaults.var, -- default value or function that returns the default value (optional)
 			reference = "BagSet_OrderCat_LAM" -- function returning String, or String unique global reference to control (optional)
 		}
+
+end
+
+-- ----------------------------------------------------------
+
+function AC_UI.OrderListInit()
+	aclogger = AutoCategory.logger
 
 end
