@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.3.12 (120)[/COLOR]:
+[LIST]
+[*] Fixed error seen while trying to add a New category.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.11 (119)[/COLOR]:
 [LIST]
 [*] Added in the Russian translations for the previously hardcoded strings thanks to VChet!
