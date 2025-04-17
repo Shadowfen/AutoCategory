@@ -24,23 +24,45 @@ AC_UI.BagSet_DisplayCat_LAM.dsplistEntries = {
 -- ----------------------------------------------------------
 function AC_UI.BagSet_DisplayCat_LAM:loadList()
 
-	self.dsplistEntries = {}
-	local dsplistEntries = self.dsplistEntries
 	local bagId = AC_UI.BagSet_SelectBag_LAM:getValue()
-	local u = 1
-	local tentry = {}
-	local tbl = {}
-	for i, v in pairs(AutoCategory.cache.entriesByBag[bagId].choicesValues) do
-		tentry = { 
-			value = tostring(v), 
-			text = tostring(v), 
-			uniqueKey = i,
-		}
-		table.insert(tbl, tentry )
-		u = u + 1
+	AutoCategory.acctSaved.displayName = SF.safeTable(AutoCategory.acctSaved.displayName)
+	AutoCategory.charSaved.displayName = SF.safeTable(AutoCategory.charSaved.displayName)
+	AutoCategory.saved.displayName = SF.safeTable(AutoCategory.saved.displayName)
+	if next(AutoCategory.saved.displayName) then
+		self.dsplistEntries = SF.safeTable(AutoCategory.saved.displayOrder[bagId])
+	else
+		self.dsplistEntries = {}
+		local u = 1
+		local tentry = {}
+		local nentry = {}
+		local tbl = {}
+		local ntbl = {}
+		for i, v in pairs(AutoCategory.cache.entriesByBag[bagId].choicesValues) do
+			tentry = { 
+				value = tostring(v), 
+				text = tostring(v), 
+				uniqueKey = u,
+			}
+			table.insert(tbl, tentry )
+			nentry = {
+				uniqueKey = u,
+				showpri = #tbl,
+			}
+			ntbl[tostring(v)] = nentry
+			u = u + 1
+		end
+		self.dsplistEntries = tbl
+		if AutoCategory.charSaved.accountWide then
+			AutoCategory.acctSaved.displayOrder[bagId] = self.dsplistEntries
+			AutoCategory.acctSaved.displayName[bagId] = ntbl
+		else
+			AutoCategory.charSaved.displayOrder[bagId] = self.dsplistEntries
+			AutoCategory.charSaved.displayName[bagId] = ntbl
+		end
+		AutoCategory.saved.displayOrder[bagId] = self.dsplistEntries
+		AutoCategory.saved.displayName[bagId] = ntbl
 	end
-	self.dsplistEntries = tbl
-	return tbl
+	return self.dsplistEntries
 end
 
 function AC_UI.BagSet_DisplayCat_LAM:controlDef()

@@ -181,6 +181,7 @@ end
 -- for sorting rules by tag and name
 -- returns true if the a should come before b
 -- unused
+--[[
 local function RuleDataSortingFunction(a, b)
     local result = false
     if a.tag ~= b.tag then
@@ -193,6 +194,7 @@ local function RuleDataSortingFunction(a, b)
 
     return result
 end
+--]]
 
 -- for sorting bagged rules by priority and name
 -- returns true if the a should come before b
@@ -216,8 +218,14 @@ function AutoCategory.UpdateCurrentSavedVars()
     AutoCategory.saved.general = AutoCategory.acctSaved.general
     AutoCategory.saved.appearance = AutoCategory.acctSaved.appearance
 
+	--AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
+	AutoCategory.acctSaved.displayOrder = nil
+	AutoCategory.acctSaved.displayName = nil
+
 	AutoCategory.charSaved.general = nil	-- fix old data corruption error
 	AutoCategory.charSaved.appearance = nil	-- fix old data corruption error
+	AutoCategory.charSaved.displayOrder = nil
+	AutoCategory.charSaved.displayName = nil
 
 	-- rule definitions are always account-wide
 	-- AutoCategory.acctRules only has user-defined rules
@@ -231,10 +239,12 @@ function AutoCategory.UpdateCurrentSavedVars()
     if not AutoCategory.charSaved.accountWide then
         AutoCategory.saved.bags = AutoCategory.charSaved.bags
         AutoCategory.saved.collapses = AutoCategory.charSaved.collapses
+        --AutoCategory.saved.displayOrder = AutoCategory.charSaved.displayOrder
 
     else
         AutoCategory.saved.bags = AutoCategory.acctSaved.bags
         AutoCategory.saved.collapses = AutoCategory.acctSaved.collapses
+        --AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
     end
 	if AutoCategory.saved.bags[7] then AutoCategory.saved.bags[7] = nil end -- fix old data corruption
 
@@ -247,7 +257,7 @@ end
 function AutoCategory.LoadCollapse()
     if not AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
-        AutoCategory.ResetCollapse(AutoCategory.saved)
+        return AutoCategory.ResetCollapse(AutoCategory.saved)
     end
 end
 
@@ -308,6 +318,9 @@ function AutoCategory.ResetToDefaults()
 	AutoCategory.charSaved.accountWide = AutoCategory.defaultSettings.accountWide
 end
 
+-- create local alias for references in this file
+local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
+
 -- rename a rule, updates the cache lookups and bagsets too
 function AutoCategory.renameRule(oldName, newName)
 	if oldName == newName then return oldname end
@@ -357,7 +370,6 @@ function AutoCategory.cacheRuleInitialize()
 
 	-- refill the rules-based lookups
 	local ruletbl = ac_rules.ruleList
-    --table.sort(ruletbl, RuleDataSortingFunction ) -- sort by tag and name
     for ndx = 1, #ruletbl do
 		-- add rule to ac_rules.ruleNames lookup
         local rule = ruletbl[ndx]
@@ -570,7 +582,7 @@ local function addTableRules(tbl, tblname, ispredef)
 	local function addUserRule(stbl, rule)
 		-- add to acctRules list
 		if stbl.rules ~= AutoCategory.acctRules.rules then
-			AutoCategory.ARW:addRule(rule)
+			return AutoCategory.ARW:addRule(rule)
 		end
 	end
 
@@ -806,7 +818,7 @@ local inven_data = {
 	},
 }
 
-local function RefreshList(inventoryType, even_if_hidden)
+local function refreshList(inventoryType, even_if_hidden)
 	if even_if_hidden == nil then even_if_hidden = false end
 
 	if not inventoryType or not inven_data[inventoryType] then return end
@@ -835,20 +847,21 @@ local function RefreshList(inventoryType, even_if_hidden)
 end
 
 -- make accessible
-AutoCategory.RefreshList = RefreshList
+AutoCategory.RefreshList = refreshList
 
 function AutoCategory.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
 
-	RefreshList(INVENTORY_BACKPACK, even_if_hidden)
-	RefreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
-	RefreshList(INVENTORY_GUILD_BANK, even_if_hidden)
-	RefreshList(INVENTORY_HOUSE_BANK, even_if_hidden)
-	RefreshList(INVENTORY_BANK, even_if_hidden)
-	RefreshList(AC_DECON, even_if_hidden)
-	RefreshList(AC_IMPROV, even_if_hidden)
-	RefreshList(UV_DECON, even_if_hidden)
+	refreshList(INVENTORY_BACKPACK, even_if_hidden)
+	refreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
+	refreshList(INVENTORY_GUILD_BANK, even_if_hidden)
+	refreshList(INVENTORY_HOUSE_BANK, even_if_hidden)
+	refreshList(INVENTORY_BANK, even_if_hidden)
+	refreshList(AC_DECON, even_if_hidden)
+	refreshList(AC_IMPROV, even_if_hidden)
+	refreshList(UV_DECON, even_if_hidden)
 end
+-- create local alias for references within this file
 
 -- -----------------------------------------------
 -- used only for AC_ItemRowHeader functions
@@ -901,7 +914,7 @@ function AC_ItemRowHeader_OnMouseClicked(header)
     local bagTypeId = getBagTypeId(header)
 
     local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
-    AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, not collapsed)
+    setCategoryCollapsed(bagTypeId, cateName, not collapsed)
     AutoCategory.RefreshCurrentList()
 end
 
@@ -918,7 +931,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
         AddMenuItem(
             L(SI_CONTEXT_MENU_EXPAND),
             function()
-                AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, false)
+                setCategoryCollapsed(bagTypeId, cateName, false)
                 AutoCategory.RefreshCurrentList()
             end
         )
@@ -927,7 +940,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
         AddMenuItem(
             L(SI_CONTEXT_MENU_COLLAPSE),
             function()
-                AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, true)
+                setCategoryCollapsed(bagTypeId, cateName, true)
                 AutoCategory.RefreshCurrentList()
             end
         )
@@ -938,7 +951,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
         L(SI_CONTEXT_MENU_EXPAND_ALL),
         function()
             for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
-				AutoCategory.SetCategoryCollapsed(bagTypeId,k,false)
+				setCategoryCollapsed(bagTypeId,k,false)
             end
             AutoCategory.RefreshCurrentList()
         end
@@ -949,9 +962,9 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
         L(SI_CONTEXT_MENU_COLLAPSE_ALL),
         function()
             for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
-				AutoCategory.SetCategoryCollapsed(bagTypeId,k,true)
+				setCategoryCollapsed(bagTypeId,k,true)
             end
-			AutoCategory.SetCategoryCollapsed(bagTypeId,AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"],true)
+			setCategoryCollapsed(bagTypeId,AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"],true)
             AutoCategory.RefreshCurrentList()
         end
     )
@@ -972,52 +985,3 @@ function AC_Binding_ToggleCategorize()
     end
     AutoCategory.RefreshCurrentList()
 end
-
---[[
-The following functions replicated from ZOS esoui/ingame/fence/keyboard/fence_keyboard.lua are
-needed to correct an error in the the original code so that the Launder window works with
-AutoCategory category header lines.
---]]
-function ZO_Fence_Keyboard:OnEnterLaunder(totalLaunders, laundersUsed)
-    self.mode = ZO_MODE_STORE_LAUNDER
-    ZO_PlayerInventoryInfoBarAltFreeSlots:SetHidden(false)
-    ZO_PlayerInventoryInfoBarAltMoney:SetHidden(true)
-    self:UpdateTransactionLabel(totalLaunders, laundersUsed, SI_FENCE_LAUNDER_LIMIT, SI_FENCE_LAUNDER_LIMIT_REACHED)
-
-	-- modified to prevent nil access attempts
-    local function ColorCost(control, data, scrollList)
-        local priceControl = control:GetNamedChild("SellPrice")
-		-- modification: do something intelligent if we could not find the named child
-		if not priceControl then 
-			-- this row is not a standard item row entry
-			-- fall back to default callback behaviour
-			local dataEntry = control.dataEntry
-			if not data or data == dataEntry.data then
-				local dataTypeInfo = GetDataTypeInfo(self, dataEntry.typeId)
-				if dataTypeInfo.setupCallback then
-					dataTypeInfo.setupCallback(control, dataEntry.data, self)
-				end
-			end
-
-			return
-		end
-		-- end modification
-        ZO_CurrencyControl_SetCurrencyData(priceControl, CURT_MONEY, data.stackLaunderPrice, CURRENCY_SHOW_ALL, (GetCurrencyAmount(CURT_MONEY, CURRENCY_LOCATION_CHARACTER) < data.stackLaunderPrice))
-        ZO_CurrencyControl_SetCurrency(priceControl, ZO_KEYBOARD_CURRENCY_OPTIONS)
-    end
-
-    PLAYER_INVENTORY:RefreshBackpackWithFenceData(ColorCost)
-    ZO_PlayerInventorySortByPriceName:SetText(GetString(SI_LAUNDER_SORT_TYPE_COST))
-    self:RefreshFooter()
-end
-
-function ZO_Fence_Manager:OnEnterLaunder()
-    self:FireCallbacks("FenceEnterLaunder", self.totalLaunders, self.laundersUsed)
-end
-
-FENCE_KEYBOARD.OnEnterLaunder = ZO_Fence_Keyboard.OnEnterLaunder
-FENCE_MANAGER:RegisterCallback("FenceEnterLaunder", function(totalLaunders, laundersUsed) 
-	FENCE_KEYBOARD:OnEnterLaunder(totalLaunders, laundersUsed) 
-	end)
-
---[[ End of replicated/modified fence_keyboard.lua code from ZOS]]

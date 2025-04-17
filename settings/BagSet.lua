@@ -57,12 +57,6 @@ AC_UI.BagSet_EditCat_LAM = BagSet_EditCat_LAM
 
 -- local to this screen
 local bagSet_RemoveCat_LAM = AC.BaseUI:New()	-- button
---AC_UI.BagSet_RemoveCat_LAM = bagSet_RemoveCat_LAM
-
--- AC_UI.BagSet_OrderCat_LAM is defined in OrderListUI.lua
---local BagSet_OrderCat_LAM = AC_UI.BagSet_OrderCat_LAM
--- AC_UI.BagSet_DisplayCat_LAM is defined in DisplayListUI.lua
---local BagSet_DisplayCat_LAM = AC_UI.BagSet_DisplayCat_LAM
 
 local AddCat_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_TAG")	-- only uses choices
 AC_UI.AddCat_SelectTag_LAM = AddCat_SelectTag_LAM
@@ -96,11 +90,9 @@ AC_UI.BagSet = {}
 local currentBagRule = nil
 local function CatSet_DisplayRule(rule)
 	AC_UI.CatSet_SelectTag_LAM:refresh()
-	--AC_UI.CatSet_SelectTag_LAM:setValue(rule.tag)
 
 	AC_UI.CatSet_SelectRule_LAM:refresh()
 	AC_UI.CatSet.setRule(rule)		-- sets tag and name
-	--AC_UI.CatSet_SelectRule_LAM:setValue(rule.name)
 	AC_UI.CatSet_SelectRule_LAM:updateControl()
 
 	currentRule = rule

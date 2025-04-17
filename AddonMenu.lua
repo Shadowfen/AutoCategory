@@ -4,11 +4,11 @@ local LMP = LibMediaProvider
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local L = GetString
+--local L = GetString
 
-local CVT = AutoCategory.CVT
-local aclogger = AutoCategory.logger
-local RuleApi = AutoCategory.RuleApi
+--local CVT = AutoCategory.CVT
+local aclogger
+--local RuleApi = AutoCategory.RuleApi
 --local ARW = AutoCategory.ARW
 --local RulesW = AutoCategory.RulesW
 
@@ -28,10 +28,7 @@ local divider = AC_UI.divider
 --local currentRule = AutoCategory.CreateNewRule("","")
 
 
---local BagSet_SelectBag_LAM = AC_UI.BagSet_SelectBag_LAM
---local BagSet_SelectRule_LAM = AC_UI.BagSet_SelectRule_LAM
 local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
---local AddCat_SelectRule_LAM = AC_UI.AddCat_SelectRule_LAM
 
 local warningDuplicatedName = AC_UI.warningDuplicatedName
 
@@ -52,12 +49,12 @@ function AC_UI.RefreshDropdownData()
 end
 
 -- updates the LAM cvt lists from our BaseDD objects
-local RCpending = false
+local RCPending = false
 function AC_UI.RefreshControls()
-	local waittime = 500
+	local waitTime = 500
 	if RCPending then return end
 
-	RCpending = true
+	RCPending = true
 
 	zo_callLater(function()
 		auBagSet.updateControls()

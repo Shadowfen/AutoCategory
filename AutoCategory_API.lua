@@ -159,6 +159,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		return  false, "", 0, 0, nil, nil
 	end
 
+	--local dispName = SF.safeTable(AutoCategory.saved.displayName[bag_type_id])
+	--AutoCategory.saved.displayName[bag_type_id] = dispName
 	-- call the rules for this bag against the entry, stop when one matches
 	-- return values from pcall internal func
 	local lenv = AutoCategory.Environment
@@ -168,7 +170,13 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		if entry.name then
 			local rule = AutoCategory.GetRuleByName(entry.name)
 			if rule and checkValidRule(entry.name, rule) then
-				showpri = entry.priority
+				--AutoCategory.saved.displayName[bag_type_id] = SF.safeTable(AutoCategory.saved.displayName[bag_type_id])
+				--if dispName[entry.name] then
+				--	showpri = 999-dispName[entry.name].showpri
+				--else
+					showpri = entry.priority
+					--dispName[entry.name].showpri = showpri
+				--end
 				local ruleCode = AutoCategory.compiledRules[entry.name]
 				if ruleCode then
 					setfenv( ruleCode, lenv )

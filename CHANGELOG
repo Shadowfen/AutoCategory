@@ -1,3 +1,11 @@
+[COLOR="DeepSkyBlue"]4.3.13 (121)[/COLOR]:
+[LIST]
+[*] Fixed variable name typo that was causing the refresh controls to run multiple times without a wait or a block while already running. Made other miscellaneous optimizations.
+[*] Fixed inventory position jumping problem some people see.
+[*] Moved overridden (fixed) ZOS code to a separate source file for obviousness's sake.
+[*] Some code cleanup.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.12 (120)[/COLOR]:
 [LIST]
 [*] Fixed error seen while trying to add a New category.

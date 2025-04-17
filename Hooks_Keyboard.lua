@@ -139,15 +139,18 @@ local function getHeaderFace()
 	end
 	local appearance = AutoCategory.acctSaved.appearance
 	AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
-	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	AutoCategory.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
-	return header_face
+	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
+	--AutoCategory.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
+	--return header_face
 end
 
 -- setup function for category header type to be added to the scroll list
 local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
+	--aliases
+	local acctSaved = AutoCategory.acctSaved
+	local saved = AutoCategory.saved
 	--set header
-	local appearance = AutoCategory.acctSaved.appearance
+	local appearance = acctSaved.appearance
 	local headerLabel = rowControl:GetNamedChild("HeaderName")
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
 	headerLabel:SetFont(string.format('%s|%d|%s',
@@ -157,7 +160,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 
 	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
 	local data = slot.dataEntry.data
-	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"])
+	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, saved.appearance["CATEGORY_OTHER_TEXT"])
 	local cateName = data.AC_categoryName
 	data.AC_bagTypeId = SF.nilDefault(data.AC_bagTypeId, 1)
 	local bagTypeId = data.AC_bagTypeId
@@ -173,8 +176,8 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
 
-	elseif AutoCategory.saved.bags[bagTypeId].isUngroupedHidden and
-			cateName == AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"] then
+	elseif saved.bags[bagTypeId].isUngroupedHidden and
+			cateName == saved.appearance["CATEGORY_OTHER_TEXT"] then
 		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 	end
 	headerLabel:SetColor(appearance[headerColor][1],
@@ -183,7 +186,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 						 appearance[headerColor][4])
 
 	-- Add count to category name if selected in options
-    if AutoCategory.acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
+    if acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
         headerLabel:SetColor(
 			appearance[headerColor][1],
@@ -198,7 +201,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	-- set the collapse marker
 	local marker = rowControl:GetNamedChild("CollapseMarker")
 	local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
-	if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
+	if acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
 		marker:SetHidden(false)
 		if collapsed then
 			-- is collapsed, so (+)
@@ -214,8 +217,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 		marker:SetHidden(true)
 	end
 
-	rowControl:SetHeight(
-		AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
+	rowControl:SetHeight(acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
 	rowControl.slot = slot
 end
 
@@ -231,7 +233,7 @@ local function AddTypeToList(rowHeight, datalist, inven_ndx, headerType)
 	if inven_ndx then
 		hiddenCB = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
 	end
-	ZO_ScrollList_AddDataType(datalist, headerType, templateName, 
+	return ZO_ScrollList_AddDataType(datalist, headerType, templateName, 
 	    rowHeight, setupFunc, hiddenCB, nil, resetCB)
 end
 
@@ -240,14 +242,14 @@ end
 local function createHeaderEntry(catInfo)
 	if not catInfo then return {} end
 
-	local headerEntry = ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, { 
+	return ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, { 
 			AC_categoryName = catInfo.AC_categoryName,
 			AC_sortPriorityName = catInfo.AC_sortPriorityName,
 			AC_bagTypeId = catInfo.AC_bagTypeId,
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
 			stackLaunderPrice = 0})
-	return headerEntry
+	--return headerEntry
 end
 -- ---------------------------------------------------
 
@@ -277,31 +279,85 @@ local function isCollapsed(itemEntry)
 	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
 end
 
+-- Note that an item will always match either a defined rule or "OTHER" (when it does not match a defined rule)
+-- so every itemEntry will "match" something as long as it is not a header item itself
 local function runRulesOnEntry(itemEntry, specialType)
 	--only match on items(not headers)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
 
+	-- look for a match against rule definitions
 	local data = itemEntry.data
-	local bagId = data.bagId
-	local slotIndex = data.slotIndex
+	local function matchRules(data)
+		local bagId = data.bagId
+		local slotIndex = data.slotIndex
 
-	local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
-				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
-	data.AC_matched = matched
-	data.AC_bagTypeId = bagTypeId
-	data.AC_isHeader = false
+		local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
+					= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
+		data.AC_matched = matched
+		data.AC_bagTypeId = bagTypeId
+		data.AC_isHeader = false
+		data.AC_categoryPriority = categoryPriority
 
-	if matched then
-		data.AC_categoryName = categoryName
-		data.AC_sortPriorityName = string.format("%04d%s", 1000 - categoryPriority , categoryName)
-		data.AC_isHidden = isHidden
+		if matched then
+			data.AC_categoryName = categoryName
+			data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , categoryName)
+			data.AC_isHidden = isHidden
 
-	else
-		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
-		data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
-		-- if was not matched, then the isHidden value that was returned is not valid
-		data.AC_isHidden = isUngroupedHidden(bagTypeId)
+		else
+			data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+			data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
+			-- if was not matched, then the isHidden value that was returned is not valid
+			data.AC_isHidden = isUngroupedHidden(bagTypeId)
+		end
 	end
+	return matchRules(data)
+end
+
+local function reorderDisplayCats(itemEntry, specialType)
+	--only match on items(not headers)
+	if itemEntry.typeId == CATEGORY_HEADER then return end
+
+	-- look for a match against rule definitions
+	local data = itemEntry.data
+	local function lookupShowPri(data)
+		local bagId = data.bagId
+		--local slotIndex = data.slotIndex
+
+		local dispName = SF.safeTable(AutoCategory.saved.displayName[bagId])
+		if not next(dispName) then
+			--d(data.AC_categoryName)
+			if data.AC_categoryPriority then 
+				--d("AC_categoryPriority="..data.AC_categoryPriority)
+				local showPriority = data.AC_categoryPriority
+				data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , data.AC_categoryName)
+			else
+				local showPriority = 0
+				data.AC_sortPriorityName = string.format("%04d%s", 9999-showPriority , data.AC_categoryName)
+			end
+		else
+			if data.AC_matched then
+				--d("AC_categoryName="..data.AC_categoryName)
+				local t,u = string.find(data.AC_categoryName, "%s%(")
+				local catname = data.AC_categoryName
+				if t ~= nil then
+					--d("finding start")
+					catname = string.sub(data.AC_categoryName,1, t-1)
+				end
+				--d("catname="..catname)
+				if not dispName[catname] then
+					data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
+					else
+					--d(dispName[catname].showpri)
+					local showPriority = 1000 - dispName[catname].showpri
+					data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , data.AC_categoryName)
+				end
+
+			else
+				data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
+			end
+		end	
+	end
+	return lookupShowPri(data)
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
@@ -362,10 +418,9 @@ local function constructEntryHash(itemEntry)
 			end
 		end
 	end
-	local newEntryHash = buildHashString(
-					data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
-					data.meetsUsageRequirement, data.locked, data.isJunk, hashFCOIS)
-	return newEntryHash
+	return buildHashString(data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, 
+			data.isInArmory, data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex,
+			data.meetsUsageRequirement, data.locked, data.isJunk, hashFCOIS)
 end
 
 local function detectItemChanges(itemEntry, newEntryHash, needReload)
@@ -433,6 +488,8 @@ local function handleRules(scrollData, needsReload, specialType)
 				updateCount = updateCount + 1
 				runRulesOnEntry(itemEntry, specialType)
 			end
+			--reorderDisplayCats(itemEntry,specialType)
+			--d("sortPriorityName="..itemEntry.data.AC_sortPriorityName)
 		end
 	end
 	forceRuleReloadByUniqueIDs = {} --- reset update buffer
@@ -440,7 +497,7 @@ local function handleRules(scrollData, needsReload, specialType)
 end
 
 --- Create list with visible items and headers (performs category count).
-local function createNewScrollData(scrollData) --, sortfn)
+local function createNewScrollData(scrollData)
 	local newScrollData = {} --- output, entries sorted with category headers
 
 	-- --------------------
@@ -460,7 +517,7 @@ local function createNewScrollData(scrollData) --, sortfn)
 	end
 	-- --------------------
 	-- create newScrollData with headers and only non hidden items. No sorting here!
-	for k, itemEntry in ipairs(scrollData) do 
+	for _, itemEntry in ipairs(scrollData) do 
 		-- add visible non-header rows to the new scrollData table
 		if not isHiddenEntry(itemEntry) then
 			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
@@ -555,7 +612,6 @@ local function prehookSort(self, inventoryType)
 	if scrollData then
 		handleRules(scrollData, needsReload) --> update rules' results if necessary
 		list.data = createNewScrollData(scrollData) --, zo_inventory.sortFn) 
-		ZO_ScrollList_Commit(list)
 	end
 	return false
 end
@@ -578,7 +634,6 @@ local function prehookCraftSort(self)
 		-- add header rows
 		self.list.data = createNewScrollData(scrollData) --, self.sortFunction)
 		--table.sort(self.list.data, self.sortFunction) -- unneeded
-		ZO_ScrollList_Commit(self.list)
 	end
 	-- continue on to run follow-on hooks
 	return false
