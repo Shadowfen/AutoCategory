@@ -1,3 +1,9 @@
+[COLOR="DeepSkyBlue"]4.3.14 (122)[/COLOR]:
+[LIST]
+[*] Update minimum version requirement for LibAddonMenu to 38
+[*] Update LibCharacterKnowledge Plugin to take advantage of the added knowledge about scribing items. This change allows the CK_IsKnownCat( ... ) to accept "scribing" as a category as well.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.3.13 (121)[/COLOR]:
 [LIST]
 [*] Fixed variable name typo that was causing the refresh controls to run multiple times without a wait or a block while already running. Made other miscellaneous optimizations.
