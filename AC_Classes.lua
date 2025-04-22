@@ -739,10 +739,12 @@ AutoCategory.RuleApi = {
 			if rule == nil or rule.name == nil or rule.name == "" then
 				return
 			end
-			AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
+			--AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
+			local compiledRules = AutoCategory.compiledRules
 
 			AutoCategory.RuleApi.clearError(rule)
-			AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = nil
+			local rkey = AutoCategory.RuleApi.key(rule)
+			compiledRules[rkey] = nil
 
 			if rule.rule == nil or rule.rule == "" then
 				AutoCategory.RuleApi.setError(rule, true,"Missing rule definition")
@@ -753,10 +755,10 @@ AutoCategory.RuleApi = {
 			local compiledfunc, err = zo_loadstring(rulestr)
 			if not compiledfunc then
 				AutoCategory.RuleApi.setError(rule, true, err)
-				AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = nil
+				compiledRules[rkey] = nil
 				return err
 			end
-			AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)] = compiledfunc
+			compiledRules[rkey] = compiledfunc
 			return ""
 		end,
 	

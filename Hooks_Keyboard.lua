@@ -160,7 +160,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 
 	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
 	local data = slot.dataEntry.data
-	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, saved.appearance["CATEGORY_OTHER_TEXT"])
+	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, appearance["CATEGORY_OTHER_TEXT"])
 	local cateName = data.AC_categoryName
 	data.AC_bagTypeId = SF.nilDefault(data.AC_bagTypeId, 1)
 	local bagTypeId = data.AC_bagTypeId
@@ -180,19 +180,16 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			cateName == saved.appearance["CATEGORY_OTHER_TEXT"] then
 		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 	end
-	headerLabel:SetColor(appearance[headerColor][1],
-						 appearance[headerColor][2],
-						 appearance[headerColor][3],
-						 appearance[headerColor][4])
+	local r,g,b,a = appearance[headerColor][1],
+					appearance[headerColor][2],
+					appearance[headerColor][3],
+					appearance[headerColor][4]
+	headerLabel:SetColor(r,g,b,a)
 
 	-- Add count to category name if selected in options
     if acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
-        headerLabel:SetColor(
-			appearance[headerColor][1],
-			appearance[headerColor][2],
-			appearance[headerColor][3],
-			appearance[headerColor][4])
+        headerLabel:SetColor(r,g,b,a)
 
     else
         headerLabel:SetText(cateName)
@@ -217,7 +214,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 		marker:SetHidden(true)
 	end
 
-	rowControl:SetHeight(acctSaved.appearance["CATEGORY_HEADER_HEIGHT"])
+	rowControl:SetHeight(appearance["CATEGORY_HEADER_HEIGHT"])
 	rowControl.slot = slot
 end
 
@@ -287,10 +284,10 @@ local function runRulesOnEntry(itemEntry, specialType)
 
 	-- look for a match against rule definitions
 	local data = itemEntry.data
-	local function matchRules(data)
-		local bagId = data.bagId
-		local slotIndex = data.slotIndex
+	local bagId = data.bagId
+	local slotIndex = data.slotIndex
 
+	local function matchRules(data)
 		local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
 					= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
 		data.AC_matched = matched
@@ -505,14 +502,15 @@ local function createNewScrollData(scrollData)
 	-- to createHeaderEntry() to make a header row
 	local categoryList = {} -- [name] {AC_catCount, AC_sortPriorityName,
 							--         AC_categoryName, AC_bagTypeId }
-
+	local safeTable = SF.safeTable
+	
 	local function addCount(name)
-		categoryList[name] = SF.safeTable(categoryList[name])
+		categoryList[name] = safeTable(categoryList[name])
 		categoryList[name].AC_catCount = SF.nilDefault(categoryList[name].AC_catCount, 0) + 1
 	end
 
 	local function setCount(bagTypeId, name, count)
-		categoryList[name] = SF.safeTable(categoryList[name])
+		categoryList[name] = safeTable(categoryList[name])
 		categoryList[name].AC_catCount = count
 	end
 	-- --------------------

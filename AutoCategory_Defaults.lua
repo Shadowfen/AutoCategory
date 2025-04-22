@@ -888,8 +888,6 @@ AutoCategory.defaultAcctBagSettings = {
 AutoCategory.defaultCharSettings = {
 	bags = {}, 
     collapses = AutoCategory.defaultCollapses,
-	displayOrder = {},
-	displayName = {},
 }
 
 AutoCategory.defaultAcctSettings = {
@@ -922,8 +920,6 @@ AutoCategory.defaultAcctSettings = {
 		["SAVE_CATEGORY_COLLAPSE_STATUS"] = false,
 		["SHOW_CATEGORY_SET_TITLE"] = true,
 	},
-	displayOrder = {},
-	displayName = {},
 }
 	
 AutoCategory.default_rules = {

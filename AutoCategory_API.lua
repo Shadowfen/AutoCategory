@@ -31,6 +31,8 @@ end
 -- Convert a ZOS bagId into AutoCategory bag_type_id
 -- returns the bag_type_id enum value 
 --       or nil if bagId is not recognized
+-- Note: We have separate definitions because all of the ZOS HOUSE_BANK types
+-- are supposed to be treated the same by us.
 local BagTypeConversion = {
 	[BAG_BACKPACK]         = AC_BAG_TYPE_BACKPACK,
 	[BAG_WORN]             = AC_BAG_TYPE_BACKPACK,
@@ -58,7 +60,7 @@ function AutoCategory.validateBagRules(bagId, acprimary)
 	return AutoCategory.validateACBagRules(convert2BagTypeId(bagId, acprimary))
 end
 
--- Make sure that all of the rules for this bag are valid/undamaged
+-- Make sure that all of the rules for this bag type are valid/undamaged
 -- Do this by bag rather than by rule to avoid repeating this unnecessarily
 -- as the bag of rules is evaluated per each item in the bag.
 -- Do this up front to save time.
@@ -66,23 +68,25 @@ function AutoCategory.validateACBagRules(acBagType)
 
 	if acBagType == nil then return false end
 
+	local ruleApi = AutoCategory.RuleApi
+
 	-- Mark rules as damaged when we find something wrong with them
 	-- returns nothing
 	local function checkValidRule(name, rule)
 		if rule == nil or name == nil then return end
 		if rule.name ~= name then 
-			AutoCategory.RuleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
+			ruleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
 			return
 		end
 
 		--local isValid = true
 		if rule.rule == nil then
-			AutoCategory.RuleApi.setError(rule,true,"missing rule definition")
+			ruleApi.setError(rule,true,"missing rule definition")
 			return
 		end
 		local ruleCode = AutoCategory.compiledRules[rule.name]
 		if not ruleCode or type(ruleCode) ~= "function" then
-			AutoCategory.RuleApi.setError(rule, true,"invalid compiled rule function")
+			ruleApi.setError(rule, true,"invalid compiled rule function")
 			AutoCategory.compiledRules[rule.name] = nil
 			return
 		end
@@ -90,11 +94,13 @@ function AutoCategory.validateACBagRules(acBagType)
 		return
 	end
 
+	local bagRuleApi = AutoCategory.BagRuleApi
+
 	-- Make sure all of the rules in the bag are evaluated if damaged and marked appropriately
 	local bag = AutoCategory.saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
-		local rule = AutoCategory.BagRuleApi.getBackingRule(entry)
+		local rule = bagRuleApi.getBackingRule(entry)
 		checkValidRule(entry.name, rule)
 	end
 end
@@ -152,32 +158,26 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	end
 
 	local bag = AutoCategory.saved.bags[bag_type_id]
-	if not bag then
-		return  false, "", 0, 0, nil, nil
-	end
-	if not bag.rules then
+	if not bag or not bag.rules then
 		return  false, "", 0, 0, nil, nil
 	end
 
-	--local dispName = SF.safeTable(AutoCategory.saved.displayName[bag_type_id])
-	--AutoCategory.saved.displayName[bag_type_id] = dispName
 	-- call the rules for this bag against the entry, stop when one matches
 	-- return values from pcall internal func
 	local lenv = AutoCategory.Environment
 	local showpri = 0
+
+	local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
+	local getRuleByName = AutoCategory.GetRuleByName
+	local isCategoryCollapsed = AutoCategory.IsCategoryCollapsed
+	local compiledRules = AutoCategory.compiledRules
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i]
 		if entry.name then
-			local rule = AutoCategory.GetRuleByName(entry.name)
+			local rule = getRuleByName(entry.name)
 			if rule and checkValidRule(entry.name, rule) then
-				--AutoCategory.saved.displayName[bag_type_id] = SF.safeTable(AutoCategory.saved.displayName[bag_type_id])
-				--if dispName[entry.name] then
-				--	showpri = 999-dispName[entry.name].showpri
-				--else
-					showpri = entry.priority
-					--dispName[entry.name].showpri = showpri
-				--end
-				local ruleCode = AutoCategory.compiledRules[entry.name]
+				showpri = entry.priority
+				local ruleCode = compiledRules[entry.name]
 				if ruleCode then
 					setfenv( ruleCode, lenv )
 					AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
@@ -185,8 +185,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 					if exec_ok then
 						local catname = adjustName(rule.name,
 												AutoCategory.AdditionCategoryName)
-						AutoCategory.SetCategoryCollapsed(bag_type_id, catname,
-							AutoCategory.IsCategoryCollapsed(bag_type_id, catname))
+						setCategoryCollapsed(bag_type_id, catname,
+						isCategoryCollapsed(bag_type_id, catname))
 						if res == true then
 							return true, 
 								catname, 
@@ -198,7 +198,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 
 					else
 						AutoCategory.RuleApi.setError(rule, true, res)
-						AutoCategory.compiledRules[entry.name] = nil
+						compiledRules[entry.name] = nil
 					end
 				end
 			end
