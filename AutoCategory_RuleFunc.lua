@@ -1653,13 +1653,6 @@ function AutoCategory.RuleFunc.AcctName(...)
 	return false
 end
 
--- commented out due to comflict with version of the same function inside AutoCategory_RuleFunc
---
---[[
-function AutoCategory.AddRuleFunc(name, func)
-    AutoCategory.Environment[name] = func
-end
---]]
 AutoCategory.Environment = {
 	-- rule functions
 	zone       = AutoCategory.RuleFunc.CurrentZone,
@@ -1750,20 +1743,5 @@ AutoCategory.Environment = {
     
 	--[[
 	-- see new implementatons in AutoCategory/Misc_Plugins.lua
-	-- -------------------------------------------
-	-- Addon Integrations (old)
-	-- Alpha Gear
-	alphagear    = AutoCategory.RuleFunc.AlphaGear,
-	
-	-- Tamriel Trade Centre
-	getpricettc  = AutoCategory.RuleFunc.GetPriceTTC,
-	ttc_getprice  = AutoCategory.RuleFunc.GetPriceTTC,
-	
-	-- Master Merchant
-	getpricemm   = AutoCategory.RuleFunc.GetPriceMM,
-	mm_getprice   = AutoCategory.RuleFunc.GetPriceMM,
-	
-	-- Set Tracker
-	istracked    = AutoCategory.RuleFunc.IsTracked,
 	--]]
 }

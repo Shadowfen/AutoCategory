@@ -14,9 +14,9 @@ local ac_rules = AutoCategory.RulesW
 ----------------------
 -- Lists and variables
 
-AutoCategory.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
-AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
-AutoCategory.ARW = SF.safeTable(AutoCategory.ARW)
+--AutoCategory.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
+--AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
+--AutoCategory.ARW = SF.safeTable(AutoCategory.ARW)
 
 -- AutoCategory.saved contains table references from the appropriate saved variables - either acctSaved or charSaved
 -- depending on the setting of charSaved.accountWide
@@ -692,7 +692,7 @@ function AutoCategory.onLoad(event, addon)
 	aclogger = AutoCategory.logger
 	AutoCategory.logger:SetEnabled(true)
 
-    AutoCategory.checkLibraryVersions()
+    --AutoCategory.checkLibraryVersions()
 
     -- load our saved variables (no longer loads pre-defined rules)
     AutoCategory.acctSaved, AutoCategory.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
@@ -820,7 +820,6 @@ local inven_data = {
 
 local function refreshList(inventoryType, even_if_hidden)
 	if even_if_hidden == nil then even_if_hidden = false end
-
 	if not inventoryType or not inven_data[inventoryType] then return end
 
 	local obj = inven_data[inventoryType].object
