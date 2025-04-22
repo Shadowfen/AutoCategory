@@ -268,7 +268,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
   return false  
 end
 
--- Implement ck_isknowncat() check function for Set Tracker
+-- Implement ck_isknowncat() check function for LibCharacterKnowledge
 function AutoCategory_MiscAddons.RuleFunc.CK_IsKnownCat( ... )
 	local fn = "ck_isknowncat"
 	if LibCharacterKnowledge == nil then
@@ -285,6 +285,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnownCat( ... )
 		["recipe"] =  LCK.ITEM_CATEGORY_RECIPE, 
 		["plan"] = LCK.ITEM_CATEGORY_PLAN, 
 		["motif"] = LCK.ITEM_CATEGORY_MOTIF,
+		["scribing"] = LCK.ITEM_CATEGORY_SCRIBING,
 		}
 	local chkCats = {}
 	local ac = select( '#', ... )
