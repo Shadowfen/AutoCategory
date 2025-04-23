@@ -14,10 +14,6 @@ local ac_rules = AutoCategory.RulesW
 ----------------------
 -- Lists and variables
 
---AutoCategory.rules = {}	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
---AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
---AutoCategory.ARW = SF.safeTable(AutoCategory.ARW)
-
 -- AutoCategory.saved contains table references from the appropriate saved variables - either acctSaved or charSaved
 -- depending on the setting of charSaved.accountWide
 AutoCategory.saved = {
@@ -45,22 +41,22 @@ local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 function AutoCategory.debugCache()
     d("User rules: " .. AutoCategory.ARW:size()) --#AutoCategory.acctRules.rules)
-    d("Saved rules: " .. #AutoCategory.saved.rules)						-- should be 0 after conversion
+    d("Saved rules: " .. #saved.rules)						-- should be 0 after conversion
     d("Predefined rules: " .. #AutoCategory.predefinedRules)			-- predefined rules from base and plugins
     d("Combined rules: " .. ac_rules:sizeRules())						-- complete list of user rules and predefined rules
     d("Compiled rules: " .. SF.GetSize(ac_rules.compiled))
     d("Rules by Name: " .. SF.GetSize(ac_rules.ruleNames))	-- lookup table for rules by rule name
     d("Rules by Tag: " .. SF.GetSize(ac_rules.tagGroups))	-- actually returns the # of Tags defined
     d("Tags: " .. ac_rules:sizeTags())					-- returns the # of Tags defined
-    d("Saved bags: " .. #AutoCategory.saved.bags)						-- returns # of bags, collections of bagrules by bagId
-    d("Cache bags: " .. AutoCategory.cache.bags_cvt:size())			-- CVT of bags for bag id dropdowns, returns 3 for CVT
-    d("Entries by Bag: " .. SF.GetSize(AutoCategory.cache.entriesByBag))		-- CVT of bagrules by bagid, so always returns # bags
-    d("Entries by Name: " .. SF.GetSize(AutoCategory.cache.entriesByName))	-- bagrules lookup by bagid and rule name, returns # bags
+    d("Saved bags: " .. #saved.bags)						-- returns # of bags, collections of bagrules by bagId
+    d("Cache bags: " ..cache.bags_cvt:size())			-- CVT of bags for bag id dropdowns, returns 3 for CVT
+    d("Entries by Bag: " .. SF.GetSize(cache.entriesByBag))		-- CVT of bagrules by bagid, so always returns # bags
+    d("Entries by Name: " .. SF.GetSize(cache.entriesByName))	-- bagrules lookup by bagid and rule name, returns # bags
 end
 
 --unused (debug) - Not sure why called "EBT" since it uses entriesByName!!
 function AutoCategory.debugEBT()
-	for k, v in pairs(AutoCategory.cache.entriesByName[1]) do
+	for k, v in pairs(cache.entriesByName[1]) do
 		d("k = "..k)
 		if type(v) == "table" then
 			for k1,v1 in pairs(v) do
@@ -123,9 +119,10 @@ function AutoCategory.RulesW.CompileAll(self)
 		return
     end
 	-- compile and store each of the rules in the ruleset
+	local compile = AutoCategory.RuleApi.compile
     for j = 1, #self.ruleList do
         if self.ruleList[j] then
-            RuleApi.compile(self.ruleList[j])
+            compile(self.ruleList[j])
         end
     end
 end
@@ -215,8 +212,8 @@ end
 function AutoCategory.UpdateCurrentSavedVars()
 	--local RulesW = AutoCategory.RulesW
     -- general, and appearance are always accountWide
-    AutoCategory.saved.general = AutoCategory.acctSaved.general
-    AutoCategory.saved.appearance = AutoCategory.acctSaved.appearance
+    saved.general = AutoCategory.acctSaved.general
+    saved.appearance = AutoCategory.acctSaved.appearance
 
 	--AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
 	AutoCategory.acctSaved.displayOrder = nil
@@ -237,16 +234,14 @@ function AutoCategory.UpdateCurrentSavedVars()
 
 	-- bags/collapses might or might not be acct wide
     if not AutoCategory.charSaved.accountWide then
-        AutoCategory.saved.bags = AutoCategory.charSaved.bags
-        AutoCategory.saved.collapses = AutoCategory.charSaved.collapses
-        --AutoCategory.saved.displayOrder = AutoCategory.charSaved.displayOrder
-
+        saved.bags = AutoCategory.charSaved.bags
+        saved.collapses = AutoCategory.charSaved.collapses
+    
     else
-        AutoCategory.saved.bags = AutoCategory.acctSaved.bags
-        AutoCategory.saved.collapses = AutoCategory.acctSaved.collapses
-        --AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
+        saved.bags = AutoCategory.acctSaved.bags
+        saved.collapses = AutoCategory.acctSaved.collapses
     end
-	if AutoCategory.saved.bags[7] then AutoCategory.saved.bags[7] = nil end -- fix old data corruption
+	if saved.bags[7] then saved.bags[7] = nil end -- fix old data corruption
 
     AutoCategory.cacheInitialize()
 end
@@ -281,7 +276,7 @@ end
 
 function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 	if not categoryName then return end
-	AutoCategory.saved.collapses[bagTypeId][categoryName] = collapsed
+	saved.collapses[bagTypeId][categoryName] = collapsed
 end
 -- -----------------------------------------------------------
 
@@ -318,7 +313,7 @@ function AutoCategory.ResetToDefaults()
 	AutoCategory.charSaved.accountWide = AutoCategory.defaultSettings.accountWide
 end
 
--- create local alias for references in this file
+-- create local alias for references in this function
 local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
 
 -- rename a rule, updates the cache lookups and bagsets too
@@ -346,10 +341,10 @@ function AutoCategory.renameBagRule(oldName, newName)
 
 	--Update bags so that every entry has the same name, should be changed to new name.
 	for i = 1, 6 do	-- for all bags
-		local bag = AutoCategory.saved.bags[i]
+		local bag = saved.bags[i]
 		if not bag then 
 			bag = { rules = {}, }
-			AutoCategory.saved.bags[i] = bag
+			saved.bags[i] = bag
 		end
 		local rules = bag.rules
 		for j = 1, #rules do   -- for all bagrules in the bag
@@ -407,13 +402,16 @@ function AutoCategory.cacheInitBag(bagId)
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by priority high-to-low) into the dropdown
-	if AutoCategory.saved.bags[bagId] == nil then
-		AutoCategory.saved.bags[bagId] = {rules={}}
-	elseif not AutoCategory.saved.bags[bagId].rules then
-		AutoCategory.saved.bags[bagId].rules={}
+	if saved.bags[bagId] == nil then
+		saved.bags[bagId] = {rules={}}
+	elseif not saved.bags[bagId].rules then
+		saved.bags[bagId].rules={}
 	end
-	local svdbag = AutoCategory.saved.bags[bagId]
-	table.sort(svdbag.rules, BagRuleSortingFunction)
+
+	local svdbag = saved.bags[bagId]
+	if svdbag ~= nil then
+		table.sort(svdbag.rules, BagRuleSortingFunction)
+	end
 
 	aclogger:Debug("Initializing bag "..bagId.." with bagrules")
 	for entry = 1, #svdbag.rules do
@@ -573,9 +571,10 @@ local function addTableRules(tbl, tblname, ispredef)
 	end
 
 	local function addPredef(stbl, rule)
+		local predefinedRules = AutoCategory.predefinedRules
 		-- add to predefinedRules list
-		if stbl.rules ~= AutoCategory.predefinedRules then
-			AutoCategory.predefinedRules[#AutoCategory.predefinedRules+1] = rule
+		if stbl.rules ~= predefinedRules then
+			predefinedRules[#predefinedRules+1] = rule
 		end
 	end
 
@@ -587,6 +586,8 @@ local function addTableRules(tbl, tblname, ispredef)
 	end
 
 	-- process all of the rules in the table
+	local getRuleByName = AutoCategory.GetRuleByName
+	local getUsableRuleName = AutoCategory.GetUsableRuleName
 	local v, r
 	for k=#tbl.rules, 1, -1 do
 		v = tbl.rules[k]
@@ -594,7 +595,7 @@ local function addTableRules(tbl, tblname, ispredef)
 			v.pred=1
 		end
 
-		r = AutoCategory.GetRuleByName(v.name)
+		r =getRuleByName(v.name)
 		if r then
 			aclogger:Warn("Found duplicate rule name - "..v.name)
 			-- already have one
@@ -605,7 +606,7 @@ local function addTableRules(tbl, tblname, ispredef)
 			else
 				local oldname = v.name
 				-- rename different rule
-				newName = AutoCategory.GetUsableRuleName(v.name)
+				newName = getUsableRuleName(v.name)
 				v.name = newName
 				aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
