@@ -1,5 +1,3 @@
-local AC = AutoCategory
-local SF =  LibSFUtils
 
 
         -- General Settings

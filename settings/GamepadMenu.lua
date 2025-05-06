@@ -4,30 +4,7 @@ SF = LibSFUtils
 local L = GetString
 
 local divider = AC_UI.divider
---[[
-local function divider()
-	return {
-		type = "divider",
-		width = "full", --or "half" (optional)
-		height = 10,
-		alpha = 0.5,
-	}
-end
---]]
-
 local description = AC_UI.description
---[[
-local function description(textId, titleId)
-	return
-		{
-			type = "description",
-			text = textId, -- text or string id or function returning a string
-			title = titleId, -- or string id or function returning a string (optional)
-			width = "full", --or "half" (optional)
-		}
-end
---]]
-
 
 
 AC_UI.GamepadMenu = {

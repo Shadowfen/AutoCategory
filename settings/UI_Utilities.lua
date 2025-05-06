@@ -1,4 +1,3 @@
-local AC = AutoCategory
 local SF = LibSFUtils
 
 local L = GetString

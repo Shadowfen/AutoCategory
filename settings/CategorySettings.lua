@@ -9,31 +9,19 @@ local CVT = AutoCategory.CVT
 local auBagSet = AC_UI.BagSet
 
 local CatSet_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_TAG") -- only uses choices
+-- Make accessible to BagSet
 AC_UI.CatSet_SelectTag_LAM = CatSet_SelectTag_LAM
 
 local CatSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_RULE", nil,  CVT.USE_TOOLTIPS) -- uses choicesTooltips
+-- Make accessible to BagSet
 AC_UI.CatSet_SelectRule_LAM = CatSet_SelectRule_LAM
 
 -- local to this screen
 local catSet_NewCat_LAM = AC.BaseUI:New() 	-- button
-AC_UI.CatSet_NewCat_LAM = catSet_NewCat_LAM
-
--- local to this screen
 local catSet_CopyCat_LAM = AC.BaseUI:New() 	-- button
-AC_UI.CatSet_CopyCat_LAM = catSet_CopyCat_LAM
-
--- local to this screen
 local CatSet_DeleteCat_LAM = AC.BaseUI:New()	-- button
-AC_UI.CatSet_DeleteCat_LAM = CatSet_DeleteCat_LAM
-
--- local to this screen
 local CatSet_NameEdit_LAM = AC.BaseUI:New("AC_EDITBOX_EDITRULE_NAME") -- editbox
-AC_UI.CatSet_NameEdit_LAM = CatSet_NameEdit_LAM
-
--- local to this screen
 local CatSet_TagEdit_LAM = AC.BaseUI:New("AC_EDITBOX_EDITRULE_TAG")	-- editbox
-AC_UI.CatSet_TagEdit_LAM = CatSet_TagEdit_LAM
-
 
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
@@ -141,7 +129,7 @@ end
 
 -- customization of BaseDD for CatSet_SelectTag_LAM
 -- -------------------------------------------------------
-function AC_UI.CatSet_SelectTag_LAM:setValue(value)
+function CatSet_SelectTag_LAM:setValue(value)
 	if not value then return end
 	local oldvalue = self:getValue()
 	if oldvalue == value then return end
@@ -163,13 +151,13 @@ end
 
 -- refresh the value of the cvt lists for CatSet_SelectTag_LAM from the 
 -- current contents of the AutoCategory.RulesW.tags list.
-function AC_UI.CatSet_SelectTag_LAM:refresh()
+function CatSet_SelectTag_LAM:refresh()
 	if self:getValue() == nil then
 		self:select(AutoCategory.RulesW.tags)
 	end
 end
 
-function AC_UI.CatSet_SelectTag_LAM:controlDef()
+function CatSet_SelectTag_LAM:controlDef()
 	return
 		-- Tags - AC_DROPDOWN_EDITRULE_TAG
 		{
@@ -195,14 +183,14 @@ end
 
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
-function AC_UI.CatSet_SelectRule_LAM:getValue()
+function CatSet_SelectRule_LAM:getValue()
 	--aclogger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
 -- refresh the contents and value of the cvt lists for CatSet_SelectRule_LAM from the 
 -- current contents of the AutoCategory.RulesW.tagGroups[tag] list.
-function AC_UI.CatSet_SelectRule_LAM:refresh()
+function CatSet_SelectRule_LAM:refresh()
 	local ltag = CatSet_SelectTag_LAM:getValue()
 	if not ltag then return end
 
@@ -221,13 +209,13 @@ function AC_UI.CatSet_SelectRule_LAM:refresh()
 	end
 end
 
-function AC_UI.CatSet_SelectRule_LAM:setValue(value)
+function CatSet_SelectRule_LAM:setValue(value)
 	self:select(value)
 	currentRule = AutoCategory.GetRuleByName(value)
 	AC_UI.checkCurrentRule()
 end
 
-function AC_UI.CatSet_SelectRule_LAM:controlDef()
+function CatSet_SelectRule_LAM:controlDef()
 	-- Categories - AC_DROPDOWN_EDITRULE_RULE
 	return
 		{
@@ -346,14 +334,14 @@ end
 
 -- customization of BaseUI for CatSet_NameEdit_LAM editbox
 -- -------------------------------------------------------
-function AC_UI.CatSet_NameEdit_LAM:getValue()
+function CatSet_NameEdit_LAM:getValue()
 	if currentRule then
 		return currentRule.name
 	end
 	return ""
 end
 
-function AC_UI.CatSet_NameEdit_LAM:setValue(value)
+function CatSet_NameEdit_LAM:setValue(value)
 	local oldName = CatSet_SelectRule_LAM:getValue()
 	if oldName == value then
 		return
@@ -401,7 +389,7 @@ function AC_UI.CatSet_NameEdit_LAM:setValue(value)
 	auBagSet.SelectRule(currentRule.name)
 end
 
-function AC_UI.CatSet_NameEdit_LAM:controlDef()
+function CatSet_NameEdit_LAM:controlDef()
 	return
 		-- Name EditBox - AC_EDITBOX_EDITRULE_NAME
 		{
@@ -427,7 +415,7 @@ end
 -- when a rule changes the tag name, we need to update the various lists tracking tags vs rules
 -- returns the rule name, and a list of rules that belong to newtag.
 -- When parameters are bad, return nil,nil
-function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
+function CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 	-- bad parameters
 	if not rule or not rule.name or not newtag then return nil,nil end
 
@@ -454,13 +442,13 @@ function AC_UI.CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 end
 
 
-function AC_UI.CatSet_TagEdit_LAM:getValue()
+function CatSet_TagEdit_LAM:getValue()
 	if not currentRule then return "" end
 
 	return currentRule.tag
 end
 
-function AC_UI.CatSet_TagEdit_LAM:setValue(value)
+function CatSet_TagEdit_LAM:setValue(value)
 	if not currentRule then return end
 
 	local oldtag = currentRule.tag
@@ -480,7 +468,7 @@ function AC_UI.CatSet_TagEdit_LAM:setValue(value)
 	AC_UI.RefreshControls()
 end
 
-function AC_UI.CatSet_TagEdit_LAM:controlDef()
+function CatSet_TagEdit_LAM:controlDef()
 	-- Tag EditBox - AC_EDITBOX_EDITRULE_TAG
 	return
 	{
@@ -499,7 +487,7 @@ end
 
 -- customization of BaseUI for CatSet_DeleteCat_LAM button
 -- -------------------------------------------------------
-function AC_UI.CatSet_DeleteCat_LAM:execute()
+function CatSet_DeleteCat_LAM:execute()
 	local oldRuleName = CatSet_SelectRule_LAM:getValue()
 	local ndx = AutoCategory.RulesW.ruleNames[oldRuleName]
 	if ndx then
@@ -563,7 +551,7 @@ function AC_UI.CatSet_DeleteCat_LAM:execute()
 	AC_UI.RefreshControls()
 end
 
-function AC_UI.CatSet_DeleteCat_LAM:controlDef()
+function CatSet_DeleteCat_LAM:controlDef()
 	-- Delete Category/Rule Button
 	return
 		{
@@ -752,7 +740,7 @@ function AC_UI.CatSet.setRule(rule)
 end
 -- -------------------------------------------------------
 
-function AC_UI.CatSet.Init()
+function AC_UI.CatSet_Init()
 	aclogger = AutoCategory.logger
     CatSet_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags} )
 end
