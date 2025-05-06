@@ -38,7 +38,7 @@ function AC_UI.BagSet_OrderCat_LAM:controlDef()
 			getFunc = function() return tmplistEntries end,
 			setFunc = function(sortedSortListEntries)         
 				--settings.iconSortOrderEntries = sortedSortListEntries
-				for idx, data in ipairs(sortedSortListEntries) do
+				for idx, data in pairs(sortedSortListEntries) do
 					--settings.icon[data.value].sortOrder = idx
 					--settings.iconSortOrder[idx] = data.value
 					end

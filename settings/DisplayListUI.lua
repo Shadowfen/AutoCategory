@@ -77,7 +77,7 @@ function AC_UI.BagSet_DisplayCat_LAM:controlDef()
 			getFunc = function() return self.dsplistEntries end,
 			setFunc = function(dispListEntries)         
 				--settings.iconSortOrderEntries = dispListEntries
-				for idx, data in ipairs(dispListEntries) do
+				for idx, data in pairs(dispListEntries) do
 					--settings.icon[data.value].sortOrder = idx
 					--settings.iconSortOrder[idx] = data.value
 					end
