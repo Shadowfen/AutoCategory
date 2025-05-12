@@ -4,7 +4,7 @@ local L = GetString
 local SF = LibSFUtils
 local AC = AutoCategory
 
-local aclogger = AutoCategory.logger
+local aclogger
 --local RuleApi = AutoCategory.RuleApi
 --local BagRuleApi = AutoCategory.BagRuleApi
 
@@ -70,12 +70,8 @@ function AutoCategory.CVT:clear()
 	self.dirty = 1
 	self.choices = SF.safeClearTable(self.choices)
 
-	if self.choicesValues then
-		self.choicesValues = SF.safeClearTable(self.choicesValues)
-	end
-	if self.choicesTooltips then
-		self.choicesTooltips = SF.safeClearTable(self.choicesTooltips)
-	end
+    if self.choicesValues then self.choicesValues = SF.safeClearTable(self.choicesValues) end
+    if self.choicesTooltips then self.choicesTooltips = SF.safeClearTable(self.choicesTooltips) end
 
 	self.indexValue = nil
 end
@@ -132,12 +128,7 @@ end
 -- if "value" is a non-empty table, then select the first entry from that table.
 -- returns the value selected (may be nil)
 function AutoCategory.CVT:select(value)
-	local searchtbl = self.choices
-	if self.choicesValues then
-		searchtbl = self.choicesValues
-	end
-	if not searchtbl then return nil end
-
+    local searchtbl = self.choicesValues or self.choices
 	if type(value) == "table" then
 		if #value > 0 then
 			self.indexValue = value[1]
@@ -275,8 +266,8 @@ function AutoCategory.CVT:removeItemChoice(removeItem)
 	return self.indexValue
 end
 
--- remove an item by choiceValue from the dropdown lists (does not update the control)
--- returns new selected value/choice
+-- remove an item (by choiceValue) from the dropdown lists (does not update the control)
+-- returns new selected value/choice or nil if does not have choicesValues table.
 function AutoCategory.CVT:removeItemChoiceValue(removeItem)
 	local removeIndex = -1
     if not self.choicesValues then return nil end
@@ -284,11 +275,12 @@ function AutoCategory.CVT:removeItemChoiceValue(removeItem)
 	-- find the choiceValue to remove
 	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(self.choicesValues, removeItem)
 	if not ndx then return self.indexValue end		-- nothing to remove
+
 	self.dirty = 1
 	removeIndex = ndx
 	local num = #self.choicesValues		-- value BEFORE removal
 	-- remove it
-	table.remove(self.choicesValues, removeIndex)
+	table.remove(self.choicesValues, removeIndex) -- not optional here
 	table.remove(self.choices, removeIndex)		-- not optional
 	if #self.choicesTooltips then
 		table.remove(self.choicesTooltips, removeIndex)
@@ -490,19 +482,19 @@ end
 
 -- The BagRule class assists in the definition, management, and formatting of
 -- bag rules for the collection of them in the Bag Settings Categories dropdown.
--- The minimum that a bagrule has is { name, priority }.
+-- The minimum that a bagrule has is { name, runpriority }.
 -- -------------------------------------------------------
 -- helper functions for BagRules (for bag settings)
 
 -- --------------------------------------------
 -- Create a new Bag Entry (factory)
--- Rule parameter is required, priority is optional.
--- If a priority is not provided, default to 1000
--- Returns a table {name=, priority=} or nil
+-- Rule parameter is required, runpriority is optional.
+-- If a runpriority is not provided, default to 1000
+-- Returns a table {name=, runpriority=, showpriority=} or nil
 --
-function AutoCategory.CreateNewBagRule(rule, priority)
+function AutoCategory.CreateNewBagRule(rule, runpriority, showprior)
 	local rulename = nil
-	local ruleprior = nil
+	local ruleRunprior = nil
 	if not rule then
 		return nil
 	end
@@ -510,23 +502,28 @@ function AutoCategory.CreateNewBagRule(rule, priority)
 		rulename = rule
 		rule = AutoCategory.GetRuleByName(rulename)
 
-	elseif not rule.name then
+	end
+	if not rule.name then
 		return nil
 
 	else
 		rulename = rule.name
 	end
 
-	if priority == nil then
-		ruleprior = 1000
-
+	if runpriority == nil then
+		ruleRunprior = 1000
 	else
-		ruleprior = priority
+		ruleRunprior = runpriority
+	end
+
+	if showprior == nil then
+		showprior = ruleRunprior
 	end
 
 	local bagrule = {
 		name = rulename,
-		priority = ruleprior,
+		runpriority = ruleRunprior,
+		showpriority = showprior,
 	}
 	return bagrule
 end
@@ -562,8 +559,9 @@ end
 
 function AutoCategory.RuleList.addRule(self, newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
+	local rulename = newRule.name
 
-	local ndx = self.ruleNames[newRule.name]
+	local ndx = self.ruleNames[rulename]
 	if ndx then
 		-- rule by name already in list
 		if overwriteFlag then
@@ -573,7 +571,7 @@ function AutoCategory.RuleList.addRule(self, newRule, overwriteFlag)
 	end
 
 	self.ruleList[#self.ruleList+1] = newRule
-	self.ruleNames[newRule.name] = #self.ruleList
+	self.ruleNames[rulename] = #self.ruleList
 end
 
 -- remove a rule from the ruleList
@@ -600,6 +598,7 @@ function AutoCategory.RuleList.removeRule(self, ndx)
 end
 
 -- returns a rule from the ruleList as specified by name
+-- or nil if named rule does not exist
 function AutoCategory.RuleList.getRuleByName(self, ruleName)
 	if not ruleName then return nil end
 	local ndx = self.ruleNames[ruleName]
@@ -627,11 +626,12 @@ function AutoCategory.RuleList.sort(self, sortfn)
 	-- rebuild name lookup
 	local arrules = self.ruleList
 	for k = #arrules,1,-1 do
-		if not self.lkRruleNamesules[arrules[k].name ] then
+		if not self.ruleNames[arrules[k].name ] then
 			self.ruleNames[arrules[k].name] = k
 		end
 	end
 end
+
 --[[
 -- not currently used (and not complete)
 -- -------------------------------------------------
@@ -649,6 +649,7 @@ function AutoCategory.BagRuleList:initialize(bagrules)
 	self.bagrule = bagrules
 	self.ruleList = bagrules.rules
 	self.lkRules = {}
+
 	local arrules = self.ruleList
 	for k = #arrules,1,-1 do
 		if not self.lkRules[arrules[k].name ] then
@@ -741,20 +742,21 @@ AutoCategory.RuleApi = {
 			end
 			--AutoCategory.compiledRules = SF.safeTable(AutoCategory.compiledRules)
 			local compiledRules = AutoCategory.compiledRules
+			local ruleapi = AutoCategory.RuleApi
 
-			AutoCategory.RuleApi.clearError(rule)
-			local rkey = AutoCategory.RuleApi.key(rule)
+			ruleapi.clearError(rule)
+			local rkey = ruleapi.key(rule)
 			compiledRules[rkey] = nil
 
 			if rule.rule == nil or rule.rule == "" then
-				AutoCategory.RuleApi.setError(rule, true,"Missing rule definition")
+				ruleapi.setError(rule, true,"Missing rule definition")
 				return rule.err
 			end
 
 			local rulestr = "return(" .. rule.rule .. ")"
 			local compiledfunc, err = zo_loadstring(rulestr)
 			if not compiledfunc then
-				AutoCategory.RuleApi.setError(rule, true, err)
+				ruleapi.setError(rule, true, err)
 				compiledRules[rkey] = nil
 				return err
 			end
@@ -780,7 +782,7 @@ AutoCategory.BagRuleApi = {
 			if not bagrule.name or bagrule.name == "" then
 				return false
 			end
-			if not bagrule.priority then return false end
+			if not bagrule.runpriority then return false end
 			return true
 		end,
 
@@ -789,23 +791,34 @@ AutoCategory.BagRuleApi = {
 		end,
 
 	-- formatShow() creates a string to represent the bagrule in the UI dropdown.
-	-- It combines the name and priority and optionally marks or colorizes them
+	-- It combines the name and runpriority and optionally marks or colorizes them
 	-- based on if the bag rule is marked "hidden" or if the backing Rule has
 	-- disappeared (i.e the bag rule is now invalid).
-	formatShow	= function (bagrule)
+	-- If no priority is passed in then the rule's runpriority is used.
+	-- Returns the string for the bagrule dropdown. Format: "name (runpriority/showpriority)"
+	formatShow	= function (bagrule, priority)
+		-- if we don't have a priority passed in then initialize to runpriority from bagrule.
+		if priority == nil then
+			priority = bagrule.runpriority
+		end
+
+		local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
+			if bagrule.showpriority == nil then
+				bagrule.showpriority = priority
+			end
 			local sn = nil
-			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
-				sn = string.format("|cFF4444(!)|r %s (%d)", bagrule.name, bagrule.priority)
+				sn = string.format("|cFF4444(!)|r %s (%d/%d)", bagrule.name, priority, bagrule.showpriority)
 
 			else
+				--make sure we have a showpriority in our bagrule
 				if bagrule.isHidden then
 					-- grey out the "hidden" category header
-					sn = string.format("|c626250%s (%d)|r", bagrule.name, bagrule.priority)
+					sn = string.format("|c626250%s (%d/%d)|r", bagrule.name, priority, bagrule.showpriority)
 
 				else
-					sn = string.format("%s (%d)", bagrule.name, bagrule.priority)
+					sn = string.format("%s (%d/%d)", bagrule.name, priority, bagrule.showpriority)
 				end
 			end
 			return sn
@@ -813,9 +826,6 @@ AutoCategory.BagRuleApi = {
 
 	-- Provides a tooltip string for the bag rule which may be displayed
 	-- when hovering over the bag rule in the dropdown menu.
-	-- Note: A bug in LAM has broken the display of tooltips from
-	-- the menu, but I hope that the fix recommended by Calamath may
-	-- soon be released for LAM.
 	formatTooltip = function (bagrule)
 			local tt = nil
 			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
@@ -839,9 +849,14 @@ AutoCategory.BagRuleApi = {
 	-- Allows setting the isHidden value for the bag rule
 	-- (translates false into nil to reduce junk in saved variables).
 	setHidden = function (bagrule, isHidden)
-		if isHidden == false then isHidden = nil end
+		if isHidden == false then bagrule.isHidden = nil end
 		if bagrule.isHidden == isHidden then return bagrule.isHidden end
+		if isHidden == false then isHidden = nil end
 		bagrule.isHidden = isHidden
 		return bagrule.isHidden
 	end,
 }
+
+function AutoCategory.AC_Classes_Init()
+	aclogger = AutoCategory.logger
+end

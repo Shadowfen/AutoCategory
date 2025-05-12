@@ -1,5 +1,8 @@
-[COLOR="DeepSkyBlue"]4.3.14 (122)[/COLOR]:
+[COLOR="DeepSkyBlue"]4.4.0 (122)[/COLOR]:
 [LIST]
+[*] NEW: Requires the library LibScroll in addition to the previously required libraries.
+[*] NEW: In the Bag Settings, the bag priority has been separated into a "run priority" and a "show priority" and both are displayed in the category dropdowp as "caname (run/show)". The run priority sets the order in which rules are run just as the old priority did. The show prioriiity runs AFTER the rules have run to rearrange categories in the order that you specify for display in your inventory window.
+[*] NEW: A button in the Bag Settings under the "show priority" slider will open up a window that will show the names of the categories in the order by their "show priority". It does not refresh when you change the "show priority" for a category. If you push the button again (after changes) it will refresh the window with the new order. Closing "Settings" will automatically dismiss the window (as will simply hitting the X on it).
 [*] Update minimum version requirement for LibAddonMenu to 38
 [*] Update LibCharacterKnowledge Plugin to take advantage of the added knowledge about scribing items. This change allows the CK_IsKnownCat( ... ) to accept "scribing" as a category as well.
 [/LIST]

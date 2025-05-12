@@ -1,11 +1,4 @@
 --====API====--
---local SF = LibSFUtils
---local AC = AutoCategory
---local RuleApi = AutoCategory.RuleApi
-
--- aliases
---local saved = AutoCategory.saved
---local aclogger = AutoCategory.logger
 
 -- For use to tell if AutoCategory has finished its initialization process and
 -- is ready for business. The following variable is nil if AutoCategory is
@@ -113,7 +106,7 @@ end
 -- returns
 --   boolean - was a match found?
 --   string  - name of rule matched combined with additionCategoryName, ex. "Set(godly set)"
---   number  - priority of rule
+--   number  - run priority of rule
 --   number -  show priority of rule
 --   enum    - bag type id
 --   boolean - is entry hidden?
@@ -136,7 +129,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			name  = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 			return name
 		end
-		if enhancement == "" then
+		if not enhancement or enhancement == "" then
 			-- just use declared category name
 			return name
 
@@ -167,6 +160,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local lenv = AutoCategory.Environment
 	local showpri = 0
 
+	-- localized aliases
 	local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
 	local getRuleByName = AutoCategory.GetRuleByName
 	local isCategoryCollapsed = AutoCategory.IsCategoryCollapsed
@@ -176,7 +170,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		if entry.name then
 			local rule = getRuleByName(entry.name)
 			if rule and checkValidRule(entry.name, rule) then
-				showpri = entry.priority
+				--showpri = entry.showpriority or entry.runpriority
 				local ruleCode = compiledRules[entry.name]
 				if ruleCode then
 					setfenv( ruleCode, lenv )
@@ -190,8 +184,8 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						if res == true then
 							return true, 
 								catname, 
-								entry.priority, 
-								showpri,
+								entry.runpriority, 
+								entry.showpriority,
 								bag_type_id, 
 								entry.isHidden
 						end

@@ -180,7 +180,7 @@ function AutoCategory.HookGamepadInventory()
 		end
 
 		local lastBestItemCategoryName
-		for i, itemData in ipairs(filteredDataTable) do
+		for i, itemData in pairs(filteredDataTable) do
 			local entryData = ZO_GamepadEntryData:New(itemData.name, itemData.iconFile)
 			entryData:InitializeInventoryVisualData(itemData)
 
@@ -446,7 +446,7 @@ local function gci_AddFilteredDataToList(self, filteredDataTable)
     table.sort(filteredDataTable, AutoCategory_ItemSortComparator) -- this is different
 
     local lastBestItemCategoryName
-    for i, itemData in ipairs(filteredDataTable) do
+    for i, itemData in pairs(filteredDataTable) do
         if itemData.bestItemCategoryName ~= lastBestItemCategoryName then
             lastBestItemCategoryName = itemData.bestItemCategoryName
             itemData:SetHeader(zo_strformat(SI_GAMEPAD_CRAFTING_INVENTORY_HEADER, lastBestItemCategoryName))

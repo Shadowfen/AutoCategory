@@ -18,6 +18,7 @@ local aclogger
 
 local auBagSet = AC_UI.BagSet
 local auCatSet = AC_UI.CatSet
+local auAppearanceMenu = AC_UI.AppearanceMenu
 
 -- -------------------------------------------------------
 -- function aliases
@@ -148,12 +149,14 @@ function AutoCategory.debugBagTags()
 end
 
 
-function AutoCategory.AddonMenuInit()
+function AutoCategory.AddonMenu_Init()
 	aclogger = AutoCategory.logger
     AutoCategory.cacheInitialize()
 
-	auBagSet.Init()
-	auCatSet.Init()
+	AC_UI.BagSet.Init()
+	AC_UI.DspWin_Init()
+	AC_UI.CatSet_Init()
+	AC_UI.AppearanceMenu_Init()
 
 	AC_UI.RefreshDropdownData()
 	AC_UI.RefreshControls()
@@ -192,7 +195,7 @@ function AutoCategory.AddonMenuInit()
 		AC_UI.GeneralMenu,
 
         -- Appearance Settings
-		AC_UI.AppearanceMenu,		
+		auAppearanceMenu.controlDef(),		
 
 		-- Gamepad settings
 		AC_UI.GamepadMenu,
@@ -203,4 +206,7 @@ function AutoCategory.AddonMenuInit()
 	LAM:RegisterOptionControls("AC_CATEGORY_SETTINGS", optionsTable)
 	CALLBACK_MANAGER:RegisterCallback("LAM-RefreshPanel", RefreshPanel)
 	CALLBACK_MANAGER:RegisterCallback("LAM-PanelControlsCreated", AutoCategory.LengthenRuleBox)
+	CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", function() 
+		AutoCategory.dspWin:SetHidden(true)
+	end)
 end

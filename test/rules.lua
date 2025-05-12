@@ -1457,7 +1457,7 @@ AutoCategory.cache = {
     tags = {}, -- [#] tagname
     bags_svt = {}, -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
-    entriesByName = {}, -- [bagId][rulename] {priority, isHidden}
+    entriesByName = {}, -- [bagId][rulename] {runpriority, showpriority, isHidden}
 	collapses = {},
 }
 local cache = AutoCategory.cache

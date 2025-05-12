@@ -24,14 +24,12 @@ In order to reduce the impact of the add-on:
 
 		Some API events are monitored:
 			- A hook on PLAYER_INVENTORY:OnInventorySlotUpdated triggers re-execution of rules for a single item
-			- A callback on LAM-PanelClosed triggers re-execution of rules (due to potential rule changes)
 			- The event EVENT_STACKED_ALL_ITEMS_IN_BAG is used so re-execution of rules with inventory refresh can be triggered manually by stacking all items.
 ]]
 
 
 local LMP = LibMediaProvider
 local SF = LibSFUtils
-local AC = AutoCategory
 
 -- uniqueIDs of items that have been updated (need rule re-execution),
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
@@ -140,8 +138,6 @@ local function getHeaderFace()
 	local appearance = AutoCategory.acctSaved.appearance
 	AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-	--AutoCategory.logger:Debug("Retrieved face "..SF.str(header_face).." from LMP:Fetch")
-	--return header_face
 end
 
 -- setup function for category header type to be added to the scroll list
@@ -283,6 +279,7 @@ local function runRulesOnEntry(itemEntry, specialType)
 	if itemEntry.typeId == CATEGORY_HEADER then return end
 
 	-- look for a match against rule definitions
+	--localized aliases
 	local data = itemEntry.data
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
@@ -308,53 +305,6 @@ local function runRulesOnEntry(itemEntry, specialType)
 		end
 	end
 	return matchRules(data)
-end
-
-local function reorderDisplayCats(itemEntry, specialType)
-	--only match on items(not headers)
-	if itemEntry.typeId == CATEGORY_HEADER then return end
-
-	-- look for a match against rule definitions
-	local data = itemEntry.data
-	local function lookupShowPri(data)
-		local bagId = data.bagId
-		--local slotIndex = data.slotIndex
-
-		local dispName = SF.safeTable(AutoCategory.saved.displayName[bagId])
-		if not next(dispName) then
-			--d(data.AC_categoryName)
-			if data.AC_categoryPriority then 
-				--d("AC_categoryPriority="..data.AC_categoryPriority)
-				local showPriority = data.AC_categoryPriority
-				data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , data.AC_categoryName)
-			else
-				local showPriority = 0
-				data.AC_sortPriorityName = string.format("%04d%s", 9999-showPriority , data.AC_categoryName)
-			end
-		else
-			if data.AC_matched then
-				--d("AC_categoryName="..data.AC_categoryName)
-				local t,u = string.find(data.AC_categoryName, "%s%(")
-				local catname = data.AC_categoryName
-				if t ~= nil then
-					--d("finding start")
-					catname = string.sub(data.AC_categoryName,1, t-1)
-				end
-				--d("catname="..catname)
-				if not dispName[catname] then
-					data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
-					else
-					--d(dispName[catname].showpri)
-					local showPriority = 1000 - dispName[catname].showpri
-					data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , data.AC_categoryName)
-				end
-
-			else
-				data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
-			end
-		end	
-	end
-	return lookupShowPri(data)
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
@@ -410,7 +360,7 @@ local function constructEntryHash(itemEntry)
 	if FCOIS and not NilOrLessThan(bagId, 0) and not NilOrLessThan(slotIndex,0) then
 		local _, markedIconsArray = FCOIS.IsMarked(bagId, slotIndex, -1)
 		if markedIconsArray then
-			for _, value in ipairs(markedIconsArray) do
+			for _, value in pairs(markedIconsArray) do
 				hashFCOIS = hashFCOIS .. tostring(value)
 			end
 		end
@@ -438,7 +388,7 @@ local function detectItemChanges(itemEntry, newEntryHash, needReload)
 	end
 
 	--- Test if uniqueID tagged for update
-	for i, uniqueID in ipairs(forceRuleReloadByUniqueIDs) do 
+	for i, uniqueID in pairs(forceRuleReloadByUniqueIDs) do 
 		-- look for items with changes detected
 		if data.uniqueID == uniqueID then
 			table.remove(forceRuleReloadByUniqueIDs, i)
@@ -477,7 +427,7 @@ local function handleRules(scrollData, needsReload, specialType)
 	-- so need to always reload
 	local reloadAll = needsReload or false 
 
-	for _, itemEntry in ipairs(scrollData) do
+	for _, itemEntry in pairs(scrollData) do
 		if itemEntry.typeId ~= CATEGORY_HEADER then 
 			local newHash = constructEntryHash(itemEntry)
 			if detectItemChanges(itemEntry, newHash, reloadAll) then 
@@ -485,11 +435,9 @@ local function handleRules(scrollData, needsReload, specialType)
 				updateCount = updateCount + 1
 				runRulesOnEntry(itemEntry, specialType)
 			end
-			--reorderDisplayCats(itemEntry,specialType)
-			--d("sortPriorityName="..itemEntry.data.AC_sortPriorityName)
 		end
 	end
-	forceRuleReloadByUniqueIDs = {} --- reset update buffer
+	SF.safeClearTable(forceRuleReloadByUniqueIDs) --- reset update buffer
 	return updateCount
 end
 
@@ -515,7 +463,7 @@ local function createNewScrollData(scrollData)
 	end
 	-- --------------------
 	-- create newScrollData with headers and only non hidden items. No sorting here!
-	for _, itemEntry in ipairs(scrollData) do 
+	for _, itemEntry in pairs(scrollData) do 
 		-- add visible non-header rows to the new scrollData table
 		if not isHiddenEntry(itemEntry) then
 			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
@@ -631,7 +579,6 @@ local function prehookCraftSort(self)
 
 		-- add header rows
 		self.list.data = createNewScrollData(scrollData) --, self.sortFunction)
-		--table.sort(self.list.data, self.sortFunction) -- unneeded
 	end
 	-- continue on to run follow-on hooks
 	return false

@@ -18,7 +18,7 @@ local ac_rules = AutoCategory.RulesW
 -- depending on the setting of charSaved.accountWide
 AutoCategory.saved = {
     rules = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err} -- obsolete
-    bags = {}, -- [bagId] {rules={name, priority, isHidden}, isUngroupedHidden} -- pairs with collapses
+    bags = {}, -- [bagId] {rules={name, runpriority, showpriority, isHidden}, isUngroupedHidden} -- pairs with collapses
 	general = {},   -- from savedvars
 	appearance = {}, -- from savedvars
 	collapses = {},  -- from savedvars -- charSaved.collapses or acctSaved.collapses -- pairs with bags
@@ -28,7 +28,8 @@ AutoCategory.cache = {
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
-    entriesByName = {}, -- [bagId][rulename]  (BagRule){ name, priority, isHidden }
+    entriesByShowBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
+    entriesByName = {}, -- [bagId][rulename]  (BagRule){ name, runpriority, showpriority, isHidden }
 }
 
 AutoCategory.BagRuleEntry = {}
@@ -193,13 +194,31 @@ local function RuleDataSortingFunction(a, b)
 end
 --]]
 
--- for sorting bagged rules by priority and name
+-- for sorting bagged rules by showpriority and name
 -- returns true if the a should come before b
-local function BagRuleSortingFunction(a, b)
+local function BagRuleShowSortingFunction(a, b)
     local result = false
-	if not (a and b and a.name and b.name and a.priority and b.priority) then return false end
-    if a.priority ~= b.priority then
-        result = a.priority > b.priority
+	if a.showpriority == nil then
+		a.showpriority = a.runpriority
+	end
+	if not (a and b and a.name and b.name and a.showpriority and b.showpriority) then return false end
+    if a.showpriority ~= b.showpriority then
+        result = a.showpriority > b.showpriority
+
+    else
+		if type(a.name) == "table" or type(b.name) == "table" then return false end
+		result = a.name < b.name
+    end
+    return result
+end
+
+-- for sorting bagged rules by runpriority and name
+-- returns true if the a should come before b
+local function BagRuleRunSortingFunction(a, b)
+    local result = false
+	if not (a and b and a.name and b.name and a.runpriority and b.runpriority) then return false end
+    if a.runpriority ~= b.runpriority then
+        result = a.runpriority > b.runpriority
 
     else
 		if type(a.name) == "table" or type(b.name) == "table" then return false end
@@ -396,35 +415,65 @@ function AutoCategory.cacheInitBag(bagId)
     ZO_ClearTable(cache.entriesByName[bagId])
 
 	cache.entriesByBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+	cache.entriesByShowBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES)
 
-	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, priority, isHidden } }
+	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, runpriority, showpriority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
+	local sbag = cache.entriesByShowBag[bagId]		-- CVT
 
 	-- fill the bag-based lookups
-    -- load in the bagged rules (sorted by priority high-to-low) into the dropdown
+    -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
 	if saved.bags[bagId] == nil then
 		saved.bags[bagId] = {rules={}}
 	elseif not saved.bags[bagId].rules then
 		saved.bags[bagId].rules={}
 	end
 
+	aclogger:Debug("Initializing sbag "..bagId.." with bagrules")
 	local svdbag = saved.bags[bagId]
+-- [ [	
 	if svdbag ~= nil then
-		table.sort(svdbag.rules, BagRuleSortingFunction)
+		table.sort(svdbag.rules, BagRuleShowSortingFunction)
+	end
+	local win = AutoCategory.dspWin
+	win:ClearList()
+	for entry = 1, #svdbag.rules do
+		local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+		if not bagrule then break end
+
+		local ruleName = bagrule.name
+		aclogger:Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
+
+		local sn = AutoCategory.BagRuleApi.formatShow(bagrule, bagrule.runpriority)
+		sbag.choices[#sbag.choices+1] = sn
+		sbag.choicesValues[#sbag.choicesValues+1] = AutoCategory.BagRuleApi.formatValue(bagrule)
+		win:AddItem(sn)
+	end
+	win:UpdateScrollList()
+	-- ] ]
+		
+		
+	if svdbag ~= nil then
+		table.sort(svdbag.rules, BagRuleRunSortingFunction)
 	end
 
 	aclogger:Debug("Initializing bag "..bagId.." with bagrules")
 	for entry = 1, #svdbag.rules do
-		local bagrule = svdbag.rules[entry] -- BagRule {name, priority, isHidden}
+		local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
 		if not bagrule then break end
 
 		local ruleName = bagrule.name
+		if bagrule.priority ~= nil then
+			bagrule.runpriority = bagrule.priority
+			bagrule.showpriority = bagrule.priority
+			bagrule.priority = nil
+		end
 		--aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
 		if not ename[ruleName] then
 			ename[ruleName] = bagrule
 			ebag.choicesValues[#ebag.choicesValues+1] = AutoCategory.BagRuleApi.formatValue(bagrule)
 
-			local sn = AutoCategory.BagRuleApi.formatShow(bagrule)
+			local sn = AutoCategory.BagRuleApi.formatShow(bagrule, bagrule.runpriority)
 			local tt = AutoCategory.BagRuleApi.formatTooltip(bagrule)
 			ebag.choices[#ebag.choices+1] = sn
 			ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
@@ -432,6 +481,7 @@ function AutoCategory.cacheInitBag(bagId)
             ename[ruleName] = bagrule
 		end
 	end
+
 end
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
@@ -439,9 +489,10 @@ function AutoCategory.cacheBagInitialize()
 	-- initialize the bag-based lookups
     ZO_ClearTable(cache.entriesByName)
     ZO_ClearTable(cache.entriesByBag)
+    ZO_ClearTable(cache.entriesByShowBag)
 
 	-- fill the bag-based lookups
-    -- load in the bagged rules (sorted by priority high-to-low) into the dropdown
+    -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
     for bagId = 1, 6 do
 		AutoCategory.cacheInitBag(bagId)
     end
@@ -488,6 +539,10 @@ function AutoCategory.cache.AddRule(rule)
     if ac_rules.tagGroups[rule.tag] == nil then
         ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
+
+	if rule.showpriority == nil then
+		rule.showpriority = rule.runpriority
+	end
 
 	local rule_ndx = ac_rules.ruleNames[rule.name]
     if rule_ndx then
@@ -597,18 +652,18 @@ local function addTableRules(tbl, tblname, ispredef)
 
 		r =getRuleByName(v.name)
 		if r then
-			aclogger:Warn("Found duplicate rule name - "..v.name)
+			--aclogger:Warn("Found duplicate rule name - "..v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so don't add it again
-				aclogger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
+				--aclogger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
 
 			else
 				local oldname = v.name
 				-- rename different rule
 				newName = getUsableRuleName(v.name)
 				v.name = newName
-				aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
+				--aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
 				addCombinedRule(v)
 				AutoCategory.renameBagRule(oldname, newName)
@@ -618,7 +673,7 @@ local function addTableRules(tbl, tblname, ispredef)
 				else
 					-- add to acctRules
 					addUserRule(tbl, v)
-					aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+					--aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 				end
 			end
 
@@ -630,12 +685,12 @@ local function addTableRules(tbl, tblname, ispredef)
 			if RuleApi.isPredefined(v) then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
-				aclogger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				--aclogger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 
 		    else
 				-- it's a user rule
 				addUserRule(tbl, v)
-				aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				--aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 			end
         end
     end
@@ -738,6 +793,9 @@ function AutoCategory.onPlayerActivated()
 	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCategory.BulkMode = false end)
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCategory.BulkMode = false end)
 
+	--create window to show display order
+	--AutoCategory.dspWin = SF.CreateMsgWin("DisplayOrder","Show Category Display Order", nil, nil, false)
+	AutoCategory.dspWin = AC_UI.DspWin:New("DisplayOrder","Category Display Order", nil, nil, false)
 	--capabilities with other (older) add-ons
 	IntegrateQuickMenu()
 
@@ -761,7 +819,8 @@ function AutoCategory.onPlayerActivated()
     AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.initializePlugins()
 	AutoCategory.cacheInitialize()
-	AutoCategory.AddonMenuInit()
+	AutoCategory.AddonMenu_Init()
+	AutoCategory.AC_Classes_Init()
 	AutoCategory.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
 end
 

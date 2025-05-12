@@ -1300,8 +1300,8 @@ function AutoCategory.RuleFunc.IsTag( ... )
 			table.insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
 		end
 	end
-	for _,idsc in ipairs(itemTagStrings) do
-		for _,desc in ipairs(taglist) do
+	for _,idsc in pairs(itemTagStrings) do
+		for _,desc in pairs(taglist) do
 			if string.lower(idsc) == string.lower(desc) then return true end
 		end
 	end

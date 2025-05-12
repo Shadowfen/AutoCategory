@@ -21,12 +21,7 @@ end
 --                      If you do not provide this, it will be set to a function that
 --                      ALWAYS returns false. 
 function AutoCategory.AddRuleFunc(name, func)
-    if func == nil then
-        AutoCategory.Environment[name] = AutoCategory.dummyRuleFunc
-
-    else
-        AutoCategory.Environment[name] = func
-    end
+    AC.Environment[name] = func or AC.dummyRuleFunc
 end
 
 -- Load in localization strings for a plugin
@@ -39,7 +34,7 @@ end
 --                     language is not supported (we don't have a table for it).
 --                     The default value is "en" if you do not specify.
 function AutoCategory.LoadLanguage(stringtable, default_language)
-    return SF.LoadLanguage(stringtable, default_language)
+    return SF.LoadLanguage(stringtable, default_language or "en")
 end
 
 -- Register the plugin with AutoCategory so that it will be initialized along with
