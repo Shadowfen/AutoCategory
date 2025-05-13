@@ -529,9 +529,6 @@ function CatSet_DeleteCat_LAM:execute()
 	end
 
 	AutoCategory.cacheBagInitialize()
-	--if currentRule.tag == value then
-	--	CatSet_SelectRule_LAM:select(currentRule.name)
-	--end
 	CatSet_SelectRule_LAM:refresh()
 	CatSet_SelectRule_LAM:updateControl()
 
@@ -543,12 +540,12 @@ function CatSet_DeleteCat_LAM:execute()
 	CatSet_SelectRule_LAM:updateControl()
 
 	AC_UI.BagSet_SelectRule_LAM:refresh()
-	--AC_UI.BagSet_SelectRule_LAM:setValue(currentRule.name)
 	AC_UI.BagSet_SelectRule_LAM:updateControl()
+	BagSet_ShowRule_LAM:refresh(bag)
 
 	AC_UI.AddCat_SelectRule_LAM:refresh()
-	--AC_UI.RefreshDropdownData()
 	AC_UI.RefreshControls()
+	AC_UI.BagSet_RefreshOrder()
 end
 
 function CatSet_DeleteCat_LAM:controlDef()
