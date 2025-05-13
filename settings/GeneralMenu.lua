@@ -30,6 +30,18 @@ AC_UI.GeneralMenu = {
                 end,
         },
 
+        -- Show category "SET ()"
+        {
+            type = "checkbox",
+            name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
+            tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
+            getFunc = function() return AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] end,
+            setFunc = function(value)
+                AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] = value
+                AutoCategory.ResetCollapse(AutoCategory.saved)
+            end,
+        },
+        AC_UI.divider(),
         -- Show category collapse icon
         {
             type = "checkbox",
@@ -54,16 +66,5 @@ AC_UI.GeneralMenu = {
             disabled = function() return AutoCategory.saved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false end,
         },
 
-        -- Show category "SET ()"
-        {
-            type = "checkbox",
-            name = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE,
-            tooltip = SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP,
-            getFunc = function() return AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] end,
-            setFunc = function(value)
-                AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] = value
-                AutoCategory.ResetCollapse(AutoCategory.saved)
-            end,
-        },
     }
 }
