@@ -9,7 +9,6 @@ local AC = AutoCategory
 --local CVT = AutoCategory.CVT
 local aclogger
 --local RuleApi = AutoCategory.RuleApi
---local ARW = AutoCategory.ARW
 --local RulesW = AutoCategory.RulesW
 
 

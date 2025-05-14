@@ -495,7 +495,6 @@ function CatSet_DeleteCat_LAM:execute()
 		-- remove from the rule list that gets saved
 		AutoCategory.ARW:removeRuleByName(oldRuleName)
 		AutoCategory.cacheRuleInitialize()
-		--AC_UI.RefreshDropdownData()
 	end
 
 	if oldRuleName == AC_UI.AddCat_SelectRule_LAM:getValue() then
