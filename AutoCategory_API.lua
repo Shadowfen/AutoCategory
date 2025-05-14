@@ -87,6 +87,7 @@ function AutoCategory.validateACBagRules(acBagType)
 		return
 	end
 
+	-- aliases
 	local bagRuleApi = AutoCategory.BagRuleApi
 
 	-- Make sure all of the rules in the bag are evaluated if damaged and marked appropriately
