@@ -738,6 +738,7 @@ end
 
 function AC_UI.CatSet_Init()
 	aclogger = AutoCategory.logger
+	
     CatSet_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags} )
 end
 

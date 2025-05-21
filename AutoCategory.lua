@@ -7,8 +7,6 @@ local AC = AutoCategory
 local CVT = AutoCategory.CVT
 local aclogger = AutoCategory.logger
 local RuleApi = AutoCategory.RuleApi
---local BagRuleApi = AutoCategory.BagRuleApi
---local ARW = AutoCategory.ARW
 local ac_rules = AutoCategory.RulesW
 
 ----------------------
@@ -28,7 +26,7 @@ AutoCategory.cache = {
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
-    entriesByShowBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
+    entriesByShowBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, bagrules} --
     entriesByName = {}, -- [bagId][rulename]  (BagRule){ name, runpriority, showpriority, isHidden }
 }
 
@@ -175,24 +173,6 @@ local function RuleSortingFunction(a, b)
     end
     return a.name < b.name
 end
-
--- for sorting rules by tag and name
--- returns true if the a should come before b
--- unused
---[[
-local function RuleDataSortingFunction(a, b)
-    local result = false
-    if a.tag ~= b.tag then
-        result = a.tag < b.tag
-
-    else
-        --alphabetical sort, cannot have same name rules
-        result = a.name < b.name
-    end
-
-    return result
-end
---]]
 
 -- for sorting bagged rules by showpriority and name
 -- returns true if the a should come before b
@@ -370,6 +350,7 @@ function AutoCategory.renameBagRule(oldName, newName)
 			local rule = rules[j]
 			if rule.name == oldName then
 				rule.name = newName
+				break
 			end
 		end
 	end
@@ -411,15 +392,17 @@ function AutoCategory.cacheInitBag(bagId)
 	end
 
 	-- initialize the bag-based lookups for this bag
-	cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId])
-    ZO_ClearTable(cache.entriesByName[bagId])
+    cache.entriesByName[bagId] = SF.safeClearTable(cache.entriesByName[bagId])
 
 	cache.entriesByBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 	cache.entriesByShowBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES)
+	cache.entriesByShowBag[bagId].bagrules = {}
 
+	-- aliases
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, runpriority, showpriority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
 	local sbag = cache.entriesByShowBag[bagId]		-- CVT
+	local bagRuleApi = AutoCategory.BagRuleApi
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
@@ -430,27 +413,29 @@ function AutoCategory.cacheInitBag(bagId)
 	end
 
 	aclogger:Debug("Initializing sbag "..bagId.." with bagrules")
-	local svdbag = saved.bags[bagId]
--- [ [	
+	local svdbag = saved.bags[bagId]		-- alias
+
 	if svdbag ~= nil then
 		table.sort(svdbag.rules, BagRuleShowSortingFunction)
 	end
 	local win = AutoCategory.dspWin
 	win:ClearList()
-	for entry = 1, #svdbag.rules do
-		local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-		if not bagrule then break end
+	do
+		local sn
+		for entry = 1, #svdbag.rules do
+			local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+			if not bagrule then break end
 
-		local ruleName = bagrule.name
-		aclogger:Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
+			--aclogger:Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
 
-		local sn = AutoCategory.BagRuleApi.formatShow(bagrule, bagrule.runpriority)
-		sbag.choices[#sbag.choices+1] = sn
-		sbag.choicesValues[#sbag.choicesValues+1] = AutoCategory.BagRuleApi.formatValue(bagrule)
-		win:AddItem(sn)
+			sn = bagRuleApi.formatShow(bagrule)
+			sbag.choices[#sbag.choices+1] = sn
+			sbag.choicesValues[#sbag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
+			sbag.bagrules[#sbag.bagrules+1] = bagrule
+			win:AddItem(bagrule) --sn)
+		end
 	end
 	win:UpdateScrollList()
-	-- ] ]
 		
 		
 	if svdbag ~= nil then
@@ -458,27 +443,29 @@ function AutoCategory.cacheInitBag(bagId)
 	end
 
 	aclogger:Debug("Initializing bag "..bagId.." with bagrules")
-	for entry = 1, #svdbag.rules do
-		local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-		if not bagrule then break end
+	do
+		local sn
+		local tt
+		local bagrule
+		local bagRuleApi = AutoCategory.BagRuleApi
+		for entry = 1, #svdbag.rules do
+			bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+			if not bagrule then break end
 
-		local ruleName = bagrule.name
-		if bagrule.priority ~= nil then
-			bagrule.runpriority = bagrule.priority
-			bagrule.showpriority = bagrule.priority
-			bagrule.priority = nil
-		end
-		--aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
-		if not ename[ruleName] then
-			ename[ruleName] = bagrule
-			ebag.choicesValues[#ebag.choicesValues+1] = AutoCategory.BagRuleApi.formatValue(bagrule)
+			local ruleName = bagrule.name
+			AutoCategory.BagRuleApi.convertPriority(bagrule)
+			--aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
+			if not ename[ruleName] then
+				ename[ruleName] = bagrule
+				ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
 
-			local sn = AutoCategory.BagRuleApi.formatShow(bagrule, bagrule.runpriority)
-			local tt = AutoCategory.BagRuleApi.formatTooltip(bagrule)
-			ebag.choices[#ebag.choices+1] = sn
-			ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
-        else
-            ename[ruleName] = bagrule
+				sn = bagRuleApi.formatShow(bagrule)
+				tt = bagRuleApi.formatTooltip(bagrule)
+				ebag.choices[#ebag.choices+1] = sn
+				ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
+			else
+				ename[ruleName] = bagrule
+			end
 		end
 	end
 
@@ -525,6 +512,25 @@ function AutoCategory.GetRuleByName(name)
     return ac_rules.ruleList[ndx]
 end
 
+-- find and return the bagrule referenced by name
+function AutoCategory.GetBagRuleByName(bagId, name)
+    if not name then
+        return nil, nil
+    end
+
+	local bagrules = AutoCategory.cache.entriesByShowBag[bagId]
+	if not bagrules then return nil end
+	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(
+			bagrules.choicesValues, 
+			name)
+    if not ndx then
+        return nil, nil
+    end
+
+    return bagrules.bagrules[ndx], ndx
+end
+
+
 -- when we add a new rule to RulesW.ruleList, also add it to the various lookups and dropdowns
 -- returns nil on success or error message
 function AutoCategory.cache.AddRule(rule)
@@ -540,9 +546,7 @@ function AutoCategory.cache.AddRule(rule)
         ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	if rule.showpriority == nil then
-		rule.showpriority = rule.runpriority
-	end
+	AutoCategory.BagRuleApi.convertPriority(rule)
 
 	local rule_ndx = ac_rules.ruleNames[rule.name]
     if rule_ndx then
@@ -604,8 +608,6 @@ local function addTableRules(tbl, tblname, ispredef)
 
 	aclogger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
-	-- create name lookup for acctRules
-	--local lkacctRules = AutoCategory.ARW:getLookup()
 	local newName
 
 	-- add a rule to the combined rules list and the name-lookup
@@ -762,9 +764,6 @@ function AutoCategory.onLoad(event, addon)
 
 		-- There are no char-level variables for AutoCatRules!
     AutoCategory.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCategory.default_rules)
-	--if SF.isEmpty(AutoCategory.acctRules) then
-	--	SF.defaultMissing(AutoCategory.acctRules,AutoCategory.default_rules)
-	--end
 	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
 
 	AutoCategory.LoadCollapse()
@@ -794,8 +793,8 @@ function AutoCategory.onPlayerActivated()
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCategory.BulkMode = false end)
 
 	--create window to show display order
-	--AutoCategory.dspWin = SF.CreateMsgWin("DisplayOrder","Show Category Display Order", nil, nil, false)
-	AutoCategory.dspWin = AC_UI.DspWin:New("DisplayOrder","Category Display Order", nil, nil, false)
+	AutoCategory.dspWin = AC_UI.DspWin.New()
+		
 	--capabilities with other (older) add-ons
 	IntegrateQuickMenu()
 
@@ -880,7 +879,7 @@ local inven_data = {
 
 local function refreshList(inventoryType, even_if_hidden)
 	if even_if_hidden == nil then even_if_hidden = false end
-	if not inventoryType or not inven_data[inventoryType] then return end
+	if not inventoryType or not inven_data[inventoryType] then return false end
 
 	local obj = inven_data[inventoryType].object
 	local ctl = inven_data[inventoryType].control
@@ -911,6 +910,10 @@ AutoCategory.RefreshList = refreshList
 function AutoCategory.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
 
+	for k,v in pairs( inven_data ) do
+		refreshList(k, even_if_hidden) 
+	end
+	--[[
 	refreshList(INVENTORY_BACKPACK, even_if_hidden)
 	refreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
 	refreshList(INVENTORY_GUILD_BANK, even_if_hidden)
@@ -919,6 +922,7 @@ function AutoCategory.RefreshCurrentList(even_if_hidden)
 	refreshList(AC_DECON, even_if_hidden)
 	refreshList(AC_IMPROV, even_if_hidden)
 	refreshList(UV_DECON, even_if_hidden)
+	--]]
 end
 -- create local alias for references within this file
 

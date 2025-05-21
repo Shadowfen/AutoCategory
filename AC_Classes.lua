@@ -6,7 +6,6 @@ local AC = AutoCategory
 
 local aclogger
 --local RuleApi = AutoCategory.RuleApi
---local BagRuleApi = AutoCategory.BagRuleApi
 
 -- -------------------------------------------------------
 -- The CVT class manages the choices, choicesValues, and
@@ -777,7 +776,17 @@ AutoCategory.RuleApi = {
 -- -------------------------------------------------
 -- collected functions to be applied to a BagRule
 --
-AutoCategory.BagRuleApi = {
+local bagRuleApi = {
+	convertPriority = function (bagrule)
+			if bagrule.priority then 
+				bagrule.runpriority = bagrule.priority
+				bagrule.priority = nil
+			end
+			if not bagrule.showpriority then 
+				bagrule.showpriority = bagrule.runpriority
+			end
+		end,
+
 	isValid = function (bagrule)
 			if not bagrule.name or bagrule.name == "" then
 				return false
@@ -791,34 +800,40 @@ AutoCategory.BagRuleApi = {
 		end,
 
 	-- formatShow() creates a string to represent the bagrule in the UI dropdown.
-	-- It combines the name and runpriority and optionally marks or colorizes them
+	-- It combines the name and runpriority and showpriority and optionally marks or colorizes them
 	-- based on if the bag rule is marked "hidden" or if the backing Rule has
 	-- disappeared (i.e the bag rule is now invalid).
 	-- If no priority is passed in then the rule's runpriority is used.
 	-- Returns the string for the bagrule dropdown. Format: "name (runpriority/showpriority)"
-	formatShow	= function (bagrule, priority)
-		-- if we don't have a priority passed in then initialize to runpriority from bagrule.
-		if priority == nil then
-			priority = bagrule.runpriority
-		end
+	formatShow	= function (bagrule)
 
-		local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
-			if bagrule.showpriority == nil then
-				bagrule.showpriority = priority
-			end
+			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
+			AutoCategory.BagRuleApi.convertPriority(bagrule)
+
 			local sn = nil
 			if not rule then
 				-- missing rule (nil was passed in)
-				sn = string.format("|cFF4444(!)|r %s (%d/%d)", bagrule.name, priority, bagrule.showpriority)
+				sn = string.format("|cFF4444(!)|r %s (%d/%d)", bagrule.name, bagrule.runpriority, bagrule.showpriority)
 
 			else
-				--make sure we have a showpriority in our bagrule
 				if bagrule.isHidden then
 					-- grey out the "hidden" category header
-					sn = string.format("|c626250%s (%d/%d)|r", bagrule.name, priority, bagrule.showpriority)
+					local r, g, b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
+					local hex = "626250"
+					if r and not AutoCategory.saved.general["ENABLE_GAMEPAD"] then
+						r,g,b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
+						hex = SF.colorRGBToHex(r, g, b)
+					end
+					sn = string.format("|c%s%s (%d/%d)|r", hex, bagrule.name, bagrule.runpriority, bagrule.showpriority)
 
 				else
-					sn = string.format("%s (%d/%d)", bagrule.name, priority, bagrule.showpriority)
+					if  AutoCategory.saved.general["ENABLE_GAMEPAD"] then
+						sn = string.format("%s (%d/%d)", bagrule.name, bagrule.runpriority, bagrule.showpriority)
+					else
+						local r, g, b = unpack(AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"])
+						local hex = SF.colorRGBToHex(r, g, b)
+						sn = string.format("|c%s%s (%d/%d)|r", hex, bagrule.name, bagrule.runpriority, bagrule.showpriority)
+					end
 				end
 			end
 			return sn
@@ -828,7 +843,7 @@ AutoCategory.BagRuleApi = {
 	-- when hovering over the bag rule in the dropdown menu.
 	formatTooltip = function (bagrule)
 			local tt = nil
-			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
+			local rule =AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)
 				tt = L(SI_AC_WARNING_CATEGORY_MISSING)
@@ -849,13 +864,17 @@ AutoCategory.BagRuleApi = {
 	-- Allows setting the isHidden value for the bag rule
 	-- (translates false into nil to reduce junk in saved variables).
 	setHidden = function (bagrule, isHidden)
-		if isHidden == false then bagrule.isHidden = nil end
+		if isHidden == false then 
+			bagrule.isHidden = nil
+			return false
+		end
 		if bagrule.isHidden == isHidden then return bagrule.isHidden end
-		if isHidden == false then isHidden = nil end
 		bagrule.isHidden = isHidden
 		return bagrule.isHidden
 	end,
 }
+-- make accessible
+AutoCategory.BagRuleApi = bagRuleApi
 
 function AutoCategory.AC_Classes_Init()
 	aclogger = AutoCategory.logger

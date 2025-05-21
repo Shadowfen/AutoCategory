@@ -49,6 +49,8 @@ local BagSet_ShowCatOrder_LAM = AC.BaseUI:New()	-- button
 local BagSet_HideCat_LAM = AC.BaseUI:New()		-- checkbox
 local BagSet_EditCat_LAM = AC.BaseUI:New()	-- button
 local bagSet_RemoveCat_LAM = AC.BaseUI:New()	-- button
+AC_UI.BagSet_RemoveCat_LAM = bagSet_RemoveCat_LAM -- make accessible to DisplayOrderWin
+AC_UI.BagSet_EditCat_LAM = BagSet_EditCat_LAM -- make accessible to DisplayOrderWin
 
 local AddCat_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_ADDCATEGORY_TAG")	-- only uses choices
 AC_UI.AddCat_SelectTag_LAM = AddCat_SelectTag_LAM
@@ -139,6 +141,8 @@ function BagSet_SelectBag_LAM:setValue(value)
 	AddCat_SelectRule_LAM:refresh()
 
 	AC_UI.RefreshControls()
+	AC_UI.BagSet_RefreshOrder()
+
 end
 
 function BagSet_SelectBag_LAM:controlDef()
@@ -223,7 +227,9 @@ function BagSet_HideCat_LAM:setValue(value)
 			AutoCategory.cacheBagInitialize()
 			AC_UI.RefreshDropdownData()
 			BagSet_SelectRule_LAM:setValue(ruleNm)
+			BagSet_ShowRule_LAM:refresh(bag)
 			AC_UI.RefreshControls()
+			AC_UI.BagSet_RefreshOrder()
 		end
 	end
 end
@@ -283,12 +289,10 @@ end
 function BagSet_SelectRule_LAM:setValue(val)
 	if not val then return end
 	
-	--aclogger:Warn("BagSet_SelectRUle_LAM:setValue to "..val)
 	self:select(val)
 	currentBagRule = val
 	local bagrule = AutoCategory.cache.entriesByName[getCurrentBagId()][val]
 	if bagrule and bagrule.runpriority then
-		--aclogger:Warn("BagSet_SelectRUle_LAM - found bagrule named "..val.." in bag "..getCurrentBagId())
 		if bagrule.showpriority == nil then
 			bagrule.showpriority = bagrule.runpriority
 		end
@@ -296,7 +300,7 @@ function BagSet_SelectRule_LAM:setValue(val)
 		BagSet_ShowPriority_LAM:setValue(bagrule.showpriority)
 
 		AC_UI.RefreshControls()
-
+		AutoCategory.dspWin.SelectItem(AutoCategory.dspWin,getCurrentBagId(), bagrule.name)
 	end
 end
 
@@ -328,12 +332,10 @@ function BagSet_ShowRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	--aclogger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
 		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and AutoCategory.cache.entriesByBag[currentBag] then
-			--aclogger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
 			dataCurrentRules_EditBag:assign(AutoCategory.cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
@@ -344,7 +346,6 @@ function BagSet_ShowRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	--aclogger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_ShowRule_LAM field
@@ -361,6 +362,7 @@ function BagSet_ShowRule_LAM:setValue(val)
 		end
 		BagSet_RunPriority_LAM:setValue(bagrule.runpriority)
 		BagSet_ShowPriority_LAM:setValue(bagrule.showpriority)
+		
 	end
 end
 
@@ -419,7 +421,9 @@ function BagSet_RunPriority_LAM:setValue(value)
 		AC_UI.CatSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:refresh()
+		BagSet_ShowRule_LAM:refresh(bag)
 		AC_UI.RefreshControls()
+		AC_UI.BagSet_RefreshOrder()
 	end
 end
 
@@ -484,8 +488,10 @@ function BagSet_ShowPriority_LAM:setValue(value)
 		AC_UI.CatSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:setValue(ruleName)
 		BagSet_SelectRule_LAM:refresh()
+		BagSet_ShowRule_LAM:refresh(bag)
 		AC_UI.RefreshControls()
 	end
+	AC_UI.BagSet_RefreshOrder()
 end
 
 function BagSet_ShowPriority_LAM:controlDef()
@@ -519,20 +525,15 @@ function BagSet_ShowCatOrder_LAM:execute()
 	-- load the window with the current order
 	local bagId = getCurrentBagId()
 	AutoCategory.cacheInitBag(bagId)
+	BagSet_ShowRule_LAM:refresh(bagId)
+	AC_UI.BagSet_RefreshOrder()
+	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	BagSet_SelectRule_LAM:setValue(BagSet_SelectRule_LAM:getValue())
 
-	local sbag = AutoCategory.cache.entriesByShowBag[bagId]		-- CVT
-	--if sbag == nil then aclogger:Error("AutoCategory.cache.entriesByShowBag["..bagId.."] is nil"); return end
-	--if sbag.choices == nil then aclogger:Error("sbag.choices is nil"); return end
-
-	local win = AutoCategory.dspWin
-	win:ClearList()
-	for i = 1, #sbag.choices do
-		win:AddItem(sbag.choices[i])
-	end
-	win:UpdateScrollList()
-	
 	-- display the window
-	win:SetHidden(false)
+	AutoCategory.dspWin:SetHidden(false)
+	AutoCategory.dspWin:BringWindowToTop()	-- doesn't work if window is hidden
+
 end
 
 function BagSet_ShowCatOrder_LAM:controlDef()
@@ -600,7 +601,9 @@ function bagSet_RemoveCat_LAM:execute()
 	AutoCategory.cacheBagInitialize()
 	BagSet_SelectRule_LAM:refresh()
 	AddCat_SelectRule_LAM:refresh()
+	BagSet_ShowRule_LAM:refresh(bagId)
 	AC_UI.RefreshControls()
+	AC_UI.BagSet_RefreshOrder()
 end
 
 function bagSet_RemoveCat_LAM:controlDef()
@@ -800,6 +803,8 @@ function AddCat_BagAdd_LAM:execute()
 	BagSet_SelectRule_LAM:updateControl()
 
 	AddCat_SelectRule_LAM:updateControl()
+	BagSet_ShowRule_LAM:refresh(bagId)
+	AC_UI.BagSet_RefreshOrder()
 end
 
 function AddCat_BagAdd_LAM:controlDef()
@@ -1009,6 +1014,27 @@ function AC_UI.BagSet.controlDef()
 	}
 end	
 
+function AC_UI.BagSet_ResetPriority()
+	runprior = BagSet_RunPriority_LAM:getValue()
+	BagSet_ShowPriority_LAM:setValue(runprior)
+end
+
+function AC_UI.BagSet_ResetAllPriority()
+	local bagId = getCurrentBagId()
+	if not bagId then return end
+	local bag = AutoCategory.cache.entriesByBag[bagId].choicesValues
+	local rulename
+	for k = 1, #bag do
+		rulename = bag[k]
+		bagrule = AutoCategory.GetBagRuleByName(bagId, rulename)
+		if bagrule then 
+			bagrule.showpriority = bagrule.runpriority
+		end
+	end
+	AC_UI.BagSet.refresh()
+end
+
+
 function AC_UI.BagSet.clear()				
 	BagSet_SelectBag_LAM:select(AC_BAG_TYPE_BACKPACK)
 	BagSet_SelectRule_LAM:clearIndex()
@@ -1027,10 +1053,49 @@ function AC_UI.BagSet.refresh()
 	
 end
 
+function AC_UI.BagSet_RefreshOrder()
+	local bag = getCurrentBagId()
+	local sbag = AutoCategory.cache.entriesByShowBag[bag]		-- CVT
+	if sbag and sbag.choices then
+		local win = AutoCategory.dspWin
+		win:ClearList()
+		for i = 1, #sbag.bagrules do
+			win:AddItem(sbag.bagrules[i])
+		end
+		win:UpdateScrollList()
+	end
+end
+
 function AC_UI.BagSet.SelectRule(name)
-	BagSet_SelectRule_LAM:refresh()
+	--BagSet_SelectRule_LAM:refresh()
 	BagSet_SelectRule_LAM:setValue(name)
 	BagSet_SelectRule_LAM:updateControl()
+end
+
+function AC_UI.BagSet.HideCategory(name)
+	--BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:setValue(name)
+	BagSet_HideCat_LAM:setValue(true)
+
+	BagSet_ShowRule_LAM:refresh()
+	BagSet_SelectRule_LAM:updateControl()
+	AC_UI.BagSet_RefreshOrder()
+end
+
+function AC_UI.BagSet_GetHideCatStatus(name)
+	--BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:setValue(name)
+	local val = BagSet_HideCat_LAM:getValue()
+	return val
+end
+
+function AC_UI.BagSet.ShowCategory(name)
+	--BagSet_SelectRule_LAM:refresh()
+	BagSet_SelectRule_LAM:setValue(name)
+	BagSet_HideCat_LAM:setValue(false)
+	BagSet_SelectRule_LAM:updateControl()
+	BagSet_ShowRule_LAM:refresh()
+	AC_UI.BagSet_RefreshOrder()
 end
 
 function AC_UI.BagSet.updateControls()
