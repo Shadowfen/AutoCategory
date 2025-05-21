@@ -1,9 +1,13 @@
 [COLOR="DeepSkyBlue"]4.4.0 (122)[/COLOR]:
 [LIST]
 [*] NEW: In the Bag Settings, the bag priority has been separated into a "run priority" and a "show priority" and both are displayed in the category dropdowp as "catname (run/show)". The run priority sets the order in which rules are run just as the old priority did. The show prioriiity runs AFTER the rules have run to rearrange categories in the order that you specify for display in your inventory window.
-[*] NEW: A button ("Show Category Order") in the Bag Settings under the "show priority" slider will open up a window that will show the names of the categories in the order by their "show priority". If it does not refresh automatically when you change bags or priorities, you can push the button again (after changes) so it will refresh the window with the new order. Closing "Settings" will automatically dismiss the window (as will simply hitting the X on it).
-[*] NEW: A "Category Order Display" window that is brought up by the Show Category Order button. You can left click on the entries in the window to select the same entry in Bag Settings - making it easier to adjust show priorities. Right clicking on an entry in the Display Order window will give you a context menu of other actions you can take on the category item.
+[*] NEW: A button ("Show Category Order") in the Bag Settings under the "show priority" slider will open up a window that will show the names of the categories in the order by their "show priority". If you click it again while the window is visible, it will refresh the window with the any changes. Closing "Settings" will automatically dismiss the window (as will simply hitting the X on it).
+[*] NEW: A "Category Order Display" window that is brought up by the "Show Category Order" button. You can left click on the entries in the window to select the same entry in Bag Settings - making it easier to adjust show priorities.
+[*] NEW: Selecting a category in the Bag Settings section will highlight and make visible the corresponding entry in the "Category Display Order" window.
+[*] NEW: A context menu has been added to the "Category Order Display" window so that when you right-click on an entry in the "Category Display Order" window various actions you can call on the category item(s).
+[*] NEW: Update language texts for all currently supported languages thanks to Google. Corrections would be welcomed!
 
+[*] Convert from .txt manifest to .addon manifest.
 [*] Fixed the color display for a non-hidden category to the color specified in the Appearance Settings.
 [*] Fixed the color display for a hidden category to the color specified in the Appearance Settings.
 [*] Update minimum version requirement for LibAddonMenu to 38

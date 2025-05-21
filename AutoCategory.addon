@@ -1,0 +1,51 @@
+## Title: AutoCategory
+## APIVersion: 101046 101045
+## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
+## Description: Inventory categorization. Type "/ac" for settings
+## Version: 4.4.0
+## AddOnVersion: 122
+## SavedVariables: AutoCategorySavedVars AutoCatRules
+## DependsOn: LibAddonMenu-2.0>=38 LibCustomMenu>=730 LibSFUtils>=58 LibMediaProvider-1.0>=33 LibDebugLogger>=268
+## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker>=75 
+## OptionalDependsOn: MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge DressingRoom
+
+
+lang/strings.lua
+lang/$(language).lua
+
+ZOS_Overwrites.lua
+
+AutoCategory_Global.lua
+AutoCategory_Defaults.lua
+Plugin_API.lua
+AutoCategory.xml
+Hooks_Keyboard.lua
+Hooks_Gamepad.lua
+AC_Classes.lua
+AutoCategory.lua
+
+settings/UI_Utilities.lua
+settings/GeneralMenu.lua
+settings/AppearanceMenu.lua
+settings/GamepadMenu.lua
+settings/BagSet.lua
+settings/CategorySettings.lua
+settings/DisplayOrderWin.lua
+
+AddonMenu.lua
+AutoCategory_RuleFunc.lua
+AutoCategory_API.lua
+plugins/Misc_Plugins.lua
+
+; new style addon plugin files
+plugins/ItemMarker_Plugin.lua
+plugins/ItemSaver_Plugin.lua
+plugins/FCOIS_Plugin.lua
+plugins/Iakoni_GearChanger_Plugin.lua
+plugins/UnknownTracker_Plugin.lua
+plugins/DressingRoom2018_Plugin.lua
+
+; old integration with other addons files
+AutoCategory_Integrations_QuickMenu.lua
+
+Bindings.xml
