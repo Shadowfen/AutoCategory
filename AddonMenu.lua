@@ -1,19 +1,7 @@
 -- aliases
 local LAM = LibAddonMenu2
-local LMP = LibMediaProvider
 local SF = LibSFUtils
-local AC = AutoCategory
 
---local L = GetString
-
---local CVT = AutoCategory.CVT
-local aclogger
---local RuleApi = AutoCategory.RuleApi
---local RulesW = AutoCategory.RulesW
-
-
---local cache = AutoCategory.cache
---local saved = AutoCategory.saved
 
 local auBagSet = AC_UI.BagSet
 local auCatSet = AC_UI.CatSet
@@ -149,7 +137,6 @@ end
 
 
 function AutoCategory.AddonMenu_Init()
-	aclogger = AutoCategory.logger
     AutoCategory.cacheInitialize()
 
 	AC_UI.BagSet.Init()
