@@ -813,7 +813,7 @@ function AutoCategory.onPlayerActivated()
 	addTableRules(AutoCategory.charSaved, ".charSaved", false)
 	AutoCategory.charSaved.rules = nil	-- no longer used
 
-	AutoCategory.logger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	--AutoCategory.logger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
 
     AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.initializePlugins()

@@ -136,7 +136,7 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	--AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
 end
 

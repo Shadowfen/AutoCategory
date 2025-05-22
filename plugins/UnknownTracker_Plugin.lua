@@ -115,15 +115,11 @@ local function lookupItem(itemLink, characters)
         -- not a real item
         return false 
     end
-    --d("item "..itemLink)
-    --d("characters")
-    --d(characters)
     if not knownlist then 
         -- noone knows it
         return true 
     end
-    --d("knownby")
-    --d(knownlist)
+
     -- find out who doesn't know it
     if not knownlist or not next(knownlist) then
         return true
@@ -190,7 +186,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
     if not itemLink then return false end
 
 	-- it is an item that can be learned
-    local itemType,sptype = GetItemLinkItemType(itemLink)
+    local itemType, sptype = GetItemLinkItemType(itemLink)
     local islearnable = false
 	if valid_itemtypes[itemType] == true then
         islearnable = true

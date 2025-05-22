@@ -131,7 +131,7 @@ end
 
 
 local function SetSelected(scrollList, index, data)
-    AutoCategory.logger:Warn("SetSelected")
+    --AutoCategory.logger:Warn("SetSelected")
     if not scrollList then return end
 
     scrollList.scrollData.lastSelectedIndex = index
@@ -184,7 +184,7 @@ local winData = {
 
 
 local function AreSelectionsEnabled(self)
-    AutoCategory.logger:Info("AreSelectionsEnabled")
+    --AutoCategory.logger:Info("AreSelectionsEnabled")
     if self.selectionTemplate or self.selectionCallback then
         return true
     else
@@ -212,19 +212,19 @@ end
 
 --=======================================================--
 local function ClearScrollList(self)
-    AutoCategory.logger:Info("ClearScrollList")
+    --AutoCategory.logger:Info("ClearScrollList")
 	ZO_ScrollList_Clear(self)
 	ZO_ScrollList_Commit(self)
 
     local win = self.parent
     if not win then return end
-    AutoCategory.logger:Info("ClearScrollList - clearing ac_dataList")
+    --AutoCategory.logger:Info("ClearScrollList - clearing ac_dataList")
     win.ac_dataList = SF.safeClearTable(win.ac_dataList)
 end
 
 -- use information from scrollData to create a scroll list 
 local function createScrollList(scrollData, prefix)
-    AutoCategory.logger:Info("createScrollList")
+    --AutoCategory.logger:Info("createScrollList")
     if scrollData.done  then return end     -- run once protection
     scrollData.done = true
 
@@ -263,7 +263,7 @@ local function createScrollList(scrollData, prefix)
     ZO_ScrollList_SetEqualityFunction(scrollList, ROW_TYPE_ID, function(left,right) 
         return left and right and left.name == right.name end)
 	
-    AutoCategory.logger:Warn("Selections are enabled")
+    --AutoCategory.logger:Warn("Selections are enabled")
     ZO_ScrollList_EnableSelection(scrollList, "ZO_ThinListHighlight", OnRowSelect)
 	
 	-- Easy Access Functions:
