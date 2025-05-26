@@ -45,12 +45,6 @@ local function setupDataRow(rowControl, data, scrollList)
                 AddMenuItem(
                     GetString(SI_AC_MENU_BS_RESET_SHOW_PRIOR),
                     function()
-                        local selectedData = ctrl.dataEntry
-                        if not selectedData then return end
-                        selectedData = selectedData.data
-                        if not selectedData then return end
-                        local shortname = selectedData.name
-                        
                         AC_UI.BagSet.SelectRule(shortname)
                         AC_UI.BagSet_ResetPriority()
                         AC_UI.BagSet_RefreshOrder()
@@ -59,12 +53,6 @@ local function setupDataRow(rowControl, data, scrollList)
                 AddMenuItem(
                     GetString(SI_AC_MENU_BS_BUTTON_EDIT),
                     function()
-                        local selectedData = ctrl.dataEntry
-                        if not selectedData then return end
-                        selectedData = selectedData.data
-                        if not selectedData then return end
-                        local shortname = selectedData.name
-                        
                         AC_UI.BagSet.SelectRule(shortname)
                         AC_UI.BagSet_EditCat_LAM.execute()
                         AC_UI.BagSet_RefreshOrder()
@@ -73,12 +61,6 @@ local function setupDataRow(rowControl, data, scrollList)
                 AddMenuItem(
                     GetString(SI_AC_MENU_BS_BUTTON_REMOVE),
                     function()
-                        local selectedData = ctrl.dataEntry
-                        if not selectedData then return end
-                        selectedData = selectedData.data
-                        if not selectedData then return end
-                        local shortname = selectedData.name
-                        
                         AC_UI.BagSet.SelectRule(shortname)
                         AC_UI.BagSet_RemoveCat_LAM.execute()
                         AC_UI.BagSet_RefreshOrder()
@@ -180,17 +162,6 @@ local winData = {
     minWidth = 220,
     minHeight = 150,
 }
-
-
-
-local function AreSelectionsEnabled(self)
-    --AutoCategory.logger:Info("AreSelectionsEnabled")
-    if self.selectionTemplate or self.selectionCallback then
-        return true
-    else
-        return false
-    end
-end
 
 
 local function UpdateScrollList(scrollList, dataTable)
