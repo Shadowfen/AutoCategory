@@ -2,7 +2,7 @@
 
 local L = GetString
 local SF = LibSFUtils
-local AC = AutoCategory
+--local AC = AutoCategory
 
 local aclogger
 --local RuleApi = AutoCategory.RuleApi

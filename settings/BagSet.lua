@@ -69,6 +69,8 @@ local ImpExp_Import_LAM = AC.BaseUI:New()	-- button
 AC_UI.BagSet = {}
 
 local currentBagRule = nil
+local currentRule = nil
+
 local function CatSet_DisplayRule(rule)
 	AC_UI.CatSet_SelectTag_LAM:refresh()
 

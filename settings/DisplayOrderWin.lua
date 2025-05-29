@@ -362,7 +362,7 @@ function AC_UI.DspWin:New()
     local scrollList = createScrollList(scrollData, prefix)
     scrollList.parent = win
     win.ac_scrollList = scrollList
-    CreateWinLabel(win, prefix, win.title, minWidth)
+    CreateWinLabel(win) --, prefix, win.title, minWidth)
     CreateCloseBtn(win, prefix)
 
     -- add in functions for DspWin
