@@ -75,7 +75,7 @@ function AutoCategory_UnknownTracker.LoadLanguage(defaultlang)
     if defaultlang == nil then defaultlang = "en" end
     
     -- initialize strings
-    AutoCategory.LoadLanguage(localization_strings,"en")
+    AutoCategory.LoadLanguage(localization_strings,defaultlang)
 end
 
 --Initialize plugin for Auto Category - Unknown Tracker
@@ -126,6 +126,11 @@ local function lookupItem(itemLink, characters)
     end
     local allchars,allacct = UnknownTracker:GetCharacterList()
     local fst = next(knownlist)
+    if not fst then
+        -- noone knows it
+        return true
+    end
+
     local unknowers
     if "@" == string.sub(fst,1,1) then
         --looking for account names
@@ -220,7 +225,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown( ... )
 	local fn = "ismotifunknown"
 	if UnknownTracker == nil then return false end
 
-    local isunknown = false
+    --local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
 
@@ -252,7 +257,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsFurnishingUnknown( ... )
 	local fn = "isfurnishingunknown"
 	if UnknownTracker == nil then return false end
 	
-    local isunknown = false
+    --local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
     
@@ -272,7 +277,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsStyleUnknown( ... )
 	local fn = "isstyleunknown"
 	if UnknownTracker == nil then return false end
 	
-    local isunknown = false
+    --local isunknown = false
     -- who is supposed to know it?
     local characters = getCharList(...)
     

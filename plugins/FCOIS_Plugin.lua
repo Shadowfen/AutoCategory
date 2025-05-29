@@ -595,7 +595,7 @@ function AutoCategory_FCOIS.LoadLanguage(defaultlang)
     if defaultlang == nil then defaultlang = "en" end
     
     -- initialize strings
-    AutoCategory.LoadLanguage(localization_strings,"en")
+    AutoCategory.LoadLanguage(localization_strings,defaultlang)
 end
 
 --Initialize plugin for Auto Category - FCOIS

@@ -39,7 +39,7 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 	local ismarked, markName = ItemMarker_IsItemMarked(AutoCategory.checkingItemBagId,
 										AutoCategory.checkingItemSlotIndex)
 	if ismarked == true then
-		local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+		--local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 		--AutoCategory.logger:Debug("im_marked return positive for "..markName.." on "..name.."  ac = "..ac)
 		if ac > 0 then
 			if checkMarks[markName] then

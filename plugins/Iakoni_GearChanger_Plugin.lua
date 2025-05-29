@@ -223,7 +223,7 @@ function AutoCategory_Iakoni.LoadLanguage(defaultlang)
     if defaultlang == nil then defaultlang = "en" end
 
     -- initialize strings
-    AutoCategory.LoadLanguage(localization_strings,"en")
+    AutoCategory.LoadLanguage(localization_strings,defaultlang)
 end
 
 function AutoCategory_Iakoni.Initialize()
