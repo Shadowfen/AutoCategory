@@ -41,6 +41,8 @@ local BagTypeConversion = {
 	[BAG_HOUSE_BANK_SIX]   = AC_BAG_TYPE_HOUSEBANK,
 	[BAG_HOUSE_BANK_SEVEN] = AC_BAG_TYPE_HOUSEBANK,
 	[BAG_HOUSE_BANK_EIGHT] = AC_BAG_TYPE_HOUSEBANK,
+	[BAG_FURNITURE_VAULT]  = AC_BAG_TYPE_FURNVAULT
+
 }
 -- convert ZOS bag type to AC bag type
 function convert2BagTypeId(bagId, acprimary)

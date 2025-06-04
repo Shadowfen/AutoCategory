@@ -4,12 +4,13 @@ AC_BAG_TYPE_GUILDBANK = 3
 AC_BAG_TYPE_CRAFTBAG = 4
 AC_BAG_TYPE_CRAFTSTATION = 5
 AC_BAG_TYPE_HOUSEBANK = 6
+AC_BAG_TYPE_FURNVAULT = 7
 
 local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = SF.colors.gold:Colorize("4.4.0"),
+    version = SF.colors.gold:Colorize("4.4.3"),
     settingName = "AutoCategory",
     settingDisplayName = SF.colors.gold:Colorize("AutoCategory - Revised"),
     author = SF.colors.purple:Colorize("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),

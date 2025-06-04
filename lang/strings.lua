@@ -13,12 +13,14 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG = "Craft Bag",
     SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Craft Station",
     SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Home Storage Chests",
+    SI_AC_BAGTYPE_SHOWNAME_FURNVAULT = "Furniture Vault",
     SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Backpack",
     SI_AC_BAGTYPE_TOOLTIP_BANK = "Bank",
     SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Guild Bank",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG = "Craft Bag",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION = "Destruct/Improvement in Craft Station", 
     SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK = "Home Storage Chests", 
+    SI_AC_BAGTYPE_TOOLTIP_FURNVAULT = "Furniture Vault",
 
     -- Text Alignment Option strings
     SI_AC_ALIGNMENT_LEFT = "Left",

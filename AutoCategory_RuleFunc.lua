@@ -1296,7 +1296,8 @@ function AutoCategory.RuleFunc.IsTag( ... )
 	-- Build a map of tag category -> table of tags in that category
 	for i = 1, numItemTags do
 		local itemTagDescription, itemTagCategory = GetItemLinkItemTagInfo(itemLink, i)
-		if itemTagCategory == TAG_CATEGORY_TREASURE_TYPE and itemTagDescription ~= "" then
+		--if (itemTagCategory == TAG_CATEGORY_TREASURE_TYPE or itemTagCategory == TAG_CATEGORY_FURNITURE_BEHAVIOR) and itemTagDescription ~= "" then
+		if itemTagCategory ~= TAG_CATEGORY_NONE and itemTagDescription ~= "" then
 			table.insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
 		end
 	end

@@ -14,6 +14,7 @@ AutoCategory.cache.bags_cvt.choices = {
 	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG),
 	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
+	L(SI_AC_BAGTYPE_SHOWNAME_FURNVAULT),
 }
 AutoCategory.cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_BACKPACK,
@@ -22,6 +23,7 @@ AutoCategory.cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_CRAFTBAG,
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
+	AC_BAG_TYPE_FURNVAULT,
 }
 AutoCategory.cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK),
@@ -30,6 +32,7 @@ AutoCategory.cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG),
 	L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
+	L(SI_AC_BAGTYPE_TOOLTIP_FURNVAULT),
 }
 
 
@@ -831,7 +834,7 @@ end
 -- -------------------------------------------------------
 function ImpExp_ExportAll_LAM:execute()
 	local selectedBag = getCurrentBagId()
-	for bagId = 1, 6 do
+	for bagId = 1, 7 do
 		if bagId ~= selectedBag then
 			copyBagToBag(selectedBag, bagId)
 		end

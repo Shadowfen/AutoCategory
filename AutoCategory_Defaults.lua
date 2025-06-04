@@ -220,6 +220,7 @@ AutoCategory.defaultCollapses = {
         [AC_BAG_TYPE_CRAFTBAG] = {},
         [AC_BAG_TYPE_CRAFTSTATION] = {},
         [AC_BAG_TYPE_HOUSEBANK] = {},
+        [AC_BAG_TYPE_FURNVAULT] = {},
     }
 
 AutoCategory.defaultSettings = {
@@ -242,6 +243,9 @@ AutoCategory.defaultSettings = {
 		[AC_BAG_TYPE_HOUSEBANK] = {
 			rules = {},
 		},
+		[AC_BAG_TYPE_FURNVAULT] = {
+			rules = {},
+		}
 	}, 
     collapses = AutoCategory.defaultCollapses,
 	accountWide = true,
@@ -882,6 +886,12 @@ AutoCategory.defaultAcctBagSettings = {
 					["runpriority"] = 100,
 					["name"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING),
 				},
+			},
+		},
+		[AC_BAG_TYPE_FURNVAULT] = {
+			rules = {
+				["runpriority"] = 1000,
+				["name"] = L(SI_AC_DEFAULT_CATEGORY_FURNISHING),
 			},
 		},
 	}, 

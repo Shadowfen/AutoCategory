@@ -240,8 +240,7 @@ function AutoCategory.UpdateCurrentSavedVars()
         saved.bags = AutoCategory.acctSaved.bags
         saved.collapses = AutoCategory.acctSaved.collapses
     end
-	if saved.bags[7] then saved.bags[7] = nil end -- fix old data corruption
-
+	
     AutoCategory.cacheInitialize()
 end
 
@@ -275,6 +274,7 @@ end
 
 function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 	if not categoryName then return end
+	if not saved.collapses[bagTypeId] then saved.collapses[bagTypeId] = {} end
 	saved.collapses[bagTypeId][categoryName] = collapsed
 end
 -- -----------------------------------------------------------
@@ -339,7 +339,7 @@ function AutoCategory.renameBagRule(oldName, newName)
 	if oldName == newName then return end
 
 	--Update bags so that every entry has the same name, should be changed to new name.
-	for i = 1, 6 do	-- for all bags
+	for i = 1, 7 do	-- for all bags
 		local bag = saved.bags[i]
 		if not bag then 
 			bag = { rules = {}, }
@@ -385,9 +385,9 @@ end
 
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
--- bagId needs to be between 1 and 6 (inclusive)
+-- bagId needs to be between 1 and 7 (inclusive)
 function AutoCategory.cacheInitBag(bagId)
-	if bagId == nil or bagId < 1 or bagId > 6 then 
+	if bagId == nil or bagId < 1 or bagId > 7 then 
 		return
 	end
 
@@ -480,7 +480,7 @@ function AutoCategory.cacheBagInitialize()
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
-    for bagId = 1, 6 do
+    for bagId = 1, 7 do
 		AutoCategory.cacheInitBag(bagId)
     end
 end
@@ -862,6 +862,11 @@ local inven_data = {
 		control = ZO_PlayerBank,
 	},
 
+	[INVENTORY_FURNITURE_VAULT] = {
+		object = ZO_FurnitureVault,
+		control = ZO_FurnitureVault,
+	},
+
 	[AC_DECON] = {
 		object = SMITHING.deconstructionPanel.inventory,
 		control = SMITHING.deconstructionPanel.control,
@@ -899,6 +904,11 @@ local function refreshList(inventoryType, even_if_hidden)
 			obj:PerformFullRefresh()
 		end
 
+	--elseif inventoryType == INVENTORY_FURNITURE_VAULT then
+	--	if even_if_hidden == false and not ctl:IsHidden() then
+	--		obj:UpdateList(inventoryType, even_if_hidden)
+	--	end
+
 	else
 		PLAYER_INVENTORY:UpdateList(inventoryType, even_if_hidden)
 	end
@@ -913,16 +923,6 @@ function AutoCategory.RefreshCurrentList(even_if_hidden)
 	for k,v in pairs( inven_data ) do
 		refreshList(k, even_if_hidden) 
 	end
-	--[[
-	refreshList(INVENTORY_BACKPACK, even_if_hidden)
-	refreshList(INVENTORY_CRAFT_BAG, even_if_hidden)
-	refreshList(INVENTORY_GUILD_BANK, even_if_hidden)
-	refreshList(INVENTORY_HOUSE_BANK, even_if_hidden)
-	refreshList(INVENTORY_BANK, even_if_hidden)
-	refreshList(AC_DECON, even_if_hidden)
-	refreshList(AC_IMPROV, even_if_hidden)
-	refreshList(UV_DECON, even_if_hidden)
-	--]]
 end
 -- create local alias for references within this file
 

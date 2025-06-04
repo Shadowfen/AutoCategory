@@ -1,3 +1,20 @@
+[COLOR="DeepSkyBlue"]4.4.3 (124)[/COLOR]:
+[LIST]
+[*] 
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.4.2 (124)[/COLOR]:
+[LIST]
+[*] Allow the rules for the Furniture Vault "bag" to save and reload.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.4.1 (123)[/COLOR]:
+[LIST]
+[*] Partial support of the new Furniture Vault. Still working on it, but it is usable now.
+[*] The istag() function can now be used to search for specific furnitue behaviours such as "readable", "light", and "interactive".
+[*] Category rules that a created specifically (and only) for the Furniture Vault do not need to use filtertype("furnishing") as a part of the rule because everything in the Furniture Vault is a furnishing.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.4.0 (122)[/COLOR]:
 [LIST]
 [COLOR="Red"]IMPORTANT NOTICE[/COLOR]: This version of AutoCategory changes some of the variables stored in SavedVariables so that the new saved variable file is not entirely compatible with the previous version of AutoCategory. You should save a backup of your AutoCategory.lua saved variable file before starting up ESO with the new version for the first time. Alternatively, you can manually convert backwards by using a text editor to change all of the "runpriority" variable names to "priority" instead, and all "showpriority" variables should be removed entirely for all characters/accounts.[/COLOR]

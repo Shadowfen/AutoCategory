@@ -9,9 +9,10 @@ local INVENTORY_CRAFT_BAG = 2
 local INVENTORY_GUILD_BANK = 3
 local INVENTORY_HOUSE_BANK = 4
 local INVENTORY_BANK = 5
-local AC_DECON = 6
-local AC_IMPROV = 7
-local UV_DECON = 8
+local INVENTORY_FURNITURE_VAULT = 7
+local AC_DECON = 880
+local AC_IMPROV = 881
+local UV_DECON = 882
 
 local ZO_PlayerInventory = {}
 
