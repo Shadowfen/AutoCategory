@@ -131,7 +131,7 @@ function AutoCategory.HookGamepadInventory()
 		return GetString("SI_GAMEPADQUESTITEMCATEGORY", questItemCategory)
 	end
 
-	-- Replase content in Supplies category by all items from inventory (like in keyboard inventory)
+	-- Replace content in Supplies category by all items from inventory (like in keyboard inventory)
 	-- Supplies category is targetCategoryData.filterType == nil
 	ZO_PreHook(GAMEPAD_INVENTORY, "RefreshItemList", function (self)
 		self.itemList:Clear()
