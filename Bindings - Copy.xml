@@ -1,0 +1,9 @@
+<Bindings>
+	<Layer name="SI_KEYBINDINGS_LAYER_GENERAL">
+		<Category name="Auto Category">
+			<Action name="TOGGLE_AUTO_CATEGORY">
+				<Down>AC_Binding_ToggleCategorize()</Down>  
+			</Action>
+		</Category>
+	</Layer>
+</Bindings>
