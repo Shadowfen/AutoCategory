@@ -154,6 +154,11 @@ local specializedItemTypeMap = {
 	["woodworking_booster"] = SPECIALIZED_ITEMTYPE_WOODWORKING_BOOSTER,
 	["woodworking_material"] = SPECIALIZED_ITEMTYPE_WOODWORKING_MATERIAL,
 	["woodworking_raw_material"] = SPECIALIZED_ITEMTYPE_WOODWORKING_RAW_MATERIAL,
+    ["furnishing_ornamental"]= SPECIALIZED_ITEMTYPE_FURNISHING_ORNAMENTAL,
+    ["furnishing_light"]= SPECIALIZED_ITEMTYPE_FURNISHING_LIGHT,
+    ["furnishing_seating"]= SPECIALIZED_ITEMTYPE_FURNISHING_SEATING,
+    ["furnishing_crafting_station"]= SPECIALIZED_ITEMTYPE_FURNISHING_CRAFTING_STATION,
+    ["furnishing_target_dummy"]= SPECIALIZED_ITEMTYPE_FURNISHING_TARGET_DUMMY,
 }
 -- add in convenience specialized combos
 specializedItemTypeMap.script = { 

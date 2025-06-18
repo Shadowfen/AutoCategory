@@ -1,3 +1,9 @@
+[COLOR="DeepSkyBlue"]4.4.4 (126)[/COLOR]:
+[LIST]
+[*] New values for the specialized item type (sptype) function: "furnishing_light", "furnishing_seating", "furnishing_crafting_station", and "furnishing_target_dummy". Note: if you use the addon Advanced Filters, you probably don't need to use these because Advanced FIlters will provide them as tabs at the top of the Furniture Vault inventory.
+[/LIST]
+
+
 [COLOR="DeepSkyBlue"]4.4.3 (125)[/COLOR]:
 [LIST]
 [*] Added spanish language strings for the Furniture Vault as provided by MasterZiggy.
