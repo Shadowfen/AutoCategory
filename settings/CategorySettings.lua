@@ -540,7 +540,7 @@ function CatSet_DeleteCat_LAM:execute()
 
 	AC_UI.BagSet_SelectRule_LAM:refresh()
 	AC_UI.BagSet_SelectRule_LAM:updateControl()
-	BagSet_ShowRule_LAM:refresh(bag)
+	AC_UI.BagSet_ShowRule_LAM:refresh(bag)
 
 	AC_UI.AddCat_SelectRule_LAM:refresh()
 	AC_UI.RefreshControls()

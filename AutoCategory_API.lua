@@ -136,7 +136,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			-- just use declared category name
 			return name
 
-		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false then
+		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false or self.checkingItemBagId == BAG_FURNITURE_VAULT then
 			-- just use the set name without the category name
 			return enhancement
 

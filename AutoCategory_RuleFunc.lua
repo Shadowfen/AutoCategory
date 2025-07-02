@@ -1659,6 +1659,28 @@ function AutoCategory.RuleFunc.AcctName(...)
 	return false
 end
 
+function AutoCategory.RuleFunc.AutoFurnitureCategory( ... )
+	local fn = "autofurniturecat"
+
+	local itemType, sptype = GetItemLinkItemType(AutoCategory.checkingItemLink)
+	if itemType == ITEMTYPE_FURNISHING then
+        --local itemTypeText = GetString("SI_ITEMTYPE", itemType)
+        local furnitureDataId = GetItemLinkFurnitureDataId(AutoCategory.checkingItemLink)
+        local categoryId, subcategoryId = GetFurnitureDataCategoryInfo(furnitureDataId)
+        local furnitureCategoryText = GetFurnitureCategoryName(categoryId)
+        local furnitureSubcategoryText = GetFurnitureCategoryName(subcategoryId)
+		AutoCategory.logger:Info("category: "..furnitureCategoryText.."  subcategory: "..furnitureSubcategoryText)
+        if furnitureSubcategoryText == "" then
+            furnitureSubcategoryText = nil
+        end
+		AutoCategory.AdditionCategoryName = furnitureCategoryText
+		return true
+	end
+	return false
+end
+
+
+
 AutoCategory.Environment = {
 	-- rule functions
 	zone       = AutoCategory.RuleFunc.CurrentZone,
@@ -1746,6 +1768,7 @@ AutoCategory.Environment = {
 	-- special sort gear into sets functionality
 	autoset      = AutoCategory.RuleFunc.AutoSetName,
 	combined_autoset = AutoCategory.RuleFunc.CombinedAutoSetName,
+	autofurniturecat = AutoCategory.RuleFunc.AutoFurnitureCategory,
     
 	--[[
 	-- see new implementatons in AutoCategory/Misc_Plugins.lua

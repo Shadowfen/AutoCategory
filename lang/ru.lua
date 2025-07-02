@@ -152,6 +152,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_DEFAULT_TAG_GEARS= "Снаряжение",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "Основные предметы",
     SI_AC_DEFAULT_TAG_MATERIALS= "Материалы",
+    SI_AC_DEFAULT_TAG_FURNITURE= "мебель",
 
     SI_AC_DEFAULT_CATEGORY_ARMOR= "Броня",
     SI_AC_DEFAULT_CATEGORY_BOE= "Привязывается",

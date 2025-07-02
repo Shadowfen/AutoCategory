@@ -44,6 +44,7 @@ local BagSet_SelectRule_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITBAG_RULE", nil, CVT
 AC_UI.BagSet_SelectRule_LAM = BagSet_SelectRule_LAM
 
 local BagSet_ShowRule_LAM = AC.BaseDD:New("AC_DROPDOWN_SHOWBAG_RULE", nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
+AC_UI.BagSet_ShowRule_LAM = BagSet_ShowRule_LAM
 
 -- local to this screen
 local BagSet_RunPriority_LAM = AC.BaseUI:New()		-- slider

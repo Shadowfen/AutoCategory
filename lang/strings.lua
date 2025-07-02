@@ -163,6 +163,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_DEFAULT_TAG_GEARS= "Gears",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "General Items",
     SI_AC_DEFAULT_TAG_MATERIALS= "Materials",
+    SI_AC_DEFAULT_TAG_FURNITURE= "Furniture",
 
     -- default Category Names
     SI_AC_DEFAULT_CATEGORY_ARMOR= "Armor",
@@ -192,6 +193,8 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_DEFAULT_CATEGORY_CONTAINER_DESC= "Unopened containers",
     SI_AC_DEFAULT_CATEGORY_FURNISHING= "Furnishing",
     SI_AC_DEFAULT_CATEGORY_FURNISHING_DESC= "Furniture to place in houses",
+    SI_AC_DEFAULT_CATEGORY_BYCATEGORY = "ByCategory",
+    SI_AC_DEFAULT_CATEGORY_BYCATEGORY_DESC= "This furniture category name is always hidden.",
     SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS= "Glyphs & Gems",
     SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS_DESC= "",
     SI_AC_DEFAULT_CATEGORY_NEW= "New",

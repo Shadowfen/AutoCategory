@@ -149,6 +149,8 @@ AutoCategory_localization_strings["es"] = {
     SI_AC_DEFAULT_TAG_GEARS= "Equipamiento",
 	SI_AC_DEFAULT_TAG_GENERAL_ITEMS = "Elementos generales",
     SI_AC_DEFAULT_TAG_MATERIALS = "Materiales",
+    SI_AC_DEFAULT_TAG_FURNITURE= "Meubles",
+
 
     SI_AC_DEFAULT_CATEGORY_ARMOR= "Armadura",
     SI_AC_DEFAULT_CATEGORY_BOE= "BoE",

@@ -211,6 +211,13 @@ AutoCategory.predefinedRules =  {
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC),
 		["pred"] = 1,
     },
+	{
+		["rule"] = "autofurniturecat()",
+		["tag"] = L(SI_AC_DEFAULT_TAG_FURNITURE),
+		["name"] = L(SI_AC_DEFAULT_CATEGORY_BYCATEGORY),
+		["description"] = "",
+		["pred"] = 1,
+	}
 }
 
 AutoCategory.defaultCollapses = {

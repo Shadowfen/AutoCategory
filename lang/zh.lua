@@ -129,6 +129,7 @@ AutoCategory_localization_strings["zh"] = {
     SI_AC_DEFAULT_TAG_GEARS= "装备",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "通用物品",
     SI_AC_DEFAULT_TAG_MATERIALS= "材料",
+    SI_AC_DEFAULT_TAG_FURNITURE= "家具",
 
     SI_AC_DEFAULT_CATEGORY_ARMOR= "护甲",
     SI_AC_DEFAULT_CATEGORY_BOE= "BoE",

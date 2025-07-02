@@ -120,6 +120,8 @@ AutoCategory_localization_strings["de"] = {
     SI_AC_DEFAULT_TAG_GEARS = "Ausrüstung",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS = "Generelle Gegenstände",
     SI_AC_DEFAULT_TAG_MATERIALS = "Material",
+    SI_AC_DEFAULT_TAG_FURNITURE= "Möbel",
+
     SI_AC_DEFAULT_CATEGORY_ARMOR = "Rüstung", 
     SI_AC_DEFAULT_CATEGORY_BOE = "BoE (Gebunden beim Anlegen)", 
     SI_AC_DEFAULT_CATEGORY_BOE_DESC = "BoE Ausrüstung für den Verkauf, welche beim Anlegen an den Account gebunden werden",  
