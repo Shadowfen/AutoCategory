@@ -40,17 +40,17 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 										AutoCategory.checkingItemSlotIndex)
 	if ismarked == true then
 		--local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-		--AutoCategory.logger:Debug("im_marked return positive for "..markName.." on "..name.."  ac = "..ac)
+		AutoCat_Logger():Debug("im_marked return positive for "..markName.." on "..name.."  ac = "..ac)
 		if ac > 0 then
 			if checkMarks[markName] then
-				--AutoCategory.logger:Debug("In checkMarks")
+				AutoCat_Logger():Debug("In checkMarks")
 				return true
 			end
-			--AutoCategory.logger:Debug("Not in checkMarks")
+			AutoCat_Logger():Debug("Not in checkMarks")
 			return false
 			
 		else
-			--AutoCategory.logger:Debug("Matched")
+			AutoCat_Logger():Debug("Matched")
 			return true
 		end
 	end

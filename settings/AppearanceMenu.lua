@@ -2,8 +2,6 @@ local LMP = LibMediaProvider
 
 local L = GetString
 
-local aclogger
-
 local dropdownFontStyle	= {
 	'none', 'outline', 'thin-outline', 'thick-outline',
 	'shadow', 'soft-shadow-thin', 'soft-shadow-thick',
@@ -160,5 +158,5 @@ end
 -- -------------------------------------------------------
 
 function AC_UI.AppearanceMenu_Init()
-	aclogger = AutoCategory.logger
+
 end

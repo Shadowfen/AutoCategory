@@ -1,8 +1,6 @@
 local AC = AutoCategory
 local SF = LibSFUtils
 
-local aclogger  -- set when the init is called
-
 local L = GetString
 local CVT = AutoCategory.CVT
 
@@ -272,12 +270,12 @@ function BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	--aclogger:Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	AutoCat_Logger():Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
 		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and AutoCategory.cache.entriesByBag[currentBag] then
-			--aclogger:Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			AutoCat_Logger():Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
 			dataCurrentRules_EditBag:assign(AutoCategory.cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
@@ -288,7 +286,7 @@ function BagSet_SelectRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	--aclogger:Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	AutoCat_Logger():Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -590,11 +588,11 @@ function bagSet_RemoveCat_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
 	local savedbag = AutoCategory.saved.bags[bagId]
-	--aclogger:Debug("Removing rule name "..ruleName)
+	AutoCat_Logger():Debug("Removing rule name "..ruleName)
 	for i = 1, #savedbag.rules do
 		local bagEntry = savedbag.rules[i]
 		if bagEntry.name == ruleName then
-			--aclogger:Debug("Found it! - "..ruleName)
+			AutoCat_Logger():Debug("Found it! - "..ruleName)
 			table.remove(savedbag.rules, i)
 			break
 		end
@@ -1114,7 +1112,6 @@ end
 
 
 function AC_UI.BagSet.Init()
-	aclogger = AutoCategory.logger
 
     -- initialize tables
 	BagSet_SelectBag_LAM:assign(AutoCategory.cache.bags_cvt)

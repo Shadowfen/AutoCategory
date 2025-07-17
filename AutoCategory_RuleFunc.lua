@@ -1669,7 +1669,7 @@ function AutoCategory.RuleFunc.AutoFurnitureCategory( ... )
         local categoryId, subcategoryId = GetFurnitureDataCategoryInfo(furnitureDataId)
         local furnitureCategoryText = GetFurnitureCategoryName(categoryId)
         local furnitureSubcategoryText = GetFurnitureCategoryName(subcategoryId)
-		AutoCategory.logger:Info("category: "..furnitureCategoryText.."  subcategory: "..furnitureSubcategoryText)
+		AutoCat_Logger():Debug("category: "..furnitureCategoryText.."  subcategory: "..furnitureSubcategoryText)
         if furnitureSubcategoryText == "" then
             furnitureSubcategoryText = nil
         end

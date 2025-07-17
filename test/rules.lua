@@ -1522,14 +1522,14 @@ function AutoCategory.cache.AddRule(rule)
 	else
 		-- add the new rule
 		if rule.pred and rule.pred == 1 then 
-			--AC.logger:Debug("[AddRule] Adding rule to predefinedRules ".. rule.name)
+			--AutoCat_Logger():Debug("[AddRule] Adding rule to predefinedRules ".. rule.name)
 			--table.insert(AC.predefinedRules, rule) 
 			
 		else
-			AC.logger:Debug("[AddRule] Adding rule to acctRules ".. rule.name)
+			AutoCat_Logger():Debug("[AddRule] Adding rule to acctRules ".. rule.name)
 			table.insert(AC.acctRules.rules, rule)
 		end
-    AC.logger:Debug("[AddRule] Adding rule to AC.rules ".. rule.name)
+        AutoCat_Logger():Debug("[AddRule] Adding rule to AC.rules ".. rule.name)
 		table.insert(AC.rules, rule)
 		rule_ndx = #AC.rules
 		cache.rulesByName[rule.name] = rule_ndx
@@ -1548,48 +1548,48 @@ end
 
 -- add rules from a list to AC.rules (if not dupe), remove them from the original list if notdel == false/nii
 local function addTableRules(tbl, tblname, notdel, ispredef)
-	AC.logger:Info("Adding rules from table "..(tblname or "unknown").." with "..SF.GetSize(tbl.rules))
+	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").." with "..SF.GetSize(tbl.rules))
 	local r, rndx, newName
 	if not tbl.rules then 
-		AC.logger:Info("No rules available from table "..(tblname or "unknown"))
+		AutoCat_Logger():Warn("No rules available from table "..(tblname or "unknown"))
 		return 
 	end
 	
 	for k, v in pairs(tbl.rules) do
-		--AC.logger:Info("Processing rule "..k..". "..v.name.." from "..(tblname or "unknown"))
+		--AutoCat_Logger():Debug("Processing rule "..k..". "..v.name.." from "..(tblname or "unknown"))
 		if notdel == false then
-      --AC.logger:Info("Removing rule "..k..". "..v.name.." from original list "..(tblname or "unknown"))
+      --AutoCat_Logger():Debug("Removing rule "..k..". "..v.name.." from original list "..(tblname or "unknown"))
 			table.remove(tbl.rules,k)
 		end
 		
 		rndx = cache.rulesByName[v.name]
 		if rndx then
-			--AC.logger:Warn("Found duplicate rule name - "..v.name)
+			--AutoCat_Logger():Info("Found duplicate rule name - "..v.name)
 			r = AC.GetRuleByName(v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so remove from input table
-				AC.logger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
+				AutoCat_Logger():Debug("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
 				
 			else
 				-- rename different rule
 				newName = AC.GetUsableRuleName(v.name)
-				AC.logger:Warn("Renaming rule "..v.name.." to "..newName)
+				AutoCat_Logger():Debug("Renaming rule "..v.name.." to "..newName)
 				v.name = newName
-				--AC.logger:Info("Adding renamed rule "..v.name.." to AC.rules")
+				--AutoCat_Logger():Debug("Adding renamed rule "..v.name.." to AC.rules")
 				table.insert(AC.rules, v)
 				if v.pred and v.pred == 1 then 
 					--table.insert(AC.predefinedRules, v) 
 				else
 					table.insert(AC.acctRules.rules, v)
 				end
-				--AC.logger:Debug("!AC.rules now = "..#AC.rules)
+				--AutoCat_Logger():Debug("!AC.rules now = "..#AC.rules)
 				cache.rulesByName[v.name] = #AC.rules
         if notdel == false then
           table.remove(tbl.rules, k)
           table.insert(tbl.rules, v)
         end
-				--AC.logger:Info("Inserting renamed rule "..v.name.." to "..(tblname or "unknown"))
+				--AutoCat_Logger():Info("Inserting renamed rule "..v.name.." to "..(tblname or "unknown"))
 			end
 			
 		else
@@ -1604,8 +1604,8 @@ local function addTableRules(tbl, tblname, notdel, ispredef)
           end
         end
         table.insert(AC.rules, v)
-        --AC.logger:Debug("!AC.rules now = "..#AC.rules)
-        AC.logger:Info("Adding rule "..v.name.." to AC.rules")
+        --AutoCat_Logger():Debug("!AC.rules now = "..#AC.rules)
+        AutoCat_Logger():Debug("Adding rule "..v.name.." to AC.rules")
         cache.rulesByName[v.name] = #AC.rules
       end
     end
@@ -1618,49 +1618,49 @@ end
 	
 	-- add pre-defined rules first
 	local pred = { rules = AC.predefinedRules, }
-	print("1 predefined "..#AC.predefinedRules)
+	AutoCat_Logger():Info("1 predefined "..#AC.predefinedRules)
   addTableRules(pred, "AC.predefinedRules", true)
 	local fpred = { rules = AC.FCOIS_predefinedRules, }
-  print("FCOIS_predefined "..#AC.FCOIS_predefinedRules)
+  AutoCat_Logger():Info("FCOIS_predefined "..#AC.FCOIS_predefinedRules)
   addTableRules(fpred, "AC.FCOIS_predefinedRules", true, true)
 
 	-- load lookup for predefines
 	local lpred = {}
 	for k, v in pairs(AC.predefinedRules) do
 		if lpred[v.name] then
-			AC.logger:Info("Found duplicate predefine: "..v.name.." ("..k..") - original k = "..lpred[v.name])
+			AutoCat_Logger():Info("Found duplicate predefine: "..v.name.." ("..k..") - original k = "..lpred[v.name])
 		else
 			lpred[v.name] = k
 		end
 	end
 	
 --print("lpred "..#lpred)
-print("2 predefined "..#AC.predefinedRules)
-print ("srules "..#AC.srules)
-print ("rules "..#AC.rules)
-print ("acctRules "..#AC.acctRules.rules)
+AutoCat_Logger():Info("2 predefined "..#AC.predefinedRules)
+AutoCat_Logger():Info ("srules "..#AC.srules)
+AutoCat_Logger():Info ("rules "..#AC.rules)
+AutoCat_Logger():Info ("acctRules "..#AC.acctRules.rules)
 
   -- prune base pre-defines
 	local asv = SF.GetSize(AC.srules)
 	for k,v in pairs(AC.srules) do
 		if lpred[v.name] then
 			-- delete dupe
-			AC.logger:Warn("Deleting base pre-def from srules: "..v.name)
+			AutoCat_Logger():Info("Deleting base pre-def from srules: "..v.name)
 			table.remove(AC.srules, k)
 		end
 	end
-	AC.logger:Info("srule # went from "..asv.." to "..SF.GetSize(AC.srules))
+	AutoCat_Logger():Debug("srule # went from "..asv.." to "..SF.GetSize(AC.srules))
 	--[[
 	if AC.charSaved.rules then
 		local csv = SF.GetSize(AC.charSaved.rules)
 		for k,v in pairs(AC.charSaved.rules) do
 			if lpred[v.name] then
 				-- delete dupe
-				AC.logger:Warn("Deleting base pre-def from charSaved.rules: "..v.name)
+				AutoCat_Logger():Info("Deleting base pre-def from charSaved.rules: "..v.name)
 				table.remove(AC.charSaved.rules, k)
 			end
 		end
-		AC.logger:Info("charSaved.rule # went from "..csv.." to "..SF.GetSize(AC.charSaved.rules))
+		AutoCat_Logger():Info("charSaved.rule # went from "..csv.." to "..SF.GetSize(AC.charSaved.rules))
 	end
   --]]
 	
@@ -1688,7 +1688,7 @@ print ("acctRules "..#AC.acctRules.rules)
 --end
 
 --print("lpred "..#lpred)
-print("3 predefined "..#AC.predefinedRules)
-print ("srules "..#AC.srules)
-print ("rules "..#AC.rules)
-print ("acctRules "..#AC.acctRules.rules)
+AutoCat_Logger():Info("3 predefined "..#AC.predefinedRules)
+AutoCat_Logger():Info ("srules "..#AC.srules)
+AutoCat_Logger():Info ("rules "..#AC.rules)
+AutoCat_Logger():Info ("acctRules "..#AC.acctRules.rules)

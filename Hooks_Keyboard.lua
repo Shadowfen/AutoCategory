@@ -136,7 +136,7 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	--AutoCategory.logger:Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
+	AutoCat_Logger():Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
 	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
 end
 
@@ -501,9 +501,9 @@ local function createNewScrollData(scrollData)
 	-- Create headers and append to newScrollData
 	for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
-			--AutoCategory.logger:Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
+			AutoCat_Logger():Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
 			local headerEntry = createHeaderEntry(catInfo)
-			--AutoCategory.logger:Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
+			AutoCat_Logger():Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
 			if headerEntry then
 				table.insert(newScrollData, headerEntry)
 			end

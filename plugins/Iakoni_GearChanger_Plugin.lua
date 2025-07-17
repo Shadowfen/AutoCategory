@@ -233,7 +233,7 @@ function AutoCategory_Iakoni.Initialize()
         return
     end
 
-	AutoCategory.logger:Warn("Initializing Iakoni Gear Changer plugin integration")
+	AutoCat_Logger():Warn("Initializing Iakoni Gear Changer plugin integration")
     -- reinitialize strings
     AutoCategory.LoadLanguage(localization_strings,"en")
 

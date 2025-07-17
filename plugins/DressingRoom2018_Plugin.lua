@@ -23,7 +23,7 @@ function AutoCategory_DressingRm.Initialize()
         AutoCategory.AddRuleFunc("drm_inset")
         return
     end
-	AutoCategory.logger:Warn("Initializing DressingRoom 2018 plugin integration")
+	AutoCat_Logger():Info("Initializing DressingRoom 2018 plugin integration")
 
     -- initialize strings
 --    AutoCategory_DressingRm.LoadLanguage("en")

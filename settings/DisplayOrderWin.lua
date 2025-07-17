@@ -113,7 +113,7 @@ end
 
 
 local function SetSelected(scrollList, index, data)
-    --AutoCategory.logger:Warn("SetSelected")
+   -- AutoCat_Logger():Debug("SetSelected")
     if not scrollList then return end
 
     scrollList.scrollData.lastSelectedIndex = index
@@ -183,19 +183,19 @@ end
 
 --=======================================================--
 local function ClearScrollList(self)
-    --AutoCategory.logger:Info("ClearScrollList")
+    AutoCat_Logger():Debug("ClearScrollList")
 	ZO_ScrollList_Clear(self)
 	ZO_ScrollList_Commit(self)
 
     local win = self.parent
     if not win then return end
-    --AutoCategory.logger:Info("ClearScrollList - clearing ac_dataList")
+    AutoCat_Logger():Debug("ClearScrollList - clearing ac_dataList")
     win.ac_dataList = SF.safeClearTable(win.ac_dataList)
 end
 
 -- use information from scrollData to create a scroll list 
 local function createScrollList(scrollData, prefix)
-    --AutoCategory.logger:Info("createScrollList")
+    AutoCat_Logger():Debug("createScrollList")
     if scrollData.done  then return end     -- run once protection
     scrollData.done = true
 
@@ -234,7 +234,7 @@ local function createScrollList(scrollData, prefix)
     ZO_ScrollList_SetEqualityFunction(scrollList, ROW_TYPE_ID, function(left,right) 
         return left and right and left.name == right.name end)
 	
-    --AutoCategory.logger:Warn("Selections are enabled")
+    AutoCat_Logger():Debug("Selections are enabled")
     ZO_ScrollList_EnableSelection(scrollList, "ZO_ThinListHighlight", OnRowSelect)
 	
 	-- Easy Access Functions:
@@ -261,7 +261,7 @@ local function addItem(win, bagrule)
 end
 
 local function updateScrollList( win )
-    --AutoCategory.logger:Info("updateScrollList")
+    AutoCat_Logger():Debug("updateScrollList")
     local scrollList = win:GetNamedChild("ScrollList")
 
     scrollList:Update(win.ac_dataList)
@@ -288,7 +288,7 @@ end
 
 local function CreateWinLabel(win)  --, prefix, labelText, minWidth)
     if winData.title then
-        --AutoCategory.logger:Warn("calling CreateWinLabel with "..tostring(winData.title))
+        AutoCat_Logger():Debug("calling CreateWinLabel with "..tostring(winData.title))
         local label = WINDOW_MANAGER:CreateControl(winData.prefix.."Label", win, CT_LABEL)
         label:SetText(winData.title)
         label:SetFont("$(ANTIQUE_FONT)|24")
@@ -375,5 +375,5 @@ function AC_UI.DspWin:New()
 end
 
 function AC_UI.DspWin_Init()
-    aclogger = AutoCategory.logger
+
 end

@@ -609,7 +609,7 @@ function AutoCategory_FCOIS.Initialize()
         AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
         return
     end
-	AutoCategory.logger:Warn("Initializing FCOIS plugin integration")
+	AutoCat_Logger():Info("Initializing FCOIS plugin integration")
     
     -- initialize strings
     AutoCategory_FCOIS.LoadLanguage("en")

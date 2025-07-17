@@ -10,7 +10,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = SF.colors.gold:Colorize("4.4.7"),
+    version = SF.colors.gold:Colorize("4.4.8"),
     settingName = "AutoCategory",
     settingDisplayName = SF.colors.gold:Colorize("AutoCategory - Revised"),
     author = SF.colors.purple:Colorize("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),
@@ -24,6 +24,10 @@ AutoCategory = {
     rules = {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
     ARW = {},
 }
+
+AutoCat_Logger = SF.SafeLoggerFunction(AutoCategory, "logger", "AutoCategory")
+--AutoCat_Logger():SetDebug(true)
+
 
 -- Namespace for the AutoCategory user interface elements
 AC_UI = {}

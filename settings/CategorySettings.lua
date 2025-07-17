@@ -1,8 +1,6 @@
 local AC = AutoCategory
 --local SF = LibSFUtils
 
-local aclogger
-
 local L = GetString
 local CVT = AutoCategory.CVT
 
@@ -184,7 +182,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function CatSet_SelectRule_LAM:getValue()
-	--aclogger:Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	AutoCat_Logger():Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
   	return self.cvt.indexValue
 end
 
@@ -379,9 +377,9 @@ function CatSet_NameEdit_LAM:setValue(value)
 	-- apparently one the AddCat_SelectRule_LAM calls is reseting the currentRule!
 	currentRule = AutoCategory.GetRuleByName(value)
 
-	--aclogger:Debug("new name1 - "..tostring(value))
-	--aclogger:Debug("new name2 - "..tostring(currentRule))
-	--aclogger:Debug("new name3 - "..tostring(currentRule.name))
+	AutoCat_Logger():Debug("new name1 - "..tostring(value))
+	AutoCat_Logger():Debug("new name2 - "..tostring(currentRule))
+	AutoCat_Logger():Debug("new name3 - "..tostring(currentRule.name))
 	CatSet_SelectRule_LAM:refresh()
 	CatSet_SelectRule_LAM:setValue(currentRule.name)
 	CatSet_SelectRule_LAM:updateControl()
@@ -737,7 +735,6 @@ end
 -- -------------------------------------------------------
 
 function AC_UI.CatSet_Init()
-	aclogger = AutoCategory.logger
 	
     CatSet_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags} )
 end

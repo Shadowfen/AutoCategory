@@ -5,7 +5,6 @@ local SF = LibSFUtils
 local AC = AutoCategory
 
 local CVT = AutoCategory.CVT
-local aclogger = AutoCategory.logger
 local RuleApi = AutoCategory.RuleApi
 local ac_rules = AutoCategory.RulesW
 
@@ -412,7 +411,7 @@ function AutoCategory.cacheInitBag(bagId)
 		saved.bags[bagId].rules={}
 	end
 
-	aclogger:Debug("Initializing sbag "..bagId.." with bagrules")
+	AutoCat_Logger():Debug("Initializing sbag "..bagId.." with bagrules")
 	local svdbag = saved.bags[bagId]		-- alias
 
 	if svdbag ~= nil then
@@ -426,7 +425,7 @@ function AutoCategory.cacheInitBag(bagId)
 			local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
 			if not bagrule then break end
 
-			--aclogger:Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
+			AutoCat_Logger():Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
 
 			sn = bagRuleApi.formatShow(bagrule)
 			sbag.choices[#sbag.choices+1] = sn
@@ -442,7 +441,7 @@ function AutoCategory.cacheInitBag(bagId)
 		table.sort(svdbag.rules, BagRuleRunSortingFunction)
 	end
 
-	aclogger:Debug("Initializing bag "..bagId.." with bagrules")
+	AutoCat_Logger():Debug("Initializing bag "..bagId.." with bagrules")
 	do
 		local sn
 		local tt
@@ -454,7 +453,7 @@ function AutoCategory.cacheInitBag(bagId)
 
 			local ruleName = bagrule.name
 			AutoCategory.BagRuleApi.convertPriority(bagrule)
-			--aclogger:Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
+			AutoCat_Logger():Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
 			if not ename[ruleName] then
 				ename[ruleName] = bagrule
 				ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
@@ -597,7 +596,7 @@ end
 -- as appropriate.
 -- The table must be { rules = {} } and tbl.rules contains the list of rules.
 --
--- The tblname is used only for logger messages - i.e. debugging.
+-- The tblname is used only for AutoCat_Logger() messages - i.e. debugging.
 --
 -- If notdel is true then the rules are NOT removed from the source table.
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
@@ -606,7 +605,7 @@ local function addTableRules(tbl, tblname, ispredef)
 	--local RulesW = AutoCategory.RulesW
 	if not tbl.rules or tbl.rules == ac_rules.ruleList then return end
 
-	aclogger:Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
+	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
 	local newName
 
@@ -616,12 +615,12 @@ local function addTableRules(tbl, tblname, ispredef)
 		local n = ac_rules.ruleNames[rl.name]
 		if not n then
 			ac_rules.ruleList[#ac_rules.ruleList+1] = rl
-			--aclogger:Info("Adding rule "..rl.name.." to ac_rules.ruleList ndx="..#ac_rules.ruleList)
+			AutoCat_Logger():Info("Adding rule "..rl.name.." to ac_rules.ruleList ndx="..#ac_rules.ruleList)
 			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
 			return true
 		else
 			ac_rules.ruleList[n] = rl
-			--aclogger:Info("Overwriting rule "..rl.name.." to Rulac_rulesesW.ruleList ndx="..n)
+			AutoCat_Logger():Info("Overwriting rule "..rl.name.." to Rulac_rulesesW.ruleList ndx="..n)
 			ac_rules.ruleNames[rl.name] = n
 		end
 		return false
@@ -654,18 +653,18 @@ local function addTableRules(tbl, tblname, ispredef)
 
 		r =getRuleByName(v.name)
 		if r then
-			--aclogger:Warn("Found duplicate rule name - "..v.name)
+			AutoCat_Logger():Debug("Found duplicate rule name - "..v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so don't add it again
-				--aclogger:Warn("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
+				AutoCat_Logger():Debug("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
 
 			else
 				local oldname = v.name
 				-- rename different rule
 				newName = getUsableRuleName(v.name)
 				v.name = newName
-				--aclogger:Warn("Renaming duplicate rule name - "..oldname.." to "..v.name)
+				AutoCat_Logger():Debug("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
 				addCombinedRule(v)
 				AutoCategory.renameBagRule(oldname, newName)
@@ -675,7 +674,7 @@ local function addTableRules(tbl, tblname, ispredef)
 				else
 					-- add to acctRules
 					addUserRule(tbl, v)
-					--aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+					AutoCat_Logger():Debug("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 				end
 			end
 
@@ -687,25 +686,25 @@ local function addTableRules(tbl, tblname, ispredef)
 			if RuleApi.isPredefined(v) then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
-				--aclogger:Warn("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				AutoCat_Logger():Debug("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 
 		    else
 				-- it's a user rule
 				addUserRule(tbl, v)
-				--aclogger:Warn("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				AutoCat_Logger():Debug("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
 			end
         end
     end
 end
 
 local function pruneUserRules()
-	aclogger:Debug ("Executing pruneUserRules ")
+	AutoCat_Logger():Debug ("Executing pruneUserRules ")
 	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
 	local lkacctRules = AutoCategory.ARW:getLookup()
 	for k = #arrules,1,-1 do
 		local ndx = lkacctRules[arrules[k].name]
 		if  ndx and k ~= ndx then
-			aclogger:Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
+			AutoCat_Logger():Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
 			AutoCategory.ARW.removeRule(ndx)
 			--table.remove(arrules, k)
 		end
@@ -714,7 +713,7 @@ local function pruneUserRules()
 	-- remove predefined rules from acctRules
 	for k = #AutoCategory.predefinedRules,1,-1 do
 		local ndx = lkacctRules[AutoCategory.predefinedRules[k].name]
-		aclogger:Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
+		AutoCat_Logger():Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
 		AutoCategory.ARW:removeRule(ndx)
 		--table.remove(arrules, k)
 	end
@@ -722,18 +721,18 @@ end
 
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
-	aclogger:Debug ("Executing loadPluginPredefines ")
+	AutoCat_Logger():Debug ("Executing loadPluginPredefines ")
 	-- add plugin predefined rules to the base predefined rules
 	for name, plugin in pairs(AutoCategory.Plugins) do
 		if plugin.predef then
-			aclogger:Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
+			AutoCat_Logger():Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
 
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
 		end
 	end
-	aclogger:Debug ("Done executing loadPluginPredefines ")
-	aclogger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCat_Logger():Debug ("Done executing loadPluginPredefines ")
+	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
  end
 
 
@@ -745,10 +744,6 @@ function AutoCategory.onLoad(event, addon)
 
 	-- make sure we are not called again
 	AutoCategory.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
-
-	AutoCategory.logger = SF.Createlogger("AutoCategory")
-	aclogger = AutoCategory.logger
-	AutoCategory.logger:SetEnabled(true)
 
     --AutoCategory.checkLibraryVersions()
 
@@ -813,7 +808,7 @@ function AutoCategory.onPlayerActivated()
 	addTableRules(AutoCategory.charSaved, ".charSaved", false)
 	AutoCategory.charSaved.rules = nil	-- no longer used
 
-	--AutoCategory.logger:Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
 
     AutoCategory.UpdateCurrentSavedVars()
 	AutoCategory.initializePlugins()
