@@ -13,15 +13,20 @@
 			"path": "../LibAddonMenu-2.0"
 		},
 		{
-			"name": "LibScroll",
-			"path": "../LibScroll"
-		},
-		{
 			"name": "LibCustomMenu",
 			"path": "../LibCustomMenu"
 		},
 		{
+			"name": "LibMediaProvider",
+			"path": "../LibMediaProvider"
+		},
+		{
+			"name": "esoui-live-11.0.5",
 			"path": "D:/eso src/esoui-live-11.0.5"
+		},
+		{
+			"name": "LibDebugLogger",
+			"path": "../LibDebugLogger"
 		}
 	],
 	"settings": {}

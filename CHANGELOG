@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.4.8 (130)[/COLOR]:
+[LIST]
+[*] Converting to LibSFUtils logger wrapper to control if debug-level messages get sent to the LibDebugLogger.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.4.7 (129)[/COLOR]:
 [LIST]
 [*] Update to a new version of LibMMediaProvider which changed its name and thereby broke everything that used it prior to this. Now requires the updated LibMediaProvider version 1.1.
