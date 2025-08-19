@@ -2,6 +2,7 @@
 -- multiple sets of localization strings, predefined rules,
 -- two rule functions, and a hook into GearChangerByIakoni as well.
 --
+local iter_args = LibSFUtils.iter_args
 
 AutoCategory_Iakoni = {
     RuleFunc = {},
@@ -274,34 +275,30 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 	if not GearChangerByIakoni then return false end
 
 	local fn = "setindex"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax = 1, ac do
+	for ax, arg, ac in iter_args(...) do
 
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		local comIndex = -1
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		if type( arg ) == "number" then
-			comIndex = arg
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                comIndex = arg
 
-		elseif type( arg ) == "string" then
-			comIndex = tonumber(arg)
+            elseif t_arg == "string" then
+                comIndex = tonumber(arg)
 
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            for i=1, #setIndices do
+                local index = setIndices[i]
+                if comIndex == index then
+                    return true
+                end
+            end 
 		end
-		for i=1, #setIndices do
-			local index = setIndices[i]
-			if comIndex == index then
-				return true
-			end
-		end 
 	end
 
 	return false 

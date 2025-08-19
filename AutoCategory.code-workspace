@@ -1,33 +1,37 @@
 {
 	"folders": [
-		{
-			"name": "AutoCategory",
-			"path": "."
-		},
-		{
-			"name": "LibSFUtils",
-			"path": "../LibSFUtils"
-		},
-		{
-			"name": "LibAddonMenu-2.0",
-			"path": "../LibAddonMenu-2.0"
-		},
-		{
-			"name": "LibCustomMenu",
-			"path": "../LibCustomMenu"
-		},
-		{
-			"name": "LibMediaProvider",
-			"path": "../LibMediaProvider"
-		},
-		{
-			"name": "esoui-live-11.0.5",
-			"path": "D:/eso src/esoui-live-11.0.5"
-		},
-		{
-			"name": "LibDebugLogger",
-			"path": "../LibDebugLogger"
-		}
-	],
+        {
+            "name": "AutoCategory",
+            "path": "."
+        },
+        {
+            "name": "LibSFUtils",
+            "path": "../LibSFUtils"
+        },
+        {
+            "name": "LibAddonMenu-2.0",
+            "path": "../LibAddonMenu-2.0"
+        },
+        {
+            "name": "LibCustomMenu",
+            "path": "../LibCustomMenu"
+        },
+        {
+            "name": "LibMediaProvider",
+            "path": "../LibMediaProvider"
+        },
+        {
+            "name": "LibDebugLogger",
+            "path": "../LibDebugLogger"
+        },
+        {
+            "name": "LibCharacterKnowledge",
+            "path": "../LibCharacterKnowledge"
+        },
+        {
+            "name": "esoui-live-11.0.6",
+            "path": "D:/eso src/esoui-live-11.0.6"
+        }
+    ],
 	"settings": {}
 }

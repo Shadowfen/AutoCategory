@@ -1,6 +1,8 @@
 local SF = LibSFUtils
 local AC = AutoCategory
 
+local iter_args = SF.iter_args
+
 
 local specializedItemTypeMap = {
 	["additive"] = SPECIALIZED_ITEMTYPE_ADDITIVE,
@@ -488,12 +490,13 @@ AutoCategory.getItemStyles()
 -- if necessary (and provided)
 -- return true if equal/found
 local function isKnown(arg, typekey, fn, map)
-    if type( arg ) == "number" then
+    local t_arg = type(arg)
+    if t_arg == "number" then
         if arg == typekey then
             return true
         end
         
-    elseif map and type( arg ) == "string" then
+    elseif map and t_arg == "string" then
         local val = map[string.lower( arg )]
         if type ( val ) == "table" then
             if val[typekey] then
@@ -522,25 +525,17 @@ end
 
 function AutoCategory.RuleFunc.isItemId(...)
 	local fn = "isitemid"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
-	--local chkId = GetItemLinkItemId(AutoCategory.checkingItemLink)
 	local chkId = GetItemId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	--if chkId ~= itemId then
-	--	error("ZOS error: GetItemId and GetItemLinkItemId are returning different values for the same item.")
-	--end
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            if arg == chkId then return true end
 		end
 		
-        if arg == chkId then return true end
 		
 	end
 	
@@ -549,22 +544,15 @@ end
 
 function AutoCategory.RuleFunc.SpecializedItemType( ... )
 	local fn = "sptype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-	for ax = 1, ac do
+    local _, sptype = GetItemLinkItemType(AutoCategory.checkingItemLink)
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args(... ) do
 		
-		local arg = select( ax, ... )
-		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		--local arg = select( ax, ... )
+		if arg then
+            local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
+            if rslt then return rslt end
 		end
-		
-		local _, sptype = GetItemLinkItemType(AutoCategory.checkingItemLink)
-        local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
-        if rslt then return rslt end
 		
 	end
 	
@@ -593,21 +581,17 @@ end
 
 function AutoCategory.RuleFunc.ItemType( ... )
 	local fn = "type"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local itemType = GetItemLinkItemType(AutoCategory.checkingItemLink)
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local rslt = isKnown(arg, itemType, fn, itemTypeMap)
+            if rslt then return rslt end
 		end
-		local rslt = isKnown(arg, itemType, fn, itemTypeMap)
-        if rslt then return rslt end
 		
 	end
 	
@@ -617,22 +601,18 @@ end
 
 function AutoCategory.RuleFunc.EquipType( ... )
 	local fn = "equiptype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
-  local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local rslt = isKnown(arg, equipType, fn, equipTypeMap)
+            if rslt then return rslt end
 		end
-		local rslt = isKnown(arg, equipType, fn, equipTypeMap)
-        if rslt then return rslt end
 		
 	end
 	
@@ -642,22 +622,18 @@ end
 
 function AutoCategory.RuleFunc.ItemStyle( ... )
 	local fn = "itemstyle"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-  local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 
-	for ax = 1, ac do
+    local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local styleName = zo_strlower(GetItemStyleName(itemstyle))
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args(  ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		if zo_strlower(GetItemStyleName(itemstyle)) == zo_strlower(arg) then
-			return true
+		if arg then
+            if styleName == zo_strlower(arg) then
+                return true
+            end
 		end
 		
 	end
@@ -676,7 +652,6 @@ end
 function AutoCategory.RuleFunc.IsBound( ... )
 	local fn = "isbound"
 	
-	--local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	local itemLink = AutoCategory.checkingItemLink
 	local isBound = IsItemLinkBound(itemLink)
 	return isBound
@@ -796,38 +771,33 @@ end
 
 function AutoCategory.RuleFunc.Quality( ... )
 	local fn = "quality"  
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	local displayquality = GetItemLinkDisplayQuality(AutoCategory.checkingItemLink)
 	
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		 
-		if type( arg ) == "number" then
-			if arg == quality then
-				return true
-			end
-			
-		elseif type( arg ) == "string" then
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                if arg == quality then
+                    return true
+                end
+                
+            elseif t_arg == "string" then
 
-			local v = qualityMap[string.lower( arg )]
-			if v and v == displayquality then
-				return true
-			end
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
+                local v = qualityMap[string.lower( arg )]
+                if v and v == displayquality then
+                    return true
+                end
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
 		end
-		
 	end
 	
 	return false
@@ -850,105 +820,90 @@ end
 
 function AutoCategory.RuleFunc.BoundType( ... )
 	local fn = "boundtype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
+
+    local boundType = GetItemLinkBindType(AutoCategory.checkingItemLink)
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
+		
+		--local arg = select( ax, ... )
+		
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                if arg == boundType then
+                    return true
+                end
+                
+            elseif t_arg == "string" then
+                local v = boundTypeMap[string.lower( arg )]
+                if v and v == boundType then
+                    return true
+                end
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+		end		
 	end
-	
-	local boundType = GetItemLinkBindType(AutoCategory.checkingItemLink)
-	for ax = 1, ac do
-		
-		local arg = select( ax, ... )
-		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		
-		if type( arg ) == "number" then
-			if arg == boundType then
-				return true
-			end
-			
-		elseif type( arg ) == "string" then
-			local v = boundTypeMap[string.lower( arg )]
-			if v and v == boundType then
-				return true
-			end
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		
-	end
-	
+
 	return false
-	
 end
 
 
 function AutoCategory.RuleFunc.FilterType( ... )
 	local fn = "filtertype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 
-  local itemFilterType = { GetItemFilterTypeInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
-	for ax = 1, ac do
+    local itemFilterType = { GetItemFilterTypeInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		
-		local testFilterType
+		if arg then
+            local testFilterType
+            local t_arg = type(arg)
 
-		if type( arg ) == "number" then
-			testFilterType = arg
-			
-		elseif type( arg ) == "string" then  
-			testFilterType = filterTypeMap[string.lower( arg )]
-			if testFilterType == nil then
-				error( string.format("error: %s(): argument '%s' is not recognized.", fn, string.lower(arg)))
-			end	
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		for i = 1, #itemFilterType do
-			if itemFilterType[i] == testFilterType then
-				return true
-			end
+            if t_arg == "number" then
+                testFilterType = arg
+                
+            elseif t_arg == "string" then  
+                testFilterType = filterTypeMap[string.lower( arg )]
+                if testFilterType == nil then
+                    error( string.format("error: %s(): argument '%s' is not recognized.", fn, string.lower(arg)))
+                end	
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            for i = 1, #itemFilterType do
+                if itemFilterType[i] == testFilterType then
+                    return true
+                end
+            end
 		end
 	end
-	
 	return false
 	
 end
 
 function AutoCategory.RuleFunc.Level( ... )
 	local fn = "level"
-	local level = GetItemRequiredLevel(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	return level
+	return GetItemRequiredLevel(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.CPLevel( ... )
 	local fn = "cp"
-	local level = GetItemRequiredChampionPoints(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	return level
+	return GetItemRequiredChampionPoints(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.CharLevel( ... )
 	local fn = "charlevel"
-	local level = GetUnitLevel("player")
-	return level
+	return GetUnitLevel("player")
 end
 
 function AutoCategory.RuleFunc.CharCP( ... )
 	local fn = "charcp"
-	local cp = GetUnitChampionPoints("player")
-	return cp
+	return GetUnitChampionPoints("player")
 end
 
 
@@ -961,9 +916,7 @@ end
 
 function AutoCategory.RuleFunc.StackSize( ... )
 	local fn = "stacksize"
-	local stackSize = GetSlotStackSize(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	  
-	return stackSize
+	return GetSlotStackSize(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.KeepForResearch( ... )
@@ -985,37 +938,33 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.SetName( ... )
 	local fn = "set"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-	local hasSet, setName = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
+
+    local hasSet, setName = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	if not hasSet then
 		return false
 	end
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		
-		local findString
-		if type( arg ) == "number" then
-			findString = tostring(arg)
-			
-		elseif type( arg ) == "string" then
-			findString = arg
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		--fix german language issue
-		setName = string.gsub( setName , "%^.*", "")
-		if string.find(setName, findString, 1 ,true) then
-			return true
+		if arg then
+            local t_arg = type(arg)
+            local findString
+            if t_arg == "number" then
+                findString = tostring(arg)
+                
+            elseif t_arg == "string" then
+                findString = arg
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            --fix german language issue
+            setName = string.gsub( setName , "%^.*", "")
+            if string.find(setName, findString, 1 ,true) then
+                return true
+            end
 		end
 	end
 	
@@ -1085,41 +1034,38 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.TraitType( ... )
 	local fn = "traittype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local traitType, _ = GetItemLinkTraitInfo(AutoCategory.checkingItemLink)
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                if arg == traitType then
+                    return true
+                end
+                
+            elseif t_arg == "string" then
+                local v = traitMap[string.lower( arg )]
+                if type(v) == "table" then
+                    if v[traitType] then
+                        return true
+                    end
+                    
+                else
+                    if v and v == traitType then
+                        return true
+                    end
+                end
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
 		end
 		
-		if type( arg ) == "number" then
-			if arg == traitType then
-				return true
-			end
-			
-		elseif type( arg ) == "string" then
-			local v = traitMap[string.lower( arg )]
-			if type(v) == "table" then
-				if v[traitType] then
-					return true
-				end
-				
-			else
-				if v and v == traitType then
-					return true
-				end
-			end
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
 	end
 	
 	return false
@@ -1129,35 +1075,32 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.ArmorType( ... )
 	local fn = "armortype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
-  local armorType = GetItemArmorType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax = 1, ac do
+    local armorType = GetItemArmorType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-		
-		if type( arg ) == "number" then
-			if arg == armorType then
-				return true
-			end
-			
-		elseif type( arg ) == "string" then 
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                if arg == armorType then
+                    return true
+                end
+                
+            elseif t_arg == "string" then 
 
-			local v = armorTypeMap[string.lower( arg )]
-			if v and v == armorType then
-				return true
-			end
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
+                local v = armorTypeMap[string.lower( arg )]
+                if v and v == armorType then
+                    return true
+                end
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
 		end
+		
 	end
 	
 	return false
@@ -1167,34 +1110,30 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.WeaponType( ... )
 	local fn = "weapontype"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-  local weaponType = GetItemWeaponType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax = 1, ac do
+
+    local weaponType = GetItemWeaponType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	for ax, arg, ac in iter_args(...) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                if arg == weaponType then
+                    return true
+                end
+                
+            elseif t_arg == "string" then
+                local v = weaponTypeMap[string.lower( arg )]
+                if v and v == weaponType then
+                    return true
+                end
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
 		end
 		
-		if type( arg ) == "number" then
-			if arg == weaponType then
-				return true
-			end
-			
-		elseif type( arg ) == "string" then
-			local v = weaponTypeMap[string.lower( arg )]
-			if v and v == weaponType then
-				return true
-			end
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
 	end
 	
 	return false
@@ -1204,35 +1143,32 @@ end
 -- return true/false
 function AutoCategory.RuleFunc.TraitString( ... )
 	local fn = "traitstring"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local traitType, _ = GetItemLinkTraitInfo(AutoCategory.checkingItemLink)
 	local traitText = string.lower(GetString("SI_ITEMTRAITTYPE", traitType))
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+		
+            local findString;
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                findString = tostring(arg)
+                
+            elseif t_arg == "string" then
+                findString = arg
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            findString = string.lower(findString)
+            if string.find(traitText, findString, 1, true) then
+                return true
+            end 
 		end
-		
-		local findString;
-		if type( arg ) == "number" then
-			findString = tostring(arg)
-			
-		elseif type( arg ) == "string" then
-			findString = arg
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		findString = string.lower(findString)
-		if string.find(traitText, findString, 1, true) then
-			return true
-		end 
 	end
 	
 	return false
@@ -1243,36 +1179,33 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.ItemName( ... )
 	local fn = "itemname"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local itemName = string.lower(GetItemLinkName(AutoCategory.checkingItemLink))
    
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
+		if arg then
 		
-		local findString
-		if type( arg ) == "number" then
-			findString = tostring(arg)
-			
-		elseif type( arg ) == "string" then
-			findString = arg
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		--fix german language issue
-		findString = string.gsub(findString , "%^.*", "")
-		findString = string.lower(findString)
-		if string.find(itemName, findString, 1 ,true) then
-			return true
+            local findString
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                findString = tostring(arg)
+                
+            elseif t_arg == "string" then
+                findString = arg
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            --fix german language issue
+            findString = string.gsub(findString , "%^.*", "")
+            findString = string.lower(findString)
+            if string.find(itemName, findString, 1 ,true) then
+                return true
+            end
 		end
 	end
 	
@@ -1348,40 +1281,37 @@ function AutoCategory.RuleFunc.AlphaGear( ... )
 		return false
 	end
 	local fn = "alphagear"
-	local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 	
 	local uid = Id64ToString(GetItemUniqueId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	if not uid then return false end
 
-	for ax = 1, ac do 
-		local arg = select( ax, ... )
+	--for ax = 1, select( '#', ... ) do 
+	for ax, arg, ac in iter_args( ... ) do 
+		--local arg = select( ax, ... )
 		local comIndex = -1
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                comIndex = arg
+                
+            elseif t_arg == "string" then
+                comIndex = tonumber(arg)
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            
+            local nr = comIndex
+            if AG.setdata[nr].Set.gear > 0 then
+                for slot = 1,14 do
+                    if AG.setdata[AG.setdata[nr].Set.gear].Gear[slot].id == uid then
+                        local setName = AG.setdata[nr].Set.text[1]
+                        AutoCategory.AdditionCategoryName = setName	
+                        return true
+                    end
+                end
+            end 
 		end
-		if type( arg ) == "number" then
-			comIndex = arg
-			
-		elseif type( arg ) == "string" then
-			comIndex = tonumber(arg)
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		
-		local nr = comIndex
-		if AG.setdata[nr].Set.gear > 0 then
-			for slot = 1,14 do
-				if AG.setdata[AG.setdata[nr].Set.gear].Gear[slot].id == uid then
-					local setName = AG.setdata[nr].Set.text[1]
-					AutoCategory.AdditionCategoryName = setName	
-					return true
-				end
-			end
-		end 
 	end
 	
 	return false 
@@ -1397,11 +1327,6 @@ end
 
 function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	local fn = "armorybuild"
-	local ac = select( '#', ... )
-
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
 
 	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
 	local _, _, _, _, _, equipType, itemStyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
@@ -1421,8 +1346,9 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	local numBuilds = #(armoryBuildListNames)
 	if numBuilds == 0 then return false end
 
-	for ax = 1, ac do
-		local arg = select( ax, ... )
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
+		--local arg = select( ax, ... )
 		for build = 1,numBuilds do
 			local buildName = armoryBuildListNames[build]
 			if arg == buildName then
@@ -1442,12 +1368,14 @@ end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsInBank( ... )
-	return AutoCategory.checkingItemBagId == BAG_BANK or AutoCategory.checkingItemBagId == BAG_SUBSCRIBER_BANK
+    local bagId = AutoCategory.checkingItemBagId
+	return bagId == BAG_BANK or bagId == BAG_SUBSCRIBER_BANK
 end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsInBackpack( ... )
-	return AutoCategory.checkingItemBagId == BAG_BACKPACK or AutoCategory.checkingItemBagId == BAG_WORN
+    local bagId = AutoCategory.checkingItemBagId
+	return bagId == BAG_BACKPACK or bagId == BAG_WORN
 end
 
 -- returns true/false
@@ -1591,34 +1519,30 @@ function AutoCategory.RuleFunc.CharName(...)
     -- GetUnitName("player"))
     --   gives you charname
     local pn = string.lower(GetUnitName("player"))
-    local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	for ax = 1, ac do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local findString
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                findString = tostring(arg)
+                
+            elseif t_arg == "string" then
+                findString = arg
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            --fix german language issue
+            findString = string.gsub(findString , "%^.*", "")
+            findString = string.lower(findString)
+            if string.find(pn, findString, 1 ,true) then
+                return true
+            end
 		end
 		
-		local findString
-		if type( arg ) == "number" then
-			findString = tostring(arg)
-			
-		elseif type( arg ) == "string" then
-			findString = arg
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		--fix german language issue
-		findString = string.gsub(findString , "%^.*", "")
-		findString = string.lower(findString)
-		if string.find(pn, findString, 1 ,true) then
-			return true
-		end
 	end
 	
 	return false
@@ -1629,30 +1553,27 @@ end
 function AutoCategory.RuleFunc.AcctName(...)
     local fn = "acctname" 
     local pn = string.lower(GetDisplayName())
-    local ac = select( '#', ... )
-	if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	for ax = 1, ac do
+	--for ax = 1, select( '#', ... ) do
+	for ax, arg, ac in iter_args( ... ) do
 		
-		local arg = select( ax, ... )
+		--local arg = select( ax, ... )
 		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
+		if arg then
 		
-		local findString
-		if type( arg ) == "number" then
-			findString = tostring(arg)
-			
-		elseif type( arg ) == "string" then
-			findString = arg
-			
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
-		if string.find(pn, findString, 1 ,true) then
-			return true
+            local findString
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                findString = tostring(arg)
+                
+            elseif t_arg == "string" then
+                findString = arg
+                
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
+            if string.find(pn, findString, 1 ,true) then
+                return true
+            end
 		end
 	end
 	
