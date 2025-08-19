@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.4.9 (131)[/COLOR]
+[LIST]
+[*] Added "container_stackable" to the possible results of sptype(). This will be set for the "Unknown Master Writs" and for the "Unknown Supply Survey" containers.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.4.8 (130)[/COLOR]:
 [LIST]
 [*] Converting to LibSFUtils logger wrapper to control if debug-level messages get sent to the LibDebugLogger.

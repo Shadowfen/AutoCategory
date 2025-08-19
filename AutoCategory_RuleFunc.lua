@@ -23,6 +23,7 @@ local specializedItemTypeMap = {
 	["container_currency"] = SPECIALIZED_ITEMTYPE_CONTAINER_CURRENCY,
 	["container_event"] = SPECIALIZED_ITEMTYPE_CONTAINER_EVENT,
 	["container_style_page"] = SPECIALIZED_ITEMTYPE_CONTAINER_STYLE_PAGE,
+    ["container_stackable"] = SPECIALIZED_ITEMTYPE_CONTAINER_STACKABLE,
 	["costume"] = SPECIALIZED_ITEMTYPE_COSTUME,
 	["crown_item"] = SPECIALIZED_ITEMTYPE_CROWN_ITEM,
 	["crown_repair"] = SPECIALIZED_ITEMTYPE_CROWN_REPAIR,
