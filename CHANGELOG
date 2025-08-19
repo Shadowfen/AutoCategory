@@ -1,6 +1,8 @@
 [COLOR="DeepSkyBlue"]4.4.9 (131)[/COLOR]
 [LIST]
-[*] Added "container_stackable" to the possible results of sptype(). This will be set for the "Unknown Master Writs" and for the "Unknown Supply Survey" containers.
+[*] Added "container_stackable" to the possible search of [COLOR="MediumSeaGreen"]sptype()[/COLOR]. This will  match for the "Unknown Master Writs" and the "Unknown Supply Survey" containers. See the "Maps & Surveys" and (new) "Master Writs (All)" predefined category rules for examples of how to use this.
+[*] Modified the predefined rule for "Maps & Surveys" to also include the "Unknown Servey Reports"
+[*] Created a new predefined category rule called "Master Writs (All)" which will show the old master writs along with the new unknown master writs.
 [/LIST]
 
 [COLOR="DeepSkyBlue"]4.4.8 (130)[/COLOR]:

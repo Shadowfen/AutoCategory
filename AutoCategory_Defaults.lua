@@ -149,7 +149,7 @@ AutoCategory.predefinedRules =  {
 		["pred"] = 1,
     },
     {
-        ["rule"] = "sptype(\"trophy_survey_report\", \"trophy_treasure_map\")",
+        ["rule"] = "sptype(\"trophy_survey_report\", \"trophy_treasure_map\") or sptype(\"container_stackable\") and itemname(\"Survey\")",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GENERAL_ITEMS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS_DESC),
@@ -215,6 +215,13 @@ AutoCategory.predefinedRules =  {
 		["rule"] = "autofurniturecat()",
 		["tag"] = L(SI_AC_DEFAULT_TAG_FURNITURE),
 		["name"] = L(SI_AC_DEFAULT_CATEGORY_BYCATEGORY),
+		["description"] = "",
+		["pred"] = 1,
+	},
+	{
+		["rule"] = "type(\"master_writ\") or (sptype(\"container_stackable\") and itemname(\"Writ\"))",
+		["tag"] = L(SI_AC_DEFAULT_TAG_PAPERS),
+		["name"] = L(SI_AC_DEFAULT_CATEGORY_MASTER_WRITS),
 		["description"] = "",
 		["pred"] = 1,
 	}
