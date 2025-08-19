@@ -741,21 +741,21 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 
 		local arg = select( ax, ... )
 
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
+		if arg then
+            local t_arg = type(arg)
+            if t_arg == "number" then
+                table.insert(checkIconIds, arg)
+
+            elseif t_arg == "string" then
+                local v = markedTypeMap[string.lower( arg )]
+                if v then
+                    table.insert(checkIconIds, v)
+                end
+            else
+                error( string.format("error: %s(): argument is error." , fn ) )
+            end
 		end
 
-		if type( arg ) == "number" then
-			table.insert(checkIconIds, arg)
-
-		elseif type( arg ) == "string" then
-			local v = markedTypeMap[string.lower( arg )]
-			if v then
-				table.insert(checkIconIds, v)
-			end
-		else
-			error( string.format("error: %s(): argument is error." , fn ) )
-		end
 	end
 	
 	if #checkIconIds ~= 0 then  

@@ -2,7 +2,7 @@
 -- Aliases
 local L = GetString
 local SF = LibSFUtils
-local AC = AutoCategory
+local AutoCat = AutoCategory
 
 local CVT = AutoCategory.CVT
 local RuleApi = AutoCategory.RuleApi
@@ -13,7 +13,7 @@ local ac_rules = AutoCategory.RulesW
 
 -- AutoCategory.saved contains table references from the appropriate saved variables - either acctSaved or charSaved
 -- depending on the setting of charSaved.accountWide
-AutoCategory.saved = {
+AutoCat.saved = {
     rules = {}, -- [#] rule {rkey, name, tag, description, rule, damaged, err} -- obsolete
     bags = {}, -- [bagId] {rules={name, runpriority, showpriority, isHidden}, isUngroupedHidden} -- pairs with collapses
 	general = {},   -- from savedvars
@@ -21,7 +21,7 @@ AutoCategory.saved = {
 	collapses = {},  -- from savedvars -- charSaved.collapses or acctSaved.collapses -- pairs with bags
 }
 
-AutoCategory.cache = {
+AutoCat.cache = {
     bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS), -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
 							-- used for both the EditBag_cvt and ImportBag dropdowns
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
@@ -29,18 +29,18 @@ AutoCategory.cache = {
     entriesByName = {}, -- [bagId][rulename]  (BagRule){ name, runpriority, showpriority, isHidden }
 }
 
-AutoCategory.BagRuleEntry = {}
+AutoCat.BagRuleEntry = {}
 
 
-local saved = AutoCategory.saved
-local cache = AutoCategory.cache
+local saved = AutoCat.saved
+local cache = AutoCat.cache
 
 local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
-function AutoCategory.debugCache()
-    d("User rules: " .. AutoCategory.ARW:size()) --#AutoCategory.acctRules.rules)
+function AutoCat.debugCache()
+    d("User rules: " .. AutoCat.ARW:size()) --#AutoCategory.acctRules.rules)
     d("Saved rules: " .. #saved.rules)						-- should be 0 after conversion
-    d("Predefined rules: " .. #AutoCategory.predefinedRules)			-- predefined rules from base and plugins
+    d("Predefined rules: " .. #AutoCat.predefinedRules)			-- predefined rules from base and plugins
     d("Combined rules: " .. ac_rules:sizeRules())						-- complete list of user rules and predefined rules
     d("Compiled rules: " .. SF.GetSize(ac_rules.compiled))
     d("Rules by Name: " .. SF.GetSize(ac_rules.ruleNames))	-- lookup table for rules by rule name
@@ -53,7 +53,7 @@ function AutoCategory.debugCache()
 end
 
 --unused (debug) - Not sure why called "EBT" since it uses entriesByName!!
-function AutoCategory.debugEBT()
+function AutoCat.debugEBT()
 	for k, v in pairs(cache.entriesByName[1]) do
 		d("k = "..k)
 		if type(v) == "table" then
@@ -67,7 +67,7 @@ function AutoCategory.debugEBT()
 end
 
 --unused (debug)
-function AutoCategory.debugTags()
+function AutoCat.debugTags()
 	d("RulesW.tags:")
 	for k, v in pairs(ac_rules.tags) do
 		if type(v) == "table" then
@@ -83,20 +83,20 @@ end
 -- ------------------------ RulesW  -------------------------------
 -- not a class - just a structure with functions
 --[[
-AutoCategory.RulesW = {
+AutoCat.RulesW = {
 	ruleList= {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
 	ruleNames={},		-- [name] rule#
-	compiled = AutoCategory.compiledRules,	-- [name] function
+	compiled = AutoCat.compiledRules,	-- [name] function
 
 	tags = {},		-- [#] tagname
 	tagGroups={},	-- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
 }
 --]]
-ac_rules = AutoCategory.RulesW
+ac_rules = AutoCat.RulesW
 
 -- Add a tag if it is not already in the list(s)
-function AutoCategory.RulesW.AddTag(name)
-	local RulesW = AutoCategory.RulesW
+function AutoCat.RulesW.AddTag(name)
+	local RulesW = AutoCat.RulesW
 	if not name then return end
 	if not RulesW.tagGroups[name] then
 		RulesW.tags[#RulesW.tags+1] = name
@@ -107,9 +107,9 @@ end
 -- Compile all of the rules that we know (if necessary)
 -- Mark those that failed to compile as damaged
 --
-function AutoCategory.RulesW.CompileAll(self)
-	if not self then self = AutoCategory.RulesW end
-	-- reset AutoCategory.compiledRules to empty, creating only if necessary
+function AutoCat.RulesW.CompileAll(self)
+	if not self then self = AutoCat.RulesW end
+	-- reset AutoCat.compiledRules to empty, creating only if necessary
 	self.compiled = SF.safeClearTable(self.compiled)
 
     if self.ruleList == nil then
@@ -117,7 +117,7 @@ function AutoCategory.RulesW.CompileAll(self)
 		return
     end
 	-- compile and store each of the rules in the ruleset
-	local compile = AutoCategory.RuleApi.compile
+	local compile = AutoCat.RuleApi.compile
     for j = 1, #self.ruleList do
         if self.ruleList[j] then
             compile(self.ruleList[j])
@@ -127,17 +127,17 @@ end
 
 
 -- return number of entries in the base rule list
-function AutoCategory.RulesW.sizeRules(self)
+function AutoCat.RulesW.sizeRules(self)
 	return #self.ruleList
 end
 
 -- return number of entries in the base tag list
-function AutoCategory.RulesW.sizeTags(self)
+function AutoCat.RulesW.sizeTags(self)
 	return #self.tags
 end
 
 -- override addRule from RuleList to add in lookup table updates
-function AutoCategory.RulesW.AddRule(self, newRule, overwriteFlag)
+function AutoCat.RulesW.AddRule(self, newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
 	if not newRule.tag or newRule.tag == "" then
         newRule.tag = AC_EMPTY_TAG_NAME
@@ -154,7 +154,7 @@ function AutoCategory.RulesW.AddRule(self, newRule, overwriteFlag)
 		self.ruleList[#self.ruleList+1] = newRule
 		self.ruleNames[newRule.name] = #self.ruleList
 	end
-	self.tagGroups[newRule.tag]:append(newRule.name, nil, AutoCategory.RuleApi.getDesc(newRule))
+	self.tagGroups[newRule.tag]:append(newRule.name, nil, AutoCat.RuleApi.getDesc(newRule))
 
 	RuleApi.compile(newRule)
 end
@@ -207,11 +207,11 @@ local function BagRuleRunSortingFunction(a, b)
 end
 
 -- swap between account-wide and char-wide settings
-function AutoCategory.UpdateCurrentSavedVars()
+function AutoCat.UpdateCurrentSavedVars()
 	--local RulesW = AutoCategory.RulesW
     -- general, and appearance are always accountWide
-    saved.general = AutoCategory.acctSaved.general
-    saved.appearance = AutoCategory.acctSaved.appearance
+    saved.general = AutoCat.acctSaved.general
+    saved.appearance = AutoCat.acctSaved.appearance
 
 	--AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
 	AutoCategory.acctSaved.displayOrder = nil
@@ -231,29 +231,29 @@ function AutoCategory.UpdateCurrentSavedVars()
     ac_rules:CompileAll()
 
 	-- bags/collapses might or might not be acct wide
-    if not AutoCategory.charSaved.accountWide then
-        saved.bags = AutoCategory.charSaved.bags
-        saved.collapses = AutoCategory.charSaved.collapses
+    if not AutoCat.charSaved.accountWide then
+        saved.bags = AutoCat.charSaved.bags
+        saved.collapses = AutoCat.charSaved.collapses
     
     else
-        saved.bags = AutoCategory.acctSaved.bags
-        saved.collapses = AutoCategory.acctSaved.collapses
+        saved.bags = AutoCat.acctSaved.bags
+        saved.collapses = AutoCat.acctSaved.collapses
     end
 	
-    AutoCategory.cacheInitialize()
+    AutoCat.cacheInitialize()
 end
 
 -- -----------------------------------------------------------
 -- Manage collapses
 -- -----------------------------------------------------------
-function AutoCategory.LoadCollapse()
-    if not AutoCategory.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
+function AutoCat.LoadCollapse()
+    if not AutoCat.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
-        return AutoCategory.ResetCollapse(AutoCategory.saved)
+        return AutoCat.ResetCollapse(AutoCat.saved)
     end
 end
 
-function AutoCategory.ResetCollapse(vars)
+function AutoCat.ResetCollapse(vars)
     for j = 1, #cache.bags_cvt do
 		local bagcol = vars.collapses[j]
 		for k,_ in pairs(bagcol) do
@@ -263,15 +263,15 @@ function AutoCategory.ResetCollapse(vars)
 end
 
 -- Determine if the specified category of the particular bag is collapsed or not
-function AutoCategory.IsCategoryCollapsed(bagTypeId, categoryName)
+function AutoCat.IsCategoryCollapsed(bagTypeId, categoryName)
 	if bagTypeId == nil or categoryName == nil then return false end
 
-	local collapsetbl = SF.safeTable(AutoCategory.saved.collapses[bagTypeId])
+	local collapsetbl = SF.safeTable(AutoCat.saved.collapses[bagTypeId])
     return collapsetbl[categoryName] or false
 end
 
 
-function AutoCategory.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
+function AutoCat.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
 	if not categoryName then return end
 	if not saved.collapses[bagTypeId] then saved.collapses[bagTypeId] = {} end
 	saved.collapses[bagTypeId][categoryName] = collapsed
@@ -279,62 +279,62 @@ end
 -- -----------------------------------------------------------
 
 -- will need to rebuild RulesW.ruleList after this
-function AutoCategory.ResetToDefaults()
+function AutoCat.ResetToDefaults()
 
-	AutoCategory.ARW.clear()
-	ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.rules, AutoCategory.acctRules.rules)
-	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
+	AutoCat.ARW.clear()
+	ZO_DeepTableCopy(AutoCat.defaultAcctSettings.rules, AutoCat.acctRules.rules)
+	AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
 
-	AutoCategory.acctSaved.rules = nil	-- no longer used
-	AutoCategory.charSaved.rules = nil	-- no longer used
+	AutoCat.acctSaved.rules = nil	-- no longer used
+	AutoCat.charSaved.rules = nil	-- no longer used
 
-	AutoCategory.acctSaved.bags = SF.safeClearTable(AutoCategory.acctSaved.bags)
-    ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.bags, AutoCategory.acctSaved.bags)
+	AutoCat.acctSaved.bags = SF.safeClearTable(AutoCat.acctSaved.bags)
+    ZO_DeepTableCopy(AutoCat.defaultAcctSettings.bags, AutoCat.acctSaved.bags)
 
-	AutoCategory.charSaved.bags = SF.safeClearTable(AutoCategory.charSaved.bags)
-    ZO_DeepTableCopy(AutoCategory.defaultSettings.bags, AutoCategory.charSaved.bags)
+	AutoCat.charSaved.bags = SF.safeClearTable(AutoCat.charSaved.bags)
+    ZO_DeepTableCopy(AutoCat.defaultSettings.bags, AutoCat.charSaved.bags)
 
-    AutoCategory.ResetCollapse(AutoCategory.acctSaved)
-    AutoCategory.ResetCollapse(AutoCategory.charSaved)
+    AutoCat.ResetCollapse(AutoCat.acctSaved)
+    AutoCat.ResetCollapse(AutoCat.charSaved)
 
-	AutoCategory.acctSaved.appearance = SF.safeClearTable(AutoCategory.acctSaved.appearance)
-    ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.appearance,
-			AutoCategory.acctSaved.appearance)
+	AutoCat.acctSaved.appearance = SF.safeClearTable(AutoCat.acctSaved.appearance)
+    ZO_DeepTableCopy(AutoCat.defaultAcctSettings.appearance,
+			AutoCat.acctSaved.appearance)
 
-	AutoCategory.acctSaved.general = SF.safeClearTable(AutoCategory.acctSaved.general)
-	ZO_DeepTableCopy(AutoCategory.defaultAcctSettings.general,
-			AutoCategory.acctSaved.general)
+	AutoCat.acctSaved.general = SF.safeClearTable(AutoCat.acctSaved.general)
+	ZO_DeepTableCopy(AutoCat.defaultAcctSettings.general,
+			AutoCat.acctSaved.general)
 
-	AutoCategory.charSaved.general = nil	-- fix old data corruption error
-	AutoCategory.charSaved.appearance = nil	-- fix old data corruption error
+	AutoCat.charSaved.general = nil	-- fix old data corruption error
+	AutoCat.charSaved.appearance = nil	-- fix old data corruption error
 
-	AutoCategory.charSaved.accountWide = AutoCategory.defaultSettings.accountWide
+	AutoCat.charSaved.accountWide = AutoCat.defaultSettings.accountWide
 end
 
 -- create local alias for references in this function
-local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
+local setCategoryCollapsed = AutoCat.SetCategoryCollapsed
 
 -- rename a rule, updates the cache lookups and bagsets too
-function AutoCategory.renameRule(oldName, newName)
+function AutoCat.renameRule(oldName, newName)
 	if oldName == newName then return oldname end
 
-	local rule = AutoCategory.GetRuleByName(oldName)
+	local rule = AutoCat.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
 
 	local oldrndx = ac_rules.ruleNames[oldName]
 	ac_rules.ruleNames[oldName] = nil
 
-	newName = AutoCategory.GetUsableRuleName(newName)
+	newName = AutoCat.GetUsableRuleName(newName)
 
 	rule.name = newName
 	ac_rules.ruleNames[rule.name] = oldrndx
 
-	AutoCategory.renameBagRule(oldName, newName)
+	AutoCat.renameBagRule(oldName, newName)
 	return newName
 end
 
 -- When a rule changes names, referencees to in the bag rules also need to change
-function AutoCategory.renameBagRule(oldName, newName)
+function AutoCat.renameBagRule(oldName, newName)
 	if oldName == newName then return end
 
 	--Update bags so that every entry has the same name, should be changed to new name.
@@ -356,7 +356,7 @@ function AutoCategory.renameBagRule(oldName, newName)
 end
 
 -- initialize the RulesW.ruleNames, RulesW.tagGroups, and the RulesW.tags tables from RulesW.ruleList
-function AutoCategory.cacheRuleInitialize()
+function AutoCat.cacheRuleInitialize()
 	-- initialize the rules-based lookups
     ac_rules.ruleNames = SF.safeClearTable(ac_rules.ruleNames)
     ac_rules.tagGroups = SF.safeClearTable(ac_rules.tagGroups)
@@ -385,7 +385,7 @@ end
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
 -- bagId needs to be between 1 and 7 (inclusive)
-function AutoCategory.cacheInitBag(bagId)
+function AutoCat.cacheInitBag(bagId)
 	if bagId == nil or bagId < 1 or bagId > 7 then 
 		return
 	end
@@ -401,7 +401,7 @@ function AutoCategory.cacheInitBag(bagId)
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, runpriority, showpriority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
 	local sbag = cache.entriesByShowBag[bagId]		-- CVT
-	local bagRuleApi = AutoCategory.BagRuleApi
+	local bagRuleApi = AutoCat.BagRuleApi
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
@@ -417,7 +417,7 @@ function AutoCategory.cacheInitBag(bagId)
 	if svdbag ~= nil then
 		table.sort(svdbag.rules, BagRuleShowSortingFunction)
 	end
-	local win = AutoCategory.dspWin
+	local win = AutoCat.dspWin
 	win:ClearList()
 	do
 		local sn
@@ -446,13 +446,13 @@ function AutoCategory.cacheInitBag(bagId)
 		local sn
 		local tt
 		local bagrule
-		local bagRuleApi = AutoCategory.BagRuleApi
+		local bagRuleApi = AutoCat.BagRuleApi
 		for entry = 1, #svdbag.rules do
 			bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
 			if not bagrule then break end
 
 			local ruleName = bagrule.name
-			AutoCategory.BagRuleApi.convertPriority(bagrule)
+			AutoCat.BagRuleApi.convertPriority(bagrule)
 			AutoCat_Logger():Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
 			if not ename[ruleName] then
 				ename[ruleName] = bagrule
@@ -471,7 +471,7 @@ function AutoCategory.cacheInitBag(bagId)
 end
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
-function AutoCategory.cacheBagInitialize()
+function AutoCat.cacheBagInitialize()
 	-- initialize the bag-based lookups
     ZO_ClearTable(cache.entriesByName)
     ZO_ClearTable(cache.entriesByBag)
@@ -480,7 +480,7 @@ function AutoCategory.cacheBagInitialize()
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
     for bagId = 1, 7 do
-		AutoCategory.cacheInitBag(bagId)
+		AutoCat.cacheInitBag(bagId)
     end
 end
 
@@ -489,16 +489,16 @@ end
 -- assumes that RulesW.ruleList and saved.bags have entries but
 -- some or all of the cache tables need (re)initializing
 --
-function AutoCategory.cacheInitialize()
+function AutoCat.cacheInitialize()
     -- initialize the rules-based lookups
-    AutoCategory.cacheRuleInitialize()
-	AutoCategory.cacheBagInitialize()
+    AutoCat.cacheRuleInitialize()
+	AutoCat.cacheBagInitialize()
 
 end
 
 
 -- find and return the rule referenced by name
-function AutoCategory.GetRuleByName(name)
+function AutoCat.GetRuleByName(name)
     if not name then
         return nil
     end
@@ -512,12 +512,12 @@ function AutoCategory.GetRuleByName(name)
 end
 
 -- find and return the bagrule referenced by name
-function AutoCategory.GetBagRuleByName(bagId, name)
+function AutoCat.GetBagRuleByName(bagId, name)
     if not name then
         return nil, nil
     end
 
-	local bagrules = AutoCategory.cache.entriesByShowBag[bagId]
+	local bagrules = AutoCat.cache.entriesByShowBag[bagId]
 	if not bagrules then return nil end
 	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(
 			bagrules.choicesValues, 
@@ -532,7 +532,7 @@ end
 
 -- when we add a new rule to RulesW.ruleList, also add it to the various lookups and dropdowns
 -- returns nil on success or error message
-function AutoCategory.cache.AddRule(rule)
+function AutoCat.cache.AddRule(rule)
     if not rule or not rule.name then
         return "AddRule: Rule or name of rule was nil"
     end -- can't use a nil rule
@@ -545,7 +545,7 @@ function AutoCategory.cache.AddRule(rule)
         ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	AutoCategory.BagRuleApi.convertPriority(rule)
+	AutoCat.BagRuleApi.convertPriority(rule)
 
 	local rule_ndx = ac_rules.ruleNames[rule.name]
     if rule_ndx then
@@ -558,7 +558,7 @@ function AutoCategory.cache.AddRule(rule)
 		ac_rules.ruleList[#ac_rules.ruleList+1] = rule
 		rule_ndx = #ac_rules.ruleList
 		ac_rules.ruleNames[rule.name] = rule_ndx
-		ac_rules.tagGroups[rule.tag]:append(rule.name, nil, AutoCategory.RuleApi.getDesc(rule))
+		ac_rules.tagGroups[rule.tag]:append(rule.name, nil, AutoCat.RuleApi.getDesc(rule))
     end
 
 	RuleApi.compile(rule)
@@ -582,9 +582,9 @@ local function setupContextMenu()
 	LCM:RegisterContextMenu(AC_AddMenuItem, LibCustomMenu.CATEGORY_LATE )
 end
 
-function AutoCategory.initializePlugins()
+function AutoCat.initializePlugins()
 	-- initialize plugins
-	for _, v in pairs(AutoCategory.Plugins) do
+	for _, v in pairs(AutoCat.Plugins) do
 		if v.init then
 			v.init()
 		end
@@ -627,7 +627,7 @@ local function addTableRules(tbl, tblname, ispredef)
 	end
 
 	local function addPredef(stbl, rule)
-		local predefinedRules = AutoCategory.predefinedRules
+		local predefinedRules = AutoCat.predefinedRules
 		-- add to predefinedRules list
 		if stbl.rules ~= predefinedRules then
 			predefinedRules[#predefinedRules+1] = rule
@@ -636,14 +636,14 @@ local function addTableRules(tbl, tblname, ispredef)
 
 	local function addUserRule(stbl, rule)
 		-- add to acctRules list
-		if stbl.rules ~= AutoCategory.acctRules.rules then
-			return AutoCategory.ARW:addRule(rule)
+		if stbl.rules ~= AutoCat.acctRules.rules then
+			return AutoCat.ARW:addRule(rule)
 		end
 	end
 
 	-- process all of the rules in the table
-	local getRuleByName = AutoCategory.GetRuleByName
-	local getUsableRuleName = AutoCategory.GetUsableRuleName
+	local getRuleByName = AutoCat.GetRuleByName
+	local getUsableRuleName = AutoCat.GetUsableRuleName
 	local v, r
 	for k=#tbl.rules, 1, -1 do
 		v = tbl.rules[k]
@@ -667,7 +667,7 @@ local function addTableRules(tbl, tblname, ispredef)
 				AutoCat_Logger():Debug("Renaming duplicate rule name - "..oldname.." to "..v.name)
 
 				addCombinedRule(v)
-				AutoCategory.renameBagRule(oldname, newName)
+				AutoCat.renameBagRule(oldname, newName)
 				if RuleApi.isPredefined(v) then 
 					addPredef(tbl, v)
 
@@ -697,6 +697,7 @@ local function addTableRules(tbl, tblname, ispredef)
     end
 end
 
+--[[
 local function pruneUserRules()
 	AutoCat_Logger():Debug ("Executing pruneUserRules ")
 	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
@@ -718,12 +719,13 @@ local function pruneUserRules()
 		--table.remove(arrules, k)
 	end
 end
+--]]
 
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
 	AutoCat_Logger():Debug ("Executing loadPluginPredefines ")
 	-- add plugin predefined rules to the base predefined rules
-	for name, plugin in pairs(AutoCategory.Plugins) do
+	for name, plugin in pairs(AutoCat.Plugins) do
 		if plugin.predef then
 			AutoCat_Logger():Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
 
@@ -732,96 +734,96 @@ local function loadPluginPredefines()
 		end
 	end
 	AutoCat_Logger():Debug ("Done executing loadPluginPredefines ")
-	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCat.predefinedRules))
  end
 
 
 -- setup that needs to be done when the addon is loaded into the game
-function AutoCategory.onLoad(event, addon)
-    if addon ~= AutoCategory.name then
+function AutoCat.onLoad(event, addon)
+    if addon ~= AutoCat.name then
         return
     end
 
 	-- make sure we are not called again
-	AutoCategory.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
+	AutoCat.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
 
-    --AutoCategory.checkLibraryVersions()
+    --AutoCat.checkLibraryVersions()
 
     -- load our saved variables (no longer loads pre-defined rules)
-    AutoCategory.acctSaved, AutoCategory.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
-		1.1, AutoCategory.defaultAcctSettings, AutoCategory.defaultCharSettings)
-	if SF.isEmpty(AutoCategory.acctSaved.bags) then 
-		SF.defaultMissing(AutoCategory.acctSaved.bags, AutoCategory.defaultAcctBagSettings.bags)
+    AutoCat.acctSaved, AutoCat.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
+		1.1, AutoCat.defaultAcctSettings, AutoCat.defaultCharSettings)
+	if SF.isEmpty(AutoCat.acctSaved.bags) then 
+		SF.defaultMissing(AutoCat.acctSaved.bags, AutoCat.defaultAcctBagSettings.bags)
 	end
-	if SF.isEmpty(AutoCategory.charSaved.bags) then
-		SF.defaultMissing(AutoCategory.charSaved.bags, AutoCategory.defaultAcctBagSettings.bags)
+	if SF.isEmpty(AutoCat.charSaved.bags) then
+		SF.defaultMissing(AutoCat.charSaved.bags, AutoCat.defaultAcctBagSettings.bags)
 	end
 
 		-- There are no char-level variables for AutoCatRules!
-    AutoCategory.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCategory.default_rules)
-	AutoCategory.ARW = AutoCategory.RuleList:New(AutoCategory.acctRules.rules)
+    AutoCat.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCat.default_rules)
+	AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
 
-	AutoCategory.LoadCollapse()
+	AutoCat.LoadCollapse()
 
 	-- Set up the context menu item for AutoCategory
 	setupContextMenu()
 
 	-- hooks
-	AutoCategory.HookGamepadMode()
-	AutoCategory.HookKeyboardMode()
+	AutoCat.HookGamepadMode()
+	AutoCat.HookKeyboardMode()
 
 end
 
 -- --------------------------------------------------------------------
 -- keep track of registered events for AutoCategory
-AutoCategory.evtmgr = SF.EvtMgr:New("AutoCategory")
+AutoCat.evtmgr = SF.EvtMgr:New("AutoCategory")
 
 -- only runs once
 -- continues initialization after all addons are loaded into the game
-function AutoCategory.onPlayerActivated()
-	local evtmgr = AutoCategory.evtmgr
+function AutoCat.onPlayerActivated()
+	local evtmgr = AutoCat.evtmgr
 
 	-- make sure we are only called once
 	evtmgr:unregEvt(EVENT_PLAYER_ACTIVATED)
 
-	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCategory.BulkMode = false end)
-	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCategory.BulkMode = false end)
+	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCat.BulkMode = false end)
+	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCat.BulkMode = false end)
 
 	--create window to show display order
-	AutoCategory.dspWin = AC_UI.DspWin.New()
+	AutoCat.dspWin = AC_UI.DspWin.New()
 		
 	--capabilities with other (older) add-ons
 	IntegrateQuickMenu()
 
-	AutoCategory.meta = SF.safeTable(AutoCategory.meta)
-	SF.addonMeta(AutoCategory.meta,"AutoCategory")
+	AutoCat.meta = SF.safeTable(AutoCat.meta)
+	SF.addonMeta(AutoCat.meta,"AutoCategory")
 
 	-- add plugin predefined rules to the combined rules and name-lookup
 	loadPluginPredefines()
-	local pd = { rules = AutoCategory.predefinedRules, }
+	local pd = { rules = AutoCat.predefinedRules, }
 	addTableRules(pd, ".predefinedRules", true)
 	--pruneUserRules()
 
-	addTableRules(AutoCategory.acctRules, ".acctRules", false)
-	addTableRules(AutoCategory.acctSaved, ".acctSaved", false)
-	AutoCategory.acctSaved.rules = nil	-- no longer used
-	addTableRules(AutoCategory.charSaved, ".charSaved", false)
-	AutoCategory.charSaved.rules = nil	-- no longer used
+	addTableRules(AutoCat.acctRules, ".acctRules", false)
+	addTableRules(AutoCat.acctSaved, ".acctSaved", false)
+	AutoCat.acctSaved.rules = nil	-- no longer used
+	addTableRules(AutoCat.charSaved, ".charSaved", false)
+	AutoCat.charSaved.rules = nil	-- no longer used
 
-	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCategory.predefinedRules))
+	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCat.predefinedRules))
 
-    AutoCategory.UpdateCurrentSavedVars()
-	AutoCategory.initializePlugins()
-	AutoCategory.cacheInitialize()
-	AutoCategory.AddonMenu_Init()
-	AutoCategory.AC_Classes_Init()
-	AutoCategory.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
+    AutoCat.UpdateCurrentSavedVars()
+	AutoCat.initializePlugins()
+	AutoCat.cacheInitialize()
+	AutoCat.AddonMenu_Init()
+	AutoCat.AC_Classes_Init()
+	AutoCat.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
 end
 
 do
 	-- register our event handler function to be called to do initialization
-	AutoCategory.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 		AutoCategory.onLoad)
-	AutoCategory.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCategory.onPlayerActivated)
+	AutoCat.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 	AutoCat.onLoad)
+	AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
 end
 
 
@@ -910,9 +912,9 @@ local function refreshList(inventoryType, even_if_hidden)
 end
 
 -- make accessible
-AutoCategory.RefreshList = refreshList
+AutoCat.RefreshList = refreshList
 
-function AutoCategory.RefreshCurrentList(even_if_hidden)
+function AutoCat.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
 
 	for k,v in pairs( inven_data ) do
@@ -938,10 +940,10 @@ function AC_ItemRowHeader_OnMouseEnter(header)
     local bagTypeId = getBagTypeId(header)
 
 
-    local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
+    local collapsed = AutoCat.IsCategoryCollapsed(bagTypeId, cateName)
     local markerBG = header:GetNamedChild("CollapseMarkerBG")
 
-    if AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
+    if AutoCat.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] then
         markerBG:SetHidden(false)
         if collapsed then
             markerBG:SetTexture("EsoUI/Art/Buttons/plus_over.dds")
@@ -964,16 +966,16 @@ end
 -- called from AutoCategory.xml
 -- collapse/expand a header by clicking on the -/+ icon
 function AC_ItemRowHeader_OnMouseClicked(header)
-    if (AutoCategory.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false) then
+    if (AutoCat.acctSaved.general["SHOW_CATEGORY_COLLAPSE_ICON"] == false) then
         return
     end
 
     local cateName = header.slot.dataEntry.data.AC_categoryName
     local bagTypeId = getBagTypeId(header)
 
-    local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
+    local collapsed = AutoCat.IsCategoryCollapsed(bagTypeId, cateName)
     setCategoryCollapsed(bagTypeId, cateName, not collapsed)
-    AutoCategory.RefreshCurrentList()
+    AutoCat.RefreshCurrentList()
 end
 
 -- called from AutoCategory.xml
@@ -984,13 +986,13 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     local bagTypeId = getBagTypeId(header)
 
 	-- add either single Expand or Collapse to menu as appropriate for category state
-    local collapsed = AutoCategory.IsCategoryCollapsed(bagTypeId, cateName)
+    local collapsed = AutoCat.IsCategoryCollapsed(bagTypeId, cateName)
     if collapsed then
         AddMenuItem(
             L(SI_CONTEXT_MENU_EXPAND),
             function()
                 setCategoryCollapsed(bagTypeId, cateName, false)
-                AutoCategory.RefreshCurrentList()
+                AutoCat.RefreshCurrentList()
             end
         )
 
@@ -999,7 +1001,7 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
             L(SI_CONTEXT_MENU_COLLAPSE),
             function()
                 setCategoryCollapsed(bagTypeId, cateName, true)
-                AutoCategory.RefreshCurrentList()
+                AutoCat.RefreshCurrentList()
             end
         )
     end
@@ -1008,10 +1010,10 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_EXPAND_ALL),
         function()
-            for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
+            for k, _ in pairs(AutoCat.saved.collapses[bagTypeId]) do
 				setCategoryCollapsed(bagTypeId,k,false)
             end
-            AutoCategory.RefreshCurrentList()
+            AutoCat.RefreshCurrentList()
         end
     )
 
@@ -1019,11 +1021,11 @@ function AC_ItemRowHeader_OnShowContextMenu(header)
     AddMenuItem(
         L(SI_CONTEXT_MENU_COLLAPSE_ALL),
         function()
-            for k, _ in pairs(AutoCategory.saved.collapses[bagTypeId]) do
+            for k, _ in pairs(AutoCat.saved.collapses[bagTypeId]) do
 				setCategoryCollapsed(bagTypeId,k,true)
             end
-			setCategoryCollapsed(bagTypeId,AutoCategory.saved.appearance["CATEGORY_OTHER_TEXT"],true)
-            AutoCategory.RefreshCurrentList()
+			setCategoryCollapsed(bagTypeId,AutoCat.saved.appearance["CATEGORY_OTHER_TEXT"],true)
+            AutoCat.RefreshCurrentList()
         end
     )
     ShowMenu()
@@ -1032,14 +1034,14 @@ end
 -- called from binding.xml
 -- toggle AutoCategory on or off
 function AC_Binding_ToggleCategorize()
-    AutoCategory.Enabled = not AutoCategory.Enabled
-    if AutoCategory.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] then
-        if AutoCategory.Enabled then
+    AutoCat.Enabled = not AutoCat.Enabled
+    if AutoCat.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] then
+        if AutoCat.Enabled then
             d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON))
 
         else
             d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF))
         end
     end
-    AutoCategory.RefreshCurrentList()
+    AutoCat.RefreshCurrentList()
 end
