@@ -1,9 +1,9 @@
 ## Title: AutoCategory
-## APIVersion: 101046 101047
+## APIVersion: 101048 101047
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 4.4.9
-## AddOnVersion: 131
+## Version: 4.5.0
+## AddOnVersion: 132
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
 ## DependsOn: LibAddonMenu-2.0>=40 LibCustomMenu>=730 LibSFUtils>=63 LibMediaProvider>=34 
 ## DependsOn: LibDebugLogger>=268

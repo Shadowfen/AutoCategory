@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.5.0 (132)[/COLOR]
+[LIST]
+[*] Fixed the Add Category section's select category dropdown so that it has values after you choose a new tag.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.4.9 (131)[/COLOR]
 [LIST]
 [*] Added "container_stackable" to the possible search of [COLOR="MediumSeaGreen"]sptype()[/COLOR]. This will  match for the "Unknown Master Writs" and the "Unknown Supply Survey" containers. See the "Maps & Surveys" and (new) "Master Writs (All)" predefined category rules for examples of how to use this.

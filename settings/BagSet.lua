@@ -646,9 +646,11 @@ function AC_UI.AddCat_SelectTag_LAM:setValue(value)
 
 	self.cvt.indexValue = value
 
+	AddCat_SelectTag_LAM:updateControl()
 	AddCat_SelectRule_LAM:clearIndex()
 	AddCat_SelectRule_LAM:assign(AddCat_SelectRule_LAM.filterRules(getCurrentBagId(),value))
 	AddCat_SelectRule_LAM:refresh()
+	AddCat_SelectRule_LAM:updateControl()
 end
 
 function AC_UI.AddCat_SelectTag_LAM:controlDef()
@@ -682,19 +684,22 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	if not cache.entriesByName[bagId] then
 		cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId] )
 	end
-
+    AutoCat_Logger():Debug(SF.str("running filterRules for bag ", bagId, " tag ",tag))
 	-- filter out already-in-use rules from the "add category" list for bag rules
 	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(), nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	if not AutoCategory.RulesW.tagGroups[tag] then
 		-- no rules available for tag
+        AutoCat_Logger():Debug("no rules available")
 		return dataCurrentRules_AddCategory
 	end
 
 	local rbyt = AutoCategory.RulesW.tagGroups[tag]
+    AutoCat_Logger():Debug(SF.str("# entries for tag ",rbyt:size()))
 	for i = 1, rbyt:size() do
 		local value = rbyt.choices[i]
 		if value and cache.entriesByName[bagId][value] == nil then
 			--add the rule if not in bag
+            AutoCat_Logger():Debug("Adding "..rbyt.choices[i])
 			dataCurrentRules_AddCategory:append(rbyt.choices[i], nil, rbyt.choicesTooltips[i])
 		end
 	end
