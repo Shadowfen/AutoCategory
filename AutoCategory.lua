@@ -176,7 +176,7 @@ end
 -- for sorting bagged rules by showpriority and name
 -- returns true if the a should come before b
 local function BagRuleShowSortingFunction(a, b)
-    local result = false
+    local result
 	if a.showpriority == nil then
 		a.showpriority = a.runpriority
 	end
@@ -194,7 +194,7 @@ end
 -- for sorting bagged rules by runpriority and name
 -- returns true if the a should come before b
 local function BagRuleRunSortingFunction(a, b)
-    local result = false
+    local result
 	if not (a and b and a.name and b.name and a.runpriority and b.runpriority) then return false end
     if a.runpriority ~= b.runpriority then
         result = a.runpriority > b.runpriority
@@ -421,18 +421,20 @@ function AutoCat.cacheInitBag(bagId)
 	win:ClearList()
 	do
 		local sn
-		for entry = 1, #svdbag.rules do
-			local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-			if not bagrule then break end
+        if svdbag then
+            for entry = 1, #svdbag.rules do
+                local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+                if not bagrule then break end
 
-			AutoCat_Logger():Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
+                AutoCat_Logger():Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
 
-			sn = bagRuleApi.formatShow(bagrule)
-			sbag.choices[#sbag.choices+1] = sn
-			sbag.choicesValues[#sbag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
-			sbag.bagrules[#sbag.bagrules+1] = bagrule
-			win:AddItem(bagrule) --sn)
-		end
+                sn = bagRuleApi.formatShow(bagrule)
+                sbag.choices[#sbag.choices+1] = sn
+                sbag.choicesValues[#sbag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
+                sbag.bagrules[#sbag.bagrules+1] = bagrule
+                win:AddItem(bagrule) --sn)
+            end
+        end
 	end
 	win:UpdateScrollList()
 		
@@ -446,26 +448,27 @@ function AutoCat.cacheInitBag(bagId)
 		local sn
 		local tt
 		local bagrule
-		local bagRuleApi = AutoCat.BagRuleApi
-		for entry = 1, #svdbag.rules do
-			bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-			if not bagrule then break end
+        if svdbag then
+            for entry = 1, #svdbag.rules do
+                bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+                if not bagrule then break end
 
-			local ruleName = bagrule.name
-			AutoCat.BagRuleApi.convertPriority(bagrule)
-			AutoCat_Logger():Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
-			if not ename[ruleName] then
-				ename[ruleName] = bagrule
-				ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
+                local ruleName = bagrule.name
+                AutoCat.BagRuleApi.convertPriority(bagrule)
+                AutoCat_Logger():Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
+                if not ename[ruleName] then
+                    ename[ruleName] = bagrule
+                    ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
 
-				sn = bagRuleApi.formatShow(bagrule)
-				tt = bagRuleApi.formatTooltip(bagrule)
-				ebag.choices[#ebag.choices+1] = sn
-				ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
-			else
-				ename[ruleName] = bagrule
-			end
-		end
+                    sn = bagRuleApi.formatShow(bagrule)
+                    tt = bagRuleApi.formatTooltip(bagrule)
+                    ebag.choices[#ebag.choices+1] = sn
+                    ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
+                else
+                    ename[ruleName] = bagrule
+                end
+            end
+        end
 	end
 
 end
@@ -585,7 +588,7 @@ end
 function AutoCat.initializePlugins()
 	-- initialize plugins
 	for _, v in pairs(AutoCat.Plugins) do
-		if v.init then
+		if v and v.init then
 			v.init()
 		end
 	end
@@ -615,12 +618,12 @@ local function addTableRules(tbl, tblname, ispredef)
 		local n = ac_rules.ruleNames[rl.name]
 		if not n then
 			ac_rules.ruleList[#ac_rules.ruleList+1] = rl
-			AutoCat_Logger():Info("Adding rule "..rl.name.." to ac_rules.ruleList ndx="..#ac_rules.ruleList)
+			AutoCat_Logger():Debug("Adding rule "..rl.name.." to ac_rules.ruleList ndx="..#ac_rules.ruleList)
 			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
 			return true
 		else
 			ac_rules.ruleList[n] = rl
-			AutoCat_Logger():Info("Overwriting rule "..rl.name.." to Rulac_rulesesW.ruleList ndx="..n)
+			AutoCat_Logger():Debug("Overwriting rule "..rl.name.." to Rulac_rulesesW.ruleList ndx="..n)
 			ac_rules.ruleNames[rl.name] = n
 		end
 		return false
@@ -917,7 +920,7 @@ AutoCat.RefreshList = refreshList
 function AutoCat.RefreshCurrentList(even_if_hidden)
 	if not even_if_hidden then even_if_hidden = false end
 
-	for k,v in pairs( inven_data ) do
+	for k,_ in pairs( inven_data ) do
 		refreshList(k, even_if_hidden) 
 	end
 end

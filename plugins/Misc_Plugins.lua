@@ -14,43 +14,66 @@ AutoCategory_MiscAddons = {
 function AutoCategory_MiscAddons.Initialize()
 
     -- Master Merchant
-	AutoCategory.AddRuleFunc("getpricemm", 
-		AutoCategory_MiscAddons.RuleFunc.GetPriceMM)
-	AutoCategory.AddRuleFunc("mm_getprice", 
-		AutoCategory_MiscAddons.RuleFunc.GetPriceMM)
+	if MasterMerchant then
+        AutoCategory.AddRuleFunc("getpricemm", 
+            AutoCategory_MiscAddons.RuleFunc.GetPriceMM)
+        AutoCategory.AddRuleFunc("mm_getprice", 
+            AutoCategory_MiscAddons.RuleFunc.GetPriceMM)
+        AutoCat_Logger():Info("Initializing Master Merchant plugin integration")
+    else
+        -- assign dummy rule functions
+        AutoCategory.AddRuleFunc("getpricemm", AutoCategory.dummyRuleFunc)   -- always return false
+        AutoCategory.AddRuleFunc("mm_getprice", AutoCategory.dummyRuleFunc)   -- always return false
+    end
 	
     -- Tamriel Trade Center
-	AutoCategory.AddRuleFunc("getamountttc",
-		AutoCategory_MiscAddons.RuleFunc.GetAmountTTC)    
-	AutoCategory.AddRuleFunc("ttc_getamount",
-		AutoCategory_MiscAddons.RuleFunc.GetAmountTTC)    
-    AutoCategory.AddRuleFunc("getpricettc", AutoCategory_MiscAddons.RuleFunc.GetPriceTTC)
-    AutoCategory.AddRuleFunc("ttc_getpricettc", AutoCategory_MiscAddons.RuleFunc.GetPriceTTC)
+	if TamrielTradeCentre and TamrielTradeCentrePrice then
+        AutoCategory.AddRuleFunc("getamountttc",
+            AutoCategory_MiscAddons.RuleFunc.GetAmountTTC)    
+        AutoCategory.AddRuleFunc("ttc_getamount",
+            AutoCategory_MiscAddons.RuleFunc.GetAmountTTC)    
+        AutoCategory.AddRuleFunc("getpricettc", AutoCategory_MiscAddons.RuleFunc.GetPriceTTC)
+        AutoCategory.AddRuleFunc("ttc_getpricettc", AutoCategory_MiscAddons.RuleFunc.GetPriceTTC)
+        AutoCat_Logger():Info("Initializing Tamriel Trade Center plugin integration")
+
+    else
+        -- assign dummy rule functions
+        AutoCategory.AddRuleFunc("getamountttc", AutoCategory.dummyRuleFunc)   -- always return false
+        AutoCategory.AddRuleFunc("ttc_getamount", AutoCategory.dummyRuleFunc)   -- always return false
+        AutoCategory.AddRuleFunc("getpricettc", AutoCategory.dummyRuleFunc)   -- always return false
+        AutoCategory.AddRuleFunc("ttc_getpricettc", AutoCategory.dummyRuleFunc)   -- always return false
+    end
     
     -- AlphaGear
     if not AG then
+        -- assign dummy rule functions
         AutoCategory.AddRuleFunc("alphagear", AutoCategory.dummyRuleFunc)   -- always return false
 		
     else
         AutoCategory.AddRuleFunc("alphagear", AutoCategory_MiscAddons.RuleFunc.AlphaGear)
+        AutoCat_Logger():Info("Initializing AlphaGear plugin integration")
     end
-    
+
     -- SetTracker
     if not SetTrack then
+        -- assign dummy rule functions
         AutoCategory.AddRuleFunc("istracked", AutoCategory.dummyRuleFunc)    -- always return false
 		
     else
         AutoCategory.AddRuleFunc("istracked", AutoCategory_MiscAddons.RuleFunc.IsTracked)
+	    AutoCat_Logger():Info("Initializing Set Tracker plugin integration")
     end
-	
+
 	-- Character Knowledge
 	if not LibCharacterKnowledge then
+        -- assign dummy rule functions
         AutoCategory.AddRuleFunc("ck_isknowncat", AutoCategory.dummyRuleFunc)    -- always return false
         AutoCategory.AddRuleFunc("ck_isknown", AutoCategory.dummyRuleFunc)    -- always return false
 		
     else
         AutoCategory.AddRuleFunc("ck_isknowncat", AutoCategory_MiscAddons.RuleFunc.CK_IsKnownCat)
         AutoCategory.AddRuleFunc("ck_isknown", AutoCategory_MiscAddons.RuleFunc.CK_IsKnown)
+	    AutoCat_Logger():Info("Initializing LibCharacterKnowledge plugin integration")
     end
     
     
@@ -62,7 +85,7 @@ end
 
 -- Implement getpricemm() check function for Master Merchant
 function AutoCategory_MiscAddons.RuleFunc.GetPriceMM( ... )
-	local fn = "mm_getprice"
+	--local fn = "mm_getprice"
 	if MasterMerchant then
 		local itemLink = getCurrentItemLink()
 		local mmData = MasterMerchant:itemStats(itemLink, false)
@@ -75,7 +98,7 @@ end
 
 -- Implement getpricettc() check function for Tamriel Trade Center
 function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
-	local fn = "ttc_getprice"
+	--local fn = "ttc_getprice"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
 		local itemLink = getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
@@ -117,7 +140,7 @@ end
 
 -- Implement getamountttc() check function for Tamriel Trade Center
 function AutoCategory_MiscAddons.RuleFunc.GetAmountTTC( ... )
-	local fn = "ttc_getamount"
+	--local fn = "ttc_getamount"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
 		local itemLink = getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
@@ -190,7 +213,7 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
     checkSets[arg]=true
   end
   
-  local iTrackIndex, sTrackName, sTrackColour, sTrackNotes = SetTrack.GetTrackingInfo(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AC.checkingItemBagId, AC.checkingItemSlotIndex)
   if iTrackIndex >= 0 then
     if ac > 0 then
       if checkSets[sTrackName] ~= nil then
@@ -234,13 +257,13 @@ end
 
 -- Implement ck_isknown() check function for Set Tracker
 function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
-	local fn = "ck_isknown"
+	--local fn = "ck_isknown"
 	if LibCharacterKnowledge == nil then
 		return false
 	end
 	
 	local itemLink = getCurrentItemLink()
-	local cat = LCK.GetItemCategory(itemLink)
+	--local cat = LCK.GetItemCategory(itemLink)
 	
 	--local server = zo_strsplit(" ", GetWorldName())[1]
 	if AutoCategory_MiscAddons.charlist == nil then
@@ -253,7 +276,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		
 	else
 		local arg = select(1, ...)
-		for i,v in pairs(AutoCategory_MiscAddons.charlist) do
+		for _, v in pairs(AutoCategory_MiscAddons.charlist) do
 			local name = zo_strformat("<<1>>",v.name)
 			if name == arg then
 				crafter = v.id --characterId

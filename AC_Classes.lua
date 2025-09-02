@@ -222,7 +222,7 @@ end
 -- remove an item (by choice) from the dropdown lists (does not update the control)
 -- returns the new (maybe new) index value
 function AutoCategory.CVT:removeItemChoice(removeItem)
-	local removeIndex = -1
+	local removeIndex
     if not self.choices then	-- corrupt cvt
 		self.dirty = 1
 		self.choices = {}
@@ -267,7 +267,7 @@ end
 -- remove an item (by choiceValue) from the dropdown lists (does not update the control)
 -- returns new selected value/choice or nil if does not have choicesValues table.
 function AutoCategory.CVT:removeItemChoiceValue(removeItem)
-	local removeIndex = -1
+	local removeIndex
     if not self.choicesValues then return nil end
 
 	-- find the choiceValue to remove
@@ -491,8 +491,8 @@ end
 -- Returns a table {name=, runpriority=, showpriority=} or nil
 --
 function AutoCategory.CreateNewBagRule(rule, runpriority, showprior)
-	local rulename = nil
-	local ruleRunprior = nil
+	local rulename
+	local ruleRunprior
 	if not rule then
 		return nil
 	end
@@ -809,7 +809,7 @@ local bagRuleApi = {
 			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			AutoCategory.BagRuleApi.convertPriority(bagrule)
 
-			local sn = nil
+			local sn
 			if not rule then
 				-- missing rule (nil was passed in)
 				sn = string.format("|cFF4444(!)|r %s (%d/%d)", bagrule.name, bagrule.runpriority, bagrule.showpriority)
@@ -820,7 +820,7 @@ local bagRuleApi = {
 					local r, g, b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
 					local hex = "626250"
 					if r and not AutoCategory.saved.general["ENABLE_GAMEPAD"] then
-						r,g,b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
+						--r, g, b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
 						hex = SF.colorRGBToHex(r, g, b)
 					end
 					sn = string.format("|c%s%s (%d/%d)|r", hex, bagrule.name, bagrule.runpriority, bagrule.showpriority)
@@ -841,7 +841,7 @@ local bagRuleApi = {
 	-- Provides a tooltip string for the bag rule which may be displayed
 	-- when hovering over the bag rule in the dropdown menu.
 	formatTooltip = function (bagrule)
-			local tt = nil
+			local tt
 			local rule =AutoCategory.BagRuleApi.getBackingRule(bagrule)
 			if not rule then
 				-- missing rule (nil was passed in)

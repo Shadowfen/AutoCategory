@@ -600,29 +600,33 @@ end
 
 --Initialize plugin for Auto Category - FCOIS
 function AutoCategory_FCOIS.Initialize()
-	if FCOIS == nil then
-        AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("fco_isgear", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
+    if FCOIS then
+        AutoCat_Logger():Info("Initializing FCOIS plugin integration")
+        
+        -- initialize strings
+        AutoCategory_FCOIS.LoadLanguage("en")
+
+        -- load supporting rule functions
+        AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
+        AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
+        AutoCategory.AddRuleFunc("fco_isprotected", 
+            AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+        AutoCategory.AddRuleFunc("isfcoisprotected",
+            AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
+        AutoCategory.AddRuleFunc("fco_isgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
+        AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
         return
     end
-	AutoCat_Logger():Info("Initializing FCOIS plugin integration")
-    
-    -- initialize strings
-    AutoCategory_FCOIS.LoadLanguage("en")
 
-    -- load supporting rule functions
-    AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
-    AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
-    AutoCategory.AddRuleFunc("fco_isprotected", 
-		AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
-    AutoCategory.AddRuleFunc("isfcoisprotected",
-		AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
-    AutoCategory.AddRuleFunc("fco_isgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
-    AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
+    -- assign dummy rule functions
+    AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("fco_isgear", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
+    return
+
 end
 
 local markedTypeMap = {

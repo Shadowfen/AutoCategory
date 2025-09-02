@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.5.1 (133)[/COLOR]
+[LIST]
+[*] Using luacheck to clean up code.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.5.0 (132)[/COLOR]
 [LIST]
 [*] Fixed the Add Category section's select category dropdown so that it has values after you choose a new tag.
@@ -5,8 +10,8 @@
 
 [COLOR="DeepSkyBlue"]4.4.9 (131)[/COLOR]
 [LIST]
-[*] Added "container_stackable" to the possible search of [COLOR="MediumSeaGreen"]sptype()[/COLOR]. This will  match for the "Unknown Master Writs" and the "Unknown Supply Survey" containers. See the "Maps & Surveys" and (new) "Master Writs (All)" predefined category rules for examples of how to use this.
-[*] Modified the predefined rule for "Maps & Surveys" to also include the "Unknown Servey Reports"
+[*] Added "container_stackable" to the possible search of [COLOR="MediumSeaGreen"]sptype()[/COLOR]. This will  match for the "Unknown Master Writs" and the "Unidentified Supply Survey" containers. See the "Maps & Surveys" and (new) "Master Writs (All)" predefined category rules for examples of how to use this.
+[*] Modified the predefined rule for "Maps & Surveys" to also include the "Unidentified Servey Reports"
 [*] Created a new predefined category rule called "Master Writs (All)" which will show the old master writs along with the new unknown master writs.
 [/LIST]
 

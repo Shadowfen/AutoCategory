@@ -347,7 +347,7 @@ function CatSet_NameEdit_LAM:setValue(value)
 	if value == "" then
 		warningDuplicatedName.warningMessage = L(
 			SI_AC_WARNING_CATEGORY_NAME_EMPTY)
-		value = oldName
+		--value = oldName
 		return
 	end
 

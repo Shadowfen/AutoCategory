@@ -228,24 +228,26 @@ function AutoCategory_Iakoni.LoadLanguage(defaultlang)
 end
 
 function AutoCategory_Iakoni.Initialize()
-	if not GearChangerByIakoni then
-        AutoCategory.AddRuleFunc("setindex", AutoCategory.dummyRuleFunc)
-        AutoCategory.AddRuleFunc("inset", AutoCategory.dummyRuleFunc)
+	if GearChangerByIakoni then
+        AutoCat_Logger():Info("Initializing Iakoni Gear Changer plugin integration")
+        -- reinitialize strings
+        AutoCategory.LoadLanguage(localization_strings,"en")
+
+        -- load supporting rule functions
+        AutoCategory.AddRuleFunc("setindex", AutoCategory_Iakoni.RuleFunc.SetIndex)
+        AutoCategory.AddRuleFunc("inset", AutoCategory_Iakoni.RuleFunc.InSet)
+        
+        -- hook into GearChangerByIakoni addon
+        GearChangerByIakoni.DoRefresh = GearChangerByIakoni_DoRefresh
         return
     end
 
-	AutoCat_Logger():Warn("Initializing Iakoni Gear Changer plugin integration")
-    -- reinitialize strings
-    AutoCategory.LoadLanguage(localization_strings,"en")
-
-    -- load supporting rule functions
-    AutoCategory.AddRuleFunc("setindex", AutoCategory_Iakoni.RuleFunc.SetIndex)
-    AutoCategory.AddRuleFunc("inset", AutoCategory_Iakoni.RuleFunc.InSet)
-    
-    -- hook into GearChangerByIakoni addon
-    GearChangerByIakoni.DoRefresh = GearChangerByIakoni_DoRefresh
+    -- assign dummy rule functions
+    AutoCategory.AddRuleFunc("setindex", AutoCategory.dummyRuleFunc)
+    AutoCategory.AddRuleFunc("inset", AutoCategory.dummyRuleFunc)
 end
 
+--[[
 local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
 	local result = {}
 	if GearChangerByIakoni and GearChangerByIakoni.savedVariables then
@@ -269,6 +271,7 @@ local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
 	end
 	return result
 end
+--]]
 
 -- Implement the GearChanger setindex() check function for rules
 function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
@@ -277,9 +280,8 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 	local fn = "setindex"
 
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax, arg, ac in iter_args(...) do
+	for _, arg in iter_args(...) do
 
-		--local arg = select( ax, ... )
 		local comIndex = -1
 		if arg then
             local t_arg = type(arg)
@@ -306,7 +308,7 @@ end
 
 -- Implement the GearChanger inset() check function for rules
 function AutoCategory_Iakoni.RuleFunc.InSet( ... )
-	local fn = "inset"
+	--local fn = "inset"
 	if not GearChangerByIakoni then return false end
 
 	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)

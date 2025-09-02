@@ -2,7 +2,6 @@
 -- requires AutoCategory_Defaults.lua
 
 local SF = LibSFUtils       -- We're using the library's LoadLanguage function
---local AC = AutoCategory
 
 -- A dummy rule function available for use with dummying out a RuleFunc name
 -- so that it can still be "available" (used in user-defined rules when the 
@@ -21,7 +20,7 @@ end
 --                      If you do not provide this, it will be set to a function that
 --                      ALWAYS returns false. 
 function AutoCategory.AddRuleFunc(name, func)
-    AC.Environment[name] = func or AC.dummyRuleFunc
+    AutoCategory.Environment[name] = func or AutoCategory.dummyRuleFunc
 end
 
 -- Load in localization strings for a plugin

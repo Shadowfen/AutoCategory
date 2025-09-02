@@ -9,14 +9,16 @@ AutoCategory_ItemMarker = {
 
 --Initialize plugin for Auto Category - Item Marker
 function AutoCategory_ItemMarker.Initialize()
-	if not ItemMarker then
-        AutoCategory.AddRuleFunc("im_ismarked", AutoCategory.dummyRuleFunc)
+    if ItemMarker then
+        AutoCat_Logger():Info("Initializing Item Marker plugin integration")
+        
+        -- load supporting rule functions
+        AutoCategory.AddRuleFunc("im_ismarked", AutoCategory_ItemMarker.RuleFunc.IsMarkedIM)
         return
     end
-    
-    -- load supporting rule functions
-    AutoCategory.AddRuleFunc("im_ismarked", AutoCategory_ItemMarker.RuleFunc.IsMarkedIM)
-    
+
+    -- assign dummy rule functions
+    AutoCategory.AddRuleFunc("im_ismarked", AutoCategory.dummyRuleFunc)
 end
 
 -- Implement im_ismarked() check function for Item Marker

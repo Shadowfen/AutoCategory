@@ -19,17 +19,20 @@ AutoCategory_DressingRm.predefinedRules = {
 
 --Initialize plugin for AutoCategory - DressingRoom 2018
 function AutoCategory_DressingRm.Initialize()
-	if DressingRoom == nil then
-        AutoCategory.AddRuleFunc("drm_inset")
+    if DressingRoom then
+        AutoCat_Logger():Info("Initializing DressingRoom 2018 plugin integration")
+
+        -- initialize strings
+    --    AutoCategory_DressingRm.LoadLanguage("en")
+
+        -- load supporting rule functions
+        AutoCategory.AddRuleFunc("drm_inset", AutoCategory_DressingRm.RuleFunc.InSet)
         return
     end
-	AutoCat_Logger():Info("Initializing DressingRoom 2018 plugin integration")
 
-    -- initialize strings
---    AutoCategory_DressingRm.LoadLanguage("en")
+    -- assign dummy rule functions
+    AutoCategory.AddRuleFunc("drm_inset")
 
-    -- load supporting rule functions
-    AutoCategory.AddRuleFunc("drm_inset", AutoCategory_DressingRm.RuleFunc.InSet)
 end
 
 function AutoCategory_DressingRm.RuleFunc.InSet( ... )

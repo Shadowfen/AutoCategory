@@ -26,7 +26,7 @@ AutoCategory = {
 }
 
 AutoCat_Logger = SF.SafeLoggerFunction(AutoCategory, "logger", "AutoCategory")
---AutoCat_Logger():SetDebug(true)
+AutoCat_Logger():SetDebug(true)
 
 
 -- Namespace for the AutoCategory user interface elements

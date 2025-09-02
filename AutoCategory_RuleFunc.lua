@@ -1,5 +1,5 @@
 local SF = LibSFUtils
-local AC = AutoCategory
+--local AC = AutoCategory
 
 local iter_args = SF.iter_args
 
@@ -51,10 +51,7 @@ local specializedItemTypeMap = {
 	["food_savoury"] = SPECIALIZED_ITEMTYPE_FOOD_SAVOURY,
 	["food_unique"] = SPECIALIZED_ITEMTYPE_FOOD_UNIQUE,
 	["food_vegetable"] = SPECIALIZED_ITEMTYPE_FOOD_VEGETABLE,
-    ["furnishing_attunable_crafting_station"] = 	
-			SPECIALIZED_ITEMTYPE_FURNISHING_ATTUNABLE_CRAFTING_STATION,
-	["furnishing_crafting_station"] = SPECIALIZED_ITEMTYPE_FURNISHING_CRAFTING_STATION,
-	["furnishing_light"] = SPECIALIZED_ITEMTYPE_FURNISHING_LIGHT,
+    ["furnishing_attunable_crafting_station"] = SPECIALIZED_ITEMTYPE_FURNISHING_ATTUNABLE_CRAFTING_STATION,
 	["furnishing_material_alchemy"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_ALCHEMY,
 	["furnishing_material_blacksmithing"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_BLACKSMITHING,
 	["furnishing_material_clothier"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_CLOTHIER,
@@ -62,9 +59,6 @@ local specializedItemTypeMap = {
 	["furnishing_material_jewelry"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_JEWELRYCRAFTING,
 	["furnishing_material_provisioning"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_PROVISIONING,
 	["furnishing_material_woodworking"] = SPECIALIZED_ITEMTYPE_FURNISHING_MATERIAL_WOODWORKING,
-	["furnishing_ornamental"] = SPECIALIZED_ITEMTYPE_FURNISHING_ORNAMENTAL,
-	["furnishing_seating"] = SPECIALIZED_ITEMTYPE_FURNISHING_SEATING,
-	["furnishing_target_dummy"] = SPECIALIZED_ITEMTYPE_FURNISHING_TARGET_DUMMY,
 	["glyph_armor"] = SPECIALIZED_ITEMTYPE_GLYPH_ARMOR,
 	["glyph_jewelry"] = SPECIALIZED_ITEMTYPE_GLYPH_JEWELRY,
 	["glyph_weapon"] = SPECIALIZED_ITEMTYPE_GLYPH_WEAPON,
@@ -518,25 +512,21 @@ local function isKnown(arg, typekey, fn, map)
     return false
 end
  
-local L = GetString
+--local L = GetString
 function AutoCategory.RuleFunc.CurrentZone()
-	local fn = "zone"
+	--local fn = "zone"
     return ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex()))
 end
 
 function AutoCategory.RuleFunc.isItemId(...)
-	local fn = "isitemid"
+	--local fn = "isitemid"
 	
 	local chkId = GetItemId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             if arg == chkId then return true end
 		end
-		
 		
 	end
 	
@@ -544,12 +534,10 @@ function AutoCategory.RuleFunc.isItemId(...)
 end
 
 function AutoCategory.RuleFunc.SpecializedItemType( ... )
-	local fn = "sptype"
+	--local fn = "sptype"
     local _, sptype = GetItemLinkItemType(AutoCategory.checkingItemLink)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args(... ) do
+	for _, arg in iter_args(... ) do
 		
-		--local arg = select( ax, ... )
 		if arg then
             local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
             if rslt then return rslt end
@@ -564,7 +552,7 @@ end
 -- name of item matches one of the specified names
 -- returns true/false
 function AutoCategory.RuleFunc.IsInCurrentZone( ... )
-	local fn = "isinzone"
+	--local fn = "isinzone"
 
 	local itemName = string.lower(GetItemLinkName(AutoCategory.checkingItemLink))
 	local zoneName = string.lower(ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex())))
@@ -584,8 +572,7 @@ function AutoCategory.RuleFunc.ItemType( ... )
 	local fn = "type"
 	
 	local itemType = GetItemLinkItemType(AutoCategory.checkingItemLink)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
+	for _, arg in iter_args( ... ) do
 		
 		--local arg = select( ax, ... )
 		
@@ -601,14 +588,11 @@ function AutoCategory.RuleFunc.ItemType( ... )
 end
 
 function AutoCategory.RuleFunc.EquipType( ... )
-	local fn = "equiptype"
+	--local fn = "equiptype"
 	
     local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local rslt = isKnown(arg, equipType, fn, equipTypeMap)
@@ -622,14 +606,11 @@ function AutoCategory.RuleFunc.EquipType( ... )
 end
 
 function AutoCategory.RuleFunc.ItemStyle( ... )
-	local fn = "itemstyle"
+	--local fn = "itemstyle"
 
     local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     local styleName = zo_strlower(GetItemStyleName(itemstyle))
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args(  ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args(  ... ) do
 		
 		if arg then
             if styleName == zo_strlower(arg) then
@@ -644,14 +625,14 @@ function AutoCategory.RuleFunc.ItemStyle( ... )
 end
 
 function AutoCategory.RuleFunc.IsLocked( ... )
-	local fn = "islocked"
+	--local fn = "islocked"
 	
 	local isLocked = IsItemPlayerLocked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return isLocked
 end
 
 function AutoCategory.RuleFunc.IsBound( ... )
-	local fn = "isbound"
+	--local fn = "isbound"
 	
 	local itemLink = AutoCategory.checkingItemLink
 	local isBound = IsItemLinkBound(itemLink)
@@ -659,14 +640,14 @@ function AutoCategory.RuleFunc.IsBound( ... )
 end
 
 function AutoCategory.RuleFunc.IsUnbound( ... )
-	local fn = "isunbound"
+	--local fn = "isunbound"
 	
 	local isBound = IsItemLinkBound(AutoCategory.checkingItemLink)
 	return not isBound
 end
 
 function AutoCategory.RuleFunc.IsCharBound( ... )
-	local fn = "ischarbound"
+	--local fn = "ischarbound"
     
 	local itemLink = AutoCategory.checkingItemLink
     local bindType = GetItemLinkBindType(itemLink)
@@ -678,7 +659,7 @@ function AutoCategory.RuleFunc.IsCharBound( ... )
 end
 
 function AutoCategory.RuleFunc.IsUnknownCollectible( ... )
-	local fn = "isunknowncollectible"
+	--local fn = "isunknowncollectible"
 
 	local collectibleId = GetItemLinkContainerCollectibleId(AutoCategory.checkingItemLink)
 	if collectibleId == 0 then return false end
@@ -686,24 +667,23 @@ function AutoCategory.RuleFunc.IsUnknownCollectible( ... )
 end
 
 function AutoCategory.RuleFunc.IsCollected( ... )
-	local fn = "iscollected"
+	--local fn = "iscollected"
 	
 	local itemLink = AutoCategory.checkingItemLink
 	local itemId = GetItemLinkItemId(itemLink)
-	local hasSet, setName = GetItemLinkSetInfo(itemLink)
+	local hasSet = GetItemLinkSetInfo(itemLink)
 	if hasSet == false then return false end
 	local isCollected = IsItemSetCollectionPieceUnlocked(itemId)
 	return isCollected
 end
 
 function AutoCategory.RuleFunc.IsNotCollected( ... )
-	local fn = "isnotcollected"
+	--local fn = "isnotcollected"
 	
 	local itemLink = AutoCategory.checkingItemLink
 	local itemId = GetItemLinkItemId(itemLink)
-	local hasSet, setName = GetItemLinkSetInfo(itemLink)
+	local hasSet = GetItemLinkSetInfo(itemLink)
 	if hasSet == false then return false end
-    local itemType = GetItemLinkItemType(itemLink)
 	if IsItemLinkCrafted(itemLink) == true then return false end
 	local isCollected = IsItemSetCollectionPieceUnlocked(itemId)
 	if isCollected == false then return true end
@@ -711,13 +691,13 @@ function AutoCategory.RuleFunc.IsNotCollected( ... )
 end
 
 function AutoCategory.RuleFunc.IsStolen( ... )
-	local fn = "isstolen"
+	--local fn = "isstolen"
 	
 	return IsItemStolen(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.IsLockpick( ... )
-	local fn = "islockpick"
+	--local fn = "islockpick"
 	
 	local itemType = GetItemLinkItemType(AutoCategory.checkingItemLink)
     if itemType == ITEMTYPE_LOCKPICK or itemType == ITEMTYPE_TOOL then
@@ -729,13 +709,13 @@ function AutoCategory.RuleFunc.IsLockpick( ... )
 end
 
 function AutoCategory.RuleFunc.IsBoPTradeable( ... )
-	local fn = "isboptradeable"
+	--local fn = "isboptradeable"
 	local result = IsItemBoPAndTradeable(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return result
 end
 
 function AutoCategory.RuleFunc.IsCompanionOnly( ... )
-	local fn = "iscompaniononly"
+	--local fn = "iscompaniononly"
 
 	local actorCategory = GetItemActorCategory(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	if actorCategory == GAMEPLAY_ACTOR_CATEGORY_COMPANION then
@@ -745,7 +725,7 @@ function AutoCategory.RuleFunc.IsCompanionOnly( ... )
 end
 
 function AutoCategory.RuleFunc.IsCrafted( ... )
-	local fn = "iscrafted"
+	--local fn = "iscrafted"
 	local itemLink = AutoCategory.checkingItemLink
 	local itemType = GetItemLinkItemType(itemLink)
     if (itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) then
@@ -756,7 +736,7 @@ function AutoCategory.RuleFunc.IsCrafted( ... )
 end
 
 function AutoCategory.RuleFunc.IsLearnable( ... )
-	local fn = "islearnable"
+	--local fn = "islearnable"
 	
 	local itemLink = AutoCategory.checkingItemLink
 	
@@ -776,10 +756,7 @@ function AutoCategory.RuleFunc.Quality( ... )
 	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	local displayquality = GetItemLinkDisplayQuality(AutoCategory.checkingItemLink)
 	
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -805,14 +782,14 @@ function AutoCategory.RuleFunc.Quality( ... )
 end
 
 function AutoCategory.RuleFunc.GetQuality()
-	local fn = "getquality"
+	--local fn = "getquality"
 	
 	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	return quality
 end
 
 function AutoCategory.RuleFunc.IsNew( ... )
-	local fn = "isnew"
+	--local fn = "isnew"
 	if not AutoCategory.checkingItemBagId then
 		return false
 	end
@@ -823,10 +800,7 @@ function AutoCategory.RuleFunc.BoundType( ... )
 	local fn = "boundtype"
 
     local boundType = GetItemLinkBindType(AutoCategory.checkingItemLink)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -855,10 +829,7 @@ function AutoCategory.RuleFunc.FilterType( ... )
 	local fn = "filtertype"
 
     local itemFilterType = { GetItemFilterTypeInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local testFilterType
@@ -888,35 +859,35 @@ function AutoCategory.RuleFunc.FilterType( ... )
 end
 
 function AutoCategory.RuleFunc.Level( ... )
-	local fn = "level"
+	--local fn = "level"
 	return GetItemRequiredLevel(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.CPLevel( ... )
-	local fn = "cp"
+	--local fn = "cp"
 	return GetItemRequiredChampionPoints(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
 function AutoCategory.RuleFunc.CharLevel( ... )
-	local fn = "charlevel"
+	--local fn = "charlevel"
 	return GetUnitLevel("player")
 end
 
 function AutoCategory.RuleFunc.CharCP( ... )
-	local fn = "charcp"
+	--local fn = "charcp"
 	return GetUnitChampionPoints("player")
 end
 
 
 function AutoCategory.RuleFunc.SellPrice( ... )
-	local fn = "sellprice"
+	--local fn = "sellprice"
 		
 	local _, sellPrice = GetItemLinkInfo(AutoCategory.checkingItemLink)
 	return sellPrice
 end
 
 function AutoCategory.RuleFunc.StackSize( ... )
-	local fn = "stacksize"
+	--local fn = "stacksize"
 	return GetSlotStackSize(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 end
 
@@ -938,16 +909,13 @@ end
 -- item is part of one of the specified sets (by set name)
 -- returns true/false
 function AutoCategory.RuleFunc.SetName( ... )
-	local fn = "set"
+	--local fn = "set"
 
     local hasSet, setName = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	if not hasSet then
 		return false
 	end
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -974,7 +942,7 @@ end
 
 
 function AutoCategory.RuleFunc.AutoSetName( ... )
-	local fn = "autoset"
+	--local fn = "autoset"
 
 	local hasSet, setName = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	if not hasSet then
@@ -991,7 +959,7 @@ end
 
 -- combine perfected with equiv non-perfected sets
 function AutoCategory.RuleFunc.CombinedAutoSetName( ... )
-	local fn = "combined_autoset"
+	--local fn = "combined_autoset"
 
 	local hasSet, setName, _, _, _, setId, _  = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	if not hasSet then
@@ -1014,14 +982,14 @@ function AutoCategory.RuleFunc.CombinedAutoSetName( ... )
 end
 
 function AutoCategory.RuleFunc.IsSet( ... )
-	local fn = "isset"
-	local hasSet, setName = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
+	--local fn = "isset"
+	local hasSet = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	return hasSet
 end
  
 function AutoCategory.RuleFunc.IsMonsterSet( ... )
-	local fn = "ismonsterset"
-	local hasSet, setName, numBonuses, numEquipped, maxEquipped = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
+	--local fn = "ismonsterset"
+	local hasSet, _, _, _, maxEquipped = GetItemLinkSetInfo(AutoCategory.checkingItemLink)
 	if not hasSet then
 		return false
 	end
@@ -1037,10 +1005,7 @@ function AutoCategory.RuleFunc.TraitType( ... )
 	local fn = "traittype"
 	
 	local traitType, _ = GetItemLinkTraitInfo(AutoCategory.checkingItemLink)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -1078,10 +1043,7 @@ function AutoCategory.RuleFunc.ArmorType( ... )
 	local fn = "armortype"
 	
     local armorType = GetItemArmorType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -1113,9 +1075,7 @@ function AutoCategory.RuleFunc.WeaponType( ... )
 	local fn = "weapontype"
 
     local weaponType = GetItemWeaponType(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-	for ax, arg, ac in iter_args(...) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args(...) do
 		
 		if arg then
             local t_arg = type(arg)
@@ -1147,10 +1107,7 @@ function AutoCategory.RuleFunc.TraitString( ... )
 	
 	local traitType, _ = GetItemLinkTraitInfo(AutoCategory.checkingItemLink)
 	local traitText = string.lower(GetString("SI_ITEMTRAITTYPE", traitType))
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
 		
@@ -1183,10 +1140,7 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	
 	local itemName = string.lower(GetItemLinkName(AutoCategory.checkingItemLink))
    
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
 		
@@ -1214,7 +1168,7 @@ function AutoCategory.RuleFunc.ItemName( ... )
 end
 
 function AutoCategory.RuleFunc.IsTag( ... )
-	local fn = "istag"
+	--local fn = "istag"
 	
 	local ac = select( '#', ... )
 	if ac == 0 then
@@ -1235,7 +1189,6 @@ function AutoCategory.RuleFunc.IsTag( ... )
 	-- Build a map of tag category -> table of tags in that category
 	for i = 1, numItemTags do
 		local itemTagDescription, itemTagCategory = GetItemLinkItemTagInfo(itemLink, i)
-		--if (itemTagCategory == TAG_CATEGORY_TREASURE_TYPE or itemTagCategory == TAG_CATEGORY_FURNITURE_BEHAVIOR) and itemTagDescription ~= "" then
 		if itemTagCategory ~= TAG_CATEGORY_NONE and itemTagDescription ~= "" then
 			table.insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
 		end
@@ -1250,7 +1203,7 @@ end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsTreasure( ... )
-	local fn = "istreasure"
+	--local fn = "istreasure"
 	
 	local itemLink = AutoCategory.checkingItemLink
 	
@@ -1264,7 +1217,6 @@ function AutoCategory.RuleFunc.IsTreasure( ... )
 	
 	-- declared as description = treasure
 	local description, itemTag = GetItemLinkItemTagInfo(itemLink, index)
-	local itemName = string.lower(GetItemLinkName(itemLink))
 	if itemTag == TAG_CATEGORY_TREASURE_TYPE then
 		local ldesc = string.lower(description)
 		if string.find(ldesc, "treasure", 1 ,true) then
@@ -1286,10 +1238,8 @@ function AutoCategory.RuleFunc.AlphaGear( ... )
 	local uid = Id64ToString(GetItemUniqueId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	if not uid then return false end
 
-	--for ax = 1, select( '#', ... ) do 
-	for ax, arg, ac in iter_args( ... ) do 
-		--local arg = select( ax, ... )
-		local comIndex = -1
+	for _, arg in iter_args( ... ) do 
+		local comIndex
 		if arg then
             local t_arg = type(arg)
             if t_arg == "number" then
@@ -1319,7 +1269,7 @@ function AutoCategory.RuleFunc.AlphaGear( ... )
 end
 
 function AutoCategory.RuleFunc.CannotDecon(...)
-	local fn = "cannotdecon"
+	--local fn = "cannotdecon"
 	if AutoCategory.RuleFunc.IsCompanionOnly() then return true end
 	local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
     return IsItemLinkForcedNotDeconstructable(itemLink)
@@ -1327,15 +1277,11 @@ end
 
 
 function AutoCategory.RuleFunc.ArmoryBuild( ... )
-	local fn = "armorybuild"
+	--local fn = "armorybuild"
 
 	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
-	local _, _, _, _, _, equipType, itemStyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	
-	--local st =zo_strlower(GetItemStyleName(itemstyle))
-	--if st~= nil then
-	--	d(st)
-	--end
 	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then 
 				return false 
 		end
@@ -1347,9 +1293,7 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	local numBuilds = #(armoryBuildListNames)
 	if numBuilds == 0 then return false end
 
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		for build = 1,numBuilds do
 			local buildName = armoryBuildListNames[build]
 			if arg == buildName then
@@ -1363,7 +1307,7 @@ end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsEquipping( ... )
-	local fn = "isequipping"
+	--local fn = "isequipping"
 	return AutoCategory.checkingItemBagId == BAG_WORN
 end
 
@@ -1381,7 +1325,7 @@ end
 
 -- returns true/false
 function AutoCategory.RuleFunc.IsInQuickslot( ... )
-	local fn = "isinquickslot"
+	--local fn = "isinquickslot"
 	if AutoCategory.checkingItemBagId ~= BAG_BACKPACK then return false end
 	local actionslot = FindActionSlotMatchingItem(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex,HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
 	if actionslot ~= nil then return true end
@@ -1391,7 +1335,7 @@ end
 -- Addon Integration - TamrielTradeCentre
 -- returns number (price)
 function AutoCategory.RuleFunc.GetPriceTTC( ... )
-	local fn = "ttc_getprice"
+	--local fn = "ttc_getprice"
 	if TamrielTradeCentre then
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(AutoCategory.checkingItemLink)
 		if priceInfo then 
@@ -1433,7 +1377,7 @@ end
 -- Addon Integration - MasterMerchant
 -- returns number (price)
 function AutoCategory.RuleFunc.GetPriceMM( ... )
-	local fn = "mm_getprice"
+	--local fn = "mm_getprice"
 	if MasterMerchant then
 		local mmData = MasterMerchant:itemStats(AutoCategory.checkingItemLink, false)
         if (mmData.avgPrice ~= nil) then
@@ -1446,7 +1390,7 @@ end
 -- Addon Integration - SetTracker
 -- returns true/false
 function AutoCategory.RuleFunc.IsTracked( ... )
-  local fn = "istracked"
+  --local fn = "istracked"
   if SetTrack == nil then
     return false
   end
@@ -1461,7 +1405,7 @@ function AutoCategory.RuleFunc.IsTracked( ... )
     checkSets[arg]=true
   end
   
-  local iTrackIndex, sTrackName, sTrackColour, sTrackNotes = SetTrack.GetTrackingInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+  local iTrackIndex, sTrackName, _, _ = SetTrack.GetTrackingInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
   if iTrackIndex >= 0 then
     if ac > 0 then
       if checkSets[sTrackName] ~= nil then
@@ -1492,7 +1436,7 @@ end
 -- code donated by Tonyleila
 -- returns ITEM_DISPLAY_QUALITY_*
 function AutoCategory.RuleFunc.GetMaxTraits( ... )
-    local fn = "getmaxtraits"
+    --local fn = "getmaxtraits"
 	local itemLink = AutoCategory.checkingItemLink
     if IsCraftedPotion(itemLink) then
         local quality = ITEM_DISPLAY_QUALITY_NORMAL
@@ -1520,9 +1464,7 @@ function AutoCategory.RuleFunc.CharName(...)
     -- GetUnitName("player"))
     --   gives you charname
     local pn = string.lower(GetUnitName("player"))
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
             local findString
@@ -1554,10 +1496,7 @@ end
 function AutoCategory.RuleFunc.AcctName(...)
     local fn = "acctname" 
     local pn = string.lower(GetDisplayName())
-	--for ax = 1, select( '#', ... ) do
-	for ax, arg, ac in iter_args( ... ) do
-		
-		--local arg = select( ax, ... )
+	for _, arg in iter_args( ... ) do
 		
 		if arg then
 		
@@ -1582,9 +1521,9 @@ function AutoCategory.RuleFunc.AcctName(...)
 end
 
 function AutoCategory.RuleFunc.AutoFurnitureCategory( ... )
-	local fn = "autofurniturecat"
+	--local fn = "autofurniturecat"
 
-	local itemType, sptype = GetItemLinkItemType(AutoCategory.checkingItemLink)
+	local itemType = GetItemLinkItemType(AutoCategory.checkingItemLink)
 	if itemType == ITEMTYPE_FURNISHING then
         --local itemTypeText = GetString("SI_ITEMTYPE", itemType)
         local furnitureDataId = GetItemLinkFurnitureDataId(AutoCategory.checkingItemLink)
@@ -1592,9 +1531,9 @@ function AutoCategory.RuleFunc.AutoFurnitureCategory( ... )
         local furnitureCategoryText = GetFurnitureCategoryName(categoryId)
         local furnitureSubcategoryText = GetFurnitureCategoryName(subcategoryId)
 		AutoCat_Logger():Debug("category: "..furnitureCategoryText.."  subcategory: "..furnitureSubcategoryText)
-        if furnitureSubcategoryText == "" then
-            furnitureSubcategoryText = nil
-        end
+        --if furnitureSubcategoryText == "" then
+        --    furnitureSubcategoryText = nil
+        --end
 		AutoCategory.AdditionCategoryName = furnitureCategoryText
 		return true
 	end

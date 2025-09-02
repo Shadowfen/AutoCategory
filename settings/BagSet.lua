@@ -531,7 +531,7 @@ function BagSet_ShowCatOrder_LAM:execute()
 	AutoCategory.cacheInitBag(bagId)
 	BagSet_ShowRule_LAM:refresh(bagId)
 	AC_UI.BagSet_RefreshOrder()
-	local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
+	--local ruleNm = currentBagRule or BagSet_SelectRule_LAM:getValue()
 	BagSet_SelectRule_LAM:setValue(BagSet_SelectRule_LAM:getValue())
 
 	-- display the window
@@ -795,25 +795,26 @@ function AddCat_BagAdd_LAM:execute()
 
 	local saved = AutoCategory.saved
 	local entry = AutoCategory.CreateNewBagRule(ruleName)
-	saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
-	currentBagRule = entry.name
+    if entry then
+        saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
+        currentBagRule = entry.name
+        AutoCategory.cacheBagInitialize()
 
-	AutoCategory.cacheBagInitialize()
+        BagSet_SelectRule_LAM:select(ruleName)
+        BagSet_RunPriority_LAM:setValue(entry.runpriority)
+        BagSet_ShowPriority_LAM:setValue(entry.showpriority)
+        AddCat_SelectRule_LAM.cvt:removeItemChoiceValue(ruleName)
 
-	BagSet_SelectRule_LAM:select(ruleName)
-	BagSet_RunPriority_LAM:setValue(entry.runpriority)
-	BagSet_ShowPriority_LAM:setValue(entry.showpriority)
-	AddCat_SelectRule_LAM.cvt:removeItemChoiceValue(ruleName)
+        AddCat_SelectRule_LAM:refresh()
+        AddCat_SelectRule_LAM:updateControl()
 
-	AddCat_SelectRule_LAM:refresh()
-	AddCat_SelectRule_LAM:updateControl()
+        BagSet_SelectRule_LAM:refresh()
+        BagSet_SelectRule_LAM:updateControl()
 
-	BagSet_SelectRule_LAM:refresh()
-	BagSet_SelectRule_LAM:updateControl()
-
-	AddCat_SelectRule_LAM:updateControl()
-	BagSet_ShowRule_LAM:refresh(bagId)
-	AC_UI.BagSet_RefreshOrder()
+        AddCat_SelectRule_LAM:updateControl()
+        BagSet_ShowRule_LAM:refresh(bagId)
+        AC_UI.BagSet_RefreshOrder()
+    end
 end
 
 function AddCat_BagAdd_LAM:controlDef()
@@ -1024,7 +1025,7 @@ function AC_UI.BagSet.controlDef()
 end	
 
 function AC_UI.BagSet_ResetPriority()
-	runprior = BagSet_RunPriority_LAM:getValue()
+	local runprior = BagSet_RunPriority_LAM:getValue()
 	BagSet_ShowPriority_LAM:setValue(runprior)
 end
 
@@ -1032,7 +1033,7 @@ function AC_UI.BagSet_ResetAllPriority()
 	local bagId = getCurrentBagId()
 	if not bagId then return end
 	local bag = AutoCategory.cache.entriesByBag[bagId].choicesValues
-	local rulename
+	local rulename, bagrule
 	for k = 1, #bag do
 		rulename = bag[k]
 		bagrule = AutoCategory.GetBagRuleByName(bagId, rulename)

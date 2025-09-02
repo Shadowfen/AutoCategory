@@ -1,5 +1,5 @@
-AC = AutoCategory
-SF = LibSFUtils
+--local AC = AutoCategory
+local SF = LibSFUtils
 
 local L = GetString
 

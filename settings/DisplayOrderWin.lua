@@ -172,7 +172,7 @@ local function UpdateScrollList(scrollList, dataTable)
 	ZO_ScrollList_Clear(scrollList)
 	local dataList = ZO_ScrollList_GetDataList(scrollList)
 	-- Add data items to the list
-	for k, dataItem in pairs(dataTableCopy) do
+	for _, dataItem in pairs(dataTableCopy) do
 		local entry = ZO_ScrollList_CreateDataEntry(ROW_TYPE_ID, dataItem, nil)
 		table.insert(dataList, entry)
 	end
@@ -194,42 +194,42 @@ local function ClearScrollList(self)
 end
 
 -- use information from scrollData to create a scroll list 
-local function createScrollList(scrollData, prefix)
+local function createScrollList(pscrollData, prefix)
     AutoCat_Logger():Debug("createScrollList")
-    if scrollData.done  then return end     -- run once protection
-    scrollData.done = true
+    if pscrollData.done  then return end     -- run once protection
+    pscrollData.done = true
 
-    scrollData.name = prefix .. "ScrollList"
+    pscrollData.name = prefix .. "ScrollList"
 
-	local listName = scrollData.name
+	local listName = pscrollData.name
 	if not listName or type(listName) ~= "string" then return end
 
-	local parent = scrollData.parent
+	local parent = pscrollData.parent
 	if not parent then return end
 
 	local scrollList = WINDOW_MANAGER:CreateControlFromVirtual(listName, parent, "ZO_ScrollList")
 	if not scrollList then return end
 
     -- Easy Access References:
-	scrollList.scrollData = scrollData
+	scrollList.scrollData = pscrollData
     scrollData.scrollList = scrollList
     scrollList.setupCallback   = setupDataRow
     scrollList.selectCallback  = OnRowSelect
 
     --scrollList.deselectOnReselect = false  -- controls if selection can be deselected
 		
-	local listWidth = scrollData.width or DEFAULT_SCROLL_WIDTH
-	local listHeight = scrollData.height or DEFAULT_SCROLL_HEIGHT
+	local listWidth = pscrollData.width or DEFAULT_SCROLL_WIDTH
+	local listHeight = pscrollData.height or DEFAULT_SCROLL_HEIGHT
 	scrollList:SetDimensions(listWidth, listHeight)
 	
 	--local setupCallback = scrollList.setupCallback
-	local template = scrollData.rowTemplate or "ZO_SelectableLabel"
-	local rowHeight = scrollData.rowHeight or DEFAULT_ROW_HEIGHT
+	local template = pscrollData.rowTemplate or "ZO_SelectableLabel"
+	local rowHeight = pscrollData.rowHeight or DEFAULT_ROW_HEIGHT
 
     --ZO_ScrollList_SetAutoSelect(scrollList, true)
 	ZO_ScrollList_AddDataType(scrollList, ROW_TYPE_ID, template, rowHeight, 
-		setupDataRow, scrollData.hideCallback, scrollData.dataTypeSelectSound, 
-		scrollData.resetControlCallback)  
+		setupDataRow, pscrollData.hideCallback, pscrollData.dataTypeSelectSound, 
+		pscrollData.resetControlCallback)  
 	
     ZO_ScrollList_SetEqualityFunction(scrollList, ROW_TYPE_ID, function(left,right) 
         return left and right and left.name == right.name end)
@@ -311,9 +311,7 @@ local function CreateCloseBtn(win, prefix)
 	msgWinCloseButton:SetPressedTexture("EsoUI/Art/Buttons/closebutton_down.dds")
 	msgWinCloseButton:SetMouseOverTexture("EsoUI/Art/Buttons/closebutton_mouseover.dds")
 	msgWinCloseButton:SetDisabledTexture("EsoUI/Art/Buttons/closebutton_disabled.dds")
-	msgWinCloseButton:SetHandler("OnClicked",function(self)
-        win:SetHidden(true)
-    end)
+	msgWinCloseButton:SetHandler("OnClicked",function() win:SetHidden(true) end)
 end
 
 local function selectItem(win, bagId, ruleName)

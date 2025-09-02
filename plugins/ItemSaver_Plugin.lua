@@ -6,17 +6,20 @@
 AutoCategory_ItemSaver = {
     RuleFunc = {},
 }
+local AC_IS = AutoCategory_ItemSaver
 
 --Initialize plugin for Auto Category - Item Saver
-function AutoCategory_ItemSaver.Initialize()
-	if not ItemSaver then
-        AutoCategory.AddRuleFunc("ismarkedis", AutoCategory.dummyRuleFunc)
+function AC_IS.Initialize()
+    if ItemSaver then
+        AutoCat_Logger():Info("Initializing Item Saver plugin integration")
+        
+        -- load supporting rule functions
+        AutoCategory.AddRuleFunc("ismarkedis", AC_IS.RuleFunc.IsMarkedIS)
         return
     end
-    
-    -- load supporting rule functions
-    AutoCategory.AddRuleFunc("ismarkedis", AutoCategory_ItemSaver.RuleFunc.IsMarkedIS)
-    
+
+    -- assign dummy rule functions
+	AutoCategory.AddRuleFunc("ismarkedis", AutoCategory.dummyRuleFunc)
 end
 
 -- Implement ismarkedis() check function for Item Saver

@@ -45,7 +45,7 @@ local BagTypeConversion = {
 
 }
 -- convert ZOS bag type to AC bag type
-function convert2BagTypeId(bagId, acprimary)
+local function convert2BagTypeId(bagId, acprimary)
 	if acprimary ~= nil then return acprimary end
 	if bagId == nil then return nil end
 	return BagTypeConversion[bagId]
