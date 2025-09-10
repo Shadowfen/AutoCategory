@@ -161,7 +161,6 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	-- call the rules for this bag against the entry, stop when one matches
 	-- return values from pcall internal func
 	local lenv = AutoCategory.Environment
-	local showpri = 0
 
 	-- localized aliases
 	local setCategoryCollapsed = AutoCategory.SetCategoryCollapsed
@@ -173,7 +172,6 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 		if entry.name then
 			local rule = getRuleByName(entry.name)
 			if rule and checkValidRule(entry.name, rule) then
-				--showpri = entry.showpriority or entry.runpriority
 				local ruleCode = compiledRules[entry.name]
 				if ruleCode then
 					setfenv( ruleCode, lenv )

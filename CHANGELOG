@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.5.2 (134)[/COLOR]
+[LIST]
+[*] Added new function [COLOR="MediumSeaGreen"]issurvey()[/COLOR] which will return true if the sptype matches "SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT" (the old-style survey reports) or a localized version of a comparing itemname to the localized version of "Survey Report".
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.5.1 (133)[/COLOR]
 [LIST]
 [*] Using luacheck to clean up code.

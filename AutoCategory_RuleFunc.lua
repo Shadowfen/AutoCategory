@@ -1167,6 +1167,17 @@ function AutoCategory.RuleFunc.ItemName( ... )
 	return false
 end
 
+function AutoCategory.RuleFunc.IsSurveyReport(...)
+--	local fn = "issurvey"
+	local itemLink = AutoCategory.checkingItemLink
+    local _, sptype = GetItemLinkItemType(itemLink)
+	if sptype == SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT then return true end
+
+    -- Looking for "Survey Report"
+    local name = GetString(SI_SPECIALIZEDITEMTYPE101)
+    return AutoCategory.RuleFunc.ItemName(name)
+end
+
 function AutoCategory.RuleFunc.IsTag( ... )
 	--local fn = "istag"
 	
@@ -1621,6 +1632,7 @@ AutoCategory.Environment = {
 	stacksize    = AutoCategory.RuleFunc.StackSize,
 
 	itemname     = AutoCategory.RuleFunc.ItemName,
+    issurvey     = AutoCategory.RuleFunc.IsSurveyReport,
 
     -- Potion/Poison Traits
     getmaxtraits = AutoCategory.RuleFunc.GetMaxTraits,
