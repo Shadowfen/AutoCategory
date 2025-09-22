@@ -149,7 +149,7 @@ AutoCategory.predefinedRules =  {
 		["pred"] = 1,
     },
     {
-        ["rule"] = "sptype(\"trophy_treasure_map\") or sptype(\"container_stackable\") and issurvey()",
+        ["rule"] = "sptype(\"trophy_treasure_map\") or issurvey()",
         ["tag"] = L(SI_AC_DEFAULT_TAG_GENERAL_ITEMS),
         ["name"] = L(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS),
         ["description"] = L(SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS_DESC),
