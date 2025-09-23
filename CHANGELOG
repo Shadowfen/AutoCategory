@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.5.3 (135)[/COLOR]
+[LIST]
+[*] Fixed the default rule for Treasure Maps and Surveys.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.5.2 (134)[/COLOR]
 [LIST]
 [*] Added new function [COLOR="MediumSeaGreen"]issurvey()[/COLOR] which will return true if the sptype matches "SPECIALIZED_ITEMTYPE_TROPHY_SURVEY_REPORT" (the old-style survey reports) or a localized version of a comparing itemname to the localized version of "Survey Report".
