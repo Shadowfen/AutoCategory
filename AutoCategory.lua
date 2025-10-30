@@ -888,6 +888,7 @@ local function refreshList(inventoryType, even_if_hidden)
 
 	local obj = inven_data[inventoryType].object
 	local ctl = inven_data[inventoryType].control
+    if not obj or not ctl then return false end
 
 	if inventoryType == AC_DECON then
 		if even_if_hidden == false and not ctl:IsHidden() then

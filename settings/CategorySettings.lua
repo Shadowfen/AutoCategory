@@ -35,6 +35,7 @@ AC_UI.warningDuplicatedName = warningDuplicatedName
 
 -- aliases
 local getCurrentBagId = AutoCategory.getCurrentBagId
+local ruleCheckStatus = {}
 
 function AC_UI.CatSet.clearRuleCheckStatus()
 	ruleCheckStatus.err = nil
@@ -42,7 +43,6 @@ function AC_UI.CatSet.clearRuleCheckStatus()
 end
 -- -------------------------------------------------------
 
-local ruleCheckStatus = {}
 
 function ruleCheckStatus.getTitle()
     if ruleCheckStatus.err == nil then

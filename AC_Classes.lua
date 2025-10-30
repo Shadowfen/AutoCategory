@@ -96,10 +96,10 @@ function AutoCategory.CVT:assign(tblB)
 	self:clear()
 
 	-- 1-based and contiguous, remember?
-	-- may return nil
+	-- may return empty table
 	local function shallowcpy(src, dest)
+        dest = dest or {}
 		if not src then return dest end
-		if not dest then return dest end --dest = {} end
 		for k=1, #src do
 			dest[k] = src[k]
 		end
@@ -126,7 +126,7 @@ end
 -- if "value" is a non-empty table, then select the first entry from that table.
 -- returns the value selected (may be nil)
 function AutoCategory.CVT:select(value)
-    local searchtbl = self.choicesValues or self.choices
+    local searchtbl = self.choicesValues or self.choices or {}
 	if type(value) == "table" then
 		if #value > 0 then
 			self.indexValue = value[1]
@@ -322,7 +322,7 @@ function AutoCategory.BaseUI:updateValue()
 	local val = self:getValue()
 	if not val then return end
 
-	AutoCat_Logger():Debug("updateControl: getting control for "..tostring(self.cvt.controlName))
+	AutoCat_Logger():Debug("updateControl: getting control for "..tostring(self.controlName))
 	local uiCtrl = WINDOW_MANAGER:GetControlByName(self.controlName)
     if uiCtrl == nil then
         return
@@ -404,18 +404,26 @@ end
 -- based on the requested rule name, create a name that
 -- is not already in use (since rule names must be unique)
 function AutoCategory.GetUsableRuleName(name)
+    name = tostring(name)
 	local testName = name
 	local index = 1
-	while AutoCategory.RulesW.ruleNames[testName] ~= nil do
+    local ruleNames = AutoCategory.RulesW.ruleNames
+	while ruleNames[testName] ~= nil do
 		testName = name .. index
+        if ruleNames[testName] == nil then
+            return testName
+        end
 		index = index + 1
 	end
-	return testName
+	return nil
 end
 
 -- check that all required fields are set
 -- returns err (t/f), errmsg (string)
 function AutoCategory.isValidRule(ruledef)
+    if type(ruledef) ~= "table" then
+        return false, "ruledef must be a table, got " .. type(ruledef)
+    end
     --make sure rule is well-formed
 	-- validate rule name
     if (not ruledef or not ruledef.name
