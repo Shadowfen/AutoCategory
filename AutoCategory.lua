@@ -625,7 +625,7 @@ local function setupContextMenu()
 		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
 		local itemId = GetItemId(bagId, slotIndex)
 		local name = GetItemName(bagId, slotIndex)
-		d("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
+		--d("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
 	end
 	local function AC_AddMenuItem(rowControl, slotActions)
 		AddCustomMenuItem("AC: Get itemId", function() AC_GetItem(rowControl) end, MENU_ADD_OPTION_LABEL)

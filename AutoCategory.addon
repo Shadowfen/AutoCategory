@@ -23,6 +23,7 @@ AutoCategory.xml
 Hooks_Keyboard.lua
 Hooks_Gamepad.lua
 classes/CVT.lua
+classes/RuleList.lua
 AC_Classes.lua
 AutoCategory.lua
 

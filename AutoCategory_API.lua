@@ -44,6 +44,7 @@ local BagTypeConversion = {
 	[BAG_FURNITURE_VAULT]  = AC_BAG_TYPE_FURNVAULT
 
 }
+
 -- convert ZOS bag type to AC bag type
 local function convert2BagTypeId(bagId, acprimary)
 	if acprimary ~= nil then return acprimary end
