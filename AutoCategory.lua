@@ -80,6 +80,12 @@ function AutoCat.debugTags()
 	end
 end
 
+-- convenience function for a call to AutoCat_Logger():Debug(SF.str(...))
+-- only done for Debug() because there is no special handling for the other message levels
+-- always returns nil
+local logDebug = AutoCategory.logDebug
+
+
 -- ------------------------ RulesW  -------------------------------
 -- not a class - just a structure with functions
 --[[
@@ -98,67 +104,106 @@ ac_rules = AutoCat.RulesW
 function AutoCat.RulesW.AddTag(name)
 	local RulesW = AutoCat.RulesW
 	if not name then return end
-	if not RulesW.tagGroups[name] then
+
+    local tagGroup = RulesW.tagGroups
+    if not tagGroup then
+        RulesW.tagGroups = {}
+        tagGroup = RulesW.tagGroups
+    end
+	if not tagGroup[name] then
 		RulesW.tags[#RulesW.tags+1] = name
-		RulesW.tagGroups[name] = CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
+		tagGroup[name] = CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	end
 end
 
 -- Compile all of the rules that we know (if necessary)
 -- Mark those that failed to compile as damaged
 --
-function AutoCat.RulesW.CompileAll(self)
-	if not self then self = AutoCat.RulesW end
+function AutoCat.RulesW:CompileAll()
 	-- reset AutoCat.compiledRules to empty, creating only if necessary
 	self.compiled = SF.safeClearTable(self.compiled)
 
-    if self.ruleList == nil then
+    if not self.ruleList or #self.ruleList == 0 then
 		-- there are no rules to compile
 		return
     end
 	-- compile and store each of the rules in the ruleset
 	local compile = AutoCat.RuleApi.compile
-    for j = 1, #self.ruleList do
-        if self.ruleList[j] then
-            compile(self.ruleList[j])
+    local compiled  = 0
+    local safeCall = SF.safeCall
+    for _, rule in ipairs(self.ruleList) do
+        -- Guard against a nil entry (shouldn’t happen with ipairs, but be safe)
+        local ok, err = safeCall(compile, rule)
+        if ok then
+            compiled = compiled + 1
+        else
+            -- Mark the rule as damaged so UI can highlight it
+            rule.damaged = true
+            rule.err     = err
+            logDebug("[AutoCategory] Rule compile error for '%s': %s",
+                rule.name, err)
         end
     end
 end
 
 
 -- return number of entries in the base rule list
-function AutoCat.RulesW.sizeRules(self)
+function AutoCat.RulesW:sizeRules()
 	return #self.ruleList
 end
 
 -- return number of entries in the base tag list
-function AutoCat.RulesW.sizeTags(self)
+function AutoCat.RulesW:sizeTags()
 	return #self.tags
 end
 
--- override addRule from RuleList to add in lookup table updates
-function AutoCat.RulesW.AddRule(self, newRule, overwriteFlag)
+-- override AddRule from RuleList to add in lookup table updates
+function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
+
 	if not newRule.tag or newRule.tag == "" then
         newRule.tag = AC_EMPTY_TAG_NAME
     end
-	self.AddTag(newRule.tag)
+    if not self.tagGroups[newRule.tag] then
+	    self.AddTag(newRule.tag)
+    end
 
-	local ndx = self.ruleNames[newRule.name]
+    local ruleList = self.ruleList
+    local ruleNames = self.ruleNames
+    local name = newRule.name
+
+	local ndx = ruleNames[name]
 	if ndx then
 		-- rule by name already in list
-		if overwriteFlag then
-			self.ruleList[ndx] = newRule
+		if not overwriteFlag then
+            return      -- nothing to do
 		end
+        -- Overwrite path – keep a reference to the old rule for tag cleanup
+        local oldRule = ruleList[ndx]
+
+        -- If the tag changed, purge the old name from the old tag’s CVT
+        if oldRule.tag ~= newRule.tag then
+            local oldCvt = self.tagGroups[oldRule.tag]
+            if oldCvt then oldCvt:remove(oldRule.name) end
+        end
+
+        ruleList[ndx] = newRule
+        logDebug("[AutoCategory] Rule '%s' overwritten.", name)
+
 	else
-		self.ruleList[#self.ruleList+1] = newRule
-		self.ruleNames[newRule.name] = #self.ruleList
+        -- New rule
+		ruleList[#ruleList+1] = newRule
+		ruleNames[name] = #ruleList
+        logDebug("[AutoCategory] Rule '%s' added.", name)
 	end
-	self.tagGroups[newRule.tag]:append(newRule.name, nil, AutoCat.RuleApi.getDesc(newRule))
+    local tagCvt = self.tagGroups[newRule.tag]
+    if tagCvt then
+        tagCvt:remove(name)   -- no‑op if not present
+        tagCvt:append(name, nil, AutoCat.RuleApi.getDesc(newRule))
+    end
 
 	RuleApi.compile(newRule)
 end
---]]
 -- ---------------------end RulesW  -------------------------------
 
 
@@ -209,18 +254,21 @@ end
 -- swap between account-wide and char-wide settings
 function AutoCat.UpdateCurrentSavedVars()
 	--local RulesW = AutoCategory.RulesW
+    local acctSaved = AutoCat.acctSaved
+    local charSaved = AutoCat.charSaved
+
     -- general, and appearance are always accountWide
-    saved.general = AutoCat.acctSaved.general
-    saved.appearance = AutoCat.acctSaved.appearance
+    saved.general = acctSaved.general
+    saved.appearance = acctSaved.appearance
 
-	--AutoCategory.saved.displayOrder = AutoCategory.acctSaved.displayOrder
-	AutoCategory.acctSaved.displayOrder = nil
-	AutoCategory.acctSaved.displayName = nil
+	--AutoCategory.saved.displayOrder = acctSaved.displayOrder
+	acctSaved.displayOrder = nil
+	acctSaved.displayName = nil
 
-	AutoCategory.charSaved.general = nil	-- fix old data corruption error
-	AutoCategory.charSaved.appearance = nil	-- fix old data corruption error
-	AutoCategory.charSaved.displayOrder = nil
-	AutoCategory.charSaved.displayName = nil
+	charSaved.general = nil	-- fix old data corruption error
+	charSaved.appearance = nil	-- fix old data corruption error
+	charSaved.displayOrder = nil
+	charSaved.displayName = nil
 
 	-- rule definitions are always account-wide
 	-- AutoCategory.acctRules only has user-defined rules
@@ -231,13 +279,13 @@ function AutoCat.UpdateCurrentSavedVars()
     ac_rules:CompileAll()
 
 	-- bags/collapses might or might not be acct wide
-    if not AutoCat.charSaved.accountWide then
-        saved.bags = AutoCat.charSaved.bags
-        saved.collapses = AutoCat.charSaved.collapses
+    if not charSaved.accountWide then
+        saved.bags = charSaved.bags
+        saved.collapses = charSaved.collapses
     
     else
-        saved.bags = AutoCat.acctSaved.bags
-        saved.collapses = AutoCat.acctSaved.collapses
+        saved.bags = acctSaved.bags
+        saved.collapses = acctSaved.collapses
     end
 	
     AutoCat.cacheInitialize()
@@ -272,7 +320,7 @@ end
 
 
 function AutoCat.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
-	if not categoryName then return end
+	if not bagTypeId or not categoryName then return end
 	if not saved.collapses[bagTypeId] then saved.collapses[bagTypeId] = {} end
 	saved.collapses[bagTypeId][categoryName] = collapsed
 end
@@ -285,30 +333,33 @@ function AutoCat.ResetToDefaults()
 	ZO_DeepTableCopy(AutoCat.defaultAcctSettings.rules, AutoCat.acctRules.rules)
 	AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
 
-	AutoCat.acctSaved.rules = nil	-- no longer used
-	AutoCat.charSaved.rules = nil	-- no longer used
+    local acctSaved = AutoCat.acctSaved
+    local charSaved = AutoCat.charSaved
 
-	AutoCat.acctSaved.bags = SF.safeClearTable(AutoCat.acctSaved.bags)
-    ZO_DeepTableCopy(AutoCat.defaultAcctSettings.bags, AutoCat.acctSaved.bags)
+	acctSaved.rules = nil	-- no longer used
+	charSaved.rules = nil	-- no longer used
 
-	AutoCat.charSaved.bags = SF.safeClearTable(AutoCat.charSaved.bags)
-    ZO_DeepTableCopy(AutoCat.defaultSettings.bags, AutoCat.charSaved.bags)
+	acctSaved.bags = SF.safeClearTable(acctSaved.bags)
+    ZO_DeepTableCopy(AutoCat.defaultAcctSettings.bags, acctSaved.bags)
 
-    AutoCat.ResetCollapse(AutoCat.acctSaved)
-    AutoCat.ResetCollapse(AutoCat.charSaved)
+	charSaved.bags = SF.safeClearTable(charSaved.bags)
+    ZO_DeepTableCopy(AutoCat.defaultSettings.bags, charSaved.bags)
 
-	AutoCat.acctSaved.appearance = SF.safeClearTable(AutoCat.acctSaved.appearance)
+    AutoCat.ResetCollapse(acctSaved)
+    AutoCat.ResetCollapse(charSaved)
+
+	acctSaved.appearance = SF.safeClearTable(acctSaved.appearance)
     ZO_DeepTableCopy(AutoCat.defaultAcctSettings.appearance,
-			AutoCat.acctSaved.appearance)
+			acctSaved.appearance)
 
-	AutoCat.acctSaved.general = SF.safeClearTable(AutoCat.acctSaved.general)
+	acctSaved.general = SF.safeClearTable(acctSaved.general)
 	ZO_DeepTableCopy(AutoCat.defaultAcctSettings.general,
-			AutoCat.acctSaved.general)
+			acctSaved.general)
 
-	AutoCat.charSaved.general = nil	-- fix old data corruption error
-	AutoCat.charSaved.appearance = nil	-- fix old data corruption error
+	charSaved.general = nil	-- fix old data corruption error
+	charSaved.appearance = nil	-- fix old data corruption error
 
-	AutoCat.charSaved.accountWide = AutoCat.defaultSettings.accountWide
+	charSaved.accountWide = AutoCat.defaultSettings.accountWide
 end
 
 -- create local alias for references in this function
@@ -411,7 +462,7 @@ function AutoCat.cacheInitBag(bagId)
 		saved.bags[bagId].rules={}
 	end
 
-	AutoCat_Logger():Debug("Initializing sbag "..bagId.." with bagrules")
+	logDebug("[AutoCategory] Initializing sbag ", bagId, " with bagrules")
 	local svdbag = saved.bags[bagId]		-- alias
 
 	if svdbag ~= nil then
@@ -426,7 +477,7 @@ function AutoCat.cacheInitBag(bagId)
                 local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
                 if not bagrule then break end
 
-                AutoCat_Logger():Debug("sbag "..entry.." bagrule.name "..tostring(bagrule.name))
+                logDebug("[AutoCategory] sbag ", entry, " bagrule.name ", bagrule.name)
 
                 sn = bagRuleApi.formatShow(bagrule)
                 sbag.choices[#sbag.choices+1] = sn
@@ -443,7 +494,7 @@ function AutoCat.cacheInitBag(bagId)
 		table.sort(svdbag.rules, BagRuleRunSortingFunction)
 	end
 
-	AutoCat_Logger():Debug("Initializing bag "..bagId.." with bagrules")
+	logDebug("[AutoCategory] Initializing bag ", bagId, " with bagrules")
 	do
 		local sn
 		local tt
@@ -455,7 +506,7 @@ function AutoCat.cacheInitBag(bagId)
 
                 local ruleName = bagrule.name
                 AutoCat.BagRuleApi.convertPriority(bagrule)
-                AutoCat_Logger():Debug("bag "..entry.." bagrule.name "..tostring(bagrule.name))
+                logDebug("[AutoCategory] bag ", entry, " bagrule.name ", bagrule.name)
                 if not ename[ruleName] then
                     ename[ruleName] = bagrule
                     ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
@@ -523,8 +574,7 @@ function AutoCat.GetBagRuleByName(bagId, name)
 	local bagrules = AutoCat.cache.entriesByShowBag[bagId]
 	if not bagrules then return nil end
 	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(
-			bagrules.choicesValues, 
-			name)
+			bagrules.choicesValues, name)
     if not ndx then
         return nil, nil
     end
@@ -599,7 +649,7 @@ end
 -- as appropriate.
 -- The table must be { rules = {} } and tbl.rules contains the list of rules.
 --
--- The tblname is used only for AutoCat_Logger() messages - i.e. debugging.
+-- The tblname is used only for AutoCat_Logger()/logDebug() messages - i.e. debugging.
 --
 -- If notdel is true then the rules are NOT removed from the source table.
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
@@ -618,12 +668,12 @@ local function addTableRules(tbl, tblname, ispredef)
 		local n = ac_rules.ruleNames[rl.name]
 		if not n then
 			ac_rules.ruleList[#ac_rules.ruleList+1] = rl
-			AutoCat_Logger():Debug("Adding rule "..rl.name.." to ac_rules.ruleList ndx="..#ac_rules.ruleList)
+			logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", #ac_rules.ruleList)
 			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
 			return true
 		else
 			ac_rules.ruleList[n] = rl
-			AutoCat_Logger():Debug("Overwriting rule "..rl.name.." to Rulac_rulesesW.ruleList ndx="..n)
+			logDebug("[AutoCategory] Overwriting rule ", rl.name, " to Rulac_rulesesW.ruleList ndx=", n)
 			ac_rules.ruleNames[rl.name] = n
 		end
 		return false
@@ -640,7 +690,7 @@ local function addTableRules(tbl, tblname, ispredef)
 	local function addUserRule(stbl, rule)
 		-- add to acctRules list
 		if stbl.rules ~= AutoCat.acctRules.rules then
-			return AutoCat.ARW:addRule(rule)
+			return AutoCat.ARW:AddRule(rule)
 		end
 	end
 
@@ -656,18 +706,18 @@ local function addTableRules(tbl, tblname, ispredef)
 
 		r =getRuleByName(v.name)
 		if r then
-			AutoCat_Logger():Debug("Found duplicate rule name - "..v.name)
+			logDebug("[AutoCategory] Found duplicate rule name - ", v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so don't add it again
-				AutoCat_Logger():Debug("1 Dropped duplicate rule - "..v.name.."  from AC.rules sourced "..(tblname or "unknown"))
+				logDebug("[AutoCategory] 1 Dropped duplicate rule - ", v.name, "  from AC.rules sourced ", (tblname or "unknown"))
 
 			else
 				local oldname = v.name
 				-- rename different rule
 				newName = getUsableRuleName(v.name)
 				v.name = newName
-				AutoCat_Logger():Debug("Renaming duplicate rule name - "..oldname.." to "..v.name)
+				logDebug("[AutoCategory] Renaming duplicate rule name - ", oldname, " to ", v.name)
 
 				addCombinedRule(v)
 				AutoCat.renameBagRule(oldname, newName)
@@ -677,7 +727,7 @@ local function addTableRules(tbl, tblname, ispredef)
 				else
 					-- add to acctRules
 					addUserRule(tbl, v)
-					AutoCat_Logger():Debug("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+					logDebug("[AutoCategory] adding to user rules - ", v.name, "  from sourced ", (tblname or "unknown"))
 				end
 			end
 
@@ -689,12 +739,12 @@ local function addTableRules(tbl, tblname, ispredef)
 			if RuleApi.isPredefined(v) then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
-				AutoCat_Logger():Debug("adding to predefined rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				logDebug("[AutoCategory] adding to predefined rules - ", v.name, "  from sourced ", (tblname or "unknown"))
 
 		    else
 				-- it's a user rule
 				addUserRule(tbl, v)
-				AutoCat_Logger():Debug("adding to user rules - "..v.name.."  from sourced "..(tblname or "unknown"))
+				logDebug("[AutoCategory] adding to user rules - ", v.name, "  from sourced ", (tblname or "unknown"))
 			end
         end
     end
@@ -702,13 +752,13 @@ end
 
 --[[
 local function pruneUserRules()
-	AutoCat_Logger():Debug ("Executing pruneUserRules ")
+	logDebug ("[AutoCategory] Executing pruneUserRules ")
 	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
 	local lkacctRules = AutoCategory.ARW:getLookup()
 	for k = #arrules,1,-1 do
 		local ndx = lkacctRules[arrules[k].name]
 		if  ndx and k ~= ndx then
-			AutoCat_Logger():Debug ("Removing duplicate rule ".. arrules[k].name.." from acctRules")
+			logDebug ("[AutoCategory] Removing duplicate rule ", arrules[k].name, " from acctRules")
 			AutoCategory.ARW.removeRule(ndx)
 			--table.remove(arrules, k)
 		end
@@ -717,7 +767,7 @@ local function pruneUserRules()
 	-- remove predefined rules from acctRules
 	for k = #AutoCategory.predefinedRules,1,-1 do
 		local ndx = lkacctRules[AutoCategory.predefinedRules[k].name]
-		AutoCat_Logger():Debug ("Removing predefined rule ".. AutoCategory.predefinedRules[k].name.." from acctRules")
+		logDebug ("[AutoCategory] Removing predefined rule ", AutoCategory.predefinedRules[k].name, " from acctRules")
 		AutoCategory.ARW:removeRule(ndx)
 		--table.remove(arrules, k)
 	end
@@ -726,18 +776,18 @@ end
 
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
-	AutoCat_Logger():Debug ("Executing loadPluginPredefines ")
+	logDebug ("[AutoCategory] Executing loadPluginPredefines ")
 	-- add plugin predefined rules to the base predefined rules
 	for name, plugin in pairs(AutoCat.Plugins) do
 		if plugin.predef then
-			AutoCat_Logger():Debug ("Processing predefs from plugin ".. name.." "..SF.GetSize(plugin.predef))
+			--logDebug ("[AutoCategory] Processing predefs from plugin ", name, " ", SF.GetSize(plugin.predef))
 
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
 		end
 	end
-	AutoCat_Logger():Debug ("Done executing loadPluginPredefines ")
-	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCat.predefinedRules))
+	logDebug ("[AutoCategory] Done executing loadPluginPredefines ")
+	--logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
  end
 
 
@@ -813,7 +863,7 @@ function AutoCat.onPlayerActivated()
 	addTableRules(AutoCat.charSaved, ".charSaved", false)
 	AutoCat.charSaved.rules = nil	-- no longer used
 
-	AutoCat_Logger():Debug("2.5 predefined "..SF.GetSize(AutoCat.predefinedRules))
+	logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
 
     AutoCat.UpdateCurrentSavedVars()
 	AutoCat.initializePlugins()
@@ -930,7 +980,7 @@ end
 -- -----------------------------------------------
 -- used only for AC_ItemRowHeader functions
 local function getBagTypeId(header)
-	SF.dTable(header,5,"getBagTypeId - header")
+	--SF.dTable(header,5,"getBagTypeId - header")
 	local bagTypeId = header.slot.dataEntry.data.AC_bagTypeId
     if not bagTypeId then
 		bagTypeId = header.slot.dataEntry.AC_bagTypeId

@@ -1,6 +1,8 @@
 local SF = LibSFUtils
 --local AC = AutoCategory
 
+local logDebug = AutoCategory.logDebug
+
 local iter_args = SF.iter_args
 
 
@@ -1541,7 +1543,7 @@ function AutoCategory.RuleFunc.AutoFurnitureCategory( ... )
         local categoryId, subcategoryId = GetFurnitureDataCategoryInfo(furnitureDataId)
         local furnitureCategoryText = GetFurnitureCategoryName(categoryId)
         local furnitureSubcategoryText = GetFurnitureCategoryName(subcategoryId)
-		AutoCat_Logger():Debug("category: "..furnitureCategoryText.."  subcategory: "..furnitureSubcategoryText)
+		logDebug("[AutoFurn] category: ", furnitureCategoryText, "  subcategory: ", furnitureSubcategoryText)
         --if furnitureSubcategoryText == "" then
         --    furnitureSubcategoryText = nil
         --end

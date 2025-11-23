@@ -5,7 +5,7 @@
 ## Version: 4.5.3
 ## AddOnVersion: 135
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=40 LibCustomMenu>=730 LibSFUtils>=63 LibMediaProvider>=34 
+## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=65 LibMediaProvider>=36 
 ## DependsOn: LibDebugLogger>=268
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemMarker UnknownTracker>=75 
 ## OptionalDependsOn: MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge DressingRoom
@@ -22,6 +22,7 @@ Plugin_API.lua
 AutoCategory.xml
 Hooks_Keyboard.lua
 Hooks_Gamepad.lua
+classes/CVT.lua
 AC_Classes.lua
 AutoCategory.lua
 

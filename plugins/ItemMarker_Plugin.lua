@@ -3,6 +3,8 @@
 --
 -- No strings or predefined rules to load.
 
+local logDebug = AutoCategory.logDebug
+
 AutoCategory_ItemMarker = {
     RuleFunc = {},
 }
@@ -42,17 +44,17 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 										AutoCategory.checkingItemSlotIndex)
 	if ismarked == true then
 		--local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-		AutoCat_Logger():Debug("im_marked return positive for "..markName.." on "..name.."  ac = "..ac)
+		logDebug("[AC ItemMarker] im_marked return positive for ", markName, " on ", name, "  ac = ", ac)
 		if ac > 0 then
 			if checkMarks[markName] then
-				AutoCat_Logger():Debug("In checkMarks")
+				logDebug("[AC ItemMarker] In checkMarks")
 				return true
 			end
-			AutoCat_Logger():Debug("Not in checkMarks")
+			logDebug("[AC ItemMarker] Not in checkMarks")
 			return false
 			
 		else
-			AutoCat_Logger():Debug("Matched")
+			logDebug("[AC ItemMarker] Matched")
 			return true
 		end
 	end

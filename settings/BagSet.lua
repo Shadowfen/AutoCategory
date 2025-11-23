@@ -4,6 +4,8 @@ local SF = LibSFUtils
 local L = GetString
 local CVT = AutoCategory.CVT
 
+local logDebug = AutoCategory.logDebug
+
 --cache data for dropdown: 
 AutoCategory.cache.bags_cvt.choices = {
 	L(SI_AC_BAGTYPE_SHOWNAME_BACKPACK),
@@ -270,12 +272,12 @@ function BagSet_SelectRule_LAM:refresh(bagId)
 	local currentBag = bagId or getCurrentBagId()
 	local ndx = BagSet_SelectRule_LAM:getValue()
 
-	AutoCat_Logger():Debug("SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	logDebug("[BagSet] SelectRule:refresh: Updating cvt lists for BagSet_SelectRule for bag ", currentBag)
 	do
 		-- dropdown lists for Edit Bag Rules selection (AC_DROPDOWN_EDITBAG_BAG)
 		local dataCurrentRules_EditBag = CVT:New(self.controlName,nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS)
 		if currentBag and AutoCategory.cache.entriesByBag[currentBag] then
-			AutoCat_Logger():Debug("SelectRule:refresh: Getting rules for bag "..tostring(currentBag))
+			logDebug("[BagSet] SelectRule:refresh: Getting rules for bag ", currentBag)
 			dataCurrentRules_EditBag:assign(AutoCategory.cache.entriesByBag[currentBag])
 		end
 		self:assign(dataCurrentRules_EditBag)
@@ -286,7 +288,7 @@ function BagSet_SelectRule_LAM:refresh(bagId)
 		self:select(ndx)
 	end
 	self:setValue(self:getValue())
-	AutoCat_Logger():Debug("SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag "..tostring(currentBag))
+	logDebug("[BagSet] SelectRule:refresh: Done updating cvt lists for BagSet_SelectRule for bag ", currentBag)
 end
 
 -- set the selection of the BagSet_SelectRule_LAM field
@@ -588,11 +590,11 @@ function bagSet_RemoveCat_LAM:execute()
 	local bagId = getCurrentBagId()
 	local ruleName = currentBagRule or BagSet_SelectRule_LAM:getValue()
 	local savedbag = AutoCategory.saved.bags[bagId]
-	AutoCat_Logger():Debug("Removing rule name "..ruleName)
+	logDebug("[BagSet] Removing rule name ", ruleName)
 	for i = 1, #savedbag.rules do
 		local bagEntry = savedbag.rules[i]
 		if bagEntry.name == ruleName then
-			AutoCat_Logger():Debug("Found it! - "..ruleName)
+			logDebug("[BagSet] Found it! - ", ruleName)
 			table.remove(savedbag.rules, i)
 			break
 		end
@@ -684,22 +686,22 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	if not cache.entriesByName[bagId] then
 		cache.entriesByName[bagId] = SF.safeTable(cache.entriesByName[bagId] )
 	end
-    AutoCat_Logger():Debug(SF.str("running filterRules for bag ", bagId, " tag ",tag))
+    logDebug("[BagSet] running filterRules for bag ", bagId, " tag ", tag)
 	-- filter out already-in-use rules from the "add category" list for bag rules
 	local dataCurrentRules_AddCategory = CVT:New(AddCat_SelectRule_LAM:getControlName(), nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
 	if not AutoCategory.RulesW.tagGroups[tag] then
 		-- no rules available for tag
-        AutoCat_Logger():Debug("no rules available")
+        logDebug("[BagSet] no rules available")
 		return dataCurrentRules_AddCategory
 	end
 
 	local rbyt = AutoCategory.RulesW.tagGroups[tag]
-    AutoCat_Logger():Debug(SF.str("# entries for tag ",rbyt:size()))
+    logDebug("[BagSet] # entries for tag ", rbyt:size())
 	for i = 1, rbyt:size() do
 		local value = rbyt.choices[i]
 		if value and cache.entriesByName[bagId][value] == nil then
 			--add the rule if not in bag
-            AutoCat_Logger():Debug("Adding "..rbyt.choices[i])
+            logDebug("[BagSet] Adding ", rbyt.choices[i])
 			dataCurrentRules_AddCategory:append(rbyt.choices[i], nil, rbyt.choicesTooltips[i])
 		end
 	end

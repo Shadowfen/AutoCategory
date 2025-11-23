@@ -31,6 +31,9 @@ In order to reduce the impact of the add-on:
 local LMP = LibMediaProvider
 local SF = LibSFUtils
 
+local logDebug = AutoCategory.logDebug
+
+
 -- uniqueIDs of items that have been updated (need rule re-execution),
 -- based on PLAYER_INVENTORY:OnInventorySlotUpdated hook
 local forceRuleReloadByUniqueIDs = {}
@@ -136,8 +139,9 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	AutoCat_Logger():Debug("Fetching face "..appearance["CATEGORY_FONT_NAME"].." from LMP:Fetch")
-	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
+	logDebug("[Keyboard] Fetching face ", appearance["CATEGORY_FONT_NAME"], " from LMP:Fetch")
+	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
+    return header_face
 end
 
 -- setup function for category header type to be added to the scroll list
@@ -501,9 +505,9 @@ local function createNewScrollData(scrollData)
 	-- Create headers and append to newScrollData
 	for _, catInfo in pairs(categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
-			AutoCat_Logger():Debug("catinfo: "..". "..tostring(catInfo.AC_sortPriorityName))
+			--logDebug("[Keyboard] catinfo: ", ". ", catInfo.AC_sortPriorityName)
 			local headerEntry = createHeaderEntry(catInfo)
-			AutoCat_Logger():Debug("hdr: "..". "..tostring(headerEntry.data.AC_sortPriorityName))
+			--logDebug("[Keyboard] hdr: ", ". ", headerEntry.data.AC_sortPriorityName)
 			if headerEntry then
 				table.insert(newScrollData, headerEntry)
 			end

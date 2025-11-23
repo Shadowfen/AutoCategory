@@ -146,7 +146,7 @@ local function checkCurrentRule(rule)
         return ruleCheckStatus
     end
     
-    local func,err = zo_loadstring("return("..rule..")")
+    local func,err = zo_loadstring(string.format("return(%s)", rule.rule))
     if not func then
         ruleCheckStatus.err = err
         ruleCheckStatus.good = nil

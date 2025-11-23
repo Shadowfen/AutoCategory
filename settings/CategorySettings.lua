@@ -3,6 +3,8 @@ local AC = AutoCategory
 
 local L = GetString
 local CVT = AutoCategory.CVT
+local logDebug = AutoCategory.logDebug
+
 
 local auBagSet = AC_UI.BagSet
 
@@ -35,7 +37,6 @@ AC_UI.warningDuplicatedName = warningDuplicatedName
 
 -- aliases
 local getCurrentBagId = AutoCategory.getCurrentBagId
-local ruleCheckStatus = {}
 
 function AC_UI.CatSet.clearRuleCheckStatus()
 	ruleCheckStatus.err = nil
@@ -43,6 +44,7 @@ function AC_UI.CatSet.clearRuleCheckStatus()
 end
 -- -------------------------------------------------------
 
+local ruleCheckStatus = {}
 
 function ruleCheckStatus.getTitle()
     if ruleCheckStatus.err == nil then
@@ -182,7 +184,7 @@ end
 -- customization of BaseDD for CatSet_SelectRule_LAM
 -- -------------------------------------------------------
 function CatSet_SelectRule_LAM:getValue()
-	AutoCat_Logger():Debug("CatSet_SelectRule_LAM:getValue returns "..tostring(self.cvt.indexValue))
+	logDebug("CatSet_SelectRule_LAM:getValue returns ", self.cvt.indexValue)
   	return self.cvt.indexValue
 end
 
@@ -245,7 +247,7 @@ function catSet_NewCat_LAM:execute()
 		tag = AC_EMPTY_TAG_NAME
 	end
 	local newRule = AutoCategory.CreateNewRule(newName, tag)
-	AutoCategory.ARW:addRule(newRule)
+	AutoCategory.ARW:AddRule(newRule)
 	AutoCategory.cache.AddRule(newRule)
 
 	currentRule = newRule
@@ -265,7 +267,7 @@ function catSet_NewCat_LAM:execute()
 
 	AC_UI.RefreshDropdownData()
 	if currentRule and AutoCategory.RuleApi.isCompiled(currentRule) == nil then
-    	AutoCategory.RulesW.CompileAll(AutoCategory.RulesW)
+    	AutoCategory.RulesW:CompileAll()
 	end
 end
 
@@ -295,7 +297,7 @@ function catSet_CopyCat_LAM:execute()
 	if not srcRule then return end
 
 	local newRule = AutoCategory.CopyFrom(srcRule)
-	AutoCategory.ARW:addRule(newRule)
+	AutoCategory.ARW:AddRule(newRule)
 	AutoCategory.cache.AddRule(newRule)
 
 	currentRule = newRule
@@ -309,7 +311,7 @@ function catSet_CopyCat_LAM:execute()
 	AC_UI.checkCurrentRule()
 
 
-    AutoCategory.RulesW.CompileAll(AutoCategory.RulesW)
+    AutoCategory.RulesW:CompileAll()
 	-- Add the rule to the bagSet Add Category dropdown and perform appropriate updates
 	AC_UI.AddCat_SelectRule_LAM:assign(AC_UI.AddCat_SelectRule_LAM.filterRules(getCurrentBagId(),currentRule.tag))
 	AC_UI.BagSet.updateControls()
@@ -377,9 +379,9 @@ function CatSet_NameEdit_LAM:setValue(value)
 	-- apparently one the AddCat_SelectRule_LAM calls is reseting the currentRule!
 	currentRule = AutoCategory.GetRuleByName(value)
 
-	AutoCat_Logger():Debug("new name1 - "..tostring(value))
-	AutoCat_Logger():Debug("new name2 - "..tostring(currentRule))
-	AutoCat_Logger():Debug("new name3 - "..tostring(currentRule.name))
+	logDebug("new name1 - ", value)
+	logDebug("new name2 - ", currentRule)
+	logDebug("new name3 - ", currentRule.name)
 	CatSet_SelectRule_LAM:refresh()
 	CatSet_SelectRule_LAM:setValue(currentRule.name)
 	CatSet_SelectRule_LAM:updateControl()

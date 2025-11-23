@@ -1,5 +1,7 @@
 local SF = LibSFUtils
 
+local logDebug = AutoCategory.logDebug
+
 
 local ROW_TYPE_ID 			= 1
 local DEFAULT_ROW_HEIGHT 	= 30
@@ -113,7 +115,7 @@ end
 
 
 local function SetSelected(scrollList, index, data)
-   -- AutoCat_Logger():Debug("SetSelected")
+   -- logDebug("[DisplayOrder] SetSelected")
     if not scrollList then return end
 
     scrollList.scrollData.lastSelectedIndex = index
@@ -183,19 +185,19 @@ end
 
 --=======================================================--
 local function ClearScrollList(self)
-    AutoCat_Logger():Debug("ClearScrollList")
+    logDebug("[DisplayOrder] ClearScrollList")
 	ZO_ScrollList_Clear(self)
 	ZO_ScrollList_Commit(self)
 
     local win = self.parent
     if not win then return end
-    AutoCat_Logger():Debug("ClearScrollList - clearing ac_dataList")
+    logDebug("[DisplayOrder] ClearScrollList - clearing ac_dataList")
     win.ac_dataList = SF.safeClearTable(win.ac_dataList)
 end
 
 -- use information from scrollData to create a scroll list 
 local function createScrollList(pscrollData, prefix)
-    AutoCat_Logger():Debug("createScrollList")
+    logDebug("[DisplayOrder] createScrollList")
     if pscrollData.done  then return end     -- run once protection
     pscrollData.done = true
 
@@ -234,7 +236,7 @@ local function createScrollList(pscrollData, prefix)
     ZO_ScrollList_SetEqualityFunction(scrollList, ROW_TYPE_ID, function(left,right) 
         return left and right and left.name == right.name end)
 	
-    AutoCat_Logger():Debug("Selections are enabled")
+    logDebug("[DisplayOrder] Selections are enabled")
     ZO_ScrollList_EnableSelection(scrollList, "ZO_ThinListHighlight", OnRowSelect)
 	
 	-- Easy Access Functions:
@@ -261,7 +263,7 @@ local function addItem(win, bagrule)
 end
 
 local function updateScrollList( win )
-    AutoCat_Logger():Debug("updateScrollList")
+    logDebug("[DisplayOrder] updateScrollList")
     local scrollList = win:GetNamedChild("ScrollList")
 
     scrollList:Update(win.ac_dataList)
@@ -288,7 +290,7 @@ end
 
 local function CreateWinLabel(win)  --, prefix, labelText, minWidth)
     if winData.title then
-        AutoCat_Logger():Debug("calling CreateWinLabel with "..tostring(winData.title))
+        logDebug("[DisplayOrder] calling CreateWinLabel with ", winData.title)
         local label = WINDOW_MANAGER:CreateControl(winData.prefix.."Label", win, CT_LABEL)
         label:SetText(winData.title)
         label:SetFont("$(ANTIQUE_FONT)|24")
