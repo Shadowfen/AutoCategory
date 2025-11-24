@@ -26,7 +26,13 @@ AutoCategory = {
 }
 
 AutoCat_Logger = SF.SafeLoggerFunction(AutoCategory, "logger", "AutoCategory")
-AutoCat_Logger():SetDebug(true)
+
+--[[
+    The following SetDebug() call is commented out because it severely slows down 
+    addon operation. Turning it on does however provide lots and lots of debug logging.
+    Never leave this uncommented when releasing!!
+--]]
+--AutoCat_Logger():SetDebug(true)
 
 -- convenience function for a call to AutoCat_Logger():Debug(SF.str(...))
 -- only done for Debug() because there is no special handling for the other message levels

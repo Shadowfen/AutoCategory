@@ -24,6 +24,7 @@ Hooks_Keyboard.lua
 Hooks_Gamepad.lua
 classes/CVT.lua
 classes/RuleList.lua
+classes/RuleApi.lua
 AC_Classes.lua
 AutoCategory.lua
 
