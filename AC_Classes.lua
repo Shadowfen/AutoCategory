@@ -84,8 +84,13 @@ function AutoCategory.BaseDD:updateControl()
 		logDebug("[AC_Classes] updateControl: dropdown lists changed - updating ", self.cvt.controlName)
 		-- only update the choices if we know that the lists contents changed
 		self.cvt.dirty = nil
-        logDebug("[AC_Classes] #choices=", #self.cvt.choices, " #choicesValues=", #self.cvt.choicesValues,
-            " #choicesTooltips=", #self.cvt.choicesTooltips)
+        local numchoices = #self.cvt.choices
+        local numvalues = 0
+        if self.cvt.choicesValues then numvalues = #self.cvt.choicesValues end
+        local numtt = 0
+        if self.cvt.choicesTooltips then numtt = #self.cvt.choicesTooltips end
+        logDebug("[AC_Classes] #choices=", numchoices, " #choicesValues=", numvalues,
+            " #choicesTooltips=", numtt)
 		dropdownCtrl:UpdateChoices(self.cvt.choices, self.cvt.choicesValues,
 			self.cvt.choicesTooltips)
 	end

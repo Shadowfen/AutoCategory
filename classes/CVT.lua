@@ -51,10 +51,14 @@ function AutoCategory.CVT:initialize(ctlname, ndx, usesFlags)
 
 	if usesFlags and (usesFlags == USE_VALUES or usesFlags == USE_ALL)  then
 		self.choicesValues = {}
+    else
+        self.choicesValues = nil
 	end
 
 	if usesFlags and (usesFlags == USE_TOOLTIPS or usesFlags == USE_ALL) then
 		self.choicesTooltips = {}
+    else
+        self.choicesTooltips = nil
 	end
 
 	self.indexValue = ndx
@@ -104,8 +108,8 @@ function AutoCategory.CVT:assign(tblB)
 	end
 
 	self.choices = shallowcpy(tblB.choices, self.choices)
-	self.choicesValues = shallowcpy(tblB.choicesValues, self.choicesValues)
-	self.choicesTooltips = shallowcpy(tblB.choicesTooltips, self.choicesTooltips)
+    if self.choicesValues then self.choicesValues = shallowcpy(tblB.choicesValues, self.choicesValues) end
+	if self.choicesTooltips then self.choicesTooltips = shallowcpy(tblB.choicesTooltips, self.choicesTooltips) end
 
 	-- select the first value as the "current" value
 	if tblB.indexValue then
