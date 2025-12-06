@@ -241,7 +241,19 @@ local function createHeaderEntry(catInfo)
 			AC_bagTypeId = catInfo.AC_bagTypeId,
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
-			stackLaunderPrice = 0})
+			stackLaunderPrice = 0,
+			statusSortOrder = 0,
+			age = 0,
+			name = catInfo.AC_categoryName,
+			stackCount = 0,
+			slotIndex = 0,
+			quality = 0,
+			displayQuality = 0,
+			stackSellPrice = 0,
+			statValue = 0,
+			traitInformationSortOrder = 0,
+			sellInformationSortOrder = 0,
+			ptValue = 0})
 	--return headerEntry
 end
 -- ---------------------------------------------------
@@ -314,14 +326,25 @@ local function sortInventoryFn(inven, left, right, key, order)
 	if right == nil or right.data == nil then
 		return false
 	end
+	
+	local ldata = left.data
+	local rdata = right.data
+	
+	-- Ensure headers have required sort fields to prevent nil errors
+	if ldata.AC_isHeader then
+		if ldata.statusSortOrder == nil then ldata.statusSortOrder = 0 end
+		if ldata.age == nil then ldata.age = 0 end
+	end
+	if rdata.AC_isHeader then
+		if rdata.statusSortOrder == nil then rdata.statusSortOrder = 0 end
+		if rdata.age == nil then rdata.age = 0 end
+	end
+	
 	if AutoCategory.BulkMode then
 		-- revert to default
 		return ZO_TableOrderingFunction(left.data, right.data, 
 			inven.currentSortKey, sortKeys, inven.currentSortOrder)
 	end
-
-	local ldata = left.data
-	local rdata = right.data
 
 	if AutoCategory.Enabled then
 		if rdata.AC_sortPriorityName ~= ldata.AC_sortPriorityName then
@@ -509,6 +532,32 @@ local function createNewScrollData(scrollData)
 			end
 		end
 	end
+	
+	-- Ensure all entries have required sort fields to prevent nil errors
+	for _, entry in ipairs(newScrollData) do
+		if entry.data then
+			if entry.data.AC_isHeader then
+				-- Headers need all sort fields since any could be used as primary sort or tiebreaker
+				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
+				if entry.data.age == nil then entry.data.age = 0 end
+				if entry.data.name == nil then entry.data.name = entry.data.AC_categoryName or "" end
+				if entry.data.stackCount == nil then entry.data.stackCount = 0 end
+				if entry.data.slotIndex == nil then entry.data.slotIndex = 0 end
+				if entry.data.quality == nil then entry.data.quality = 0 end
+				if entry.data.displayQuality == nil then entry.data.displayQuality = 0 end
+				if entry.data.stackSellPrice == nil then entry.data.stackSellPrice = 0 end
+				if entry.data.statValue == nil then entry.data.statValue = 0 end
+				if entry.data.traitInformationSortOrder == nil then entry.data.traitInformationSortOrder = 0 end
+				if entry.data.sellInformationSortOrder == nil then entry.data.sellInformationSortOrder = 0 end
+				if entry.data.ptValue == nil then entry.data.ptValue = 0 end
+			else
+				-- Ensure regular items also have these fields if missing
+				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
+				if entry.data.age == nil then entry.data.age = 0 end
+			end
+		end
+	end
+	
 	return newScrollData
 end
 
@@ -612,6 +661,7 @@ function AutoCategory.HookKeyboardMode()
     AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
     AddTypeToList(rowHeight, ZO_FurnitureVaultList,     INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_VengeanceInventoryList,   INVENTORY_VENGEANCE)
 
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)
