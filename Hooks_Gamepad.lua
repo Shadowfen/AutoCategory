@@ -79,14 +79,16 @@ end
 
 -- New code; Friday-The13-rus
 function AutoCategory.HookGamepadInventory()
+    local saved = AutoCategory.saved
+
 	ZO_GamepadInventoryList.AddSlotDataToTable = ZO_GamepadInventoryList_AddSlotDataToTable
 	ZO_GamepadInventoryList.sortFunction = AutoCategory_ItemSortComparator
 	
-	if AutoCategory.saved.general["ENABLE_GAMEPAD"] ~= true then return end
+	if saved.general["ENABLE_GAMEPAD"] ~= true then return end
 
 	-- Hide existing Quickslot, Crafting and Furnishing categories
 	ZO_PreHook(GAMEPAD_INVENTORY, "AddFilteredBackpackCategoryIfPopulated", function (self, filterType, iconFile)
-		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+		if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
 		if filterType == ITEMFILTERTYPE_CRAFTING or filterType == ITEMFILTERTYPE_FURNISHING or filterType == ITEMFILTERTYPE_QUICKSLOT then
 			return true
 		end
@@ -98,7 +100,7 @@ function AutoCategory.HookGamepadInventory()
 
 	-- Update new items indicator for Supplies category (because of not it contains all inventory items)
 	ZO_PostHook(GAMEPAD_INVENTORY, "RefreshCategoryList", function(self)
-		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+		if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
 		for i = 1, self.categoryList:GetNumEntries() do
 			local category = self.categoryList:GetEntryData(i)
 			if IsSuppliesCategory(category) then
@@ -156,7 +158,7 @@ function AutoCategory.HookGamepadInventory()
 			table.sort(filteredDataTable, ZO_GamepadInventory_QuestItemSortComparator)
 
 		else
-			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+			if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 				filteredDataTable = SHARED_INVENTORY:GenerateFullSlotData(nil, BAG_BACKPACK)
 
 			else
@@ -219,7 +221,7 @@ function AutoCategory.HookGamepadInventory()
 				entryData:SetCooldown(remaining, duration)
 			end
 
-			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true or not IsSuppliesCategory(targetCategoryData) then
+			if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true or not IsSuppliesCategory(targetCategoryData) then
 				entryData:SetIgnoreTraitInformation(true)
 			end
 
@@ -238,7 +240,7 @@ function AutoCategory.HookGamepadInventory()
 		return true
 	end)
 
-	if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
+	if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] ~= true then return end
 	-- The following code related only to Extendes Supplies category
 
 	-- Allow to equip items from Supplies category
@@ -270,7 +272,7 @@ function AutoCategory.HookGamepadInventory()
 
 		local function IsQuickSlotEnabled()
 			local targetCategoryData = self.categoryList:GetTargetData()
-			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+			if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 				return CanQuickSlotTargetItem()
 
 			else
@@ -290,7 +292,7 @@ function AutoCategory.HookGamepadInventory()
 
 		local function IsCompareModeEnabled()
 			local targetCategoryData = self.categoryList:GetTargetData()
-			if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+			if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 				return CanCompareTargetItem()
 
 			else
@@ -323,7 +325,7 @@ function AutoCategory.HookGamepadInventory()
             end,
             visible = function()
 				local targetCategoryData = self.categoryList:GetTargetData()
-				if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+				if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 					return CanQuickSlotTargetItem() or CanCompareTargetItem()
 
 				else
@@ -421,7 +423,7 @@ function AutoCategory.HookGamepadInventory()
 	-- Show right tooltip for equipable items in Supplies
 	ZO_PreHook(GAMEPAD_INVENTORY, "UpdateRightTooltip", function (self)
 		local targetCategoryData = self.categoryList:GetTargetData()
-		if AutoCategory.saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
+		if saved.general["EXTENDED_GAMEPAD_SUPPLIES"] == true and IsSuppliesCategory(targetCategoryData) then
 			local selectedItemData = self.currentlySelectedData
 			local equipSlot = ZO_Character_GetEquipSlotForEquipType(selectedItemData.equipType)
 			if not equipSlot then

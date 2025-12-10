@@ -592,7 +592,8 @@ end
 function AutoCategory.RuleFunc.EquipType( ... )
 	--local fn = "equiptype"
 	
-    local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    --local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local equipType = select(6, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 
 	for _, arg in iter_args( ... ) do
 		
@@ -610,7 +611,8 @@ end
 function AutoCategory.RuleFunc.ItemStyle( ... )
 	--local fn = "itemstyle"
 
-    local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    --local _, _, _, _, _, _, itemstyle = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local itemstyle = select(7, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
     local styleName = zo_strlower(GetItemStyleName(itemstyle))
 	for _, arg in iter_args(  ... ) do
 		
@@ -703,7 +705,8 @@ function AutoCategory.RuleFunc.IsLockpick( ... )
 	
 	local itemType = GetItemLinkItemType(AutoCategory.checkingItemLink)
     if itemType == ITEMTYPE_LOCKPICK or itemType == ITEMTYPE_TOOL then
-        local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        --local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        local quality = select(8, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
         if quality > 1 then return false end
         return true
     end
@@ -755,7 +758,8 @@ end
 function AutoCategory.RuleFunc.Quality( ... )
 	local fn = "quality"  
 	
-	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	--local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local quality = select(8, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	local displayquality = GetItemLinkDisplayQuality(AutoCategory.checkingItemLink)
 	
 	for _, arg in iter_args( ... ) do
@@ -786,7 +790,8 @@ end
 function AutoCategory.RuleFunc.GetQuality()
 	--local fn = "getquality"
 	
-	local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	--local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+    local quality = select(8, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	return quality
 end
 
@@ -1293,11 +1298,12 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	--local fn = "armorybuild"
 
 	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
-	local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	--local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local equipType = select(6, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	
 	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then 
-				return false 
-		end
+        return false 
+    end
 
 	-- Retrieve a list of armory builds this item is part of
 	local armoryBuildListNames = { GetItemArmoryBuildList(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex) }
@@ -1418,7 +1424,7 @@ function AutoCategory.RuleFunc.IsTracked( ... )
     checkSets[arg]=true
   end
   
-  local iTrackIndex, sTrackName, _, _ = SetTrack.GetTrackingInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
   if iTrackIndex >= 0 then
     if ac > 0 then
       if checkSets[sTrackName] ~= nil then
@@ -1463,7 +1469,8 @@ function AutoCategory.RuleFunc.GetMaxTraits( ... )
         return quality - 1
 		
     else
-        local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        --local _, _, _, _, _, _, _, quality = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+        local quality = select(8, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
         return quality
     end
 end

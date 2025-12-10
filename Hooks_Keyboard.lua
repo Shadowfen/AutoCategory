@@ -166,8 +166,6 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	local bagTypeId = data.AC_bagTypeId
 	data.AC_catCount = SF.nilDefault(data.AC_catCount, 0)
 	local num = data.AC_catCount
-	--if not data.stackLaunderPrice then data.stackLaunderPrice = 0 end
-	--if not slot.dataEntry.data.stackLaunderPrice then slot.dataEntry.data.stackLaunderPrice = 0 end
 
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
@@ -246,7 +244,6 @@ local function createHeaderEntry(catInfo)
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
 			stackLaunderPrice = 0})
-	--return headerEntry
 end
 -- ---------------------------------------------------
 
@@ -262,7 +259,6 @@ local function isHiddenEntry(itemEntry)
 	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then
 		return true
 	end
-	--return false
 	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
 
 end
@@ -609,12 +605,12 @@ function AutoCategory.HookKeyboardMode()
 	--Add a new header row data type
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 
-    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	   INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	 INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_CraftBagList,           INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,     INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_GuildBankBackpack,      INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_HouseBankBackpack,      INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,   INVENTORY_QUEST_ITEM)
     AddTypeToList(rowHeight, ZO_FurnitureVaultList,     INVENTORY_BACKPACK)
 
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
@@ -689,4 +685,4 @@ slot.age = GetFrameTimeSeconds()
 
 slotData.statusSortOrder = self:ComputeDynamicStatusMask(slotData.isPlayerLocked, slotData.isGemmable, slotData.stolen, slotData.isBoPTradeable, slotData.isInArmory, slotData.brandNew, slotData.bagId == BAG_WORN)
 
-]]
+--]]
