@@ -21,6 +21,9 @@ function AutoCategory.RuleList:initialize(rules)
 		if not self.ruleNames[arrules[k].name ] then
 			self.ruleNames[arrules[k].name] = k
 		end
+        if not arrules[k].compile then 
+            setmetatable(arrules[k],{__index = AutoCategory.RuleApiMixin})
+        end
 	end
 end
 

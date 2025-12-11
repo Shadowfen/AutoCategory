@@ -11,7 +11,7 @@ local DEFAULT_SCROLL_HEIGHT = 400
 
 -- create a row for the category order scroll list
 local function setupDataRow(rowControl, data, scrollList)
-    rowControl:SetText(AutoCategory.BagRuleApi.formatShow(data))
+    rowControl:SetText(data:formatShow())
     rowControl:SetFont("ZoFontWinH4")
 
     -- mouse handler for each row
@@ -174,7 +174,7 @@ local function UpdateScrollList(scrollList, dataTable)
 	ZO_ScrollList_Clear(scrollList)
 	local dataList = ZO_ScrollList_GetDataList(scrollList)
 	-- Add data items to the list
-	for _, dataItem in pairs(dataTableCopy) do
+	for _, dataItem in ipairs(dataTableCopy) do
 		local entry = ZO_ScrollList_CreateDataEntry(ROW_TYPE_ID, dataItem, nil)
 		table.insert(dataList, entry)
 	end

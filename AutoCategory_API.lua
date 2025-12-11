@@ -1,3 +1,5 @@
+local SF = LibSFUtils
+
 --====API====--
 
 -- For use to tell if AutoCategory has finished its initialization process and
@@ -64,25 +66,23 @@ function AutoCategory.validateACBagRules(acBagType)
 
 	if acBagType == nil then return false end
 
-	local ruleApi = AutoCategory.RuleApi
-
 	-- Mark rules as damaged when we find something wrong with them
 	-- returns nothing
 	local function checkValidRule(name, rule)
 		if rule == nil or name == nil then return end
 		if rule.name ~= name then 
-			ruleApi.setError(rule, true,"name mismatch between bagrule and backing rule")
+			rule:setError(true,"name mismatch between bagrule and backing rule")
 			return
 		end
 
 		--local isValid = true
 		if rule.rule == nil then
-			ruleApi.setError(rule,true,"missing rule definition")
+			rule:setError(true,"missing rule definition")
 			return
 		end
 		local ruleCode = AutoCategory.compiledRules[rule.name]
 		if not ruleCode or type(ruleCode) ~= "function" then
-			ruleApi.setError(rule, true,"invalid compiled rule function")
+			rule:setError(true,"invalid compiled rule function")
 			AutoCategory.compiledRules[rule.name] = nil
 			return
 		end
@@ -90,14 +90,11 @@ function AutoCategory.validateACBagRules(acBagType)
 		return
 	end
 
-	-- aliases
-	local bagRuleApi = AutoCategory.BagRuleApi
-
 	-- Make sure all of the rules in the bag are evaluated if damaged and marked appropriately
 	local bag = AutoCategory.saved.bags[acBagType]
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i] 
-		local rule = bagRuleApi.getBackingRule(entry)
+		local rule = entry:getBackingRule()
 		checkValidRule(entry.name, rule)
 	end
 end
@@ -116,7 +113,12 @@ end
 --   boolean - is entry hidden?
 function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	-- set up bagId and slotIndex to "pass in" to the rule functions
-	self.checkingItemBagId = bagId
+    self.checking = SF.safeClearTable(self.checking)
+    self.checking.BagId = bagId
+    self.checking.SlotIndex = slotIndex
+    self.checking.ItemLink = GetItemLink(bagId, slotIndex)
+
+    self.checkingItemBagId = bagId
 	self.checkingItemSlotIndex = slotIndex
 	self.checkingItemLink = GetItemLink(bagId, slotIndex)
 
@@ -160,7 +162,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	end
 
 	-- call the rules for this bag against the entry, stop when one matches
-	-- return values from pcall internal func
+	-- return values from SF.safeCall func
 	local lenv = AutoCategory.Environment
 
 	-- localized aliases
@@ -168,6 +170,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	local getRuleByName = AutoCategory.GetRuleByName
 	local isCategoryCollapsed = AutoCategory.IsCategoryCollapsed
 	local compiledRules = AutoCategory.compiledRules
+
 	for i = 1, #bag.rules do
 		local entry = bag.rules[i]
 		if entry.name then
@@ -177,7 +180,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 				if ruleCode then
 					setfenv( ruleCode, lenv )
 					AutoCategory.AdditionCategoryName = ""	-- this may be changed by autoset() or alphagear
-					local exec_ok, res = pcall( ruleCode )
+					local exec_ok, res = SF.safeCall( ruleCode )
 					if exec_ok then
 						local catname = adjustName(rule.name,
 												AutoCategory.AdditionCategoryName)
@@ -193,7 +196,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 						end
 
 					else
-						AutoCategory.RuleApi.setError(rule, true, res)
+						rule:setError(true, res)
 						compiledRules[entry.name] = nil
 					end
 				end

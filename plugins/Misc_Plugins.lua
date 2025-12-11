@@ -231,20 +231,6 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
   return false  
 end
 
---[[
-local function getCharId( charname )
-	local sv = {}
-	for i = 1, GetNumCharacters() do
-		local name, _, _, _, _, _, characterId = GetCharacterInfo(i)
-		sv[name] = characterId
-	end
-	if sv[charname] ~= nil then
-	    return sv[charname]
-	end
-	return nil
-end
---]]
-
 -- Get a list of all characters on all local accounts
 local function initChars()
 	if LibCharacterKnowledge == nil then
@@ -276,7 +262,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		
 	else
 		local arg = select(1, ...)
-		for _, v in pairs(AutoCategory_MiscAddons.charlist) do
+		for _, v in ipairs(AutoCategory_MiscAddons.charlist) do
 			local name = zo_strformat("<<1>>",v.name)
 			if name == arg then
 				crafter = v.id --characterId

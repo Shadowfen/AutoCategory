@@ -182,7 +182,7 @@ local function GearChangerByIakoni_DoRefresh(list)
     local b=GearChangerByIakoni.savedVariables.ArraySetSavedFlag
 
     --loop through the currently shown inventory items
-    for _,v in pairs(list.activeControls) do
+    for _,v in ipairs(list.activeControls) do
         local bag = v.dataEntry.data.bagId
         local slot = v.dataEntry.data.slotIndex
         if bag ~= nil and slot ~= nil then
@@ -199,7 +199,7 @@ local function GearChangerByIakoni_DoRefresh(list)
 
                 for i=1, 10 do
                     if b[i] == 1 then --check only if the set is saved
-                        for _,u in pairs(GearChangerByIakoni.WornArray) do
+                        for _,u in ipairs(GearChangerByIakoni.WornArray) do
                             if itemID==a[i][u] then
                                 marker:SetHidden(false)
                                 founditem = true
@@ -258,7 +258,7 @@ local function IokaniGearChanger_GetGearSet(bagId, slotIndex)
 			local itemID = Id64ToString(GetItemUniqueId(bagId, slotIndex))
 			for i=1, 10 do
 				if b[i] == 1 then --check only if the set is saved
-					for _,u in pairs(GearChangerByIakoni.WornArray) do
+					for _,u in ipairs(GearChangerByIakoni.WornArray) do
 						if itemID==a[i][u] then
 							--find gear in set i
                             result[#result+1] = i

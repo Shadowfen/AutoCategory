@@ -103,7 +103,7 @@ function AC_UI.checkCurrentRule()
     end
 
     if currentRule.rule == nil or currentRule.rule == "" then
-		AutoCategory.RuleApi.setError(currentRule, true,"Rule definition cannot be empty")
+		currentRule:setError(true,"Rule definition cannot be empty")
 		ruleCheckStatus.err = currentRule.err
         return
     end
@@ -266,7 +266,7 @@ function catSet_NewCat_LAM:execute()
 	AC_UI.BagSet.updateControls()
 
 	AC_UI.RefreshDropdownData()
-	if currentRule and AutoCategory.RuleApi.isCompiled(currentRule) == nil then
+	if currentRule and currentRule:isCompiled() == nil then
     	AutoCategory.RulesW:CompileAll()
 	end
 end
@@ -402,7 +402,7 @@ function CatSet_NameEdit_LAM:controlDef()
 			end,
 			setFunc = function(value) self:setValue(value) end,
 			isMultiline = false,
-			disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+			disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 			width = "half",
 			reference = self:getControlName(),
 		}
@@ -426,7 +426,7 @@ function CatSet_TagEdit_LAM.changeTag(rule, oldtag, newtag)
 	AutoCategory.RulesW.AddTag(newtag)
 
 	-- add the rule to the new tag list
-	AutoCategory.RulesW.tagGroups[newtag]:append(rule.name, nil, AutoCategory.RuleApi.getDesc(rule))
+	AutoCategory.RulesW.tagGroups[newtag]:append(rule.name, nil, rule:getDesc())
 	-- remove the current rule from the oldtag list
 	if oldtag and AutoCategory.RulesW.tagGroups[oldtag] then
 		AutoCategory.RulesW.tagGroups[oldtag]:removeItemChoiceValue(rule.name)
@@ -478,7 +478,7 @@ function CatSet_TagEdit_LAM:controlDef()
 		getFunc = function() return self:getValue() end,
 		setFunc = function(value) self:setValue(value) end,
 		isMultiline = false,
-		disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+		disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 		width = "half",
 		reference = self:getControlName(),
 	}
@@ -557,13 +557,13 @@ function CatSet_DeleteCat_LAM:controlDef()
 			isDangerous = true,
 			func = function()  self:execute() end,
 			width = "half",
-			disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+			disabled = function() return currentRule == nil or currentRule:isPredefined() end,
 		}
 end
 -- -------------------------------------------------------
 
 local function editCat_getPredef()
-    if currentRule and AutoCategory.RuleApi.isPredefined(currentRule) then
+    if currentRule and currentRule:isPredefined() then
         return L(SI_AC_MENU_EC_BUTTON_PREDEFINED)
 
     else
@@ -646,7 +646,7 @@ function AC_UI.CatSet.controlDef()
                 end,
                 isMultiline = false,
                 isExtraWide = true,
-                disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+                disabled = function() return currentRule == nil or currentRule:isPredefined() end,
                 width = "full",
                 reference = "AC_EDITBOX_EDITRULE_DESC",
             },
@@ -666,7 +666,7 @@ function AC_UI.CatSet.controlDef()
                 end,
                 setFunc = function(value)
                     currentRule.rule = value
-                    ruleCheckStatus.err = AutoCategory.RuleApi.compile(currentRule)
+                    ruleCheckStatus.err = currentRule:compile()
                     if ruleCheckStatus.err == "" then
                         ruleCheckStatus.err = nil
                         ruleCheckStatus.good = true
@@ -677,7 +677,7 @@ function AC_UI.CatSet.controlDef()
                     end,
                 isMultiline = true,
                 isExtraWide = true,
-                disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+                disabled = function() return currentRule == nil or currentRule:isPredefined() end,
                 width = "full",
                 reference = "AC_EDITBOX_EDITRULE_RULE",
             },
@@ -698,7 +698,7 @@ function AC_UI.CatSet.controlDef()
                 func = function()
                     AC_UI.checkCurrentRule()
                 end,
-                disabled = function() return currentRule == nil or AutoCategory.RuleApi.isPredefined(currentRule) end,
+                disabled = function() return currentRule == nil or currentRule:isPredefined() end,
                 width = "half",
             },
         },

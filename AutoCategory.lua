@@ -5,7 +5,6 @@ local SF = LibSFUtils
 local AutoCat = AutoCategory
 
 local CVT = AutoCategory.CVT
-local RuleApi = AutoCategory.RuleApi
 local ac_rules = AutoCategory.RulesW
 
 ----------------------
@@ -128,12 +127,11 @@ function AutoCat.RulesW:CompileAll()
 		return
     end
 	-- compile and store each of the rules in the ruleset
-	local compile = AutoCat.RuleApi.compile
     local compiled  = 0
-    local safeCall = SF.safeCall
+    local safeCall = SF.safeCall    -- alias
     for _, rule in ipairs(self.ruleList) do
         -- Guard against a nil entry (shouldn’t happen with ipairs, but be safe)
-        local ok, err = safeCall(compile, rule)
+        local ok, err = safeCall(rule.compile, rule)
         if ok then
             compiled = compiled + 1
         else
@@ -160,6 +158,9 @@ end
 -- override AddRule from RuleList to add in lookup table updates
 function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
+    if not newRule.compile then 
+        setmetatable(newRule,{__index = AutoCategory.RuleApiMixin})
+    end
 
 	if not newRule.tag or newRule.tag == "" then
         newRule.tag = AC_EMPTY_TAG_NAME
@@ -191,18 +192,20 @@ function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
         logDebug("[AutoCategory] Rule '%s' overwritten.", name)
 
 	else
-        -- New rule
-		ruleList[#ruleList+1] = newRule
+        if not newRule.formatShow then
+            setmetatable(newRule,{__index = AutoCategory.BagRuleApiMixin})
+        end
+        ruleList[#ruleList+1] = newRule
 		ruleNames[name] = #ruleList
         logDebug("[AutoCategory] Rule '%s' added.", name)
 	end
     local tagCvt = self.tagGroups[newRule.tag]
     if tagCvt then
         tagCvt:remove(name)   -- no‑op if not present
-        tagCvt:append(name, nil, AutoCat.RuleApi.getDesc(newRule))
+        tagCvt:append(name, nil, newRule:getDesc())
     end
 
-	RuleApi.compile(newRule)
+	newRule:compile()
 end
 -- ---------------------end RulesW  -------------------------------
 
@@ -273,7 +276,6 @@ function AutoCat.UpdateCurrentSavedVars()
 	-- rule definitions are always account-wide
 	-- AutoCategory.acctRules only has user-defined rules
 	-- RulesW.ruleList will have acctRules plus the predefined rules
-
 	table.sort(ac_rules.ruleList, RuleSortingFunction)
 
     ac_rules:CompileAll()
@@ -304,7 +306,7 @@ end
 function AutoCat.ResetCollapse(vars)
     for j = 1, #cache.bags_cvt do
 		local bagcol = vars.collapses[j]
-		for k,_ in pairs(bagcol) do
+		for k,_ in ipairs(bagcol) do
 			bagcol[k] = nil
 		end
 	end
@@ -429,7 +431,7 @@ function AutoCat.cacheRuleInitialize()
 
         --update tag grouping lookups
 		ac_rules.AddTag(tag)
-        ac_rules.tagGroups[tag]:append(name, nil, RuleApi.getDesc(rule))
+        ac_rules.tagGroups[tag]:append(name, nil, rule:getDesc())
     end
 end
 
@@ -452,7 +454,6 @@ function AutoCat.cacheInitBag(bagId)
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, runpriority, showpriority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
 	local sbag = cache.entriesByShowBag[bagId]		-- CVT
-	local bagRuleApi = AutoCat.BagRuleApi
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
@@ -476,14 +477,17 @@ function AutoCat.cacheInitBag(bagId)
             for entry = 1, #svdbag.rules do
                 local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
                 if not bagrule then break end
+                if not bagrule.formatValue then 
+                    setmetatable(bagrule,{__index = AutoCategory.BagRuleApiMixin})
+                end
 
                 logDebug("[AutoCategory] sbag ", entry, " bagrule.name ", bagrule.name)
 
-                sn = bagRuleApi.formatShow(bagrule)
+                sn = bagrule:formatShow()
                 sbag.choices[#sbag.choices+1] = sn
-                sbag.choicesValues[#sbag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
+                sbag.choicesValues[#sbag.choicesValues+1] = bagrule:formatValue()
                 sbag.bagrules[#sbag.bagrules+1] = bagrule
-                win:AddItem(bagrule) --sn)
+                win:AddItem(bagrule)
             end
         end
 	end
@@ -505,14 +509,14 @@ function AutoCat.cacheInitBag(bagId)
                 if not bagrule then break end
 
                 local ruleName = bagrule.name
-                AutoCat.BagRuleApi.convertPriority(bagrule)
+                bagrule:convertPriority()
                 logDebug("[AutoCategory] bag ", entry, " bagrule.name ", bagrule.name)
                 if not ename[ruleName] then
                     ename[ruleName] = bagrule
-                    ebag.choicesValues[#ebag.choicesValues+1] = bagRuleApi.formatValue(bagrule)
+                    ebag.choicesValues[#ebag.choicesValues+1] = bagrule:formatValue()
 
-                    sn = bagRuleApi.formatShow(bagrule)
-                    tt = bagRuleApi.formatTooltip(bagrule)
+                    sn = bagrule:formatShow()
+                    tt = bagrule:formatTooltip()
                     ebag.choices[#ebag.choices+1] = sn
                     ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
                 else
@@ -589,6 +593,10 @@ function AutoCat.cache.AddRule(rule)
     if not rule or not rule.name then
         return "AddRule: Rule or name of rule was nil"
     end -- can't use a nil rule
+    if not rule.compile then 
+        setmetatable(rule,{__index = AutoCategory.RuleApiMixin})
+   end
+
 
     if not rule.tag or rule.tag == "" then
         rule.tag = AC_EMPTY_TAG_NAME
@@ -598,7 +606,7 @@ function AutoCat.cache.AddRule(rule)
         ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	AutoCat.BagRuleApi.convertPriority(rule)
+	rule:convertPriority()
 
 	local rule_ndx = ac_rules.ruleNames[rule.name]
     if rule_ndx then
@@ -611,10 +619,10 @@ function AutoCat.cache.AddRule(rule)
 		ac_rules.ruleList[#ac_rules.ruleList+1] = rule
 		rule_ndx = #ac_rules.ruleList
 		ac_rules.ruleNames[rule.name] = rule_ndx
-		ac_rules.tagGroups[rule.tag]:append(rule.name, nil, AutoCat.RuleApi.getDesc(rule))
+		ac_rules.tagGroups[rule.tag]:append(rule.name, nil, rule:getDesc())
     end
 
-	RuleApi.compile(rule)
+	rule:compile()
 end
 
 -- Set up the context menu item for AutoCategory
@@ -623,8 +631,8 @@ local function setupContextMenu()
 
 	local function AC_GetItem(rowControl) 
 		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
-		local itemId = GetItemId(bagId, slotIndex)
-		local name = GetItemName(bagId, slotIndex)
+		--local itemId = GetItemId(bagId, slotIndex)
+		--local name = GetItemName(bagId, slotIndex)
 		--d("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
 	end
 	local function AC_AddMenuItem(rowControl, slotActions)
@@ -637,7 +645,7 @@ end
 
 function AutoCat.initializePlugins()
 	-- initialize plugins
-	for _, v in pairs(AutoCat.Plugins) do
+	for _, v in ipairs(AutoCat.Plugins) do
 		if v and v.init then
 			v.init()
 		end
@@ -703,14 +711,18 @@ local function addTableRules(tbl, tblname, ispredef)
 		if ispredef == true then
 			v.pred=1
 		end
+        if not v.compile then 
+            setmetatable(v,{__index = AutoCategory.RuleApiMixin})
+        end
 
-		r =getRuleByName(v.name)
+		r = getRuleByName(v.name)
 		if r then
 			logDebug("[AutoCategory] Found duplicate rule name - ", v.name)
 			-- already have one
 			if v.rule == r.rule then
 				-- same rule def, so don't add it again
-				logDebug("[AutoCategory] 1 Dropped duplicate rule - ", v.name, "  from AC.rules sourced ", (tblname or "unknown"))
+				logDebug("[AutoCategory] 1 Dropped duplicate rule - ", v.name, 
+                        "  from AC.rules sourced ", (tblname or "unknown"))
 
 			else
 				local oldname = v.name
@@ -721,7 +733,7 @@ local function addTableRules(tbl, tblname, ispredef)
 
 				addCombinedRule(v)
 				AutoCat.renameBagRule(oldname, newName)
-				if RuleApi.isPredefined(v) then 
+				if v:isPredefined() then 
 					addPredef(tbl, v)
 
 				else
@@ -736,7 +748,7 @@ local function addTableRules(tbl, tblname, ispredef)
 			-- add it to the combined (AutoCategory.rule) list
 			addCombinedRule(v)
 
-			if RuleApi.isPredefined(v) then 
+			if v:isPredefined() then 
 				-- it's a predefined rule
 				addPredef(tbl, v)
 				logDebug("[AutoCategory] adding to predefined rules - ", v.name, "  from sourced ", (tblname or "unknown"))
@@ -791,6 +803,18 @@ local function loadPluginPredefines()
  end
 
 
+local function assertBagRuleMixins()
+    for bagId = 1, 7 do
+        local bag = AutoCategory.saved.bags[bagId]
+        if bag and bag.rules then
+            for _, br in ipairs(bag.rules) do
+                assert(br.formatShow, "BagRule missing mixin! bagId="..bagId.." name="..br.name)
+            end
+        end
+    end
+end
+assertBagRuleMixins()
+
 -- setup that needs to be done when the addon is loaded into the game
 function AutoCat.onLoad(event, addon)
     if addon ~= AutoCat.name then
@@ -800,31 +824,23 @@ function AutoCat.onLoad(event, addon)
 	-- make sure we are not called again
 	AutoCat.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
 
-    --AutoCat.checkLibraryVersions()
+    local isEmpty = SF.isEmpty
+    local defaultMissing = SF.defaultMissing
 
     -- load our saved variables (no longer loads pre-defined rules)
     AutoCat.acctSaved, AutoCat.charSaved = SF.getAllSavedVars("AutoCategorySavedVars",
 		1.1, AutoCat.defaultAcctSettings, AutoCat.defaultCharSettings)
-	if SF.isEmpty(AutoCat.acctSaved.bags) then 
-		SF.defaultMissing(AutoCat.acctSaved.bags, AutoCat.defaultAcctBagSettings.bags)
+	if isEmpty(AutoCat.acctSaved.bags) then 
+		defaultMissing(AutoCat.acctSaved.bags, AutoCat.defaultAcctBagSettings.bags)
 	end
-	if SF.isEmpty(AutoCat.charSaved.bags) then
-		SF.defaultMissing(AutoCat.charSaved.bags, AutoCat.defaultAcctBagSettings.bags)
+	if isEmpty(AutoCat.charSaved.bags) then
+		defaultMissing(AutoCat.charSaved.bags, AutoCat.defaultAcctBagSettings.bags)
 	end
 
-		-- There are no char-level variables for AutoCatRules!
+	-- There are no char-level variables for AutoCatRules!
     AutoCat.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCat.default_rules)
-	AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
 
-	AutoCat.LoadCollapse()
-
-	-- Set up the context menu item for AutoCategory
-	setupContextMenu()
-
-	-- hooks
-	AutoCat.HookGamepadMode()
-	AutoCat.HookKeyboardMode()
-
+    AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
 end
 
 -- --------------------------------------------------------------------
@@ -838,6 +854,17 @@ function AutoCat.onPlayerActivated()
 
 	-- make sure we are only called once
 	evtmgr:unregEvt(EVENT_PLAYER_ACTIVATED)
+
+    assertBagRuleMixins()
+
+    AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
+	AutoCat.LoadCollapse()
+	-- Set up the context menu item for AutoCategory
+	setupContextMenu()
+
+	-- hooks
+	AutoCat.HookGamepadMode()
+	AutoCat.HookKeyboardMode()
 
 	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCat.BulkMode = false end)
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCat.BulkMode = false end)
@@ -869,14 +896,13 @@ function AutoCat.onPlayerActivated()
 	AutoCat.initializePlugins()
 	AutoCat.cacheInitialize()
 	AutoCat.AddonMenu_Init()
-	AutoCat.AC_Classes_Init()
 	AutoCat.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
 end
 
+-- -----------------------------------------------
 do
 	-- register our event handler function to be called to do initialization
 	AutoCat.evtmgr:registerEvt(EVENT_ADD_ON_LOADED, 	AutoCat.onLoad)
-	AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
 end
 
 

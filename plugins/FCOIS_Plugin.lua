@@ -600,6 +600,10 @@ end
 
 --Initialize plugin for Auto Category - FCOIS
 function AutoCategory_FCOIS.Initialize()
+    -- aliases
+    local AddRuleFunc = AutoCategory.AddRuleFunc
+    local dummyRuleFunc = AutoCategory.dummyRuleFunc
+    local FCOIS_RuleFunc = AutoCategory_FCOIS.RuleFunc
     if FCOIS then
         AutoCat_Logger():Info("Initializing FCOIS plugin integration")
         
@@ -607,24 +611,22 @@ function AutoCategory_FCOIS.Initialize()
         AutoCategory_FCOIS.LoadLanguage("en")
 
         -- load supporting rule functions
-        AutoCategory.AddRuleFunc("ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
-        AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory_FCOIS.RuleFunc.IsMarked)
-        AutoCategory.AddRuleFunc("fco_isprotected", 
-            AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
-        AutoCategory.AddRuleFunc("isfcoisprotected",
-            AutoCategory_FCOIS.RuleFunc.IsFCOISProtected)
-        AutoCategory.AddRuleFunc("fco_isgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
-        AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory_FCOIS.RuleFunc.IsFCOISGear)
+        AddRuleFunc("ismarked", FCOIS_RuleFunc.IsMarked)
+        AddRuleFunc("fco_ismarked", FCOIS_RuleFunc.IsMarked)
+        AddRuleFunc("fco_isprotected", FCOIS_RuleFunc.IsFCOISProtected)
+        AddRuleFunc("isfcoisprotected", FCOIS_RuleFunc.IsFCOISProtected)
+        AddRuleFunc("fco_isgear", FCOIS_RuleFunc.IsFCOISGear)
+        AddRuleFunc("isfcoisgear", FCOIS_RuleFunc.IsFCOISGear)
         return
     end
 
     -- assign dummy rule functions
-    AutoCategory.AddRuleFunc("fco_ismarked", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("fco_isprotected", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("fco_isgear", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("ismarked", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("isfcoisprotected", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("isfcoisgear", AutoCategory.dummyRuleFunc)
+    AddRuleFunc("fco_ismarked", dummyRuleFunc)
+    AddRuleFunc("fco_isprotected", dummyRuleFunc)
+    AddRuleFunc("fco_isgear", dummyRuleFunc)
+    AddRuleFunc("ismarked", dummyRuleFunc)
+    AddRuleFunc("isfcoisprotected", dummyRuleFunc)
+    AddRuleFunc("isfcoisgear", dummyRuleFunc)
     return
 
 end

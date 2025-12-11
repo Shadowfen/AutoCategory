@@ -82,24 +82,29 @@ end
 
 --Initialize plugin for Auto Category - Unknown Tracker
 function AC_UT.Initialize()
+    -- aliases
+    local AddRuleFunc = AutoCategory.AddRuleFunc
+    local dummyRuleFunc = AutoCategory.dummyRuleFunc
+    local UT_RuleFunc = AC_UT.RuleFunc
+
     if UnknownTracker and AC_UT.RuleFunc then
         AutoCat_Logger():Info("Initializing UnknownTracker plugin integration")
 
         -- load supporting rule functions
-        AutoCategory.AddRuleFunc("isunknown", AC_UT.RuleFunc.UT_IsUnknown)
-        AutoCategory.AddRuleFunc("isrecipeunknown", AC_UT.RuleFunc.UT_IsRecipeUnknown)
-        AutoCategory.AddRuleFunc("isfurnishingunknown", AC_UT.RuleFunc.UT_IsFurnishingUnknown)
-        AutoCategory.AddRuleFunc("ismotifunknown", AC_UT.RuleFunc.UT_IsMotifUnknown)
-        AutoCategory.AddRuleFunc("isstyleunknown", AC_UT.RuleFunc.UT_IsStyleUnknown)
+        AddRuleFunc("isunknown", UT_RuleFunc.UT_IsUnknown)
+        AddRuleFunc("isrecipeunknown", UT_RuleFunc.UT_IsRecipeUnknown)
+        AddRuleFunc("isfurnishingunknown", UT_RuleFunc.UT_IsFurnishingUnknown)
+        AddRuleFunc("ismotifunknown", UT_RuleFunc.UT_IsMotifUnknown)
+        AddRuleFunc("isstyleunknown", UT_RuleFunc.UT_IsStyleUnknown)
         return
     end
 
     -- assign dummy rule functions
-    AutoCategory.AddRuleFunc("isunknown", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("isrecipeunknown", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("isfurnishingunknown", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("ismotifunknown", AutoCategory.dummyRuleFunc)
-    AutoCategory.AddRuleFunc("isstyleunknown", AutoCategory.dummyRuleFunc)
+    AddRuleFunc("isunknown", dummyRuleFunc)
+    AddRuleFunc("isrecipeunknown", dummyRuleFunc)
+    AddRuleFunc("isfurnishingunknown", dummyRuleFunc)
+    AddRuleFunc("ismotifunknown", dummyRuleFunc)
+    AddRuleFunc("isstyleunknown", dummyRuleFunc)
 end
 
 local valid_itemtypes = {
@@ -155,7 +160,7 @@ local function lookupItem(itemLink, characters)
 
     -- check against parameter list of toon names
     -- looking for specific toons that don't know
-    for charname, _ in pairs(unknowers) do
+    for charname, _ in ipairs(unknowers) do
         if characters[charname] ~= nil then
             -- we were looking for toon that does not know
             return true

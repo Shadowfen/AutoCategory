@@ -1,6 +1,24 @@
 local SF = LibSFUtils
 --local AC = AutoCategory
 
+-- aliases
+local GetItemId = GetItemId
+local GetItemStyleName = GetItemStyleName
+local GetZoneNameByIndex = GetZoneNameByIndex
+local GetCurrentMapZoneIndex = GetCurrentMapZoneIndex
+local GetItemLinkItemType = GetItemLinkItemType
+local GetItemLinkName = GetItemLinkName
+local GetItemInfo = GetItemInfo
+local GetItemLinkItemId = GetItemLinkItemId
+local GetItemLinkSetInfo = GetItemLinkSetInfo
+local GetItemTraitInformation = GetItemTraitInformation
+local GetItemLink = GetItemLink
+
+local zo_strlower = zo_strlower
+local t_insert = table.insert
+local GetString = GetString
+
+
 local logDebug = AutoCategory.logDebug
 
 local iter_args = SF.iter_args
@@ -477,7 +495,7 @@ function AutoCategory.getItemStyles()
 		end
 	end
 	--d(is)
-	table.insert(AutoCategory.dictionary, is)
+	t_insert(AutoCategory.dictionary, is)
 end
 
 AutoCategory.getItemStyles()
@@ -494,7 +512,7 @@ local function isKnown(arg, typekey, fn, map)
         end
         
     elseif map and t_arg == "string" then
-        local val = map[string.lower( arg )]
+        local val = map[zo_strlower( arg )]
         if type ( val ) == "table" then
             if val[typekey] then
                 return true
@@ -556,8 +574,8 @@ end
 function AutoCategory.RuleFunc.IsInCurrentZone( ... )
 	--local fn = "isinzone"
 
-	local itemName = string.lower(GetItemLinkName(AutoCategory.checkingItemLink))
-	local zoneName = string.lower(ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex())))
+	local itemName = zo_strlower(GetItemLinkName(AutoCategory.checkingItemLink))
+	local zoneName = zo_strlower(ZO_CachedStrFormat("<<C:1>>", GetZoneNameByIndex(GetCurrentMapZoneIndex())))
 	if( string.find(zoneName,"alik'r") ~= nil ) then
 		-- because maps never say "Alik'r Desert"
 		zoneName = "alik'r"	
@@ -773,7 +791,7 @@ function AutoCategory.RuleFunc.Quality( ... )
                 
             elseif t_arg == "string" then
 
-                local v = qualityMap[string.lower( arg )]
+                local v = qualityMap[zo_strlower( arg )]
                 if v and v == displayquality then
                     return true
                 end
@@ -817,7 +835,7 @@ function AutoCategory.RuleFunc.BoundType( ... )
                 end
                 
             elseif t_arg == "string" then
-                local v = boundTypeMap[string.lower( arg )]
+                local v = boundTypeMap[zo_strlower( arg )]
                 if v and v == boundType then
                     return true
                 end
@@ -846,9 +864,9 @@ function AutoCategory.RuleFunc.FilterType( ... )
                 testFilterType = arg
                 
             elseif t_arg == "string" then  
-                testFilterType = filterTypeMap[string.lower( arg )]
+                testFilterType = filterTypeMap[zo_strlower( arg )]
                 if testFilterType == nil then
-                    error( string.format("error: %s(): argument '%s' is not recognized.", fn, string.lower(arg)))
+                    error( string.format("error: %s(): argument '%s' is not recognized.", fn, zo_strlower(arg)))
                 end	
                 
             else
@@ -1022,7 +1040,7 @@ function AutoCategory.RuleFunc.TraitType( ... )
                 end
                 
             elseif t_arg == "string" then
-                local v = traitMap[string.lower( arg )]
+                local v = traitMap[zo_strlower( arg )]
                 if type(v) == "table" then
                     if v[traitType] then
                         return true
@@ -1061,7 +1079,7 @@ function AutoCategory.RuleFunc.ArmorType( ... )
                 
             elseif t_arg == "string" then 
 
-                local v = armorTypeMap[string.lower( arg )]
+                local v = armorTypeMap[zo_strlower( arg )]
                 if v and v == armorType then
                     return true
                 end
@@ -1092,7 +1110,7 @@ function AutoCategory.RuleFunc.WeaponType( ... )
                 end
                 
             elseif t_arg == "string" then
-                local v = weaponTypeMap[string.lower( arg )]
+                local v = weaponTypeMap[zo_strlower( arg )]
                 if v and v == weaponType then
                     return true
                 end
@@ -1113,7 +1131,7 @@ function AutoCategory.RuleFunc.TraitString( ... )
 	local fn = "traitstring"
 	
 	local traitType, _ = GetItemLinkTraitInfo(AutoCategory.checkingItemLink)
-	local traitText = string.lower(GetString("SI_ITEMTRAITTYPE", traitType))
+	local traitText = zo_strlower(GetString("SI_ITEMTRAITTYPE", traitType))
 	for _, arg in iter_args( ... ) do
 		
 		if arg then
@@ -1129,7 +1147,7 @@ function AutoCategory.RuleFunc.TraitString( ... )
             else
                 error( string.format("error: %s(): argument is error." , fn ) )
             end
-            findString = string.lower(findString)
+            findString = zo_strlower(findString)
             if string.find(traitText, findString, 1, true) then
                 return true
             end 
@@ -1145,7 +1163,7 @@ end
 function AutoCategory.RuleFunc.ItemName( ... )
 	local fn = "itemname"
 	
-	local itemName = string.lower(GetItemLinkName(AutoCategory.checkingItemLink))
+	local itemName = zo_strlower(GetItemLinkName(AutoCategory.checkingItemLink))
    
 	for _, arg in iter_args( ... ) do
 		
@@ -1164,7 +1182,7 @@ function AutoCategory.RuleFunc.ItemName( ... )
             end
             --fix german language issue
             findString = string.gsub(findString , "%^.*", "")
-            findString = string.lower(findString)
+            findString = zo_strlower(findString)
             if string.find(itemName, findString, 1 ,true) then
                 return true
             end
@@ -1208,12 +1226,12 @@ function AutoCategory.RuleFunc.IsTag( ... )
 	for i = 1, numItemTags do
 		local itemTagDescription, itemTagCategory = GetItemLinkItemTagInfo(itemLink, i)
 		if itemTagCategory ~= TAG_CATEGORY_NONE and itemTagDescription ~= "" then
-			table.insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
+			t_insert(itemTagStrings, zo_strformat(SI_TOOLTIP_ITEM_TAG_FORMATER, itemTagDescription)) 
 		end
 	end
 	for _,idsc in pairs(itemTagStrings) do
 		for _,desc in pairs(taglist) do
-			if string.lower(idsc) == string.lower(desc) then return true end
+			if zo_strlower(idsc) == zo_strlower(desc) then return true end
 		end
 	end
 	return false
@@ -1236,7 +1254,7 @@ function AutoCategory.RuleFunc.IsTreasure( ... )
 	-- declared as description = treasure
 	local description, itemTag = GetItemLinkItemTagInfo(itemLink, index)
 	if itemTag == TAG_CATEGORY_TREASURE_TYPE then
-		local ldesc = string.lower(description)
+		local ldesc = zo_strlower(description)
 		if string.find(ldesc, "treasure", 1 ,true) then
 			return true
 		end
@@ -1298,7 +1316,6 @@ function AutoCategory.RuleFunc.ArmoryBuild( ... )
 	--local fn = "armorybuild"
 
 	-- Retrieving build info for non-equippable items throws an error, so we check equip type first
-	--local _, _, _, _, _, equipType = GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
 	local equipType = select(6, GetItemInfo(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex))
 	
 	if (equipType == EQUIP_TYPE_INVALID or equipType == EQUIP_TYPE_POISON) then 
@@ -1483,7 +1500,7 @@ function AutoCategory.RuleFunc.CharName(...)
     --   gives you charname@player
     -- GetUnitName("player"))
     --   gives you charname
-    local pn = string.lower(GetUnitName("player"))
+    local pn = zo_strlower(GetUnitName("player"))
 	for _, arg in iter_args( ... ) do
 		
 		if arg then
@@ -1500,7 +1517,7 @@ function AutoCategory.RuleFunc.CharName(...)
             end
             --fix german language issue
             findString = string.gsub(findString , "%^.*", "")
-            findString = string.lower(findString)
+            findString = zo_strlower(findString)
             if string.find(pn, findString, 1 ,true) then
                 return true
             end
@@ -1515,7 +1532,7 @@ end
 -- returns true/false
 function AutoCategory.RuleFunc.AcctName(...)
     local fn = "acctname" 
-    local pn = string.lower(GetDisplayName())
+    local pn = zo_strlower(GetDisplayName())
 	for _, arg in iter_args( ... ) do
 		
 		if arg then

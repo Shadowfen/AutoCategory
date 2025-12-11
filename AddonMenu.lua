@@ -13,9 +13,6 @@ local divider = AC_UI.divider
 
 -- -------------------------------------------------------
 
---local currentRule = AutoCategory.CreateNewRule("","")
-
-
 local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
 
 local warningDuplicatedName = AC_UI.warningDuplicatedName

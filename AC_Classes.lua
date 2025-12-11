@@ -1,7 +1,7 @@
 --====AutoCategory Classes====--
 
-local L = GetString
-local SF = LibSFUtils
+--local L = GetString
+--local SF = LibSFUtils
 
 local logDebug = AutoCategory.logDebug
 
@@ -168,6 +168,7 @@ function AutoCategory.CreateNewRule(name, tag)
 		rule = "true",
 		tag = tag,
 	}
+    setmetatable(rule,{__index = AutoCategory.RuleApiMixin})
 	return rule
 end
 
@@ -189,6 +190,7 @@ function AutoCategory.CopyFrom(copyFrom)
 	newRule.damaged = copyFrom.damaged
 	newRule.err = copyFrom.err
 	newRule.pred = nil		-- defaults to not pre-defined, because copies are user-defined rules
+    --setmetatable(newRule,{__index = AutoCategory.RuleApiMixin})
 	return newRule
 end
 
@@ -237,264 +239,7 @@ function AutoCategory.CreateNewBagRule(rule, runpriority, showprior)
 		runpriority = ruleRunprior,
 		showpriority = showprior,
 	}
-	return bagrule
+    setmetatable(bagrule,{__index = AutoCategory.BagRuleApiMixin})
+    return bagrule
 end
 
-
---[[
--- not currently used (and not complete)
--- -------------------------------------------------
--- collected functions to be applied to a bagrule list
---
-AutoCategory.BagRuleList = ZO_Object:Subclass()
-
-function AutoCategory.BagRuleList:New(...)
-    local obj = ZO_Object.New(self)
-    obj:initialize(...)
-    return obj
-end
-
-function AutoCategory.BagRuleList:initialize(bagrules)
-	self.bagrule = bagrules
-	self.ruleList = bagrules.rules
-	self.lkRules = {}
-
-	local arrules = self.ruleList
-	for k = #arrules,1,-1 do
-		if not self.lkRules[arrules[k].name ] then
-			self.lkRules[arrules[k].name] = k
-		end
-	end
-end
-
-function AutoCategory.BagRuleList:size()
-	return #self.ruleList
-end
-
-function AutoCategory.BagRuleList.addBagRule(self, newRule, overwriteFlag)
-	if not newRule or not newRule.name then return end
-
-	local ndx = self.lkRules[newRule.name]
-	if ndx then
-		if overwriteFlag then
-			self.ruleList[ndx] = newRule
-		end
-		return
-	end
-
-	self.ruleList[#self.ruleList+1] = newRule
-	self.lkRules[newRule.name] = #self.ruleList
-end
---]]
-
--- -------------------------------------------------
--- collected functions to be applied to a rule
---
--- This functions to be used with rule structures loaded in or created.
-AutoCategory.RuleApi = {
-	-- check if rule def is valid (required keys all present)
-	isValid = function(r)
-			return AutoCategory.isValidRule(r)
-	end,
-
-	--determine if a rule is marked as pre-defined
-	isPredefined = function(r)
-	    return r.pred and r.pred ==1
-	end,
-
-	-- return the description if the rule has one, otherwise return the name
-	getDesc = function(r)
-			local tt = r.description
-			if not tt or tt == "" then
-				tt = r.name
-			end
-			return tt
-		end,
-
-	-- handle error marking for a rule
-	setError = function(r,dmg,errm)
-			r.damaged = dmg
-			r.err = errm
-		end,
-
-	clearError = function(r)
-			r.damaged = nil
-			r.err = nil
-		end,
-
-	-- get assigned key for the rule (if nil, returns name)
-	key = function(r)
-			if r.rkey then
-				return r.rkey
-			end
-			return r.name
-		end,
-
-	-- compare a rule to another rule for certain basic equalities
-	-- used for converting from acct/char rules to acctwide-only
-	-- returns two bools - (name is ~=), (rule def ~=)
-	isequiv = function(r, a)
-			if not a then return false, false end
-			local notname = r.name ~= a.name
-			local notrule = r.rule ~= a.rule
-			return notname, notrule
-		end,
-
-	-- Compile the Rule
-	-- Return a string that is either empty (good compile)
-	-- or an error string returned from the compile
-	--
-	-- Stores the compiled rule into AutoCategory.compiledRules table
-	compile = function(rule)
-            if type(rule) ~= "table" then
-                logDebug("[AutoCategory] compile: rule is not a table")
-                return "Invalid rule object"
-            end
-			if rule.name == nil or rule.name == "" then
-                logDebug("[AutoCategory] compile: rule has no name")
-				return "Rule missing name"
-			end
-
-			local compiledRules = AutoCategory.compiledRules
-			local ruleapi = AutoCategory.RuleApi
-
-			ruleapi.clearError(rule)
-			local rkey = ruleapi.key(rule)
-            if not rkey then 
-                ruleapi.setError(rule, true, "Unable to generate rule key")
-                return rule.err
-            end
-            
-			compiledRules[rkey] = nil
-
-			if rule.rule == nil or rule.rule == "" then
-				ruleapi.setError(rule, true,"Missing rule definition")
-				return rule.err
-			end
-
-			local rulestr = string.format("return(%s)", rule.rule)
-			local compiledfunc, err = zo_loadstring(rulestr)
-			if not compiledfunc then
-				ruleapi.setError(rule, true, err)
-				return err
-			end
-			compiledRules[rkey] = compiledfunc
-			return ""
-		end,
-	
-	-- returns nil if the rule is not compiled, non-nil if it is compiled
-	isCompiled = function(rule)
-		if rule == nil or rule.name == nil or rule.name == "" then
-			return
-		end
-		return AutoCategory.compiledRules[AutoCategory.RuleApi.key(rule)]
-	end,
-}
-
-
--- -------------------------------------------------
--- collected functions to be applied to a BagRule
---
-local bagRuleApi = {
-	convertPriority = function (bagrule)
-			if bagrule.priority then 
-				bagrule.runpriority = bagrule.priority
-				bagrule.priority = nil
-			end
-			if not bagrule.showpriority then 
-				bagrule.showpriority = bagrule.runpriority
-			end
-		end,
-
-	isValid = function (bagrule)
-			if not bagrule.name or bagrule.name == "" then
-				return false
-			end
-			if not bagrule.runpriority then return false end
-			return true
-		end,
-
-    formatValue = function (bagrule)
-			return bagrule.name
-		end,
-
-	-- formatShow() creates a string to represent the bagrule in the UI dropdown.
-	-- It combines the name and runpriority and showpriority and optionally marks or colorizes them
-	-- based on if the bag rule is marked "hidden" or if the backing Rule has
-	-- disappeared (i.e the bag rule is now invalid).
-	-- If no priority is passed in then the rule's runpriority is used.
-	-- Returns the string for the bagrule dropdown. Format: "name (runpriority/showpriority)"
-	formatShow	= function (bagrule)
-
-			local rule = AutoCategory.BagRuleApi.getBackingRule(bagrule)
-			AutoCategory.BagRuleApi.convertPriority(bagrule)
-
-			local sn
-			if not rule then
-				-- missing rule (nil was passed in)
-				sn = string.format("|cFF4444(!)|r %s (%d/%d)", bagrule.name, bagrule.runpriority, bagrule.showpriority)
-
-			else
-				if bagrule.isHidden then
-					-- grey out the "hidden" category header
-					local r, g, b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
-					local hex = "626250"
-					if r and not AutoCategory.saved.general["ENABLE_GAMEPAD"] then
-						--r, g, b = unpack(AutoCategory.saved.appearance["HIDDEN_CATEGORY_FONT_COLOR"])
-						hex = SF.colorRGBToHex(r, g, b)
-					end
-					sn = string.format("|c%s%s (%d/%d)|r", hex, bagrule.name, bagrule.runpriority, bagrule.showpriority)
-
-				else
-					if  AutoCategory.saved.general["ENABLE_GAMEPAD"] then
-						sn = string.format("%s (%d/%d)", bagrule.name, bagrule.runpriority, bagrule.showpriority)
-					else
-						local r, g, b = unpack(AutoCategory.saved.appearance["CATEGORY_FONT_COLOR"])
-						local hex = SF.colorRGBToHex(r, g, b)
-						sn = string.format("|c%s%s (%d/%d)|r", hex, bagrule.name, bagrule.runpriority, bagrule.showpriority)
-					end
-				end
-			end
-			return sn
-		end,
-
-	-- Provides a tooltip string for the bag rule which may be displayed
-	-- when hovering over the bag rule in the dropdown menu.
-	formatTooltip = function (bagrule)
-			local tt
-			local rule =AutoCategory.BagRuleApi.getBackingRule(bagrule)
-			if not rule then
-				-- missing rule (nil was passed in)
-				tt = L(SI_AC_WARNING_CATEGORY_MISSING)
-
-			else
-				tt = AutoCategory.RuleApi.getDesc(rule)
-			end
-			return tt
-		end,
-
-	-- Get the rule structure (if it exists) for the bag rule name
-	getBackingRule = function (bagrule)
-			if not bagrule.name then return nil end
-			local rule = AutoCategory.GetRuleByName(bagrule.name)
-			return rule
-		end,
-
-	-- Allows setting the isHidden value for the bag rule
-	-- (translates false into nil to reduce junk in saved variables).
-	setHidden = function (bagrule, isHidden)
-		if isHidden == false then 
-			bagrule.isHidden = nil
-			return false
-		end
-		if bagrule.isHidden == isHidden then return bagrule.isHidden end
-		bagrule.isHidden = isHidden
-		return bagrule.isHidden
-	end,
-}
--- make accessible
-AutoCategory.BagRuleApi = bagRuleApi
-
-function AutoCategory.AC_Classes_Init()
-
-end
