@@ -796,7 +796,7 @@ function AddCat_BagAdd_LAM:execute()
 	if AutoCategory.cache.entriesByName[bagId][ruleName] then return end
 
 	local saved = AutoCategory.saved
-	local entry = AutoCategory.CreateNewBagRule(ruleName)
+	local entry = AutoCategory.CreateBagRule(ruleName)
     if entry then
         saved.bags[bagId].rules[#saved.bags[bagId].rules+1] = entry
         currentBagRule = entry.name

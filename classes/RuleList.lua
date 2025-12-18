@@ -8,12 +8,12 @@ AutoCategory.RuleList = ZO_Object:Subclass()
 -- creates a rule list wrapper with a numeric-sequenced list of rules (not under a .rules!)
 function AutoCategory.RuleList:New(...)
     local obj = ZO_Object.New(self)
-    obj:initialize(...)
+    obj:Initialize(...)
     return obj
 end
 
 -- rule list wrapper adds a name lookup to accompany the base list of rules
-function AutoCategory.RuleList:initialize(rules)
+function AutoCategory.RuleList:Initialize(rules)
 	self.ruleList = rules
 	self.ruleNames = {}		-- lookup by name for ruleList   [name] ruleListIndex
 	local arrules = self.ruleList

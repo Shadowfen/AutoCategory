@@ -27,7 +27,7 @@ local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 
 AC_UI.CatSet = {}
 
-local currentRule = AutoCategory.CreateNewRule("","")
+local currentRule = AutoCategory.CreateRule("","")
 
 --warning message
 local warningDuplicatedName = {
@@ -246,7 +246,7 @@ function catSet_NewCat_LAM:execute()
 	if tag == "" then
 		tag = AC_EMPTY_TAG_NAME
 	end
-	local newRule = AutoCategory.CreateNewRule(newName, tag)
+	local newRule = AutoCategory.CreateRule(newName, tag)
 	AutoCategory.ARW:AddRule(newRule)
 	AutoCategory.cache.AddRule(newRule)
 

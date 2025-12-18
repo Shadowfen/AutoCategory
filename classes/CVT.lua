@@ -38,11 +38,11 @@ local USE_ALL = AutoCategory.CVT.USE_ALL
 
 function AutoCategory.CVT:New(...)
     local obj = ZO_Object.New(self)
-    obj:initialize(...)
+    obj:Initialize(...)
     return obj
 end
 
-function AutoCategory.CVT:initialize(ctlname, ndx, usesFlags)
+function AutoCategory.CVT:Initialize(ctlname, ndx, usesFlags)
 	if ctlname then
 		self.controlName = ctlname
 	end

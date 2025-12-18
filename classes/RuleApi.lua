@@ -1,7 +1,93 @@
+-- -------------------------------------------------------
+-- Rule functions and helpers
+
+-- based on the requested rule name, create a name that
+-- is not already in use (since rule names must be unique)
+function AutoCategory.GetUsableRuleName(name)
+    name = tostring(name)
+	local testName = name
+	local index = 1
+	while AutoCategory.RulesW.ruleNames[testName] ~= nil do
+		testName = name .. index
+		index = index + 1
+	end
+	return testName
+end
+
+-- check that all required fields are set
+-- returns err (t/f), errmsg (string)
+function AutoCategory.isValidRule(ruledef)
+    --make sure rule is well-formed
+	-- validate rule name
+    if (not ruledef or not ruledef.name
+			or type(ruledef.name) ~= "string" or ruledef.name == "") then
+        return false, "name is required"
+    end
+	-- validate rule text
+    if (not ruledef.rule or type(ruledef.rule) ~= "string" or ruledef.rule == "") then
+		ruledef.error = true
+        return false, "rule text is required"
+    end
+	-- validate optional rule description
+    if ruledef.description then -- description is optional
+        if (type(ruledef.description) ~= "string") then
+            return false, "non-nil description must be a string"
+        end
+    end
+	-- validate optional rule tag
+    if ruledef.tag then -- tag is optional
+        if (type(ruledef.tag) ~= "string") then
+            return false, "non-nil tag must be a string"
+        end
+    end
+    return true
+end
+
+-- ----------------------------------------------------------
+
+-- factory for creating new rules
+-- minimum required contents = name. description, rule, tag
+function AutoCategory.CreateRule(name, tag)
+	local rule = {
+		name = name,
+		description = "",
+		rule = "true",
+		tag = tag,
+	}
+    setmetatable(rule,{__index = AutoCategory.RuleApiMixin})
+	return rule
+end
+
+-- factory for making copies of rules
+function AutoCategory.CopyFrom(copyFrom)
+	if not copyFrom or not copyFrom.name then return end
+
+	local ruleName = copyFrom.name
+	-- get a unique name based on the old rule name
+	local newName = AutoCategory.GetUsableRuleName(ruleName)
+	local tag = copyFrom.tag
+	if tag == "" then
+		tag = AC_EMPTY_TAG_NAME
+	end
+
+	local newRule = AutoCategory.CreateRule(newName, tag)
+    -- metatable already set from the CreateRule
+	newRule.description = copyFrom.description
+	newRule.rule = copyFrom.rule
+	newRule.damaged = copyFrom.damaged
+	newRule.err = copyFrom.err
+	newRule.pred = nil		-- defaults to not pre-defined, because copies are user-defined rules
+    return newRule
+end
+
 -- -------------------------------------------------
--- collected functions to be applied to a rule
+-- collected functions to be applied to a rule metatable
 --
--- This functions to be used with rule structures loaded in or created.
+-- This function set to be used with rule structures loaded in or created.
+-- Note: Even though the table is called a "mixin" you must NOT use
+-- it with zo_mixin() because the objects that this set of functions
+-- is used with is saved with SaveVariables and cannot have functions 
+-- just copied into it.
 AutoCategory.RuleApiMixin = {
 	-- check if rule def is valid (required keys all present)
 	isValid = function(self)

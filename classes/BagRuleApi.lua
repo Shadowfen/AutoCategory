@@ -1,7 +1,50 @@
 local SF = LibSFUtils
 
--- -------------------------------------------------
--- collected functions to be applied to a BagRule
+
+-- --------------------------------------------
+-- Create a new Bag Entry (factory)
+-- Rule parameter is required, runpriority is optional.
+-- If a runpriority is not provided, default to 1000
+-- Returns a table {name=, runpriority=, showpriority=} or nil
+--
+function AutoCategory.CreateBagRule(rule, runpriority, showprior)
+    -- validate parameters
+	local rulename
+	if type(rule) == "string" then
+		rulename = rule
+		rule = AutoCategory.GetRuleByName(rulename)
+	end
+	if not rule or not rule.name then
+		return nil
+
+	else
+		rulename = rule.name
+	end
+
+	local ruleRunprior = runpriority or 1000
+    showprior = showprior or ruleRunprior
+
+    -- create the bagrule structure
+    local bagrule = {
+		name = rulename,
+		runpriority = ruleRunprior,
+		showpriority = showprior,
+	}
+    setmetatable(bagrule,{__index = AutoCategory.BagRuleApiMixin})
+    return bagrule
+end
+
+
+-- -------------------------------------------------------
+-- The BagRule class assists in the definition, management, and formatting of
+-- bag rules for the collection of them in the Bag Settings Categories dropdown.
+-- The minimum that a bagrule has is { name, runpriority, showpriority }.
+--
+-- This function set to be used with bagrule structures loaded in or created.
+-- Note: Even though the table is called a "mixin" you must NOT use
+-- it with zo_mixin() because the objects that this set of functions
+-- is used with is saved with SaveVariables and cannot have functions 
+-- just copied into it.
 --
 local bagRuleApiMixin = {
 	convertPriority = function (self)
