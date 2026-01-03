@@ -391,7 +391,7 @@ function AutoCat.renameBagRule(oldName, newName)
 	if oldName == newName then return end
 
 	--Update bags so that every entry has the same name, should be changed to new name.
-	for i = 1, 7 do	-- for all bags
+	for i = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do	-- for all bags
 		local bag = saved.bags[i]
 		if not bag then 
 			bag = { rules = {}, }
@@ -437,9 +437,9 @@ end
 
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
--- bagId needs to be between 1 and 7 (inclusive)
+-- bagId needs to be between AC_BAG_TYPE_MIN and AC_BAG_TYPE_MAX (inclusive)
 function AutoCat.cacheInitBag(bagId)
-	if bagId == nil or bagId < 1 or bagId > 7 then 
+	if bagId == nil or bagId < AC_BAG_TYPE_MIN or bagId > AC_BAG_TYPE_MAX then 
 		return
 	end
 
@@ -537,7 +537,7 @@ function AutoCat.cacheBagInitialize()
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
-    for bagId = 1, 7 do
+    for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
 		AutoCat.cacheInitBag(bagId)
     end
 end
@@ -804,7 +804,7 @@ local function loadPluginPredefines()
 
 
 local function assertBagRuleMixins()
-    for bagId = 1, 7 do
+    for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
         local bag = AutoCategory.saved.bags[bagId]
         if bag and bag.rules then
             for _, br in ipairs(bag.rules) do

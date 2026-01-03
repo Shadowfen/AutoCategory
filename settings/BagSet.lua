@@ -841,7 +841,7 @@ end
 -- -------------------------------------------------------
 function ImpExp_ExportAll_LAM:execute()
 	local selectedBag = getCurrentBagId()
-	for bagId = 1, 7 do
+	for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
 		if bagId ~= selectedBag then
 			copyBagToBag(selectedBag, bagId)
 		end

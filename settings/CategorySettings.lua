@@ -504,7 +504,7 @@ function CatSet_DeleteCat_LAM:execute()
 
 	-- removing the rule from any bags
 	--local bagId
-	for bagId = 1,7 do
+	for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
 		local savedbag = AutoCategory.saved.bags[bagId]
 		for i = 1, #savedbag.rules do
 			local bagEntry = savedbag.rules[i]
