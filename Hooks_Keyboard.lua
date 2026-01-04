@@ -634,6 +634,20 @@ function AutoCategory.HookKeyboardMode()
 
 end
 
+function AutoCategory.UnHookKeyboardMode()
+    ZO_RemovePreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
+    ZO_RemovePreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    ZO_RemovePreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    ZO_RemovePreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
+													   "SortData",  prehookCraftSort)
+
+	--- changes detection events/hooks (anticipate if rules results may have changed)
+    ZO_RemovePreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
+
+	-- Other events that cause a full refresh
+	-- user can force a refresh with stack key
+	AutoCategory.evtmgr:unregEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
+end
 
 --[[
 -------- HINTS FOR REFERENCE -----------
