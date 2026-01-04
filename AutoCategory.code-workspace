@@ -9,6 +9,10 @@
             "path": "../LibSFUtils"
         },
         {
+            "name": "ItemMarker",
+            "path": "../ItemMarker"
+        },
+        {
             "name": "LibAddonMenu-2.0",
             "path": "../LibAddonMenu-2.0"
         },
