@@ -73,3 +73,9 @@ AutoCategory.RulesW = {
 SF.LoadLanguage(AutoCategory_localization_strings, "en")
 
 
+function AutoCategory.foreachBag(func)
+    if not func then return end
+    for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
+        func(bagId)
+    end
+end

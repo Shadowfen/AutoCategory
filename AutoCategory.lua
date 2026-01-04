@@ -391,11 +391,11 @@ function AutoCat.renameBagRule(oldName, newName)
 	if oldName == newName then return end
 
 	--Update bags so that every entry has the same name, should be changed to new name.
-	for i = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do	-- for all bags
-		local bag = saved.bags[i]
+	local function func(bagId)
+		local bag = saved.bags[bagId]
 		if not bag then 
 			bag = { rules = {}, }
-			saved.bags[i] = bag
+			saved.bags[bagId] = bag
 		end
 		local rules = bag.rules
 		for j = 1, #rules do   -- for all bagrules in the bag
@@ -406,6 +406,7 @@ function AutoCat.renameBagRule(oldName, newName)
 			end
 		end
 	end
+    AutoCategory.foreachBag(func)
 end
 
 -- initialize the RulesW.ruleNames, RulesW.tagGroups, and the RulesW.tags tables from RulesW.ruleList
@@ -537,9 +538,7 @@ function AutoCat.cacheBagInitialize()
 
 	-- fill the bag-based lookups
     -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
-    for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
-		AutoCat.cacheInitBag(bagId)
-    end
+    AutoCategory.foreachBag(AutoCat.cacheInitBag)
 end
 
 
@@ -804,7 +803,8 @@ local function loadPluginPredefines()
 
 
 local function assertBagRuleMixins()
-    for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
+
+    local function func(bagId)
         local bag = AutoCategory.saved.bags[bagId]
         if bag and bag.rules then
             for _, br in ipairs(bag.rules) do
@@ -812,6 +812,8 @@ local function assertBagRuleMixins()
             end
         end
     end
+
+    AutoCategory.foreachBag(func)
 end
 assertBagRuleMixins()
 
@@ -841,7 +843,23 @@ function AutoCat.onLoad(event, addon)
     AutoCat.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCat.default_rules)
 
     AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
+    AutoCat.evtmgr:registerEvt(EVENT_ADD_ON_UNLOADED, function(...) AutoCat:OnAddOnUnloaded(...) end)
 end
+
+-- -------------------------------------------------------------------------
+-- Unload handling – make sure the hooks are cleared when the add‑on stops
+function AutoCategory:OnAddOnUnloaded(eventCode, addonName)
+    if addonName ~= self.name then return end
+
+    AutoCat.UnHookKeyboardMode()
+
+    if self.evtmgr then
+        self.evtmgr:unregAllUpdateEvt()
+        self.evtmgr:unregAllEvt()
+        self.evtmgr = nil
+    end
+end
+
 
 -- --------------------------------------------------------------------
 -- keep track of registered events for AutoCategory

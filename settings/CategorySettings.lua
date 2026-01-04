@@ -504,7 +504,7 @@ function CatSet_DeleteCat_LAM:execute()
 
 	-- removing the rule from any bags
 	--local bagId
-	for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
+	AutoCategory.foreachBag( function(bagId)
 		local savedbag = AutoCategory.saved.bags[bagId]
 		for i = 1, #savedbag.rules do
 			local bagEntry = savedbag.rules[i]
@@ -513,7 +513,7 @@ function CatSet_DeleteCat_LAM:execute()
 				break
 			end
 		end
-	end
+	end)
 	AC_UI.BagSet_SelectRule_LAM.cvt:removeItemChoiceValue(oldRuleName)
 	if AC_UI.BagSet_SelectRule_LAM:getValue() == nil and AC_UI.BagSet_SelectRule_LAM:size() > 0 then
 		AC_UI.BagSet_SelectRule_LAM:select({}) 	-- select first

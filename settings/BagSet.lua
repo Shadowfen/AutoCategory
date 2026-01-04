@@ -841,11 +841,11 @@ end
 -- -------------------------------------------------------
 function ImpExp_ExportAll_LAM:execute()
 	local selectedBag = getCurrentBagId()
-	for bagId = AC_BAG_TYPE_MIN, AC_BAG_TYPE_MAX do
-		if bagId ~= selectedBag then
+    AutoCategory.foreachBag(function(bagId)
+        if bagId ~= selectedBag then
 			copyBagToBag(selectedBag, bagId)
 		end
-	end
+    end)
 
 	BagSet_SelectRule_LAM:clearIndex()
 	--reset add rule's selection, since all data will be changed.
