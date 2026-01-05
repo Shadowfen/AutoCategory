@@ -795,10 +795,12 @@ local function loadPluginPredefines()
 
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
+        else
+            AutoCat_Logger():Info("No predefinedRules to add from "..name)
 		end
 	end
 	logDebug ("[AutoCategory] Done executing loadPluginPredefines ")
-	--logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
+	logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
  end
 
 

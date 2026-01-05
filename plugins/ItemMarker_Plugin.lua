@@ -27,6 +27,7 @@ end
 function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 	local fn = "im_ismarked"
 	if ItemMarker == nil then
+        logDebug("[AC ItemMarker] ItemMarker addon not found ")
 		return false
 	end
 	local ac = select( '#', ... ) 
@@ -40,10 +41,14 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 		checkMarks[arg]=true
 	end
 	
-	local ismarked, markName = ItemMarker_IsItemMarked(AutoCategory.checkingItemBagId,
-										AutoCategory.checkingItemSlotIndex)
+    local checkingItemBagId = AutoCategory.checkingItemBagId
+    local checkingItemSlotIndex = AutoCategory.checkingItemSlotIndex
+	local ismarked, markName = ItemMarker_IsItemMarked(checkingItemBagId,
+										checkingItemSlotIndex)
+    local name = GetItemName(checkingItemBagId, checkingItemSlotIndex)
+    logDebug("[AC ItemMarker] im_marked returns ", ismarked, " for ", markName, " on ", name, "  ac = ", ac)
 	if ismarked == true then
-		--local name = GetItemName(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+		--local name = GetItemName(checkingItemBagId, checkingItemSlotIndex)
 		logDebug("[AC ItemMarker] im_marked return positive for ", markName, " on ", name, "  ac = ", ac)
 		if ac > 0 then
 			if checkMarks[markName] then
