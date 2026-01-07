@@ -63,8 +63,10 @@ end
 -- remove a rule from the ruleList by position (index) in the ruleList
 function AutoCategory.RuleList.removeRule(self, ndx)
 	if not ndx then return end
+
 	local rl = self.ruleList[ndx]
 	if not rl then return end
+        
 	local name = rl.name
 	if name then
 		self.ruleNames[name] = nil

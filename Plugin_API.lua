@@ -45,7 +45,7 @@ end
 --             predefined - (lists) contains a list of all of the predefined rules for this plugin (optional)
 --
 function AutoCategory.RegisterPlugin(name, initfunc, predefined)
-	if not initfunc then return end
+	if not initfunc then return false end
 
     local entry = {}
 	if type(initfunc) == "function" then
@@ -60,5 +60,6 @@ function AutoCategory.RegisterPlugin(name, initfunc, predefined)
     end
     entry.predef = predefined
     AutoCategory.Plugins[name] = entry
+    return true
 end
 
