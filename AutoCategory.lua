@@ -644,7 +644,7 @@ end
 
 function AutoCat.initializePlugins()
 	-- initialize plugins
-	for _, v in ipairs(AutoCat.Plugins) do
+	for n, v in pairs(AutoCat.Plugins) do
 		if v and v.init then
 			v.init()
 		end
