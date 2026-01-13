@@ -356,6 +356,7 @@ local function constructEntryHash(itemEntry)
 	--- Hash construction
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
+    
 	local hashFCOIS = "" -- retrieve FCOIS mark data for change detection with itemEntry hash
 	if FCOIS and not NilOrLessThan(bagId, 0) and not NilOrLessThan(slotIndex,0) then
 		local _, markedIconsArray = FCOIS.IsMarked(bagId, slotIndex, -1)

@@ -13,8 +13,6 @@ local divider = AC_UI.divider
 
 -- -------------------------------------------------------
 
-local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
-
 local warningDuplicatedName = AC_UI.warningDuplicatedName
 
 
@@ -117,20 +115,6 @@ local function CreatePanel()
 	}
 end
 
-
-function AutoCategory.debugBagTags()
-	AddCat_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags })
-	d("AddCat_SelectTag_LAM:")
-	for k, v in pairs(AddCat_SelectTag_LAM.cvt.choices) do
-		if type(v) == "table" then
-			for k1,v1 in pairs(v) do
-				d("k = "..k.."   k1="..k1.."  v1="..SF.str(v1))
-			end
-		else
-		    d("k = "..k.." v= "..SF.str(v))
-		end
-	end
-end
 
 
 function AutoCategory.AddonMenu_Init()
