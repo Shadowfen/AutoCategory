@@ -219,7 +219,7 @@ AutoCategory.predefinedRules =  {
 		["pred"] = 1,
 	},
 	{
-		["rule"] = "type(\"master_writ\") or (sptype(\"container_stackable\") and itemname(\"Writ\"))",
+		["rule"] = "type(\"master_writ\") or (sptype(\"container_stackable\") and itemname(\"writ\"))",
 		["tag"] = L(SI_AC_DEFAULT_TAG_PAPERS),
 		["name"] = L(SI_AC_DEFAULT_CATEGORY_MASTER_WRITS),
 		["description"] = "",
