@@ -13,6 +13,7 @@ AutoCategory.cache.bags_cvt.choices = {
 	L(SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK),
 	L(SI_AC_BAGTYPE_SHOWNAME_FURNVAULT),
+	L(SI_AC_BAGTYPE_SHOWNAME_VENGEANCE),
 }
 AutoCategory.cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_BACKPACK,
@@ -22,6 +23,7 @@ AutoCategory.cache.bags_cvt.choicesValues = {
 	AC_BAG_TYPE_CRAFTSTATION,
 	AC_BAG_TYPE_HOUSEBANK,
 	AC_BAG_TYPE_FURNVAULT,
+	AC_BAG_TYPE_VENGEANCE,
 }
 AutoCategory.cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_BACKPACK),
@@ -31,6 +33,7 @@ AutoCategory.cache.bags_cvt.choicesTooltips = {
 	L(SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION),
 	L(SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK),
 	L(SI_AC_BAGTYPE_TOOLTIP_FURNVAULT),
+	L(SI_AC_BAGTYPE_TOOLTIP_VENGEANCE),
 }
 
 
