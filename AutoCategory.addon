@@ -2,7 +2,7 @@
 ## APIVersion: 101048 101049
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 4.5.4
+## Version: 4.5.5
 ## AddOnVersion: 136
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
 ## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=67 LibMediaProvider>=36 

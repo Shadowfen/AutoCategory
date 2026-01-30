@@ -1,4 +1,5 @@
 local SF = LibSFUtils
+local L = GetString
 
 
 -- --------------------------------------------
