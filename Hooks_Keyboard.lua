@@ -653,6 +653,7 @@ end
 
 
 function AutoCategory.HookKeyboardMode()
+    local hookmgr = AutoCategory.hookmgr
 	--Add a new header row data type
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
 
@@ -671,14 +672,21 @@ function AutoCategory.HookKeyboardMode()
 		ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack, nil )
 
 	--- sort hooks
-	ZO_PreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
-    ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
+	hookmgr:add("keypresort", "pre", PLAYER_INVENTORY, "ApplySort", prehookSort)
+    hookmgr:add("deconcraftsort", "pre",SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    hookmgr:add("improvcraftsort", "pre",SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    hookmgr:add("unideconcraftsort", "pre",UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
 													   "SortData",  prehookCraftSort)
 
+    --ZO_PreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
+    --ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    --ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    --ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
+	--												   "SortData",  prehookCraftSort)
+
 	--- changes detection events/hooks (anticipate if rules results may have changed)
-	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
+	hookmgr:add("lotupdated", "pre", PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
+	--ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
 
 	-- Other events that cause a full refresh
 	-- user can force a refresh with stack key
@@ -687,14 +695,14 @@ function AutoCategory.HookKeyboardMode()
 end
 
 function AutoCategory.UnHookKeyboardMode()
-    ZO_RemovePreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
-    ZO_RemovePreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    ZO_RemovePreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    ZO_RemovePreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
-													   "SortData",  prehookCraftSort)
+    --ZO_RemovePreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
+    --ZO_RemovePreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    --ZO_RemovePreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    --ZO_RemovePreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
+													   --"SortData",  prehookCraftSort)
 
 	--- changes detection events/hooks (anticipate if rules results may have changed)
-    ZO_RemovePreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
+    --ZO_RemovePreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
 
 	-- Other events that cause a full refresh
 	-- user can force a refresh with stack key

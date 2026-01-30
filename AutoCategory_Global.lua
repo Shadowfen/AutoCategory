@@ -6,15 +6,17 @@ AC_BAG_TYPE_CRAFTSTATION = 5
 AC_BAG_TYPE_HOUSEBANK = 6
 AC_BAG_TYPE_FURNVAULT = 7
 AC_BAG_TYPE_VENGEANCE = 8
+AC_BAG_TYPE_MIN = AC_BAG_TYPE_BACKPACK
+AC_BAG_TYPE_MAX = AC_BAG_TYPE_VENGEANCE
 
 local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = SF.colors.gold:Colorize("4.5.3"),
+    version = SF.colors.gold("4.5.4"),
     settingName = "AutoCategory",
-    settingDisplayName = SF.colors.gold:Colorize("AutoCategory - Revised"),
-    author = SF.colors.purple:Colorize("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),
+    settingDisplayName = SF.colors.gold("AutoCategory - Revised"),
+    author = SF.colors.purple("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),
 
     RuleFunc = {},  -- internal and plugin rule functions
     Plugins = {},   -- registered plugins

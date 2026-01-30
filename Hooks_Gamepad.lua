@@ -80,6 +80,7 @@ end
 -- New code; Friday-The13-rus
 function AutoCategory.HookGamepadInventory()
     local saved = AutoCategory.saved
+    local hookmgr = AutoCategory.hookmgr
 
 	ZO_GamepadInventoryList.AddSlotDataToTable = ZO_GamepadInventoryList_AddSlotDataToTable
 	ZO_GamepadInventoryList.sortFunction = AutoCategory_ItemSortComparator
@@ -253,7 +254,7 @@ function AutoCategory.HookGamepadInventory()
 		if ZO_InventorySlot_WillItemBecomeBoundOnEquip(sourceBag, sourceSlot) then
 			local itemDisplayQuality = GetItemDisplayQuality(sourceBag, sourceSlot)
 			local itemDisplayQualityColor = GetItemQualityColor(itemDisplayQuality)
-			ZO_Dialogs_ShowPlatformDialog("CONFIRM_EQUIP_ITEM", { onAcceptCallback = DoEquip }, { mainTextParams = { itemDisplayQualityColor:Colorize(GetItemName(sourceBag, sourceSlot)) } })
+			ZO_Dialogs_ShowPlatformDialog("CONFIRM_EQUIP_ITEM", { onAcceptCallback = DoEquip }, { mainTextParams = { itemDisplayQualityColor(GetItemName(sourceBag, sourceSlot)) } })
 
 		else
 			DoEquip()

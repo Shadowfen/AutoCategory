@@ -1,3 +1,11 @@
+[COLOR="DeepSkyBlue"]4.5.4 (136)[/COLOR]
+[LIST]
+[*] Update ru localization (provided by VChet)
+[*] Initial Vengeance inventory support (provided by DakJaniels)
+[*] Created mixins for BagRule and Rule structures in SavedVariables
+[*] Updated to LibSFUtils 67.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.5.3 (135)[/COLOR]
 [LIST]
 [*] Fixed the default rule for Treasure Maps and Surveys.

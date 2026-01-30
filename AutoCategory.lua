@@ -804,12 +804,18 @@ function AutoCategory:OnAddOnUnloaded(eventCode, addonName)
         self.evtmgr:unregAllEvt()
         self.evtmgr = nil
     end
+    if self.hookmgr then
+        self.hookmgr:disableAll()
+        self.hookmgr = nil
+    end
 end
 
 
 -- --------------------------------------------------------------------
 -- keep track of registered events for AutoCategory
 AutoCat.evtmgr = SF.EvtMgr:New("AutoCategory")
+-- keep track of  hooks for AutoCategory
+AutoCat.hookmgr = SF.HookManager:New()
 
 -- only runs once
 -- continues initialization after all addons are loaded into the game
