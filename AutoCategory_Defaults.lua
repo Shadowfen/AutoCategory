@@ -235,6 +235,7 @@ AutoCategory.defaultCollapses = {
         [AC_BAG_TYPE_CRAFTSTATION] = {},
         [AC_BAG_TYPE_HOUSEBANK] = {},
         [AC_BAG_TYPE_FURNVAULT] = {},
+        [AC_BAG_TYPE_VENGEANCE] = {},
     }
 
 AutoCategory.defaultSettings = {
@@ -258,6 +259,9 @@ AutoCategory.defaultSettings = {
 			rules = {},
 		},
 		[AC_BAG_TYPE_FURNVAULT] = {
+			rules = {},
+		},
+		[AC_BAG_TYPE_VENGEANCE] = {
 			rules = {},
 		}
 	}, 
@@ -907,6 +911,9 @@ AutoCategory.defaultAcctBagSettings = {
 				["runpriority"] = 1000,
 				["name"] = L(SI_AC_DEFAULT_CATEGORY_FURNISHING),
 			},
+		},
+		[AC_BAG_TYPE_VENGEANCE] = {
+			rules = {},
 		},
 	}, 
 }

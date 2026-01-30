@@ -14,6 +14,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Craft Station",
     SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Home Storage Chests",
     SI_AC_BAGTYPE_SHOWNAME_FURNVAULT = "Furniture Vault",
+    SI_AC_BAGTYPE_SHOWNAME_VENGEANCE = "Vengeance",
     SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Backpack",
     SI_AC_BAGTYPE_TOOLTIP_BANK = "Bank",
     SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Guild Bank",
@@ -21,6 +22,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION = "Destruct/Improvement in Craft Station", 
     SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK = "Home Storage Chests", 
     SI_AC_BAGTYPE_TOOLTIP_FURNVAULT = "Furniture Vault",
+    SI_AC_BAGTYPE_TOOLTIP_VENGEANCE = "Vengeance PvP Bag",
 
     -- Text Alignment Option strings
     SI_AC_ALIGNMENT_LEFT = "Left",
