@@ -6,19 +6,23 @@
 AutoCategory_localization_strings = AutoCategory_localization_strings  or {}
 
 AutoCategory_localization_strings["ru"] = {
+    -- Bags strings
     SI_AC_BAGTYPE_SHOWNAME_BACKPACK = "Инвентарь",
     SI_AC_BAGTYPE_SHOWNAME_BANK = "Банк",
     SI_AC_BAGTYPE_SHOWNAME_GUILDBANK = "Гильдейский банк",
     SI_AC_BAGTYPE_SHOWNAME_CRAFTBAG = "Ремесленная сумка",
     SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Ремесленная станция",
     SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Домашнее хранилище",
+    SI_AC_BAGTYPE_SHOWNAME_FURNVAULT = "Хранилище мебели",
     SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Инвентарь",
     SI_AC_BAGTYPE_TOOLTIP_BANK = "Банк",
     SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Гильдейский банк",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTBAG = "Ремесленная сумка",
     SI_AC_BAGTYPE_TOOLTIP_CRAFTSTATION = "Разбор/Улучшение на Ремесленной станции",
     SI_AC_BAGTYPE_TOOLTIP_HOUSEBANK = "Домашнее хранилище",
+    SI_AC_BAGTYPE_TOOLTIP_FURNVAULT = "Хранилище мебели",
 
+    -- Text Alignment Option strings
     SI_AC_ALIGNMENT_LEFT = "Слева",
     SI_AC_ALIGNMENT_CENTER = "По центру",
     SI_AC_ALIGNMENT_RIGHT = "Справа",
@@ -27,15 +31,18 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_DEFAULT_NAME_CATEGORY_OTHER = "Прочее",
     SI_AC_DEFAULT_NAME_NEW_CATEGORY = "Новая категория",
 
+    -- warning strings
     SI_AC_WARNING_CATEGORY_MISSING = "Категория не найдена. Пожалуйста, проверьте, существует ли категория с таким именем.",
     SI_AC_WARNING_CATEGORY_NAME_EMPTY = "Название категории не может быть пустым.",
     SI_AC_WARNING_CATEGORY_NAME_DUPLICATED = "Название '%s' уже используется, попробуйте '%s'.",
     SI_AC_WARNING_NEED_RELOAD_UI = "Нужно перезагрузить UI",
 
+    -- Account-wide Settings strings
     SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING = "Настройки на аккаунт",
     SI_AC_MENU_BS_CHECKBOX_ACCOUNT_WIDE_SETTING_TOOLTIP = "Использовать настройки на аккаунт вместо настроек на персонажа",
     SI_AC_MENU_HEADER_ACCOUNT_WIDE_SETTING = "Настройки на аккаунт",
 
+    -- Bag Settings strings
     SI_AC_MENU_SUBMENU_BAG_SETTING = "|c0066FF[Настройки сумки]|r",
     SI_AC_MENU_BS_DROPDOWN_BAG = "Сумка",
     SI_AC_MENU_BS_DROPDOWN_BAG_TOOLTIP = "Выберите сумку для изменения используемых в ней категорий",
@@ -43,24 +50,22 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_BS_CHECKBOX_UNGROUPED_CATEGORY_HIDDEN_TOOLTIP = "Выбор этой настройки скроет несгруппированные предметы (Прочее), вы не сможете найти их в текущей сумке!",
 
     SI_AC_MENU_BS_DROPDOWN_CATEGORIES = "Категории",
-    SI_AC_MENU_BS_SHOWDROPDOWN_CATEGORIES = "Категории, упорядоченные для отображения",
+    SI_AC_MENU_BS_SHOWDROPDOWN_CATEGORIES = "Категории в порядке отображения",
     SI_AC_MENU_BS_SLIDER_CATEGORY_RUNPRIORITY = "Приоритет выполнения",
-    SI_AC_MENU_BS_SLIDER_CATEGORY_RUNPRIORITY_TOOLTIP = "Приоритет выполнения определяет позицию выполнения категории. Более высокие приоритеты выполняются перед более низкими приоритетами.",
+    SI_AC_MENU_BS_SLIDER_CATEGORY_RUNPRIORITY_TOOLTIP = "Приоритет выполнения определяет порядок применения правил категории к сумке. Категории с более высоким приоритетом обрабатываются раньше.",
     SI_AC_MENU_BS_SLIDER_CATEGORY_SHOWPRIORITY = "Приоритет отображения",
-    SI_AC_MENU_BS_SLIDER_CATEGORY_SHOWPRIORITY_TOOLTIP = "Приоритет отображения определяет порядок отображения категории в корзине: более высокая категория отображается перед более низкой.",
-    SI_AC_MENU_BS_BUTTON_SHOW = "Показать порядок категорий" ,
+    SI_AC_MENU_BS_SLIDER_CATEGORY_SHOWPRIORITY_TOOLTIP = "Приоритет отображения задает порядок отображения категорий в сумке: категории с более высоким приоритетом показываются раньше.",
+    SI_AC_MENU_BS_BUTTON_SHOW = "Показать порядок отображения категорий",
     SI_AC_TITLE_DSO = "Порядок отображения категорий",
-    SI_AC_MENU_BS_BUTTON_SHOW_TOOLTIP = "Откройте окно, в котором отображаются категории в выбранном вами порядке отображения." ,
-    --SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY = "Приоритет",
-    --SI_AC_MENU_BS_SLIDER_CATEGORY_PRIORITY_TOOLTIP = "Приоритет определяет позицию категории в сумке. Чем выше приоритет, тем выше позиция.",
-    SI_AC_MENU_BS_HIDE_CAT = "Скрыть категорию",
-    SI_AC_MENU_BS_SHOW_CAT = "Показать категорию",
-    SI_AC_MENU_BS_RESET_SHOW_PRIOR = "Сбросить приоритет показа",
-    SI_AC_MENU_BS_RESET_ALL_SHOW_PRIOR = "Сбросить ВСЕ Показать приоритеты для Bag",
+    SI_AC_MENU_BS_BUTTON_SHOW_TOOLTIP = "Открывает окно со списком категорий в выбранном порядке отображения.",
     SI_AC_MENU_BS_BUTTON_EDIT = "Изменить категорию",
     SI_AC_MENU_BS_BUTTON_EDIT_TOOLTIP = "Редактирование выбранной категории в настройках категории.",
+    SI_AC_MENU_BS_HIDE_CAT = "Скрыть категорию",
+    SI_AC_MENU_BS_SHOW_CAT = "Показать категорию",
     SI_AC_MENU_BS_BUTTON_REMOVE = "Убрать из сумки",
     SI_AC_MENU_BS_BUTTON_REMOVE_TOOLTIP = "Убирает категорию из сумки.",
+    SI_AC_MENU_BS_RESET_SHOW_PRIOR = "Сбросить приоритет отображения",
+    SI_AC_MENU_BS_RESET_ALL_SHOW_PRIOR = "Сбросить ВСЕ приоритеты отображения для сумки",
 
     SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN = "Скрыть категорию",
     SI_AC_MENU_BS_CHECKBOX_CATEGORY_HIDDEN_TOOLTIP = "Выбранная категория и все входящие в нее предметы будут скрыты из сумки.",
@@ -74,6 +79,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_AC_BUTTON_ADD_TOOLTIP = "Добавляет выбранную категорию в сумку.",
     SI_AC_MENU_AC_BUTTON_NEED_HELP = "Нужна помощь?",
 
+    -- Import Bag Settings strings
     SI_AC_MENU_HEADER_IMPORT_BAG_SETTING = "Импорт настроек сумки",
     SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG = "Импорт из сумки",
     SI_AC_MENU_IBS_DROPDOWN_IMPORT_FROM_BAG_TOOLTIP = "Выберите сумку из которой будут импортированы настройки.",
@@ -85,6 +91,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_UBS_BUTTON_EXPORT_TO_ALL_BAGS_TOOLTIP = "Настройки всех сумок будут заменены настройками текущей сумки!",
     SI_AC_MENU_SUBMENU_IMPORT_EXPORT = "|c0066FF[Импорт & Экспорт]|r",
 
+    -- Category Settings strings
     SI_AC_MENU_SUBMENU_CATEGORY_SETTING = "|c0066FF[Настройка категории]|r",
     SI_AC_MENU_CS_DROPDOWN_TAG = "Тег",
     SI_AC_MENU_CS_DROPDOWN_TAG_TOOLTIP = "Тег позволяет группировать категории.",
@@ -116,6 +123,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY = "Удалить",
     SI_AC_MENU_EC_BUTTON_DELETE_CATEGORY_TOOLTIP = "Удаляет выбранную категорию. Обратите внимание, что предопределенная категория не может быть удалена.",
 
+    -- Appearance Settings strings
     SI_AC_MENU_SUBMENU_APPEARANCE_SETTING = "|c0066FF[Настройка внешнего вида]|r |c65000b(Только для клавиатуры)|r",
     SI_AC_MENU_AS_DESCRIPTION_REFRESH_TIP = "Настройки внешнего вида категории. Перезагрузка интерфейса не требуется, для обновления можно переключить вкладки. *Работает ТОЛЬКО в режиме клавиатуры*",
     SI_AC_MENU_EC_DROPDOWN_CATEGORY_TEXT_FONT = "Шрифт текста категории",
@@ -130,6 +138,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_EC_SLIDER_CATEGORY_HEADER_HEIGHT = "Высота заголовка категории",
     SI_AC_MENU_EC_BUTTON_RELOAD_UI = "Перезагрузить UI",
 
+    -- General Settings strings
     SI_AC_MENU_SUBMENU_GENERAL_SETTING = "|c0066FF[Основные настройки]|r",
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE = "Показывать сообщение при включении/выключении",
     SI_AC_MENU_GS_CHECKBOX_SHOW_MESSAGE_WHEN_TOGGLE_TOOLTIP = "Будет показывать сообщение в чате при включении/выключении аддона.",
@@ -142,6 +151,7 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE = "Показывать 'Комплект(название)' для автокомплектов",
     SI_AC_MENU_GS_CHECKBOX_SHOW_CATEGORY_SET_TITLE_TOOLTIP = "Показывает 'Комплект(название)' вместо 'название' в инвентаре для автокомплектов",
 
+    -- Gamepad Settings strings
     SI_AC_MENU_SUBMENU_GAMEPAD_SETTING = "|c0066FF[Настройки для геймпада]|r |c65000b(Только для геймпада)|r",
     SI_AC_MENU_GMS_DESCRIPTION_TIP = "Работают только в режиме геймпада",
 	SI_AC_MENU_GMS_CHECKBOX_ENABLE_GAMEPAD = "Включить поддержку инвентаря",
@@ -149,18 +159,21 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES = "Включить расширенную категорию Припасы",
     SI_AC_MENU_GMS_CHECKBOX_EXTENDED_GAMEPAD_SUPPLIES_TOOLTIP = "Категория Припасы будет содержать все предметы из инвентаря. Стандартные категории Материалы, Обстановка и Предметы быстрого доступа будут скрыты.",
 
+    -- default Category Tags
     SI_AC_DEFAULT_TAG_GEARS= "Снаряжение",
     SI_AC_DEFAULT_TAG_GENERAL_ITEMS= "Основные предметы",
     SI_AC_DEFAULT_TAG_MATERIALS= "Материалы",
-    SI_AC_DEFAULT_TAG_FURNITURE= "мебель",
+    SI_AC_DEFAULT_TAG_FURNITURE= "Мебель",
+    SI_AC_DEFAULT_TAG_PAPERS= "Бумаги",
 
+    -- default Category Names
     SI_AC_DEFAULT_CATEGORY_ARMOR= "Броня",
     SI_AC_DEFAULT_CATEGORY_BOE= "Привязывается",
     SI_AC_DEFAULT_CATEGORY_BOE_DESC= "Привязываемое снаряжение для обмена",
     SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE= "Привязывается (таймер)",
     SI_AC_DEFAULT_CATEGORY_BOP_TRADEABLE_DESC= "Снаряжение, которым можно обменяться в течение определенного времени",
     SI_AC_DEFAULT_CATEGORY_DECONSTRUCT= "Разбор",
-    SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC= "Снаряжение для разбора",
     SI_AC_DEFAULT_CATEGORY_EQUIPPING= "Надето",
     SI_AC_DEFAULT_CATEGORY_EQUIPPING_DESC= "Экипированные предметы (только геймпад)",
     SI_AC_DEFAULT_CATEGORY_LOW_LEVEL= "Низкий уровень",
@@ -178,15 +191,19 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_DEFAULT_CATEGORY_CONSUMABLES= "Расх. предметы",
     SI_AC_DEFAULT_CATEGORY_CONSUMABLES_DESC= "Еда, Выпивка, Зелья",
     SI_AC_DEFAULT_CATEGORY_CONTAINER= "Контейнер",
-    SI_AC_DEFAULT_CATEGORY_CONTAINER_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_CONTAINER_DESC= "Закрытые контейнеры",
     SI_AC_DEFAULT_CATEGORY_FURNISHING= "Обстановка",
-    SI_AC_DEFAULT_CATEGORY_FURNISHING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_FURNISHING_DESC= "Мебель для размещения в доме",
+    SI_AC_DEFAULT_CATEGORY_BYCATEGORY = "По категориям",
+    SI_AC_DEFAULT_CATEGORY_BYCATEGORY_DESC= "Название категории мебели всегда скрыто.",
+    SI_AC_DEFAULT_CATEGORY_MASTER_WRITS="Мастерские заказы (все)",
+    --SI_AC_DEFAULT_CATEGORY_MASTER_WRITS_DESC="",
     SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS= "Глифы & Камни",
     SI_AC_DEFAULT_CATEGORY_GLYPHS_AND_GEMS_DESC= "",
     SI_AC_DEFAULT_CATEGORY_NEW= "Новое",
     SI_AC_DEFAULT_CATEGORY_NEW_DESC= "Предметы полученные недавно",
     SI_AC_DEFAULT_CATEGORY_POISON= "Яды",
-    SI_AC_DEFAULT_CATEGORY_POISON_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_POISON_DESC= "Различные яды",
     SI_AC_DEFAULT_CATEGORY_QUICKSLOTS= "Быстрый доступ",
     SI_AC_DEFAULT_CATEGORY_QUICKSLOTS_DESC= "Установленные в слот быстрого доступа",
     SI_AC_DEFAULT_CATEGORY_RECIPES_AND_MOTIFS= "Рецепты & Мотивы",
@@ -194,11 +211,11 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_DEFAULT_CATEGORY_SELLING= "Продажа",
     SI_AC_DEFAULT_CATEGORY_SELLING_DESC= "",
     SI_AC_DEFAULT_CATEGORY_STOLEN= "Украдено",
-    SI_AC_DEFAULT_CATEGORY_STOLEN_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_STOLEN_DESC= "Украденные предметы",
     SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS= "Карты & Исследования",
     SI_AC_DEFAULT_CATEGORY_TREASURE_MAPS_DESC= "Карты сокровищ и исследования",
     SI_AC_DEFAULT_CATEGORY_ALCHEMY= "Алхимия",
-    SI_AC_DEFAULT_CATEGORY_ALCHEMY_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_ALCHEMY_DESC= "Алхимические материалы и растворители",
     SI_AC_DEFAULT_CATEGORY_BLACKSMITHING= "Кузнечное дело",
     SI_AC_DEFAULT_CATEGORY_BLACKSMITHING_DESC= "",
     SI_AC_DEFAULT_CATEGORY_CLOTHING= "Портняжное дело",
@@ -214,10 +231,12 @@ AutoCategory_localization_strings["ru"] = {
     SI_AC_DEFAULT_CATEGORY_WOODWORKING= "Столярное дело",
     SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC= "",
 
+
     SI_BINDING_NAME_TOGGLE_AUTO_CATEGORY= "Переключить Auto Category",
     SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON="Auto Category: ВКЛ",
     SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF="Auto Category: ВЫКЛ",
 
+    -- Collapses context menu
     SI_CONTEXT_MENU_EXPAND = "Развернуть",
     SI_CONTEXT_MENU_COLLAPSE = "Свернуть",
     SI_CONTEXT_MENU_EXPAND_ALL = "Развернуть все",
