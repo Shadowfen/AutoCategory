@@ -815,7 +815,7 @@ end
 -- keep track of registered events for AutoCategory
 AutoCat.evtmgr = SF.EvtMgr:New("AutoCategory")
 -- keep track of  hooks for AutoCategory
-AutoCat.hookmgr = SF.HookManager:New()
+AutoCat.hookmgr = SF.HookManager:New("AutoCat_")
 
 -- only runs once
 -- continues initialization after all addons are loaded into the game
