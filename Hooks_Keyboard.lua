@@ -139,9 +139,8 @@ local function getHeaderFace()
 		return header_face
 	end
 	local appearance = AutoCategory.acctSaved.appearance
-	logDebug("[Keyboard] Fetching face ", appearance["CATEGORY_FONT_NAME"], " from LMP:Fetch")
-	header_face = LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] ) 
-    return header_face
+	--logDebug("[Keyboard] Fetching face ", appearance["CATEGORY_FONT_NAME"], " from LMP:Fetch")
+	return LMP:Fetch('font',  appearance["CATEGORY_FONT_NAME"] )
 end
 
 -- setup function for category header type to be added to the scroll list
@@ -169,7 +168,7 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
-	if cateName and bagTypeId and cache and cache.entriesByName and cache.entriesByName[bagTypeId] and cache.entriesByName[bagTypeId][cateName] then
+	if cateName and cache.entriesByName[bagTypeId][cateName] then
 		if cache.entriesByName[bagTypeId][cateName].isHidden then
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
@@ -243,19 +242,7 @@ local function createHeaderEntry(catInfo)
 			AC_bagTypeId = catInfo.AC_bagTypeId,
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
-			stackLaunderPrice = 0,
-			statusSortOrder = 0,
-			age = 0,
-			name = catInfo.AC_categoryName,
-			stackCount = 0,
-			slotIndex = 0,
-			quality = 0,
-			displayQuality = 0,
-			stackSellPrice = 0,
-			statValue = 0,
-			traitInformationSortOrder = 0,
-			sellInformationSortOrder = 0,
-			ptValue = 0})
+			stackLaunderPrice = 0})
 	--return headerEntry
 end
 -- ---------------------------------------------------
@@ -327,25 +314,14 @@ local function sortInventoryFn(inven, left, right, key, order)
 	if right == nil or right.data == nil then
 		return false
 	end
-	
-	local ldata = left.data
-	local rdata = right.data
-	
-	-- Ensure headers have required sort fields to prevent nil errors
-	if ldata.AC_isHeader then
-		if ldata.statusSortOrder == nil then ldata.statusSortOrder = 0 end
-		if ldata.age == nil then ldata.age = 0 end
-	end
-	if rdata.AC_isHeader then
-		if rdata.statusSortOrder == nil then rdata.statusSortOrder = 0 end
-		if rdata.age == nil then rdata.age = 0 end
-	end
-	
 	if AutoCategory.BulkMode then
 		-- revert to default
 		return ZO_TableOrderingFunction(left.data, right.data, 
 			inven.currentSortKey, sortKeys, inven.currentSortOrder)
 	end
+
+	local ldata = left.data
+	local rdata = right.data
 
 	if AutoCategory.Enabled then
 		if rdata.AC_sortPriorityName ~= ldata.AC_sortPriorityName then
@@ -380,7 +356,6 @@ local function constructEntryHash(itemEntry)
 	--- Hash construction
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
-    
 	local hashFCOIS = "" -- retrieve FCOIS mark data for change detection with itemEntry hash
 	if FCOIS and not NilOrLessThan(bagId, 0) and not NilOrLessThan(slotIndex,0) then
 		local _, markedIconsArray = FCOIS.IsMarked(bagId, slotIndex, -1)
@@ -534,32 +509,6 @@ local function createNewScrollData(scrollData)
 			end
 		end
 	end
-	
-	-- Ensure all entries have required sort fields to prevent nil errors
-	for _, entry in ipairs(newScrollData) do
-		if entry.data then
-			if entry.data.AC_isHeader then
-				-- Headers need all sort fields since any could be used as primary sort or tiebreaker
-				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
-				if entry.data.age == nil then entry.data.age = 0 end
-				if entry.data.name == nil then entry.data.name = entry.data.AC_categoryName or "" end
-				if entry.data.stackCount == nil then entry.data.stackCount = 0 end
-				if entry.data.slotIndex == nil then entry.data.slotIndex = 0 end
-				if entry.data.quality == nil then entry.data.quality = 0 end
-				if entry.data.displayQuality == nil then entry.data.displayQuality = 0 end
-				if entry.data.stackSellPrice == nil then entry.data.stackSellPrice = 0 end
-				if entry.data.statValue == nil then entry.data.statValue = 0 end
-				if entry.data.traitInformationSortOrder == nil then entry.data.traitInformationSortOrder = 0 end
-				if entry.data.sellInformationSortOrder == nil then entry.data.sellInformationSortOrder = 0 end
-				if entry.data.ptValue == nil then entry.data.ptValue = 0 end
-			else
-				-- Ensure regular items also have these fields if missing
-				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
-				if entry.data.age == nil then entry.data.age = 0 end
-			end
-		end
-	end
-	
 	return newScrollData
 end
 
@@ -586,13 +535,14 @@ local function prehookSort(self, inventoryType)
 	if SCENE_MANAGER and SCENE_MANAGER:GetCurrentScene() then
 		scene = SCENE_MANAGER:GetCurrentScene():GetName()
 	end
-	if scene then
+
+    if scene then
 		if AutoCategory.BulkMode then
 			if scene == "guildBank" or (XLGearBanker and scene == "bank") then
 				return false	-- skip out early
 			end
 		end
-	end	
+	end
 	-- end nogetrandom recommend 
 
 	local needsReload = true
@@ -635,11 +585,12 @@ local function prehookCraftSort(self)
 	return false
 end
 
---prehook 
-local function onInventorySlotUpdated(evCode, bagId, slotIndex, isNewItem)
+-- prehook parameters, not the event parameters
+local function onInventorySlotUpdated(self, bagId, slotIndex)
+--local function onInventorySlotUpdated(eventCode, bagId, slotIndex, isNewItem)
 	if not AutoCategory.Enabled then return end
-	if isNewItem == false then return end
-	--if bagId ~= AC_BAG_TYPE_BACKPACK and bagId ~= BAG_BACKPACK then return end
+	--if isNewItem == false then return end
+	if bagId ~= AC_BAG_TYPE_BACKPACK and bagId ~= BAG_BACKPACK then return end
 	
 	-- mark the slot as needing rule re-evaluation
 	table.insert(forceRuleReloadByUniqueIDs, GetItemUniqueId(bagId, slotIndex))
@@ -653,40 +604,37 @@ end
 
 
 function AutoCategory.HookKeyboardMode()
-    local hookmgr = AutoCategory.hookmgr
 	--Add a new header row data type
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
+    local hookmgr = AutoCategory.hookmgr
 
-    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	 INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_CraftBagList,           INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,     INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_GuildBankBackpack,      INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_HouseBankBackpack,      INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,   INVENTORY_QUEST_ITEM)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	   INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
     AddTypeToList(rowHeight, ZO_FurnitureVaultList,     INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_VengeanceInventoryList,   INVENTORY_VENGEANCE)
 
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)
-    AddTypeToList(rowHeight,
-		ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack, nil )
+    AddTypeToList(rowHeight, ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack, nil )
 
 	--- sort hooks
-	hookmgr:add("keypresort", "pre", PLAYER_INVENTORY, "ApplySort", prehookSort)
-    hookmgr:add("deconcraftsort", "pre",SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    hookmgr:add("improvcraftsort", "pre",SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    hookmgr:add("unideconcraftsort", "pre",UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
-													   "SortData",  prehookCraftSort)
+	hookmgr:PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
+    --hookmgr:PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    --hookmgr:PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    --hookmgr:PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+	--hookmgr:PreHook(ZO_GuildBank, "ApplySort", prehookSort)
 
     --ZO_PreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
-    --ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    --ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    --ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
-	--												   "SortData",  prehookCraftSort)
+    ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
 
 	--- changes detection events/hooks (anticipate if rules results may have changed)
-	hookmgr:add("lotupdated", "pre", PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
-	--ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated) -- item has changed
+	--hookmgr:PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
+	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
 
 	-- Other events that cause a full refresh
 	-- user can force a refresh with stack key
@@ -695,18 +643,10 @@ function AutoCategory.HookKeyboardMode()
 end
 
 function AutoCategory.UnHookKeyboardMode()
-    --ZO_RemovePreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
-    --ZO_RemovePreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    --ZO_RemovePreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    --ZO_RemovePreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, 
-													   --"SortData",  prehookCraftSort)
-
-	--- changes detection events/hooks (anticipate if rules results may have changed)
-    --ZO_RemovePreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
-
-	-- Other events that cause a full refresh
+ 	-- Other events that cause a full refresh
 	-- user can force a refresh with stack key
 	AutoCategory.evtmgr:unregEvt(EVENT_STACKED_ALL_ITEMS_IN_BAG, onStackItems)
+	AutoCategory.hookmgr:disableAll()
 end
 
 --[[
