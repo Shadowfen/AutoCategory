@@ -5,7 +5,7 @@
 ## Version: 4.5.6
 ## AddOnVersion: 137
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=67 LibMediaProvider>=36 
+## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=68 LibMediaProvider>=36 
 ## DependsOn: LibDebugLogger>=268
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemSaverLite ItemMarker UnknownTracker>=79 
 ## OptionalDependsOn: MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge DressingRoom
