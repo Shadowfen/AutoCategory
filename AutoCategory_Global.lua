@@ -12,7 +12,7 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = SF.colors.gold:Colorize("4.5.6"),
+    version = SF.colors.gold:Colorize("4.5.7"),
     settingName = "AutoCategory",
     settingDisplayName = SF.colors.gold("AutoCategory - Revised"),
     author = SF.colors.purple("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),
