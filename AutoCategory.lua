@@ -43,7 +43,6 @@ local logDebug = AutoCategory.logDebug
 
 
 -- ------------------------ RulesW defined in Globals  -------------------------------
-ac_rules = AutoCat.RulesW
 
 -- Add a tag if it is not already in the list(s)
 function AutoCat.RulesW.AddTag(name)
@@ -608,7 +607,6 @@ end
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --
 local function addTableRules(tbl, tblname, ispredef)
-	--local RulesW = AutoCategory.RulesW
 	if not tbl.rules or tbl.rules == ac_rules.ruleList then return end
 
 	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
@@ -737,8 +735,6 @@ local function loadPluginPredefines()
 	-- add plugin predefined rules to the base predefined rules
 	for name, plugin in pairs(AutoCat.Plugins) do
 		if plugin.predef then
-			--logDebug ("[AutoCategory] Processing predefs from plugin ", name, " ", SF.GetSize(plugin.predef))
-
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
         else
@@ -950,12 +946,6 @@ local function refreshList(inventoryType, even_if_hidden)
 		if even_if_hidden == false and not ctl:IsHidden() then
 			obj:PerformFullRefresh()
 		end
-
-	--elseif inventoryType == INVENTORY_FURNITURE_VAULT then
-	--	if even_if_hidden == false and not ctl:IsHidden() then
-	--		obj:UpdateList(inventoryType, even_if_hidden)
-	--	end
-
 	else
 		PLAYER_INVENTORY:UpdateList(inventoryType, even_if_hidden)
 	end
