@@ -622,19 +622,12 @@ function AutoCategory.HookKeyboardMode()
 
 	--- sort hooks
 	hookmgr:PreHook(PLAYER_INVENTORY, "ApplySort", prehookSort)
-    --hookmgr:PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    --hookmgr:PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    --hookmgr:PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-	--hookmgr:PreHook(ZO_GuildBank, "ApplySort", prehookSort)
-
-    --ZO_PreHook(PLAYER_INVENTORY,                       "ApplySort", prehookSort)
-    ZO_PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
-    ZO_PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
-    ZO_PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    hookmgr:PreHook(SMITHING.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
+    hookmgr:PreHook(SMITHING.improvementPanel.inventory,    "SortData",  prehookCraftSort)
+    hookmgr:PreHook(UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory, "SortData",  prehookCraftSort)
 
 	--- changes detection events/hooks (anticipate if rules results may have changed)
-	--hookmgr:PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
-	ZO_PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
+	hookmgr:PreHook(PLAYER_INVENTORY, "OnInventorySlotUpdated", onInventorySlotUpdated)
 
 	-- Other events that cause a full refresh
 	-- user can force a refresh with stack key
