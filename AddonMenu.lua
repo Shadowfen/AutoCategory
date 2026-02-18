@@ -33,17 +33,24 @@ end
 
 -- updates the LAM cvt lists from our BaseDD objects
 local RCPending = false
+local function updtcb()
+    auBagSet.updateControls()
+    auCatSet.updateControls()
+    RCPending = false
+end
+local updtCB
 function AC_UI.RefreshControls()
 	local waitTime = 500
+
 	if RCPending then return end
 
-	RCPending = true
+    if not updtCB then
+        updtCB = SF.CallLater:NewSingle(updtcb, waitTime)
+    end
 
-	zo_callLater(function()
-		auBagSet.updateControls()
-		auCatSet.updateControls()
-		RCPending = false
-	end, waitTime)
+	RCPending = true
+    updtCB:Start()
+	--zo_callLater(updtcb, waitTime)
 end
 
 
