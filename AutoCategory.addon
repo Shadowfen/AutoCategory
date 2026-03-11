@@ -2,10 +2,10 @@
 ## APIVersion: 101048 101049
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 4.5.7
-## AddOnVersion: 139
+## Version: 4.6
+## AddOnVersion: 140
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
-## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=68 LibMediaProvider>=36 
+## DependsOn: LibAddonMenu-2.0>=41 LibCustomMenu>=730 LibSFUtils>=69 LibMediaProvider>=36 
 ## DependsOn: LibDebugLogger>=268
 ## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemSaverLite ItemMarker UnknownTracker>=79 
 ## OptionalDependsOn: MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge DressingRoom
@@ -27,6 +27,7 @@ classes/RuleList.lua
 classes/RuleApi.lua
 classes/BagRuleApi.lua
 classes/BaseUI.lua
+;misc/MiscDebugFuncs.lua
 AutoCategory.lua
 
 settings/UI_Utilities.lua

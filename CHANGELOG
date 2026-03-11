@@ -1,3 +1,18 @@
+[COLOR="DeepSkyBlue"]4.6 (140)[/COLOR]
+[COLOR="MediumSeaGreen"]Changes to values caused by ESO changes underneath:[/COLOR]
+[LIST]
+[*] ItemTypes added ([COLOR="MediumSeaGreen"]type()[/COLOR] values): consumable_ability, container_stackable, crafted_ability
+[*] SpecializedItemTypes added ([COLOR="MediumSeaGreen"]sptype()[/COLOR] values): consumable_ability, furnishing_attunable_station, group_repair, trophy_tribute_clue
+[*] SpecializedItemTypes removed ([COLOR="MediumSeaGreen"]sptype()[/COLOR] values): furnishing_attunable_crafting_station, siege_battle_standard
+[*] FilterTypes added ([COLOR="MediumSeaGreen"]filtertype()[/COLOR] values): unused, unused2
+ 
+[/LIST]
+[COLOR="MediumSeaGreen"]Other Changes:[/COLOR]
+[LIST]
+[*] Restored the ability for the "AC: Get itemId" context menu entry to write to the chat window.
+[*] Updated to LibSFUtils 69.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.5.7 (139)[/COLOR]
 [LIST]
 [*] Updated to LibSFUtils 68.

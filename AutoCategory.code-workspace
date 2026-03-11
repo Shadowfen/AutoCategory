@@ -33,8 +33,7 @@
             "path": "../LibMediaProvider"
         },
         {
-            "name": "esoui-live",
-            "path": "D:/eso src/esoui-live-11.1.5/esoui-live"
+            "path": "D:/eso src/esoui-live-101049/esoui-live"
         }
     ],
 	"settings": {}

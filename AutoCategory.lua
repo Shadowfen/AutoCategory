@@ -550,8 +550,6 @@ function AutoCat.cache.AddRule(rule)
         ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	rule:convertPriority()
-
 	local rule_ndx = ac_rules.ruleNames[rule.name]
     if rule_ndx then
 		-- rule already exists
@@ -575,12 +573,16 @@ local function setupContextMenu()
 
 	local function AC_GetItem(rowControl) 
 		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
-		--local itemId = GetItemId(bagId, slotIndex)
-		--local name = GetItemName(bagId, slotIndex)
-		--d("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
+		local itemId = GetItemId(bagId, slotIndex)
+		local name = GetItemName(bagId, slotIndex)
+		CHAT_ROUTER:AddSystemMessage("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
 	end
 	local function AC_AddMenuItem(rowControl, slotActions)
+		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
 		AddCustomMenuItem("AC: Get itemId", function() AC_GetItem(rowControl) end, MENU_ADD_OPTION_LABEL)
+        if AutoCat.displayItem then
+		    AddCustomMenuItem("AC: Debug", function() AutoCat.displayItem(bagId, slotIndex) end, MENU_ADD_OPTION_LABEL)
+        end
 		  --Show the context menu entries at the inventory row now
 		  ShowMenu(rowControl)
 	end
