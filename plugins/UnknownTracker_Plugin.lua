@@ -160,7 +160,7 @@ local function lookupItem(itemLink, characters)
 
     -- check against parameter list of toon names
     -- looking for specific toons that don't know
-    for charname, _ in ipairs(unknowers) do
+    for charname, _ in pairs(unknowers) do
         if characters[charname] ~= nil then
             -- we were looking for toon that does not know
             return true

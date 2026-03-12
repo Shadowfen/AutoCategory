@@ -262,7 +262,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		
 	else
 		local arg = select(1, ...)
-		for _, v in ipairs(AutoCategory_MiscAddons.charlist) do
+		for _, v in pairs(AutoCategory_MiscAddons.charlist) do
 			local name = zo_strformat("<<1>>",v.name)
 			if name == arg then
 				crafter = v.id --characterId

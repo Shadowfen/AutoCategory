@@ -174,7 +174,7 @@ local function UpdateScrollList(scrollList, dataTable)
 	ZO_ScrollList_Clear(scrollList)
 	local dataList = ZO_ScrollList_GetDataList(scrollList)
 	-- Add data items to the list
-	for _, dataItem in ipairs(dataTableCopy) do
+	for _, dataItem in pairs(dataTableCopy) do
 		local entry = ZO_ScrollList_CreateDataEntry(ROW_TYPE_ID, dataItem, nil)
 		table.insert(dataList, entry)
 	end

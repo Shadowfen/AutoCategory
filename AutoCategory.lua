@@ -5,6 +5,7 @@ local SF = LibSFUtils
 local AutoCat = AutoCategory
 
 local CVT = AutoCategory.CVT
+--local RuleApi = AutoCategory.RuleApi
 local ac_rules = AutoCategory.RulesW
 
 ----------------------
@@ -251,7 +252,7 @@ end
 function AutoCat.ResetCollapse(vars)
     for j = 1, #cache.bags_cvt do
 		local bagcol = vars.collapses[j]
-		for k,_ in ipairs(bagcol) do
+		for k,_ in pairs(bagcol) do
 			bagcol[k] = nil
 		end
 	end
@@ -583,8 +584,8 @@ local function setupContextMenu()
         if AutoCat.displayItem then
 		    AddCustomMenuItem("AC: Debug", function() AutoCat.displayItem(bagId, slotIndex) end, MENU_ADD_OPTION_LABEL)
         end
-		  --Show the context menu entries at the inventory row now
-		  ShowMenu(rowControl)
+		--Show the context menu entries at the inventory row now
+		ShowMenu(rowControl)
 	end
 	LCM:RegisterContextMenu(AC_AddMenuItem, LibCustomMenu.CATEGORY_LATE )
 end
@@ -761,15 +762,9 @@ local function assertBagRuleMixins()
 
     AutoCategory.foreachBag(func)
 end
-assertBagRuleMixins()
 
--- setup that needs to be done when the addon is loaded into the game
-function AutoCat.onLoad(event, addon)
-    if addon ~= AutoCat.name then return end
-
-	-- make sure we are not called again
-	AutoCat.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
-
+-- Load the saved variables and rules tables
+local function loadSavedVars()
     local isEmpty = SF.isEmpty
     local defaultMissing = SF.defaultMissing
 
@@ -785,9 +780,32 @@ function AutoCat.onLoad(event, addon)
 
 	-- There are no char-level variables for AutoCatRules!
     AutoCat.acctRules  = SF.getAcctSavedVars("AutoCatRules", 1.1, AutoCat.default_rules)
+end
 
-    AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
+-- setup that needs to be done when the addon is loaded into the game
+function AutoCat.onLoad(event, addon)
+    if addon ~= AutoCat.name then return end
+
+	-- make sure we are not called again
+	AutoCat.evtmgr:unregEvt(EVENT_ADD_ON_LOADED)
+	AutoCat.evtmgr:registerEvt(EVENT_PLAYER_ACTIVATED, 	AutoCat.onPlayerActivated)
     AutoCat.evtmgr:registerEvt(EVENT_ADD_ON_UNLOADED, function(...) AutoCat:OnAddOnUnloaded(...) end)
+
+    loadSavedVars()
+
+	AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
+
+    AutoCat.LoadCollapse()
+
+	-- Set up the context menu item for AutoCategory
+	setupContextMenu()
+
+	-- hooks
+	AutoCat.HookGamepadMode()
+	AutoCat.HookKeyboardMode()
+	--[[
+    --]]
+
 end
 
 -- -------------------------------------------------------------------------
@@ -825,14 +843,15 @@ function AutoCat.onPlayerActivated()
 
     assertBagRuleMixins()
 
-    AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
-	AutoCat.LoadCollapse()
+    --AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
+
+	--AutoCat.LoadCollapse()
 	-- Set up the context menu item for AutoCategory
-	setupContextMenu()
+	--setupContextMenu()
 
 	-- hooks
-	AutoCat.HookGamepadMode()
-	AutoCat.HookKeyboardMode()
+	--AutoCat.HookGamepadMode()
+	--AutoCat.HookKeyboardMode()
 
 	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCat.BulkMode = false end)
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCat.BulkMode = false end)
