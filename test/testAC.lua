@@ -224,9 +224,6 @@ function AutoCategory.RuleFunc.SpecializedItemType( ... )
 		if not arg then
 			error( string.format("error: %s():  argument is nil." , fn))
 		end
-		--local itemLink = GetItemLink(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
-		--local _, sptype = GetItemLinkItemType(itemLink)
-        --local rslt = isKnown(arg, sptype, fn, specializedItemTypeMap)
         local rslt = isKnown(arg, spmap[arg], fn, spmap)
         if rslt then return rslt end
 	end

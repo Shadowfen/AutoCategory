@@ -2,9 +2,6 @@
 
 local L = GetString
 local SF = LibSFUtils
---local AC = AutoCategory
-
---local RuleApi = AutoCategory.RuleApi
 
 -- -------------------------------------------------------
 -- The CVT class manages the choices, choicesValues, and
@@ -676,6 +673,7 @@ function AutoCategory.BagRuleList.addBagRule(self, newRule, overwriteFlag)
 end
 --]]
 
+--[[
 -- -------------------------------------------------
 -- collected functions to be applied to a rule
 --
@@ -874,7 +872,4 @@ local bagRuleApi = {
 }
 -- make accessible
 AutoCategory.BagRuleApi = bagRuleApi
-
-function AutoCategory.AC_Classes_Init()
-
-end
+--]]

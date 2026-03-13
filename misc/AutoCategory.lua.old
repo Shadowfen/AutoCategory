@@ -819,7 +819,6 @@ function AutoCat.onPlayerActivated()
 	AutoCat.initializePlugins()
 	AutoCat.cacheInitialize()
 	AutoCat.AddonMenu_Init()
-	AutoCat.AC_Classes_Init()
 	AutoCat.Inited = true -- put back in for BetterUI users, AutoCategory itself does not use this.
 end
 
