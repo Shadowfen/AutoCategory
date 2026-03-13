@@ -5,8 +5,13 @@ local SF = LibSFUtils
 local AutoCat = AutoCategory
 
 local CVT = AutoCategory.CVT
---local RuleApi = AutoCategory.RuleApi
 local ac_rules = AutoCategory.RulesW
+
+-- restore a version of d() that is not captured by libDebugLogger
+local sysd = function(msg)
+    CHAT_ROUTER:AddSystemMessage(msg)
+end
+
 
 ----------------------
 -- Lists and variables
@@ -84,8 +89,7 @@ function AutoCat.RulesW:CompileAll()
             -- Mark the rule as damaged so UI can highlight it
             rule.damaged = true
             rule.err     = err
-            logDebug("[AutoCategory] Rule compile error for '%s': %s",
-                rule.name, err)
+            logDebug("[AutoCategory] Rule compile error for '%s': %s", rule.name, err)
         end
     end
 end
@@ -576,7 +580,7 @@ local function setupContextMenu()
 		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
 		local itemId = GetItemId(bagId, slotIndex)
 		local name = GetItemName(bagId, slotIndex)
-		CHAT_ROUTER:AddSystemMessage("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
+		sysd("[AC] "..tostring(name).."   itemId = "..tostring(itemId))
 	end
 	local function AC_AddMenuItem(rowControl, slotActions)
 		local bagId, slotIndex = ZO_Inventory_GetBagAndIndex(rowControl)
@@ -708,30 +712,6 @@ local function addTableRules(tbl, tblname, ispredef)
     end
 end
 
---[[
-local function pruneUserRules()
-	logDebug ("[AutoCategory] Executing pruneUserRules ")
-	local arrules = AutoCategory.ARW.ruleList --AutoCategory.acctRules.rules
-	local lkacctRules = AutoCategory.ARW:getLookup()
-	for k = #arrules,1,-1 do
-		local ndx = lkacctRules[arrules[k].name]
-		if  ndx and k ~= ndx then
-			logDebug ("[AutoCategory] Removing duplicate rule ", arrules[k].name, " from acctRules")
-			AutoCategory.ARW.removeRule(ndx)
-			--table.remove(arrules, k)
-		end
-	end
-
-	-- remove predefined rules from acctRules
-	for k = #AutoCategory.predefinedRules,1,-1 do
-		local ndx = lkacctRules[AutoCategory.predefinedRules[k].name]
-		logDebug ("[AutoCategory] Removing predefined rule ", AutoCategory.predefinedRules[k].name, " from acctRules")
-		AutoCategory.ARW:removeRule(ndx)
-		--table.remove(arrules, k)
-	end
-end
---]]
-
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
 	logDebug ("[AutoCategory] Executing loadPluginPredefines ")
@@ -803,9 +783,6 @@ function AutoCat.onLoad(event, addon)
 	-- hooks
 	AutoCat.HookGamepadMode()
 	AutoCat.HookKeyboardMode()
-	--[[
-    --]]
-
 end
 
 -- -------------------------------------------------------------------------
@@ -843,16 +820,6 @@ function AutoCat.onPlayerActivated()
 
     assertBagRuleMixins()
 
-    --AutoCat.ARW = AutoCat.RuleList:New(AutoCat.acctRules.rules)
-
-	--AutoCat.LoadCollapse()
-	-- Set up the context menu item for AutoCategory
-	--setupContextMenu()
-
-	-- hooks
-	--AutoCat.HookGamepadMode()
-	--AutoCat.HookKeyboardMode()
-
 	evtmgr:registerEvt(EVENT_CLOSE_GUILD_BANK, function () AutoCat.BulkMode = false end)
 	evtmgr:registerEvt(EVENT_CLOSE_BANK, function () AutoCat.BulkMode = false end)
 
@@ -869,7 +836,6 @@ function AutoCat.onPlayerActivated()
 	loadPluginPredefines()
 	local pd = { rules = AutoCat.predefinedRules, }
 	addTableRules(pd, ".predefinedRules", true)
-	--pruneUserRules()
 
 	addTableRules(AutoCat.acctRules, ".acctRules", false)
 	addTableRules(AutoCat.acctSaved, ".acctSaved", false)
@@ -982,12 +948,10 @@ function AutoCat.RefreshCurrentList(even_if_hidden)
 		refreshList(k, even_if_hidden) 
 	end
 end
--- create local alias for references within this file
 
 -- -----------------------------------------------
 -- used only for AC_ItemRowHeader functions
 local function getBagTypeId(header)
-	--SF.dTable(header,5,"getBagTypeId - header")
 	local bagTypeId = header.slot.dataEntry.data.AC_bagTypeId
     if not bagTypeId then
 		bagTypeId = header.slot.dataEntry.AC_bagTypeId
@@ -1098,10 +1062,10 @@ function AC_Binding_ToggleCategorize()
     AutoCat.Enabled = not AutoCat.Enabled
     if AutoCat.acctSaved.general["SHOW_MESSAGE_WHEN_TOGGLE"] then
         if AutoCat.Enabled then
-            d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON))
+            sysd(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_ON))
 
         else
-            d(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF))
+            sysd(L(SI_MESSAGE_TOGGLE_AUTO_CATEGORY_OFF))
         end
     end
     AutoCat.RefreshCurrentList()
