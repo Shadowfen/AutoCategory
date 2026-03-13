@@ -38,7 +38,7 @@ function AutoCategory_ItemSaver.RuleFunc.IsMarkedIS( ... )
 		end
 		checkSets[arg]=true
 	end
-	local ismarked, setname = ItemSaver_IsItemSaved(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local ismarked, setname = ItemSaver_IsItemSaved(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 	if ismarked == true then
 		if ac > 0 then
 			if checkSets[setname] ~= nil then

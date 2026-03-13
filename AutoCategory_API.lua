@@ -118,10 +118,6 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
     self.checking.SlotIndex = slotIndex
     self.checking.ItemLink = GetItemLink(bagId, slotIndex)
 
-    self.checkingItemBagId = bagId
-	self.checkingItemSlotIndex = slotIndex
-	self.checkingItemLink = GetItemLink(bagId, slotIndex)
-
 	local bag_type_id = convert2BagTypeId(bagId, specialType)
 	if not bag_type_id then
 		-- invalid bag
@@ -139,7 +135,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 			-- just use declared category name
 			return name
 
-		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false or self.checkingItemBagId == BAG_FURNITURE_VAULT then
+		elseif AutoCategory.saved.general["SHOW_CATEGORY_SET_TITLE"] == false or self.checking.BagId == BAG_FURNITURE_VAULT then
 			-- just use the set name without the category name
 			return enhancement
 

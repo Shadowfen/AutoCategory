@@ -784,10 +784,10 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	end
 
 	if #checkIconIds > 0 then
-		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, checkIconIds)
+		return FCOIS.IsMarked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex, checkIconIds)
 
 	else
-		return FCOIS.IsMarked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex, -1)
+		return FCOIS.IsMarked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex, -1)
 	end
 end
 
@@ -798,7 +798,7 @@ function AutoCategory_FCOIS.RuleFunc.IsFCOISProtected( ... )
 		return false
 	end
 	
-	return FCOIS.IsLocked(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	return FCOIS.IsLocked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 end
 
 -- Implement fco_isgear() check function for FCOIS
@@ -808,7 +808,7 @@ function AutoCategory_FCOIS.RuleFunc.IsFCOISGear( ... )
 		return false
 	end
 	
-	return FCOIS.IsGear(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	return FCOIS.IsGear(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 end
 
 AutoCategory.RegisterPlugin("FCOIS", AutoCategory_FCOIS.Initialize, AutoCategory_FCOIS.predefinedRules)

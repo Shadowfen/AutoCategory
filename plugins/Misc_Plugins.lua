@@ -80,7 +80,7 @@ function AutoCategory_MiscAddons.Initialize()
 end
 
 local function getCurrentItemLink()
-	return GetItemLink(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+	return GetItemLink(AC.checking.BagId, AC.checking.SlotIndex)
 end
 
 -- Implement getpricemm() check function for Master Merchant
@@ -162,7 +162,7 @@ function AutoCategory_MiscAddons.RuleFunc.AlphaGear( ... )
 		error( string.format("error: %s(): require arguments." , fn))
 	end
 	
-	local uid = Id64ToString(GetItemUniqueId(AC.checkingItemBagId, AC.checkingItemSlotIndex))
+	local uid = Id64ToString(GetItemUniqueId(AC.checking.BagId, AC.checking.SlotIndex))
 	if not uid then return false end
 
 	for ax = 1, ac do 
@@ -213,7 +213,7 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
     checkSets[arg]=true
   end
   
-  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AC.checkingItemBagId, AC.checkingItemSlotIndex)
+  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AC.checking.BagId, AC.checking.SlotIndex)
   if iTrackIndex >= 0 then
     if ac > 0 then
       if checkSets[sTrackName] ~= nil then

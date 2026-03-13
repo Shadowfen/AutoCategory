@@ -40,11 +40,9 @@ function AutoCategory_ItemMarker.RuleFunc.IsMarkedIM( ... )
 		checkMarks[arg]=true
 	end
 	
-    local checkingItemBagId = AutoCategory.checkingItemBagId
-    local checkingItemSlotIndex = AutoCategory.checkingItemSlotIndex
-	local ismarked, markName = ItemMarker_IsItemMarked(checkingItemBagId,
-										checkingItemSlotIndex)
-    --local name = GetItemName(checkingItemBagId, checkingItemSlotIndex)
+    local checkingBagId = AutoCategory.checking.BagId
+    local checkingSlotIndex = AutoCategory.checking.SlotIndex
+	local ismarked, markName = ItemMarker_IsItemMarked(checkingBagId, checkingSlotIndex)
 	if ismarked == true then
 		if ac > 0 then
 			if checkMarks[markName] then

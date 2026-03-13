@@ -57,7 +57,7 @@ function AutoCategory_DressingRm.RuleFunc.InSet( ... )
         end
 
         if set <= #gearSet then
-            local itemId = GetItemUniqueId(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+            local itemId = GetItemUniqueId(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
             for item, _ in pairs(gearSet[set]) do
                 if item == Id64ToString(itemId) then
                     return true

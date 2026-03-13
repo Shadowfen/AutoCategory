@@ -279,7 +279,7 @@ function AutoCategory_Iakoni.RuleFunc.SetIndex( ... )
 
 	local fn = "setindex"
 
-	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 	for _, arg in iter_args(...) do
 
 		local comIndex = -1
@@ -311,7 +311,7 @@ function AutoCategory_Iakoni.RuleFunc.InSet( ... )
 	--local fn = "inset"
 	if not GearChangerByIakoni then return false end
 
-	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checkingItemBagId, AutoCategory.checkingItemSlotIndex)
+	local setIndices = IakoniGearChanger_GetGearSet(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 	return #setIndices ~= 0
 end
 
