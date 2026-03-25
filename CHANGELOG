@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"]4.6.4 (144)[/COLOR]
+[LIST]
+[*] Fixed nil value error in Category Settings options.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.6.3 (143)[/COLOR]
 [LIST]
 [*] Fixed iscrafted() bug reported by Federale.

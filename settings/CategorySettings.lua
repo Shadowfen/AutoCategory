@@ -7,6 +7,7 @@ local logDebug = AutoCategory.logDebug
 
 
 local auBagSet = AC_UI.BagSet
+local emptyValueTbl = {}        -- for CVT select() to select first
 
 local CatSet_SelectTag_LAM = AC.BaseDD:New("AC_DROPDOWN_EDITRULE_TAG") -- only uses choices
 -- Make accessible to BagSet
@@ -89,7 +90,6 @@ local function checkKeywords(str)
          end
          if found == false then
              result[#result+1] = w
-             --table.insert(result, w)
          end
      end
     return result
@@ -205,7 +205,7 @@ function CatSet_SelectRule_LAM:refresh()
 		self:select(oldndx)
 	end
 	if self:getValue() == nil then
-		self:select({})	-- select first
+		self:select(emptyValueTbl)	-- select first
 	end
 end
 
@@ -516,7 +516,7 @@ function CatSet_DeleteCat_LAM:execute()
 	end)
 	AC_UI.BagSet_SelectRule_LAM.cvt:removeItemChoiceValue(oldRuleName)
 	if AC_UI.BagSet_SelectRule_LAM:getValue() == nil and AC_UI.BagSet_SelectRule_LAM:size() > 0 then
-		AC_UI.BagSet_SelectRule_LAM:select({}) 	-- select first
+		AC_UI.BagSet_SelectRule_LAM:select(emptyValueTbl) 	-- select first
 	end
 	AC_UI.BagSet_SelectRule_LAM:refresh()
 
@@ -524,7 +524,7 @@ function CatSet_DeleteCat_LAM:execute()
 	currentRule = nil
 	CatSet_SelectRule_LAM:clearIndex()
 	if CatSet_SelectRule_LAM:size() > 0 then
-		CatSet_SelectRule_LAM:select({})
+		CatSet_SelectRule_LAM:select(emptyValueTbl)
 	end
 
 	AutoCategory.cacheBagInitialize()
