@@ -1,3 +1,16 @@
+[COLOR="DeepSkyBlue"]4.6.3 (143)[/COLOR]
+[LIST]
+[*] Fixed iscrafted() bug reported by Federale.
+[*] More optimizations to HookKeyboard to speed up inventory (especially with guild banks).
+[*] Limited caching of retrieved inventory item information.
+[*] "Uplifted" table creation to reduce the number of times that tables get created (performance optimization).
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.6.2 (142)[/COLOR]
+[LIST]
+[*] Implemented atharti's recommended performance improvements in HookKeyboard.lua.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.6.1 (141)[/COLOR]
 [LIST]
 [*] Reenabled integration with the addon GridList.

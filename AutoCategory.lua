@@ -518,20 +518,23 @@ function AutoCat.GetRuleByName(name)
     return ac_rules.ruleList[ndx]
 end
 
--- find and return the bagrule referenced by name
 function AutoCat.GetBagRuleByName(bagId, name)
-    if not name then
+    if not name then return nil, nil end
+    local bagrules = cache.entriesByShowBag[bagId]
+    if not bagrules then return nil end
+    
+    -- Check if rule still exists in main list
+    if not ac_rules.ruleNames[name] then
+        -- Stale entry detected - trigger cleanup for this bag
+        AutoCat.RebuildBagCache(bagId)
         return nil, nil
     end
-
-	local bagrules = AutoCat.cache.entriesByShowBag[bagId]
-	if not bagrules then return nil end
-	local ndx = ZO_IndexOfElementInNumericallyIndexedTable(
-			bagrules.choicesValues, name)
-    if not ndx then
-        return nil, nil
-    end
-
+    
+    -- Normal lookup
+    local ndx = ZO_IndexOfElementInNumericallyIndexedTable(
+        bagrules.choicesValues, name)
+    if not ndx then return nil, nil end
+    
     return bagrules.bagrules[ndx], ndx
 end
 
@@ -869,45 +872,71 @@ local inven_data = {
 	[INVENTORY_BACKPACK] = {
 		object = ZO_PlayerInventory,
 		control = ZO_PlayerInventory,
+        listView = ZO_PlayerInventoryList,
+        ac_bag = AC_BAG_TYPE_BACKPACK,
+        zos_bag = BAG_BACKPACK,
 	},
 
 	[INVENTORY_CRAFT_BAG] = {
 		object = ZO_CraftBag,
 		control = ZO_CraftBag,
+        listView = ZO_CraftBagList,
 	},
 
 	[INVENTORY_GUILD_BANK] = {
 		object = ZO_GuildBank,
 		control = ZO_GuildBank,
+        listView = ZO_GuildBankBackpack,
+        ac_bag = AC_BAG_TYPE_GUILDBANK,
+        zos_bag = BAG_GUILDBANK,
 	},
 
-	[INVENTORY_HOUSE_BANK] = {
+	[INVENTORY_HOUSE_BANK] = {  -- for house banks 1-10
 		object = ZO_HouseBank,
 		control = ZO_HouseBank,
+        listView = ZO_HouseBankBackpack,
+        ac_bag = AC_BAG_TYPE_HOUSEBANK,
+        --zos_bag = BAG_HOUSE_BANK_ONE,
 	},
 
 	[INVENTORY_BANK] = {
 		object = ZO_PlayerBank,
 		control = ZO_PlayerBank,
+        listView = ZO_PlayerBankBackpack,
+        ac_bag = AC_BAG_TYPE_BANK,
+        zos_bag = BAG_BANK,
 	},
 
 	[INVENTORY_FURNITURE_VAULT] = {
 		object = ZO_FurnitureVault,
 		control = ZO_FurnitureVault,
+        listView = ZO_FurnitureVaultList,
+        ac_bag = AC_BAG_TYPE_FURNVAULT,
+        zos_bag = BAG_FURNITURE_VAULT,
 	},
+    [INVENTORY_VENGEANCE] = {
+        object = ZO_VengeanceInventory,
+        control = ZO_VengeanceInventory,
+        listView = ZO_VengeanceInventoryList,
+        ac_bag = AC_BAG_TYPE_VENGEANCE,
+        zos_bag = BAG_VENGEANCE,
+    },
 
 	[AC_DECON] = {
 		object = SMITHING.deconstructionPanel.inventory,
 		control = SMITHING.deconstructionPanel.control,
+        listView = SMITHING.deconstructionPanel.inventory.list,
 	},
 	[AC_IMPROV] = {
 		object = SMITHING.improvementPanel.inventory,
 		control = SMITHING.improvementPanel.control,
+        listView = SMITHING.improvementPanel.inventory.list,
 	},
 
 	[UV_DECON] = {
 		object = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.inventory,
 		control = UNIVERSAL_DECONSTRUCTION.deconstructionPanel.control,
+        listView = ZO_UniversalDeconstructionTopLevel_KeyboardPanelInventoryBackpack,
 	},
 }
 

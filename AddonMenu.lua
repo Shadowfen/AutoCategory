@@ -50,12 +50,6 @@ function AC_UI.RefreshControls()
 
 	RCPending = true
     updtCB:Start()
-	--[[zo_callLater(function()
-		auBagSet.updateControls()
-		auCatSet.updateControls()
-		RCPending = false
-	end, waitTime)
-    --]]
 end
 
 
