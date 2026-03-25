@@ -74,6 +74,7 @@ AC_UI.BagSet = {}
 
 local currentBagRule = nil
 local currentRule = nil
+local emptyValueTbl = {}        -- for CVT select() to select first
 
 local function CatSet_DisplayRule(rule)
 	AC_UI.CatSet_SelectTag_LAM:refresh()
@@ -283,7 +284,7 @@ function BagSet_SelectRule_LAM:refresh(bagId)
 		self:assign(dataCurrentRules_EditBag)
 	end
 	if not ndx then 
-		self:select({})
+		self:select(emptyValueTbl)
 	else
 		self:select(ndx)
 	end
@@ -347,7 +348,7 @@ function BagSet_ShowRule_LAM:refresh(bagId)
 		self:assign(dataCurrentRules_EditBag)
 	end
 	if not ndx then 
-		self:select({})
+		self:select(emptyValueTbl)
 	else
 		self:select(ndx)
 	end
@@ -601,7 +602,7 @@ function bagSet_RemoveCat_LAM:execute()
 	end
 	BagSet_SelectRule_LAM.cvt:removeItemChoiceValue(ruleName)
 	if BagSet_SelectRule_LAM:getValue() == nil and BagSet_SelectRule_LAM:size() > 0 then
-		BagSet_SelectRule_LAM:select({}) 	-- select first
+		BagSet_SelectRule_LAM:select(emptyValueTbl) 	-- select first
 	end
 
 	AutoCategory.cacheBagInitialize()
@@ -1125,7 +1126,7 @@ function AC_UI.BagSet.Init()
 	BagSet_SelectBag_LAM:assign(AutoCategory.cache.bags_cvt)
 	AC_UI.AddCat_SelectTag_LAM:assign( { choices=AutoCategory.RulesW.tags } )
 
-	BagSet_SelectBag_LAM:select({})
+	BagSet_SelectBag_LAM:select(emptyValueTbl)
 
     -- AddCat_SelectRule_LAM will get populated by RefreshDropdownData()
 	AddCat_SelectRule_LAM:clear()
