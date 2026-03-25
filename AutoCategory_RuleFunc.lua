@@ -753,7 +753,7 @@ end
 
 function AutoCategory.RuleFunc.IsCrafted( ... )
 	--local fn = "iscrafted"
-	local itemLink = AutoCategory.ItemLink
+	local itemLink = AutoCategory.checking.ItemLink
 	local itemType = GetItemLinkItemType(itemLink)
     if (itemType == ITEMTYPE_POTION or itemType == ITEMTYPE_POISON) then
         return select(24, ZO_LinkHandler_ParseLink(itemLink)) ~= "0"

@@ -87,7 +87,7 @@ end
 function AutoCategory_MiscAddons.RuleFunc.GetPriceMM( ... )
 	--local fn = "mm_getprice"
 	if MasterMerchant then
-		local itemLink = getCurrentItemLink()
+		local itemLink = AC.checking.ItemLink   --getCurrentItemLink()
 		local mmData = MasterMerchant:itemStats(itemLink, false)
         if (mmData.avgPrice ~= nil) then
             return mmData.avgPrice
@@ -100,7 +100,7 @@ end
 function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
 	--local fn = "ttc_getprice"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
-		local itemLink = getCurrentItemLink()
+		local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then 
 			local ac = select( '#', ... ) 
@@ -142,7 +142,7 @@ end
 function AutoCategory_MiscAddons.RuleFunc.GetAmountTTC( ... )
 	--local fn = "ttc_getamount"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
-		local itemLink = getCurrentItemLink()
+		local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then
 			return priceInfo.AmountCount
@@ -248,7 +248,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		return false
 	end
 	
-	local itemLink = getCurrentItemLink()
+	local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
 	--local cat = LCK.GetItemCategory(itemLink)
 	
 	--local server = zo_strsplit(" ", GetWorldName())[1]
@@ -285,7 +285,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnownCat( ... )
 	end
 
 	-- check if item is in one of CK's defined categories
-	local itemLink = getCurrentItemLink()
+	local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
 	local cat = LCK.GetItemCategory(itemLink)
 	if cat == LCK.ITEM_CATEGORY_NONE then return false end
 	

@@ -197,7 +197,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsUnknown( ... )
     local characters = getCharList(...)
 
     -- find out who knows it (if UT display setting is true)
-    local itemLink = GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
+    local itemLink = AutoCategory.checking.ItemLink --GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
     if not itemLink then return false end
 
 	-- it is an item that can be learned
@@ -240,7 +240,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsMotifUnknown( ... )
     local characters = getCharList(...)
 
     -- are we interested in the item?
-    local itemLink = GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
+    local itemLink = AutoCategory.checking.ItemLink --GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
     if not itemLink then return false end
     local itemType, sptype = GetItemLinkItemType(itemLink)
     if itemType ~= ITEMTYPE_RACIAL_STYLE_MOTIF then return false end
@@ -272,7 +272,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsFurnishingUnknown( ... )
     local characters = getCharList(...)
     
     -- are we interested in the item?
-    local itemLink = GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
+    local itemLink = AutoCategory.checking.ItemLink     --GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
     if not itemLink then return false end
 	
     local itemType, sptype = GetItemLinkItemType(itemLink)
@@ -292,7 +292,7 @@ function AutoCategory_UnknownTracker.RuleFunc.UT_IsStyleUnknown( ... )
     local characters = getCharList(...)
     
     -- are we interested in the item?
-    local itemLink = GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
+    local itemLink = AutoCategory.checking.ItemLink --GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
     if not itemLink then return false end
     local _, sptype = GetItemLinkItemType(itemLink)
     if sptype ~= SPECIALIZED_ITEMTYPE_COLLECTIBLE_STYLE_PAGE then return false end
