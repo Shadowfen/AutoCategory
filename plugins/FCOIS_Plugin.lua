@@ -735,14 +735,13 @@ local function GetFCOISIconText( iconId )
 end
 
 -- Implement fco_ismarked() check function for FCOIS
-local fcois_checkIconIds = {}
 function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 	local fn = "fco_ismarked"
 	if FCOIS == nil then
 		return false
 	end
 	local ac = select( '#', ... ) 
-	fcois_checkIconIds = SF.safeClearTable(fcois_checkIconIds)
+	local checkIconIds = {}
 	local additionalName = ""
 	for ax = 1, ac do
 
@@ -751,7 +750,7 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 		if arg then
             local t_arg = type(arg)
             if t_arg == "number" then
-                table.insert(fcois_checkIconIds, arg)
+                table.insert(checkIconIds, arg)
 
             elseif t_arg == "string" then
                 local v = markedTypeMap[string.lower( arg )]
@@ -765,14 +764,14 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 
 	end
 	
-	if #fcois_checkIconIds ~= 0 then  
+	if #checkIconIds ~= 0 then  
 
-		for i = 1, #fcois_checkIconIds do
-			local v = fcois_checkIconIds[i]
+		for i = 1, #checkIconIds do
+			local v = checkIconIds[i]
 			local iconText = GetFCOISIconText(v)
             if iconText and iconText ~= "" then
 				additionalName = additionalName .. iconText
-				if i ~= #fcois_checkIconIds then
+				if i ~= #checkIconIds then
 					additionalName = additionalName .. ", "
 				end
 			end
@@ -784,8 +783,8 @@ function AutoCategory_FCOIS.RuleFunc.IsMarked( ... )
 		AutoCategory.AdditionCategoryName = additionalName
 	end
 
-	if #fcois_checkIconIds > 0 then
-		return FCOIS.IsMarked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex, fcois_checkIconIds)
+	if #checkIconIds > 0 then
+		return FCOIS.IsMarked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex, checkIconIds)
 
 	else
 		return FCOIS.IsMarked(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex, -1)
