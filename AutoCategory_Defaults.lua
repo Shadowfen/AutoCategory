@@ -224,7 +224,14 @@ AutoCategory.predefinedRules =  {
 		["name"] = L(SI_AC_DEFAULT_CATEGORY_MASTER_WRITS),
 		["description"] = "",
 		["pred"] = 1,
-	}
+	},
+	{
+		["rule"] = "sptype(\"siege_ballista\", \"siege_battle_standard\", \"siege_catapult\", \"siege_oil\", \"siege_ram\", \"siege_trebuchet\", \"siege_lancer\", \"siege_graveyard\", \"siege_universal\", \"recall_stone_keep\", \"ava_repair\")",
+		["tag"] = L(SI_AC_DEFAULT_TAG_GENERAL_ITEMS),
+		["name"] = L(SI_AC_DEFAULT_CATEGORY_CYRODIIL),
+		["description"] = "",
+	},
+
 }
 
 AutoCategory.defaultCollapses = {
@@ -235,6 +242,7 @@ AutoCategory.defaultCollapses = {
         [AC_BAG_TYPE_CRAFTSTATION] = {},
         [AC_BAG_TYPE_HOUSEBANK] = {},
         [AC_BAG_TYPE_FURNVAULT] = {},
+        [AC_BAG_TYPE_VENGEANCE] = {},
     }
 
 AutoCategory.defaultSettings = {
@@ -259,7 +267,10 @@ AutoCategory.defaultSettings = {
 		},
 		[AC_BAG_TYPE_FURNVAULT] = {
 			rules = {},
-		}
+		},
+		[AC_BAG_TYPE_VENGEANCE] = {
+			rules = {},
+		},
 	}, 
     collapses = AutoCategory.defaultCollapses,
 	accountWide = true,
@@ -908,6 +919,31 @@ AutoCategory.defaultAcctBagSettings = {
 				["name"] = L(SI_AC_DEFAULT_CATEGORY_FURNISHING),
 			},
 		},
+		[AC_BAG_TYPE_VENGEANCE] = {
+			rules = {
+						{
+							["showpriority"] = 1000,
+							["name"] = "Cyrodiil",
+							["runpriority"] = 1000,
+						},
+						{
+							["showpriority"] = 900,
+							["name"] = "Armor",
+							["runpriority"] = 900,
+						},
+						{
+							["showpriority"] = 800,
+							["name"] = "Weapon",
+							["runpriority"] = 800,
+						},
+						{
+							["showpriority"] = 500,
+							["name"] = "Consumables",
+							["runpriority"] = 500,
+						},
+			},
+		}
+
 	}, 
 }
 

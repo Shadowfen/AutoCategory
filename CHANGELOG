@@ -1,3 +1,18 @@
+[COLOR="DeepSkyBlue"]4.6.8 (148)[/COLOR]
+[LIST]
+[*] Fix unorganized inventory for house banks.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.6.7 (147)[/COLOR]
+[LIST]
+[*] Fix unorganized inventory for selling to the fence.
+[/LIST]
+
+[COLOR="DeepSkyBlue"]4.6.6 (146)[/COLOR]
+[LIST]
+[*] Fix nil errors from opening inventory in Cyrodiil Vengeance.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.6.5 (145)[/COLOR]
 [LIST]
 [*] Revert changes to the FCOIS plugin.

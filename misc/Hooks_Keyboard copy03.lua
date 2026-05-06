@@ -1,3 +1,32 @@
+--[[
+CHANGE DETECTION STRATEGY
+This file uses hooks on API functions: 
+	PLAYER_INVENTORY:ApplySort, 
+	SMITHING.deconstructionPanel.inventory:SortData, and 
+	SMITHING.improvementPanel.inventory:SortData 
+to order items in categories, in all inventories (including crafting station)
+This process involves executing all active rules for each items, and can be 
+triggered multiple times in a row, notably for bank transfers (more than ten calls)
+In order to reduce the impact of the add-on:
+	1 - The results of rules' execution are stored in 'itemEntry.data'.
+		As 'itemEntry.data' is persistent, results can be reused directly 
+		without having to re-execute all the rules every time.
+		However, 'itemEntry.data' will not persist forever and will be reset 
+		at some point, and rules will need to be re-executed, but this is not much of an issue.
+
+	2 - A change detection strategy is used to re-execute rules when necessary.
+		A hash for each item is used to trigger re-execution of rules for a single item based on:
+			- Time, as a safety net, in case a change were missed for any reason: 
+				test if the results stored are older than 2 seconds
+			- Base game data: test various variables like isPlayerLocked, brandNew, 
+				isInArmory etc.
+			- FCOIS data: test if item's marks have changed
+
+		Some API events are monitored:
+			- A hook on PLAYER_INVENTORY:OnInventorySlotUpdated triggers re-execution of rules for a single item
+			- The event EVENT_STACKED_ALL_ITEMS_IN_BAG is used so re-execution of rules with inventory refresh can be triggered manually by stacking all items.
+]]
+
 
 local LMP = LibMediaProvider
 local SF = LibSFUtils
@@ -216,6 +245,7 @@ local function createHeaderEntry(catInfo)
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
 			stackLaunderPrice = 0})
+	--return headerEntry
 end
 -- ---------------------------------------------------
 
@@ -491,40 +521,14 @@ local function createNewScrollData(scrollData)
 	-- Create headers and append to newScrollData
 	for _, catInfo in pairs(cnsd_categoryList) do ---> add tracked categories
 		if catInfo.AC_catCount ~= nil then
-			logDebug("[Keyboard] catinfo: ", ". ", catInfo.AC_sortPriorityName)
+			--logDebug("[Keyboard] catinfo: ", ". ", catInfo.AC_sortPriorityName)
 			local headerEntry = createHeaderEntry(catInfo)
-			logDebug("[Keyboard] hdr: ", ". ", headerEntry.data.AC_sortPriorityName)
+			--logDebug("[Keyboard] hdr: ", ". ", headerEntry.data.AC_sortPriorityName)
 			if headerEntry then
 				table.insert(newScrollData, headerEntry)
 			end
 		end
 	end
-	
-	-- Ensure all entries have required sort fields to prevent nil errors
-	for _, entry in ipairs(newScrollData) do
-		if entry.data then
-			if entry.data.AC_isHeader then
-				-- Headers need all sort fields since any could be used as primary sort or tiebreaker
-				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
-				if entry.data.age == nil then entry.data.age = 0 end
-				if entry.data.name == nil then entry.data.name = entry.data.AC_categoryName or "" end
-				if entry.data.stackCount == nil then entry.data.stackCount = 0 end
-				if entry.data.slotIndex == nil then entry.data.slotIndex = 0 end
-				if entry.data.quality == nil then entry.data.quality = 0 end
-				if entry.data.displayQuality == nil then entry.data.displayQuality = 0 end
-				if entry.data.stackSellPrice == nil then entry.data.stackSellPrice = 0 end
-				if entry.data.statValue == nil then entry.data.statValue = 0 end
-				if entry.data.traitInformationSortOrder == nil then entry.data.traitInformationSortOrder = 0 end
-				if entry.data.sellInformationSortOrder == nil then entry.data.sellInformationSortOrder = 0 end
-				if entry.data.ptValue == nil then entry.data.ptValue = 0 end
-			else
-				-- Ensure regular items also have these fields if missing
-				if entry.data.statusSortOrder == nil then entry.data.statusSortOrder = 0 end
-				if entry.data.age == nil then entry.data.age = 0 end
-			end
-		end
-	end
-	
 	return newScrollData
 end
 
@@ -551,41 +555,9 @@ local function rebuildScrollData(zo_inventory)
 	end
 end
 
-local sceneMap = {
-    ["inventory"] = true,
-    ["bank"] = true,
-    ["guildBank"] = true,
-    ["guildStore"] = true,
-    ["smithing"] = true,
-    ["tradinghouse"] = true,
-    ["store"] = true,
-    ["universalDeconstructionSceneKeyboard"] = true,
-	["mailSend"] = true,
-	["fence_keyboard"] = true,
-	["fence_gamepad"] = true,
-	["houseBank"] = true,
-	["furnitureVault"] = true,
-}
-local function readyToUpdate()
-    local currentScene
-	if SCENE_MANAGER then
-		currentScene = SCENE_MANAGER:GetCurrentScene()
-		if currentScene then
-			local sceneName = currentScene:GetName()
-            if sceneMap[sceneName] == true then
-                return true, sceneName
-            end
-		end
-	end
-    return false, currentScene
-end
-
 -- prehook
 local function prehookSort(self, inventoryType) 
 	if not AutoCategory.Enabled then return false end
-
-    local isReady, sceneName = readyToUpdate()
-    if not isReady then return false end
 
 	-- revert to default behaviour if safety conditions not met
 	if inventoryType == INVENTORY_QUEST_ITEM then return false end
@@ -601,31 +573,23 @@ local function prehookSort(self, inventoryType)
 									zo_inventory.currentSortOrder)
 		end
 
-	--[[
-	local ldata = left.data
-	local rdata = right.data
-	
-	-- Ensure headers have required sort fields to prevent nil errors
-	if ldata.AC_isHeader then
-		if ldata.statusSortOrder == nil then ldata.statusSortOrder = 0 end
-		if ldata.age == nil then ldata.age = 0 end
+	-- from nogetrandom
+	local scene
+	if SCENE_MANAGER and SCENE_MANAGER:GetCurrentScene() then
+		scene = SCENE_MANAGER:GetCurrentScene():GetName()
 	end
-	if rdata.AC_isHeader then
-		if rdata.statusSortOrder == nil then rdata.statusSortOrder = 0 end
-		if rdata.age == nil then rdata.age = 0 end
-	end
-	--]]
 
-    if sceneName then
+    if scene then
 		if AutoCategory.BulkMode then
-			if sceneName == "guildBank" or (XLGearBanker and sceneName == "bank") then
+			if scene == "guildBank" or (XLGearBanker and scene == "bank") then
 				return false	-- skip out early
 			end
 		end
 	end
 	-- end nogetrandom recommend 
 
-	if sceneName == "bank" or sceneName == "guildBank" then
+	local needsReload = true
+	if scene == "bank" or scene == "guildBank" then
 		needsReload = false
 	end
 
@@ -639,10 +603,7 @@ local function prehookCraftSort(self)
 	-- revert to default behaviour if safety conditions not met
 	if not AutoCategory.Enabled then return false end
 
-    local isReady = readyToUpdate()
-    if not isReady then return false end
-
-    --change sort function
+	--change sort function
 	self.sortFunction = function(left, right) 
 			return sortInventoryFn(self, left, right, self.sortKey, self.sortOrder)
 		end
@@ -666,19 +627,22 @@ local callLater         -- the calllater object for controlling single-shot star
 -- clear out pending entries that are older than 15 seconds - they are hung
 local function cleanupPendingUpdates()
     updateCounter = updateCounter + 1
-    if updateCounter < CLEANUP_THRESHOLD then return end
-    
-    updateCounter = 0
-
-    -- Clean old entries from pendingUpdates
-    local currentTime = os.clock()
-    local cleaned = 0
-    for uid, timestamp in pairs(pendingUpdates) do
-        -- If entry is older than 15 seconds, remove it
-        if currentTime - timestamp > 15 then
-            pendingUpdates[uid] = nil
-            cleaned = cleaned + 1
+    if updateCounter >= CLEANUP_THRESHOLD then
+        -- Clean old entries from pendingUpdates
+        local currentTime = os.clock()
+        local cleaned = 0
+        for uid, timestamp in pairs(pendingUpdates) do
+            -- If entry is older than 15 seconds, remove it
+            if currentTime - timestamp > 15 then
+                pendingUpdates[uid] = nil
+                cleaned = cleaned + 1
+            end
         end
+        if cleaned > 0 then
+            -- Optional: log for debugging
+            logDebug("[Keyboard] Cleaned " .. cleaned .. " stale rule reload entries")
+        end
+        updateCounter = 0
     end
 end
 
@@ -718,14 +682,13 @@ function AutoCategory.HookKeyboardMode()
 	local rowHeight = AutoCategory.acctSaved.appearance["CATEGORY_HEADER_HEIGHT"]
     local hookmgr = AutoCategory.hookmgr
 
-    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	  INVENTORY_BACKPACK)
+    AddTypeToList(rowHeight, ZO_PlayerInventoryList,  	INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_CraftBagList,             INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerBankBackpack,       INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_GuildBankBackpack,        INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_HouseBankBackpack,        INVENTORY_BACKPACK)
     AddTypeToList(rowHeight, ZO_PlayerInventoryQuest,     INVENTORY_QUEST_ITEM)
     AddTypeToList(rowHeight, ZO_FurnitureVaultList,       INVENTORY_BACKPACK)
-    AddTypeToList(rowHeight, ZO_VengeanceInventoryList,   INVENTORY_VENGEANCE)
 
     AddTypeToList(rowHeight, SMITHING.deconstructionPanel.inventory.list, nil)
     AddTypeToList(rowHeight, SMITHING.improvementPanel.inventory.list,    nil)
@@ -785,6 +748,7 @@ slot.meetsUsageRequirement = meetsUsageRequirement or (bagId == BAG_WORN)
 slot.locked = locked
 slot.functionalQuality = functionalQuality
 slot.displayQuality = displayQuality
+-- slot.quality is deprecated, included here for addon backwards compatibility
 slot.quality = displayQuality
 slot.equipType = equipType
 slot.isPlayerLocked = IsItemPlayerLocked(bagId, slotIndex)

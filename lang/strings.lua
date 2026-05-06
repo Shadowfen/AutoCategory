@@ -14,6 +14,7 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_BAGTYPE_SHOWNAME_CRAFTSTATION = "Craft Station",
     SI_AC_BAGTYPE_SHOWNAME_HOUSEBANK = "Home Storage Chests",
     SI_AC_BAGTYPE_SHOWNAME_FURNVAULT = "Furniture Vault",
+    SI_AC_BAGTYPE_SHOWNAME_VENGEANCE = "Vengeance",
     SI_AC_BAGTYPE_TOOLTIP_BACKPACK = "Backpack",
     SI_AC_BAGTYPE_TOOLTIP_BANK = "Bank",
     SI_AC_BAGTYPE_TOOLTIP_GUILDBANK = "Guild Bank",
@@ -230,6 +231,8 @@ AutoCategory_localization_strings["en"] = {
     SI_AC_DEFAULT_CATEGORY_TRAIT_OR_STYLE_GEMS_DESC= "",
     SI_AC_DEFAULT_CATEGORY_WOODWORKING= "Woodworking",
     SI_AC_DEFAULT_CATEGORY_WOODWORKING_DESC= "",
+    SI_AC_DEFAULT_CATEGORY_CYRODIIL= "Cyrodiil",
+
 
 
     SI_BINDING_NAME_TOGGLE_AUTO_CATEGORY= "Toggle Auto Category",
