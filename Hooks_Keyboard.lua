@@ -565,6 +565,7 @@ local sceneMap = {
 	["fence_gamepad"] = true,
 	["houseBank"] = true,
 	["furnitureVault"] = true,
+	["trade"] = true,
 }
 local function readyToUpdate()
     local currentScene
