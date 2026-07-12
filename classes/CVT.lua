@@ -281,7 +281,7 @@ function AutoCategory.CVT:removeItemChoiceValue(removeItem)
 	-- remove it
 	table.remove(self.choicesValues, removeIndex) -- not optional here
 	table.remove(self.choices, removeIndex)		-- not optional
-	if #self.choicesTooltips then
+	if self.choicesTooltips and #self.choicesTooltips then
 		table.remove(self.choicesTooltips, removeIndex)
 	end
 
