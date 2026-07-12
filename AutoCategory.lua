@@ -613,7 +613,6 @@ end
 --
 -- The tblname is used only for AutoCat_Logger()/logDebug() messages - i.e. debugging.
 --
--- If notdel is true then the rules are NOT removed from the source table.
 -- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --
 local function addTableRules(tbl, tblname, ispredef)
@@ -714,6 +713,7 @@ local function addTableRules(tbl, tblname, ispredef)
         end
     end
 end
+AutoCategory._addTableRules = addTableRules
 
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
