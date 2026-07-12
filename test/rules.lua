@@ -1,18 +1,26 @@
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
 
 local TR = test_run
 local d = print
 
-require "LibSFUtils.LibSFUtils_Global"
-require "LibSFUtils.SFUtils_Color"
-require "LibSFUtils.LibSFUtils"
-require "LibSFUtils.SFUtils_LoadLanguage"
-require "LibSFUtils.SFUtils_Tables"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
+local SF = LibSFUtils
 
-local SF=LibSFUtils
-require "AutoCategory.AutoCategory_Global"
+require "AutoCategory_Global"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "classes.BagRuleApi"
+require "classes.BaseUI"
 
 local AC = AutoCategory
 

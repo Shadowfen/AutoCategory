@@ -1,19 +1,31 @@
-require "AutoCategory.test.zos-ac"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
+
 local d = print
 
-require "LibSFUtils.LibSFUtils_Global"
-require "LibSFUtils.SFUtils_Color"
-require "LibSFUtils.LibSFUtils"
-require "LibSFUtils.SFUtils_LoadLanguage"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
 local SF = LibSFUtils
-require "AutoCategory.AutoCategory_Global"
-require "AutoCategory.Plugin_API"
-require "AutoCategory.lang.strings"
-require "AutoCategory.lang.zh"
-require "AutoCategory.lang.fr"
-require "AutoCategory.FCOIS_Plugin"
+
+require "AutoCategory_Global"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "classes.BagRuleApi"
+require "classes.BaseUI"
+
+require "Plugin_API"
+require "lang.strings"
+require "lang.zh"
+require "lang.fr"
+require "plugins.FCOIS_Plugin"
 
 local mn = "PluginsAPI"
 AutoCategory.Environment = {}   -- Actually defined in AutoCategory_RuleFunc
@@ -71,7 +83,7 @@ local function Plugins_testChinese2FrenchLoadLanguage()
     AutoCategory.LoadLanguage(AutoCategory_localization_strings,"zh")
     local str = GetString(SI_AC_BAGTYPE_SHOWNAME_BACKPACK)
     TK.assertNotNil(str,"found SI_AC_BAGTYPE_SHOWNAME_BACKPACK")
-    TK.assertTrue(str == "Sac","Got french version of Backpack")
+    TK.assertTrue(str == "Inventaire","Got french version of Backpack")
     GetCVar = getcv
 end
 
@@ -116,19 +128,18 @@ local function Plugins_testRegisterPlugin()
     AutoCategory.Plugins = {}
     AutoCategory.RegisterPlugin("FCOIS", function() plin[1] = true end)
     TK.assertNotNil(AutoCategory.Plugins["FCOIS"], "Registered testFCOIS")
-    AutoCategory.Plugins["FCOIS"]()
+    AutoCategory.Plugins["FCOIS"].init()
     TK.assertTrue(plin[1] == true, "Running the init function worked")
     AutoCategory.RegisterPlugin("HAHA", function() AutoCategory.AddRuleFunc("hahaismarked") end)
-    AutoCategory.Plugins["HAHA"]()
+    AutoCategory.Plugins["HAHA"].init()
     TK.assertNotNil(AutoCategory.Environment["hahaismarked"], "hahaismarked function found in Environment")
     local tempfunc = function () return true end
     AutoCategory.RegisterPlugin("HeeHee", function() AutoCategory.AddRuleFunc("heeheismarked", tempfunc) end)
-    AutoCategory.Plugins["HeeHee"]()
+    AutoCategory.Plugins["HeeHee"].init()
     TK.assertNotNil(AutoCategory.Environment["heeheismarked"], "heheismarked function found in Environment")
 end
 
-
---function Plugins_runTests()
+function PluginsAPI_runTests()
     Plugins_testInitialLoadLanguage()
     Plugins_testPluginLoadLanguage()
     Plugins_testChineseOnlyLoadLanguage()
@@ -140,6 +151,11 @@ end
     -- cleanup
     testZO_ResetStringTables() -- set the string tables back to a pre-loaded state (mostly)
     AutoCategory.LoadLanguage(AutoCategory_localization_strings,"en")
+end
 
---end
+TK.init()
+
+PluginsAPI_runTests()
+
+TK.showResult(mn)
 

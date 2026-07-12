@@ -1,15 +1,35 @@
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
 
 local TR = test_run
 local d = print
 
-require "LibSFUtils.LibSFUtils"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
+require "SFUtils_Events"
+require "SFUtils_HookManager"
 local SF = LibSFUtils
-require "AutoCategory.FCOIS_Plugin"
+
+require "AutoCategory_Global"
+require "AutoCategory_Defaults"
+require "Hooks_Keyboard"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "AutoCategory"
+require "Plugin_API"
+local AC = AutoCategory
+require "plugins.FCOIS_Plugin"
 
 local moduleName = "FCOIS"
+local mn = moduleName
 
 local function FCOIS_testLoadLanguage()
     local fn = "testLoadLanguage"
@@ -31,15 +51,22 @@ end
 local function FCOIS_testPredefines()
     local fn = "testPredefines"
     TK.printSuite(moduleName,fn)
-    local added, errtbl = AutoCategory.AddPredefinedRules(AutoCategory_FCOIS.predefinedRules)
-    d("added = "..added)
-    TR.printTable(errtbl)
+    
+    local ac_rules = AutoCategory.RulesW
+    SF.safeClearTable(ac_rules.ruleList)
+    d("before = "..#ac_rules.ruleList)
+    AutoCategory._addTableRules({rules=AutoCategory_FCOIS.predefinedRules},"FCOIS.predefinedRules", true)
+    local added = #ac_rules.ruleList
     TK.assertTrue(added == 43,"testAddPredefineRule - Successfully added 43 rules")
-    TK.assertTrue(#errtbl == 0,"testAddPredefineRule - returned error table was empty")
-    --d("")
 end
 
 function FCOIS_runTests()
-    FCOIS_testLoadLanguage()
-    FCOIS_testPredefines()
+  FCOIS_testLoadLanguage()
+  FCOIS_testPredefines()
 end
+
+TK.init()
+
+FCOIS_runTests()
+
+TK.showResult(mn)

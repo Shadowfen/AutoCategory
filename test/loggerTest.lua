@@ -1,7 +1,7 @@
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
 
-
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+require "zos"
+require "tk"
 local TK = TestKit
 
 local d = print
@@ -32,7 +32,7 @@ local function CreateSFlogger(name)
     return logger
 end
 
-local function logger_testNew()
+function logger_testNew()
     local tn = "testloggerNew"
     TK.printSuite(mn,tn)
     local logger = {}
@@ -44,6 +44,10 @@ local function logger_testNew()
     logger:Debug("This is a logger test")
 end
 
+
+
+TK.init()
+  
 logger_testNew()
 
 TK.showResult(mn)

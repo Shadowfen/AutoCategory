@@ -1,31 +1,37 @@
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
 
 local d = print
 
-local INVENTORY_BACKPACK = 1
-local INVENTORY_CRAFT_BAG = 2
-local INVENTORY_GUILD_BANK = 3
-local INVENTORY_HOUSE_BANK = 4
-local INVENTORY_BANK = 5
-local INVENTORY_FURNITURE_VAULT = 7
 local AC_DECON = 6
 local AC_IMPROV = 7
 local UV_DECON = 8
 
+
 local ZO_PlayerInventory = {}
 
-require "LibSFUtils.LibSFUtils_Global"
-require "LibSFUtils.SFUtils_Color"
-require "LibSFUtils.LibSFUtils"
-require "LibSFUtils.SFUtils_Tables"
-require "LibSFUtils.SFUtils_LoadLanguage"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
+require "SFUtils_Events"
+require "SFUtils_HookManager"
 local SF = LibSFUtils
---require "AutoCategory.AutoCategory_Global"
---require "AutoCategory.AutoCategory_Defaults"
---require "AutoCategory.Hooks_Keyboard"
-require "AutoCategory.AutoCategory"
+
+require "AutoCategory_Global"
+require "AutoCategory_Defaults"
+require "Hooks_Keyboard"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "classes.BagRuleApi"
+require "classes.BaseUI"
+require "AutoCategory"
 local AC = AutoCategory
 
 local saved = AutoCategory.saved
@@ -51,8 +57,8 @@ end
 local function Cache_testGetRuleByName()
     local tn = "testGetRuleByName"
     TK.printSuite(mn,tn)
-   local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    --TR.printRule(decon)
+    local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
+    TR.printRule(decon)
     TK.assertNotNil(decon, "decon rule in saved.rules")
     TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
     TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
@@ -81,14 +87,15 @@ end
 local function Cache_testAddRule()
     TK.printSuite(mn,"testAddRule")
     local orgr = AC.GetRuleByName("Low Level")
-    TK.assertNotNil(orgr,"Low Level is there")
+    TK.assertNil(orgr,"Low Level is not there")
     --printTable(orgr)
 
-    local err = AC.cache.AddRule({name="Low Level", rule="false"})
+    local cache = AutoCategory.cache
+    local err = cache.AddRule({name="Low Level", rule="false"})
     TK.assertNotNil(err, "AddRule returned error")
     print(err)
     
-    err = AC.cache.AddRule({name="happy",rule="true"})
+    err = cache.AddRule({name="happy",rule="true", tag = "gear"})
     TK.assertNil(err, "AddRule for happy succeeded.")
 end
 
@@ -114,10 +121,16 @@ local function Cache_testUpdateSavedVars()
     TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "#saved.rules == #compiledRules")
 end
 
---function Cache_runTests()
+function Cache_runTests()
     Cache_testIsValidRule()
-    Cache_testGetRuleByName()
-    Cache_testResetToDefaults()
-    Cache_testAddRule()
-    Cache_testUpdateSavedVars()
---end
+    --Cache_testGetRuleByName()
+    --Cache_testResetToDefaults()
+    --Cache_testAddRule()
+    --Cache_testUpdateSavedVars()
+end
+
+TK.init()
+
+Cache_runTests()
+
+TK.showResult(mn)

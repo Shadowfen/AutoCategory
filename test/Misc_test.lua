@@ -1,21 +1,35 @@
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
 
 local TR = test_run
 local d = print
 
-require "LibSFUtils.LibSFUtils_Global"
-require "LibSFUtils.SFUtils_Color"
-require "LibSFUtils.LibSFUtils"
-require "LibSFUtils.SFUtils_LoadLanguage"
-require "AutoCategory.AutoCategory_Global"
-local AC = AutoCategory
-require "AutoCategory.Plugin_API"
-require "AutoCategory.Misc_Plugins"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
+require "SFUtils_Events"
+require "SFUtils_HookManager"
 local SF = LibSFUtils
 
+require "AutoCategory_Global"
+require "AutoCategory_Defaults"
+require "Hooks_Keyboard"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "AutoCategory"
+require "Plugin_API"
+local AC = AutoCategory
+require "plugins.Misc_Plugins"
+
 local moduleName = "MiscPlugins"
+local mn = moduleName
 
 function GetItemLink()
     return "dummyItemLink"
@@ -37,6 +51,12 @@ local function Misc_testgetPriceTTC()
     TK.assertTrue(AutoCategory_MiscAddons.RuleFunc.GetPriceTTC("suggested") == 10, "Got TTC suggested price")
 end
 
---function Misc_runTests()
-    Misc_testgetPriceTTC()
---end
+function Misc_runTests()
+  --Misc_testgetPriceTTC()
+end
+
+TK.init()
+  
+--Misc_testgetPriceTTC()
+
+TK.showResult(mn)

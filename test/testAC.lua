@@ -1,23 +1,36 @@
-test_run = {
-}
-require "AutoCategory.test.zos"
-require "AutoCategory.test.tk"
+package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
+
+require "zos"
+require "tk"
 local TK = TestKit
 
 TK.init()
 
-local TR = test_run
 local d = print
 
-require "LibSFUtils.LibSFUtils"
+require "LibSFUtils_Global"
+require "SFUtils_Color"
+require "LibSFUtils"
+require "SFUtils_Tables"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
+require "SFUtils_Events"
+require "SFUtils_HookManager"
 local SF = LibSFUtils
-require "AutoCategory.lang.strings"
-require "AutoCategory.AutoCategory_Global"
-require "AutoCategory.AutoCategory_Defaults"
-require "AutoCategory.Plugin_API"
-require "AutoCategory.AutoCategory"
+
+require "AutoCategory_Global"
+require "AutoCategory_Defaults"
+require "Hooks_Keyboard"
+require "classes.CVT"
+require "classes.RuleList"
+require "classes.RuleApi"
+require "classes.BagRuleApi"
+require "classes.BaseUI"
+require "AutoCategory"
 local AC = AutoCategory
---[[
+
+local mn = "AutoCategory"
+
 AC.compiledRules = {}
 AutoCategory.saved= { 
     rules = {},             -- [#] rule {name, tag, description, rule, damaged}
@@ -36,17 +49,23 @@ AutoCategory.cache = {
 AutoCategory.cache.bags.showNames = {}
 AutoCategory.cache.bags.values = {}
 AutoCategory.cache.bags.tooltips = {}
+
+AutoCategory.Environment = {}
 --
-require "AutoCategory.AddonMenu"
+require "AddonMenu"
 --]]
 local saved = AutoCategory.saved
 local cache = AutoCategory.cache
 
+local AC_EMPTY_TAG_NAME = "unknown"
+
+local TR = {}
 function TR.printRule(r)
     d(SF.str("name = ",r.name))
     d(SF.str("tag = ",r.tag))
     d(SF.str("rule = ",r.rule))
 end
+
   
 function TR.printTable(tbl)
     for k,v in pairs(tbl) do
@@ -62,47 +81,9 @@ end
 
 
 
--- pretend to load saved variables
-AC.acctSaved = SF.deepCopy(AC.defaultAcctSettings)
-TK.assertTrue(AC.acctSaved.rules[1].name == AC.defaultAcctSettings.rules[1].name,"prep - using pre-defined rules as default")
-AC.charSaved = SF.deepCopy(AC.defaultSettings)
-TK.assertTrue(#AutoCategory.acctSaved.rules > 0, "prep - has "..#AutoCategory.acctSaved.rules.." rules")
-TK.assertTrue(AC.charSaved.accountWide,"Settings are account-wide")
-
-AC.acctSaved.bags[1] = AC.defaultSettings.bags[1]
-    -- init bag category table only when the bag is missing
-    for k,v in pairs(AC.defaultAcctBagSettings.bags) do
-        d(k)
-        d(AC.listcount(v.rules))
-		if AC.acctSaved.bags[k] == nil or AC.acctSaved.bags[k].default then 
-			AC.acctSaved.bags[k].default = nil
-			AC.acctSaved.bags[k].rules = AC.defaultAcctBagSettings.bags[k].rules
-		end
-	end
-TK.assertTrue(AC.listcount(AC.acctSaved.bags[k]) == 0, "bag 1 has no rules")
 
 
-AutoCategory.UpdateCurrentSavedVars()
-TK.assertNotNil(AutoCategory.saved.rules, "testUpdateCurrentSavedVars - saved.rules has entries")
-TK.assertNotNil(AutoCategory.compiledRules, "testUpdateCurrentSavedVars - compiled rules has entries")
-TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "testUpdateCurrentSavedVars - #saved.rules == #compiledRules")
 
-require "AutoCategory.test.PluginsAPI_test"
-Plugins_runTests()
-
-require "AutoCategory.test.FCOIS_test"
-FCOIS_runTests()
-
-require "AutoCategory.test.Iakoni_test"
-Iakoni_runTests()
-
-require "AutoCategory.test.ACCache_test"
-Cache_runTests()
-
-require "AutoCategory.test.Misc_test"
-Misc_runTests()
-
---require "AutoCategory.AutoCategory_RuleFunc"
 AutoCategory.dictionary = {
     { 
         ["or"] = true,
@@ -117,62 +98,68 @@ AutoCategory.dictionary = {
     { intricate = true,},
     { type = true, traitstyle = true, isset = true, ismonsterset = true, },
 }
-local function checkKeywords(str)
-   local result = {}
-    for w in string.gmatch(str, "%a+") do
-        local found = false
-        if AC.Environment[w] then
-            found = true
-        else
-            for i=1, #AC.dictionary do
-                if AC.dictionary[i][w] then
-                    found = true
-                    break;
-                end
-            end
-        end
-        if found == false then
-            table.insert(result, "Unrecognized: "..w)
-        end
-    end
-   return result
-end
 
-local function checkCurrentRule(rule)
-    ruleCheckStatus = {}
-    if rule == nil then
-        ruleCheckStatus.err = nil
-        ruleCheckStatus.good = nil
-        return ruleCheckStatus
-    end
-    
-    local func,err = zo_loadstring(string.format("return(%s)", rule.rule))
-    if not func then
-        ruleCheckStatus.err = err
-        ruleCheckStatus.good = nil
-        --fieldData.currentRule.damaged = true 
-    else
-        local errt = checkKeywords(rule)
-        if #errt == 0 then
-            ruleCheckStatus.err = nil
-            ruleCheckStatus.good = true
-            --fieldData.currentRule.damaged = nil
-        else
-            ruleCheckStatus.err = errt[1]
-            ruleCheckStatus.good = nil
-            --fieldData.currentRule.damaged = true 
-        end
-    end
-    return ruleCheckStatus
-end
+function testCheckRule()
+    local tn = "testCheckRule"
+    TK.printSuite(mn,tn)
 
-local rule = "traitstyle(\"intricate\") or not isset() or (type(\"head\",\"shoulders\") and not ismonsterset())"
-local rcs = checkCurrentRule(rule)
-TK.assertNotNil(rcs.good, "rule is good")
-local badrule = "traitstyle(\"intricte\") or not isset() or (type(\"head\",\"shoulders\") and not ismonsterset())"
-rcs = checkCurrentRule(badrule)
-TK.assertNil(rcs.good, "badrule is not good")
-d("err[1] = "..(rcs.err or "nil"))
+  
+  local function checkKeywords(str)
+     local result = {}
+      for w in string.gmatch(str, "%a+") do
+          local found = false
+          if AC.Environment[w] then
+              found = true
+          else
+              for i=1, #AC.dictionary do
+                  if AC.dictionary[i][w] then
+                      found = true
+                      break;
+                  end
+              end
+          end
+          if found == false then
+              table.insert(result, "Unrecognized: "..w)
+          end
+      end
+     return result
+  end
+
+  local function checkCurrentRule(rule)
+      ruleCheckStatus = {}
+      if rule == nil then
+          ruleCheckStatus.err = nil
+          ruleCheckStatus.good = nil
+          return ruleCheckStatus
+      end
+      
+      local func,err = zo_loadstring(string.format("return(%s)", rule.rule))
+      if not func then
+          ruleCheckStatus.err = err
+          ruleCheckStatus.good = nil
+      
+      else
+          local errt = checkKeywords(rule)
+          if #errt == 0 then
+              ruleCheckStatus.err = nil
+              ruleCheckStatus.good = true
+          
+          else
+              ruleCheckStatus.err = errt[1]
+              ruleCheckStatus.good = nil
+          end
+      end
+      return ruleCheckStatus
+  end
+
+
+  local rule = "traitstyle(\"intricate\") or not isset() or (type(\"head\",\"shoulders\") and not ismonsterset())"
+  local rcs = checkCurrentRule(rule)
+  TK.assertNotNil(rcs.good, "rule is good")
+  local badrule = "traitstyle(\"intricte\") or not isset() or (type(\"head\",\"shoulders\") and not ismonsterset())"
+  rcs = checkCurrentRule(badrule)
+  TK.assertNil(rcs.good, "badrule is not good")
+end
 
 
 local spmap = {
@@ -204,35 +191,69 @@ local function isKnown(arg, typekey, fn, map)
     return false
 end
 
-TK.assertTrue(isKnown(15,15,"fifteen",nil),"isKnown 15 == 15")
-TK.assertFalse(isKnown(15,16,"fifteen-sixteen",nil),"isKnown 15 ~= 16")
-TK.assertTrue(isKnown("entry1", true, "entry1",spmap),"isKnown entry1 is true")
-TK.assertTrue(isKnown("entry2", 2, "entry2",spmap),"isKnown entry2 is 2")
-TK.assertFalse(isKnown("entry3", 3, "entry3",spmap),"isKnown entry3 does not exist")
 
+function testKnown()
+    local tn = "testKnown"
+    TK.printSuite(mn,tn)
 
-function AutoCategory.RuleFunc.SpecializedItemType( ... )
-	local fn = "type"
-	local ac = select( '#', ... )
-    if ac == 0 then
-		error( string.format("error: %s(): require arguments." , fn))
-	end
-	
-	for ax = 1, ac do
-		local arg = select( ax, ... )
-		
-		if not arg then
-			error( string.format("error: %s():  argument is nil." , fn))
-		end
-        local rslt = isKnown(arg, spmap[arg], fn, spmap)
-        if rslt then return rslt end
-	end
-	
-	return false
-	
+  TK.assertTrue(isKnown(15,15,"fifteen",nil),"isKnown 15 == 15")
+  TK.assertFalse(isKnown(15,16,"fifteen-sixteen",nil),"isKnown 15 ~= 16")
+  TK.assertTrue(isKnown("entry1", true, "entry1",spmap),"isKnown entry1 is true")
+  TK.assertTrue(isKnown("entry2", 2, "entry2",spmap),"isKnown entry2 is 2")
+  TK.assertFalse(isKnown("entry3", 3, "entry3",spmap),"isKnown entry3 does not exist")
 end
 
-TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry1","entry2"),"sit matches first")
-TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry3","entry2"),"sit matches second")
+function testRuleSpecItemType()
+    local tn = "testRuleSpecItemType"
+    TK.printSuite(mn,tn)
+
+  function AutoCategory.RuleFunc.SpecializedItemType( ... )
+    local fn = "type"
+    local ac = select( '#', ... )
+      if ac == 0 then
+      error( string.format("error: %s(): require arguments." , fn))
+    end
+    
+    for ax = 1, ac do
+      local arg = select( ax, ... )
+      
+      if not arg then
+        error( string.format("error: %s():  argument is nil." , fn))
+      end
+          local rslt = isKnown(arg, spmap[arg], fn, spmap)
+          if rslt then return rslt end
+    end
+    
+    return false
+    
+  end
+
+
+  TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry1","entry2"),"sit matches first")
+  TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry3","entry2"),"sit matches second")
+end
+
+
+require "test.loggerTest"
+require "test.PluginsAPI_test"
+require "test.FCOIS_test"
+require "test.Iakoni_test"
+require "test.ACCache_test"
+require "test.Misc_test"
+require "test.misc"
+
+-- --------------------------------------------------------------------------
+logger_testNew()
+PluginsAPI_runTests()
+FCOIS_runTests()
+Iakoni_runTests()
+Cache_runTests()
+Misc_runTests()
+misc_runTests()
+
+testCheckRule()
+testKnown()
+testRuleSpecItemType()
+
 TK.showResult()
  

@@ -12,6 +12,15 @@ local internal = {
   }
 }
 
+INVENTORY_BACKPACK = 1
+INVENTORY_QUEST_ITEM = 2
+INVENTORY_BANK = 3
+INVENTORY_HOUSE_BANK = 4
+INVENTORY_GUILD_BANK = 5
+INVENTORY_CRAFT_BAG = 6
+INVENTORY_FURNITURE_VAULT = 7
+INVENTORY_VENGEANCE = 8
+
 --------------------------------------------------
 _G["d"] = function(...)
     local argv 
