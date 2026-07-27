@@ -526,7 +526,7 @@ function AutoCat.GetBagRuleByName(bagId, name)
     -- Check if rule still exists in main list
     if not ac_rules.ruleNames[name] then
         -- Stale entry detected - trigger cleanup for this bag
-        AutoCat.RebuildBagCache(bagId)
+		AutoCat.cacheInitBag(bagId)
         return nil, nil
     end
     

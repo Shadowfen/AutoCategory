@@ -2,12 +2,13 @@
 ## APIVersion: 101050 101051
 ## Author: Shadowfen, crafty35a, RockingDice, Friday_the13_rus
 ## Description: Inventory categorization. Type "/ac" for settings
-## Version: 4.6.10
-## AddOnVersion: 150
+## Version: 4.6.11
+## AddOnVersion: 151
+## IsLibrary: false
 ## SavedVariables: AutoCategorySavedVars AutoCatRules
 ## DependsOn: LibAddonMenu-2.0>=43 LibCustomMenu>=730 LibSFUtils>=71 LibMediaProvider>=36 
 ## DependsOn: LibDebugLogger>=307
-## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemSaverLite ItemMarker UnknownTracker>=79 
+## OptionalDependsOn: GearChangerByIakoni FCOItemSaver QuickMenu ItemSaver ItemSaverLite ItemMarker UnknownTracker
 ## OptionalDependsOn: MasterMerchant TamrielTradeCentre SetTrack CharacterKnowledge DressingRoom
 
 

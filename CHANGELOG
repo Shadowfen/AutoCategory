@@ -1,3 +1,8 @@
+[COLOR="DeepSkyBlue"] 4.6.11 (151)[/COLOR]:
+[LIST]
+[*] Fix AutoCategory.lua:529 reference to non-existent function RebuildBagCache() that is invoked when you delete all of the rules from an inventory bag.
+[/LIST]
+
 [COLOR="DeepSkyBlue"]4.6.10 (150)[/COLOR]
 [LIST]
 [*] API bump.
