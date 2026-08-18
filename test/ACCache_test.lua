@@ -24,6 +24,7 @@ require "SFUtils_HookManager"
 local SF = LibSFUtils
 
 require "AutoCategory_Global"
+require "lang.strings"
 require "AutoCategory_Defaults"
 require "Hooks_Keyboard"
 require "classes.CVT"
@@ -58,12 +59,14 @@ local function Cache_testGetRuleByName()
     local tn = "testGetRuleByName"
     TK.printSuite(mn,tn)
     local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    TR.printRule(decon)
+    --printRule(decon)
     TK.assertNotNil(decon, "decon rule in saved.rules")
-    TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
-    TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
-    TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), "decon rule description is correct")
-    TK.assertTrue(decon.rule == "traitstring(\"intricate\")", "decon rule text is correct")
+    if decon then
+      TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
+      TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
+      TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), "decon rule description is correct")
+      TK.assertTrue(decon.rule == "traitstring(\"intricate\")", "decon rule text is correct")
+    end
     
     local badrule = AC.GetRuleByName("haha")
     TK.assertNil(badrule,"did not get non-existant rule")
@@ -123,7 +126,7 @@ end
 
 function Cache_runTests()
     Cache_testIsValidRule()
-    --Cache_testGetRuleByName()
+    Cache_testGetRuleByName()
     --Cache_testResetToDefaults()
     --Cache_testAddRule()
     --Cache_testUpdateSavedVars()

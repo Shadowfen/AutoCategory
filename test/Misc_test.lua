@@ -57,6 +57,6 @@ end
 
 TK.init()
   
---Misc_testgetPriceTTC()
+Misc_testgetPriceTTC()
 
 TK.showResult(mn)
