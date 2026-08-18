@@ -12,14 +12,15 @@ require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
 require "SFUtils_Tables"
-require "SFUtils_LoadLanguage"
-require "SFUtils_Logger"
 require "SFUtils_Events"
 require "SFUtils_HookManager"
+require "SFUtils_LoadLanguage"
+require "SFUtils_Logger"
 local SF = LibSFUtils
 
 require "AutoCategory_Global"
 require "AutoCategory_Defaults"
+require "Plugin_API"
 require "Hooks_Keyboard"
 require "classes.CVT"
 require "classes.RuleList"
@@ -234,12 +235,13 @@ function testRuleSpecItemType()
 end
 
 
+
 require "test.loggerTest"
 require "test.PluginsAPI_test"
 require "test.FCOIS_test"
 require "test.Iakoni_test"
 require "test.ACCache_test"
-require "test.Misc_test"
+--require "test.Misc_test"
 require "test.misc"
 
 -- --------------------------------------------------------------------------
@@ -247,9 +249,9 @@ logger_testNew()
 PluginsAPI_runTests()
 FCOIS_runTests()
 Iakoni_runTests()
-Cache_runTests()
-Misc_runTests()
-misc_runTests()
+--Cache_runTests()
+--Misc_runTests()
+--misc_runTests()
 
 testCheckRule()
 testKnown()

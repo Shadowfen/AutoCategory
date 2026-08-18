@@ -44,17 +44,6 @@ local TK = TestKit
 -- BaseUI / BaseDD Tests
 --===========================================================
 
-local TK = TestKit
-
-local function makeBaseUI(name)
-    return AutoCategory.BaseUI:New(name)
-end
-
-local function makeBaseDD(name, value, flags)
-    return AutoCategory.BaseDD:New(name, value, flags)
-end
-
-
 --===========================================================
 -- BaseUI
 --===========================================================
@@ -62,7 +51,7 @@ end
 function TestBaseUI_New()
     TK.printSuite("AutoCategory", "BaseUI New")
 
-    local ui = makeBaseUI("TestControl")
+    local ui = AutoCategory.BaseUI:New("TestControl")
 
     TK.assertNotNil(ui,
         "BaseUI creates object")
@@ -78,7 +67,7 @@ end
 function TestBaseUI_NoControlName()
     TK.printSuite("AutoCategory", "BaseUI no control")
 
-    local ui = makeBaseUI(nil)
+    local ui = AutoCategory.BaseUI:New(nil)
 
     TK.assertNotNil(ui,
         "BaseUI creates without control name")
@@ -91,7 +80,7 @@ end
 function TestBaseUI_UpdateValue_NoControl()
     TK.printSuite("AutoCategory", "BaseUI updateValue no control")
 
-    local ui = makeBaseUI(nil)
+    local ui = AutoCategory.BaseUI:New(nil)
 
     -- getValue is not called because updateValue() returns first.
     ui.getValue = function()
@@ -109,7 +98,7 @@ end
 function TestBaseUI_UpdateValue_NilValue()
     TK.printSuite("AutoCategory", "BaseUI updateValue nil")
 
-    local ui = makeBaseUI("TestControl")
+    local ui = AutoCategory.BaseUI:New("TestControl")
 
     ui.getValue = function()
         return nil
@@ -136,7 +125,7 @@ end
 function TestBaseUI_UpdateValue_NoControlFound()
     TK.printSuite("AutoCategory", "BaseUI updateValue missing control")
 
-    local ui = makeBaseUI("MissingControl")
+    local ui = AutoCategory.BaseUI:New("MissingControl")
 
     ui.getValue = function()
         return 123
@@ -161,7 +150,7 @@ end
 function TestBaseUI_UpdateValue()
     TK.printSuite("AutoCategory", "BaseUI updateValue")
 
-    local ui = makeBaseUI("TestControl")
+    local ui = AutoCategory.BaseUI:New("TestControl")
 
     local updateCalled = false
     local updateFlag
@@ -209,7 +198,7 @@ end
 function TestBaseDD_New()
     TK.printSuite("AutoCategory", "BaseDD New")
 
-    local dd = makeBaseDD("TestDropdown", "initial")
+    local dd = AutoCategory.BaseDD:New("TestDropdown", "initial")
 
     TK.assertNotNil(dd,
         "BaseDD creates object")
@@ -228,7 +217,7 @@ end
 function TestBaseDD_NoControlName()
     TK.printSuite("AutoCategory", "BaseDD no control")
 
-    local dd = makeBaseDD(nil)
+    local dd = AutoCategory.BaseDD:New(nil)
 
     TK.assertNotNil(dd,
         "BaseDD creates without control name")
@@ -245,7 +234,7 @@ end
 function TestBaseDD_Append()
     TK.printSuite("AutoCategory", "BaseDD append")
 
-    local dd = makeBaseDD("TestDropdown")
+    local dd = AutoCategory.BaseDD:New("TestDropdown")
 
     local result = dd:append("One")
 
@@ -263,7 +252,7 @@ end
 function TestBaseDD_AppendValues()
     TK.printSuite("AutoCategory", "BaseDD append values")
 
-    local dd = makeBaseDD(
+    local dd = AutoCategory.BaseDD:New(
         "TestDropdown",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -285,7 +274,7 @@ end
 function TestBaseDD_Select()
     TK.printSuite("AutoCategory", "BaseDD select")
 
-    local dd = makeBaseDD(
+    local dd = AutoCategory.BaseDD:New(
         "TestDropdown",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -307,7 +296,7 @@ end
 function TestBaseDD_ClearIndex()
     TK.printSuite("AutoCategory", "BaseDD clearIndex")
 
-    local dd = makeBaseDD("TestDropdown", "initial")
+    local dd = AutoCategory.BaseDD:New("TestDropdown", "initial")
 
     dd:clearIndex()
 
@@ -319,7 +308,7 @@ end
 function TestBaseDD_Clear()
     TK.printSuite("AutoCategory", "BaseDD clear")
 
-    local dd = makeBaseDD("TestDropdown", "initial")
+    local dd = AutoCategory.BaseDD:New("TestDropdown", "initial")
 
     dd:append("One")
 
@@ -342,7 +331,7 @@ end
 function TestBaseDD_Assign()
     TK.printSuite("AutoCategory", "BaseDD assign")
 
-    local source = makeBaseDD(
+    local source = AutoCategory.BaseDD:New(
         "Source",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -352,7 +341,7 @@ function TestBaseDD_Assign()
     source:append("Two", "two")
     source:select("two")
 
-    local dest = makeBaseDD(
+    local dest = AutoCategory.BaseDD:New(
         "Destination",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -383,7 +372,7 @@ end
 function TestBaseDD_Size()
     TK.printSuite("AutoCategory", "BaseDD size")
 
-    local dd = makeBaseDD("TestDropdown")
+    local dd = AutoCategory.BaseDD:New("TestDropdown")
 
     TK.assertEquals(0, dd:size(),
         "empty BaseDD size")
@@ -400,7 +389,7 @@ end
 function TestBaseDD_RemoveItemChoice()
     TK.printSuite("AutoCategory", "BaseDD remove choice")
 
-    local dd = makeBaseDD(
+    local dd = AutoCategory.BaseDD:New(
         "TestDropdown",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -432,7 +421,7 @@ end
 function TestBaseDD_RemoveItemChoiceValue()
     TK.printSuite("AutoCategory", "BaseDD remove choice value")
 
-    local dd = makeBaseDD(
+    local dd = AutoCategory.BaseDD:New(
         "TestDropdown",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -468,7 +457,7 @@ end
 function TestBaseDD_UpdateControl_NoControl()
     TK.printSuite("AutoCategory", "BaseDD updateControl no control")
 
-    local dd = makeBaseDD(nil)
+    local dd = AutoCategory.BaseDD:New(nil)
 
     dd:append("One")
 
@@ -483,7 +472,7 @@ end
 function TestBaseDD_UpdateControl_MissingControl()
     TK.printSuite("AutoCategory", "BaseDD updateControl missing control")
 
-    local dd = makeBaseDD("MissingDropdown")
+    local dd = AutoCategory.BaseDD:New("MissingDropdown")
 
     dd:append("One")
 
@@ -507,7 +496,7 @@ end
 function TestBaseDD_UpdateControl_Choices()
     TK.printSuite("AutoCategory", "BaseDD updateControl choices")
 
-    local dd = makeBaseDD("TestDropdown")
+    local dd = AutoCategory.BaseDD:New("TestDropdown")
 
     dd:append("One")
     dd:append("Two")
@@ -561,7 +550,7 @@ end
 function TestBaseDD_UpdateControl_Value()
     TK.printSuite("AutoCategory", "BaseDD updateControl value")
 
-    local dd = makeBaseDD(
+    local dd = AutoCategory.BaseDD:New(
         "TestDropdown",
         nil,
         AutoCategory.CVT.USE_VALUES
@@ -610,7 +599,7 @@ end
 function TestBaseDD_UpdateControl_NotDirty()
     TK.printSuite("AutoCategory", "BaseDD updateControl not dirty")
 
-    local dd = makeBaseDD("TestDropdown")
+    local dd = AutoCategory.BaseDD:New("TestDropdown")
 
     dd.cvt.choices = {"One"}
     dd.cvt.dirty = nil
