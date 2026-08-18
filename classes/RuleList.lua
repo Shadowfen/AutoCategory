@@ -23,9 +23,7 @@ function AutoCategory.RuleList:Initialize(rules)
 		if not self.ruleNames[arrules[k].name ] then
 			self.ruleNames[arrules[k].name] = k
 		end
-        if not arrules[k].compile then 
-            setmetatable(arrules[k], AutoCategory.RuleMetatable)
-        end
+		AutoCategory.attachRuleMixin(arrules[k])
 	end
 end
 
@@ -36,9 +34,8 @@ end
 
 function AutoCategory.RuleList:AddRule(newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
-	if not newRule.compile then
-		setmetatable(newRule, AutoCategory.RuleMetatable)
-	end
+	AutoCategory.attachRuleMixin(newRule)
+
 	local rulename = newRule.name
 
 	local ndx = self.ruleNames[rulename]

@@ -80,14 +80,14 @@ function AutoCategory_MiscAddons.Initialize()
 end
 
 local function getCurrentItemLink()
-	return GetItemLink(AC.checking.BagId, AC.checking.SlotIndex)
+	return GetItemLink(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
 end
 
 -- Implement getpricemm() check function for Master Merchant
 function AutoCategory_MiscAddons.RuleFunc.GetPriceMM( ... )
 	--local fn = "mm_getprice"
 	if MasterMerchant then
-		local itemLink = AC.checking.ItemLink   --getCurrentItemLink()
+		local itemLink = AutoCategory.checking.ItemLink   --getCurrentItemLink()
 		local mmData = MasterMerchant:itemStats(itemLink, false)
         if (mmData.avgPrice ~= nil) then
             return mmData.avgPrice
@@ -100,7 +100,7 @@ end
 function AutoCategory_MiscAddons.RuleFunc.GetPriceTTC( ... )
 	--local fn = "ttc_getprice"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
-		local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
+		local itemLink =  AutoCategory.checking.ItemLink  --getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then 
 			local ac = select( '#', ... ) 
@@ -142,7 +142,7 @@ end
 function AutoCategory_MiscAddons.RuleFunc.GetAmountTTC( ... )
 	--local fn = "ttc_getamount"
 	if TamrielTradeCentre and TamrielTradeCentrePrice then
-		local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
+		local itemLink =  AutoCategory.checking.ItemLink  --getCurrentItemLink()
 		local priceInfo = TamrielTradeCentrePrice:GetPriceInfo(itemLink)
 		if priceInfo then
 			return priceInfo.AmountCount
@@ -162,7 +162,7 @@ function AutoCategory_MiscAddons.RuleFunc.AlphaGear( ... )
 		error( string.format("error: %s(): require arguments." , fn))
 	end
 	
-	local uid = Id64ToString(GetItemUniqueId(AC.checking.BagId, AC.checking.SlotIndex))
+	local uid = Id64ToString(GetItemUniqueId(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex))
 	if not uid then return false end
 
 	for ax = 1, ac do 
@@ -213,7 +213,7 @@ function AutoCategory_MiscAddons.RuleFunc.IsTracked( ... )
     checkSets[arg]=true
   end
   
-  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AC.checking.BagId, AC.checking.SlotIndex)
+  local iTrackIndex, sTrackName = SetTrack.GetTrackingInfo(AutoCategory.checking.BagId, AutoCategory.checking.SlotIndex)
   if iTrackIndex >= 0 then
     if ac > 0 then
       if checkSets[sTrackName] ~= nil then
@@ -248,7 +248,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnown( ... )
 		return false
 	end
 	
-	local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
+	local itemLink =  AutoCategory.checking.ItemLink  --getCurrentItemLink()
 	--local cat = LCK.GetItemCategory(itemLink)
 	
 	--local server = zo_strsplit(" ", GetWorldName())[1]
@@ -285,7 +285,7 @@ function AutoCategory_MiscAddons.RuleFunc.CK_IsKnownCat( ... )
 	end
 
 	-- check if item is in one of CK's defined categories
-	local itemLink =  AC.checking.ItemLink  --getCurrentItemLink()
+	local itemLink =  AutoCategory.checking.ItemLink  --getCurrentItemLink()
 	local cat = LCK.GetItemCategory(itemLink)
 	if cat == LCK.ITEM_CATEGORY_NONE then return false end
 	

@@ -12,7 +12,7 @@ local sysd = function(msg)
     CHAT_ROUTER:AddSystemMessage(msg)
 end
 
-
+AutoCat_Internal = {}
 ----------------------
 -- Lists and variables
 
@@ -108,9 +108,7 @@ end
 -- override AddRule from RuleList to add in lookup table updates
 function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
-    if not newRule.compile then 
-        setmetatable(newRule,{__index = AutoCategory.RuleApiMixin})
-    end
+	AutoCat.attachRuleMixin(newRule)
 
 	if not newRule.tag or newRule.tag == "" then
         newRule.tag = AC_EMPTY_TAG_NAME
@@ -174,35 +172,47 @@ end
 -- for sorting bagged rules by showpriority and name
 -- returns true if the a should come before b
 local function BagRuleShowSortingFunction(a, b)
-    local result
-	if a.showpriority == nil then
-		a.showpriority = a.runpriority
-	end
-	if not (a and b and a.name and b.name and a.showpriority and b.showpriority) then return false end
-    if a.showpriority ~= b.showpriority then
-        result = a.showpriority > b.showpriority
+    if not a or not b then return false end
+    if not a.name or not b.name then return false end
 
-    else
-		if type(a.name) == "table" or type(b.name) == "table" then return false end
-		result = a.name < b.name
+    local aPriority = a.showpriority or a.runpriority
+    local bPriority = b.showpriority or b.runpriority
+
+    if not aPriority or not bPriority then
+        return false
     end
-    return result
+
+    if aPriority ~= bPriority then
+        return aPriority > bPriority
+    end
+
+    if type(a.name) ~= "string" or type(b.name) ~= "string" then
+        return false
+    end
+
+    return a.name < b.name
 end
+AutoCat_Internal.BagRuleShowSortingFunction = BagRuleShowSortingFunction
 
 -- for sorting bagged rules by runpriority and name
 -- returns true if the a should come before b
 local function BagRuleRunSortingFunction(a, b)
-    local result
-	if not (a and b and a.name and b.name and a.runpriority and b.runpriority) then return false end
-    if a.runpriority ~= b.runpriority then
-        result = a.runpriority > b.runpriority
-
-    else
-		if type(a.name) == "table" or type(b.name) == "table" then return false end
-		result = a.name < b.name
+    if not (a and b and a.name and b.name
+            and a.runpriority and b.runpriority) then
+        return false
     end
-    return result
+
+    if a.runpriority ~= b.runpriority then
+        return a.runpriority > b.runpriority
+    end
+
+    if type(a.name) ~= "string" or type(b.name) ~= "string" then
+        return false
+    end
+
+    return a.name < b.name
 end
+AutoCat_Internal.BagRuleRunSortingFunction = BagRuleRunSortingFunction
 
 -- swap between account-wide and char-wide settings
 function AutoCat.UpdateCurrentSavedVars()
@@ -545,10 +555,7 @@ function AutoCat.cache.AddRule(rule)
     if not rule or not rule.name then
         return "AddRule: Rule or name of rule was nil"
     end -- can't use a nil rule
-    if not rule.compile then 
-        setmetatable(rule,{__index = AutoCategory.RuleApiMixin})
-   end
-
+	AutoCat.attachRuleMixin(rule)
 
     if not rule.tag or rule.tag == "" then
         rule.tag = AC_EMPTY_TAG_NAME
@@ -607,16 +614,16 @@ function AutoCat.initializePlugins()
 
 end	
 
--- Add the rules in a table of rules to the combined, acctRules, and predefinedRules lists
--- as appropriate.
--- The table must be { rules = {} } and tbl.rules contains the list of rules.
---
--- The tblname is used only for AutoCat_Logger()/logDebug() messages - i.e. debugging.
---
--- The ispredef flag signals that ALL of the rules in the source table are predefines if true.
---
+--[[ Add the rules in a table of rules to the combined, acctRules, and predefinedRules lists
+	as appropriate.
+	The table must be { rules = {} } and tbl.rules contains the list of rules.
+
+	The tblname is used only for AutoCat_Logger()/logDebug() messages - i.e. debugging.
+
+	The ispredef flag signals that ALL of the rules in the source table are predefines if true.
+--]]
 local function addTableRules(tbl, tblname, ispredef)
-	if not tbl.rules or tbl.rules == ac_rules.ruleList then return end
+	if not tbl or not tbl.rules or tbl.rules == ac_rules.ruleList then return end
 
 	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
@@ -631,9 +638,10 @@ local function addTableRules(tbl, tblname, ispredef)
 			logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", #ac_rules.ruleList)
 			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
 			return true
+			
 		else
 			ac_rules.ruleList[n] = rl
-			logDebug("[AutoCategory] Overwriting rule ", rl.name, " to Rulac_rulesesW.ruleList ndx=", n)
+			logDebug("[AutoCategory] Overwriting rule ", rl.name, " in ac_rules.ruleList ndx=", n)
 			ac_rules.ruleNames[rl.name] = n
 		end
 		return false
@@ -663,9 +671,7 @@ local function addTableRules(tbl, tblname, ispredef)
 		if ispredef == true then
 			v.pred=1
 		end
-        if not v.compile then 
-            setmetatable(v,{__index = AutoCategory.RuleApiMixin})
-        end
+		AutoCat.attachRuleMixin(v)
 
 		r = getRuleByName(v.name)
 		if r then

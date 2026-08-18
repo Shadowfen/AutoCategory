@@ -43,6 +43,13 @@ function AutoCategory.isValidRule(ruledef)
     return true
 end
 
+
+function AutoCategory.attachRuleMixin(rule)
+	if rule.compile then return end
+	    
+	setmetatable(rule, AutoCategory.RuleMetatable)
+end
+
 -- ----------------------------------------------------------
 -- factory for creating new rules
 -- minimum required contents = name. description, rule, tag

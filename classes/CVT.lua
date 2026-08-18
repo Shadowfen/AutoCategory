@@ -28,8 +28,8 @@ AutoCategory.CVT = ZO_Object:Subclass()
 
 AutoCategory.CVT.USE_NONE = 0
 AutoCategory.CVT.USE_VALUES = 1
-AutoCategory.CVT.USE_TOOLTIPS = 3
-AutoCategory.CVT.USE_ALL = 4
+AutoCategory.CVT.USE_TOOLTIPS = 2
+AutoCategory.CVT.USE_ALL = 3
 
 local USE_NONE = AutoCategory.CVT.USE_NONE
 local USE_VALUES = AutoCategory.CVT.USE_VALUES
