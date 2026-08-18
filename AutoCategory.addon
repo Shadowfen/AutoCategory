@@ -24,8 +24,8 @@ AutoCategory.xml
 Hooks_Keyboard.lua
 Hooks_Gamepad.lua
 classes/CVT.lua
-classes/RuleList.lua
 classes/RuleApi.lua
+classes/RuleList.lua
 classes/BagRuleApi.lua
 classes/BaseUI.lua
 ;misc/MiscDebugFuncs.lua

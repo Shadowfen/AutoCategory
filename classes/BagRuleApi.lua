@@ -1,10 +1,6 @@
 local SF = LibSFUtils
 local L = GetString
 
-AutoCategory.BagRuleMetatable = {
-    __index = AutoCategory.BagRuleApiMixin,
-}
-
 -- --------------------------------------------
 -- Create a new Bag Entry (factory)
 -- Rule parameter is required, runpriority is optional.
@@ -159,3 +155,7 @@ local bagRuleApiMixin = {
 }
 -- make accessible
 AutoCategory.BagRuleApiMixin = bagRuleApiMixin
+AutoCategory.BagRuleMetatable = {
+    __index = AutoCategory.BagRuleApiMixin,
+}
+

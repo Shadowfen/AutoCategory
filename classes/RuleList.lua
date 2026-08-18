@@ -4,9 +4,9 @@ local SF = LibSFUtils
 -- collected (wrapper) functions to be applied to a rule list
 --
 AutoCategory.RuleList = ZO_Object:Subclass()
-AutoCategory.RuleMetatable = {
-    __index = AutoCategory.RuleApiMixin,
-}
+--AutoCategory.RuleMetatable = {
+--    __index = AutoCategory.RuleApiMixin,
+--}
 -- creates a rule list wrapper with a numeric-sequenced list of rules (not under a .rules!)
 function AutoCategory.RuleList:New(...)
     local obj = ZO_Object.New(self)
