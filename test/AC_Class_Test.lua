@@ -331,8 +331,10 @@ function ACClass_runTests()
     CVT_testSelect()
 end
 
-TK.init()
-
-ACClass_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    ACClass_runTests()
+    
+    TK.showResult("AC Class Tests")
+end

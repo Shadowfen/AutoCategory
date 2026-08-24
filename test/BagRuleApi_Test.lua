@@ -303,8 +303,10 @@ function BagRuleApi_runTests()
     Test_BagRuleApi_setHidden_sameValue()
 end
 
-TK.init()
-
-BagRuleApi_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    BagRuleApi_runTests()
+    
+    TK.showResult("AutoCat Tests")
+end

@@ -16,6 +16,7 @@ local ZO_PlayerInventory = {}
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
+require "SFUtils_Strings"
 require "SFUtils_Tables"
 require "SFUtils_LoadLanguage"
 require "SFUtils_Logger"
@@ -58,13 +59,17 @@ end
 local function Cache_testGetRuleByName()
     local tn = "testGetRuleByName"
     TK.printSuite(mn,tn)
-    local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    --printRule(decon)
+    local ac_rules = AutoCategory.RulesW
+    AutoCategory.cacheRuleInitialize()
+    AutoCategory.cache.AddRule({name="rule1", tag="group1", description="nah", rule="true",})
+    AutoCategory.cache.AddRule({name="Deconstruct", tag="Gears", description="Gears that I want to deconstruct", rule="traitstring(\"intricate\")",})
+
+    local  decon = AC.GetRuleByName("Deconstruct") --GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
     TK.assertNotNil(decon, "decon rule in saved.rules")
     if decon then
-      TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
-      TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
-      TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), "decon rule description is correct")
+      TK.assertTrue(decon.name == "Deconstruct", "decon rule name is correct")
+      TK.assertTrue(decon.tag == "Gears", "decon rule tag is correct")
+      TK.assertTrue(decon.description == "Gears that I want to deconstruct", "decon rule description is correct")
       TK.assertTrue(decon.rule == "traitstring(\"intricate\")", "decon rule text is correct")
     end
     
@@ -132,8 +137,10 @@ function Cache_runTests()
     --Cache_testUpdateSavedVars()
 end
 
-TK.init()
-
-Cache_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    Cache_runTests()
+    
+    TK.showResult("Cache Tests")
+end

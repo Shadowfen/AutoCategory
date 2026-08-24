@@ -859,7 +859,7 @@ local function TestCVT_SetControlName()
     TK.assertTrue(cvt.controlName == "myNewControl", "cvt.controlName = "..cvt.controlName)
 end
 
-local function TestCVT_runAll()
+function TestCVT_runAll()
     TestCVT_New()
     TestCVT_Initialize()
     TestCVT_BasicAccessors()
@@ -879,6 +879,10 @@ local function TestCVT_runAll()
     TestCVT_CorruptChoices()
 end
 
-TK.init()
-TestCVT_runAll()
-TK.showResult("CVT")
+if not Suite then
+    TK.init()
+    
+    TestCVT_runAll()
+    
+    TK.showResult("CVT Tests")
+end

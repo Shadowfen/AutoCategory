@@ -1466,7 +1466,7 @@ AutoCategory.cache = {
     bags_svt = {}, -- {choices{bagname}, choicesValues{bagid}, choicesTooltips{bagname}} -- for the bags themselves
     entriesByBag = {}, -- [bagId] {choices{ico rule.name (pri)}, choicesValues{rule.name}, choicesTooltips{rule.desc/name or missing}} --
     entriesByName = {}, -- [bagId][rulename] {runpriority, showpriority, isHidden}
-	collapses = {},
+    collapses = {},
 }
 local cache = AutoCategory.cache
 
@@ -1507,9 +1507,6 @@ function AutoCategory.cache.AddRule(rule)
         return "AddRule: Rule or name of rule was nil"
     end -- can't use a nil rule
 	
-	--local mt = { __index = AC.rulefuncs, }
-	--setmetatable(rule, mt)
-
 	if not rule.tag or rule.tag == "" then
         rule.tag = AC_EMPTY_TAG_NAME
     end

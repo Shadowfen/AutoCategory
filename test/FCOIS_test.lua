@@ -65,8 +65,10 @@ function FCOIS_runTests()
   FCOIS_testPredefines()
 end
 
-TK.init()
-
-FCOIS_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    FCOIS_runTests()
+    
+    TK.showResult("FCOIS Tests")
+end

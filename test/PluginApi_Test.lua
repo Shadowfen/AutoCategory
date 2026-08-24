@@ -42,7 +42,7 @@ AutoCategory.Environment = {}
 
 local TK = TestKit
 -- ============================================================
--- AutoCategory API Tests
+-- Plugin API Tests
 -- ============================================================
 
 -- ------------------------------------------------------------
@@ -265,16 +265,17 @@ end
 -- Run complete AutoCategory API test suite
 -- ------------------------------------------------------------
 
-local function runPluginAPITests()
+function runPluginAPITests()
     testDummyRuleFunc()
     testAddRuleFunc()
     testLoadLanguage()
     testRegisterPlugin()
 end
 
-
-TK.init()
-
--- convenient entry point
-runPluginAPITests()
-TK.showResult("PluginAPI")
+if not Suite then
+    TK.init()
+    
+    runPluginAPITests()
+    
+    TK.showResult("PluginAPI Tests")
+end

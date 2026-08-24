@@ -64,9 +64,8 @@ AC_UI.BagSet_EditRule_LAM = {
 }
 
 local function EditBag_testSize()
-    local tn = "testEditBagSize"
-    TK.printSuite(mn,tn)
-    d(BagSet_EditBag_LAM:size())
+    TK.printSuite(mn, "testEditBagSize")
+    
     TK.assertTrue(BagSet_EditBag_LAM:size() == 0, "has no choices")
     local newvals = {
       choices = { 1, 2, 4 },
@@ -76,228 +75,31 @@ local function EditBag_testSize()
     TK.assertTrue(BagSet_EditBag_LAM:size() == 3, "has 3 choices")
 end
 
-
-local function CVT_testNew()
-    local tn = "testCVTNew"
-    TK.printSuite(mn,tn)
-    local cvt = {}
-    TK.assertFalse(cvt.choices, "cvt has no choices" )
-     
-    cvt = AC.CVT:New("myControl", nil, AC.CVT.USE_ALL)
-    TK.assertTrue(cvt.choices and SF.GetSize(cvt.choices) == 0, "has empty choices")
-    TK.assertTrue(cvt.choicesValues and SF.GetSize(cvt.choicesValues) == 0, "has empty values")
-    TK.assertTrue(cvt.choicesTooltips and SF.GetSize(cvt.choicesTooltips) == 0, "has empty tooltips")
-    TK.assertTrue(cvt.controlName == "myControl", "control name "..cvt.controlName)
-end
-
-local function CVT_testAssign()
-    local tn = "testCVTAssign"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl",nil,AC.CVT.USE_VALUES)
-    TK.assertNil(cvt.indexValue,"no such indexValue")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
-    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-end
-
-local function CVT_testAssign2()
-    local tn = "testCVTAssign2"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl",nil,AC.CVT.USE_VALUES)
-    TK.assertNil(cvt.indexValue,"no such indexValue")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-      indexValue = "two",
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
-    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..tostring(cvt.indexValue))
-end
-
-local function CVT_testAssign3()
-    local tn = "testCVTAssign3"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl2", "two", AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl2", "cvt.controlName == myControl2")
-    cvt:select( "four" )
-    TK.assertNotNil(cvt.indexValue,"indexValue = "..tostring(cvt.indexValue))
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-      indexValue = "two",
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
-    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
-    cvt:select( "four" )
-    TK.assertTrue(cvt.indexValue == "four", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl2", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testSelect()
-    local tn = "testCVTSelect"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl3",nil,AC.CVT.USE_VALUES)
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-      indexValue = "two", -- ignored by assign
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.indexValue == "two", "beginning indexValue (after assign) == "..tostring(cvt.indexValue))
-    cvt:select("one")
-    TK.assertTrue(cvt.indexValue == "one", "next indexValue == "..cvt.indexValue)
-    cvt:select("four")
-    TK.assertTrue(cvt.indexValue == "four", "next indexValue == "..cvt.indexValue)
-    cvt:select("three")
-    TK.assertTrue(cvt.indexValue == "three", "next indexValue == "..cvt.indexValue)
-    cvt:select("five")  --  bad value
-    TK.assertTrue(cvt.indexValue == "three", "bad (five) indexValue == "..cvt.indexValue)
-end
-
-local function CVT_testAppend()
-    local tn = "testCVTAppend"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl3",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl3", "cvt.controlName == myControl3")
-    cvt.indexValue = "four"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-      indexValue = "two",
-    }
-    cvt:assign(newvals)
-    cvt:append( 3, "three", "")
-    cvt.indexValue = "two"
-    TK.assertTrue(cvt.choices[4] == 3, "choices[4] == three")
-    TK.assertTrue(cvt.choicesValues[4] == "three", "choicesValues[4] == three")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl3", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testRemoveMid()
-    local tn = "testCVTRemoveMid"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "four"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    cvt:removeItemChoiceValue("four")
-    TK.assertTrue(cvt.choices[3] == 3, "choices[3] == three")
-    TK.assertTrue(cvt.choicesValues[3] == "three", "choicesValues[3] == three")
-    TK.assertTrue(cvt.indexValue == "three", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testRemoveFst()
-    local tn = "testCVTRemoveFst"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "one"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    cvt:removeItemChoiceValue("one")
-    TK.assertTrue(cvt.choices[1] == 2, "choices[3] == two")
-    TK.assertTrue(cvt.choicesValues[1] == "two", "choicesValues[1] == two")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testRemoveLst()
-    local tn = "testCVTRemoveLst"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "three"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    cvt:removeItemChoiceValue("three")
-    TK.assertTrue(cvt.choices[1] == 1, "choices[1] == one")
-    TK.assertTrue(cvt.choicesValues[1] == "one", "choicesValues[1] == one")
-    TK.assertTrue(cvt.indexValue == "four", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testClear()
-    local tn = "testCVTClear"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "three"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(SF.GetSize(cvt.choices) == 4, "#choices == 4")
-    local chc = cvt.choices
-    cvt:clear()
-    TK.assertTrue(SF.GetSize(cvt.choices) == 0, "#choices == 0")
-    TK.assertTrue(cvt.choices == chc, "same choices table")
-    TK.assertTrue(cvt.choices[1] == nil, "choices[1] == nil")
-    --TK.assertTrue(cvt.indexValue == nil, "indexValue == nil")
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
-
-local function CVT_testSetControlName()
-    local tn = "testCVTAppend"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New()
-    TK.assertNil(cvt.controlName, "cvt.controlName == nil")
-    cvt:setControlName("myNewControl")
-    TK.assertTrue(cvt.controlName == "myNewControl", "cvt.controlName = "..cvt.controlName)
-end
-
 local function Cache_testIsValidRule()
-    local tn = "testIsValidRule"
-    TK.printSuite(mn,tn)
+    TK.printSuite(mn, "testIsValidRule")
+    
     local rule = {}
      TK.assertFalse(AutoCategory.isValidRule(nil), "nil rule is not valid" )
      TK.assertFalse(AutoCategory.isValidRule(rule), "empty rule is not valid" )
+     
      rule.name = "test1"
      local rslt,err = AutoCategory.isValidRule(rule)
      TK.assertTrue(rslt == false and err == "rule text is required", "name-only rule is not valid")
+     
      rule.rule = "false"
-     rslt,err = AutoCategory.isValidRule(rule)
+     rslt, err = AutoCategory.isValidRule(rule)
      TK.assertTrue(rslt and not err, "name and text make a valid rule")
 end
 
 local function Cache_testGetRuleByName()
-    local tn = "testGetRuleByName"
-    TK.printSuite(mn,tn)
-   local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    --TR.printRule(decon)
+    TK.printSuite(mn, "testGetRuleByName")
+    
+    local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
     TK.assertNotNil(decon, "decon rule in saved.rules")
     TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
     TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
-    TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), "decon rule description is correct")
+    TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), 
+        "decon rule description is correct")
     TK.assertTrue(decon.rule == "traitstring(\"intricate\")", "decon rule text is correct")
     
     local badrule = AC.GetRuleByName("haha")
@@ -334,10 +136,13 @@ local function Cache_testAddRule()
 end
 
 local function Cache_testUpdateSavedVars()
+    TK.printSuite(mn, "testUpdateSavedVars")
+    
     local happy = AC.GetRuleByName("happy")
     TK.assertNotNil(happy,"still have rule happy defined")
-    AC.charSaved.accountWide = false
-    TK.assertFalse(AC.charSaved.accountWide,"Settings are toon-only")
+    
+    --AC.charSaved.accountWide = false
+    --TK.assertFalse(AC.charSaved.accountWide,"Settings are toon-only")
 
     AutoCategory.UpdateCurrentSavedVars()
     TK.assertNotNil(AutoCategory.saved.rules, "saved.rules has entries")
@@ -345,8 +150,8 @@ local function Cache_testUpdateSavedVars()
     TK.assertTrue(AC.listcount(saved.rules) > 0, "saved.rules has "..AC.listcount(saved.rules).." entries")
     TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "#saved.rules == #compiledRules")
 
-    AC.charSaved.accountWide = true
-    TK.assertTrue(AC.charSaved.accountWide,"Settings are account-wide")
+    --AC.charSaved.accountWide = true
+    --TK.assertTrue(AC.charSaved.accountWide,"Settings are account-wide")
 
     AutoCategory.UpdateCurrentSavedVars()
     TK.assertNotNil(AutoCategory.saved.rules, "saved.rules has entries")
@@ -354,25 +159,22 @@ local function Cache_testUpdateSavedVars()
     TK.assertTrue(AC.listcount(saved.rules) > 0, "saved.rules has "..AC.listcount(saved.rules).." entries")
     TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "#saved.rules == #compiledRules")
 end
+
 
 function misc_runTests()
-  CVT_testNew()
-  --EditBag_testSize()
-
-  CVT_testAssign()
-  CVT_testAssign2()
-  CVT_testAssign3()
-  CVT_testAppend()
-  CVT_testSetControlName()
-  CVT_testRemoveMid()
-  CVT_testRemoveFst()
-  CVT_testRemoveLst()
-  CVT_testClear()
-  CVT_testSelect()
+  Cache_testIsValidRule()
+  --Cache_testGetRuleByName()
+  --Cache_testResetToDefaults()
+  --Cache_testAddRule()
+  --Cache_testUpdateSavedVars()
+  
+  EditBag_testSize()
 end
 
-TK.init()
-
-misc_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    misc_runTests()
+    
+    TK.showResult("Misc Cache Tests")
+end

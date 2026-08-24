@@ -541,7 +541,7 @@ local function TestRuleList_MixinAssign()
     end
 end
 
-local function TestRuleList_runAll()
+function TestRuleList_runAll()
     TestRuleList_Init()
     TestRuleList_size()
     TestRuleList_getRuleByName()
@@ -556,6 +556,10 @@ local function TestRuleList_runAll()
     TestRuleList_MixinAssign()
 end
 
-TK.init()
-TestRuleList_runAll()
-TK.showResult("AutoCategory.RuleList")
+if not Suite then
+    TK.init()
+    
+    TestRuleList_runAll()
+    
+    TK.showResult("RuleListTests")
+end

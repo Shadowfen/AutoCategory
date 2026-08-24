@@ -171,6 +171,10 @@ function testAutoCat_runAll()
     testBagRuleRunSortingFunction()
 end
 
-TK.init()
-testAutoCat_runAll()
-TK.showResult("AutoCat")
+if not Suite then
+    TK.init()
+    
+    testAutoCat_runAll()
+    
+    TK.showResult("AutoCat Tests")
+end

@@ -562,6 +562,10 @@ function test_RuleApi_runAll()
     test_RuleApi_compiledExec()
 end
 
-TK.init()
-test_RuleApi_runAll()
-TK.showResult("TestRuleApi")
+if not Suite then
+    TK.init()
+    
+    test_RuleApi_runAll()
+    
+    TK.showResult("RuleAPI Tests")
+end

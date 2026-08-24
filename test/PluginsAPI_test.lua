@@ -153,9 +153,10 @@ function PluginsAPI_runTests()
     AutoCategory.LoadLanguage(AutoCategory_localization_strings,"en")
 end
 
-TK.init()
-
-PluginsAPI_runTests()
-
-TK.showResult(mn)
-
+if not Suite then
+    TK.init()
+    
+    PluginsAPI_runTests()
+    
+    TK.showResult("PluginsAPI Tests")
+end

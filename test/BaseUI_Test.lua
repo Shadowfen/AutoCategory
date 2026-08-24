@@ -666,6 +666,10 @@ function TestBaseUI_runAll()
     TestBaseDD_UpdateControl_NotDirty()
 end
 
-TK.init()
-TestBaseUI_runAll()
-TK.showResult("BaseUI / BaseDD")
+if not Suite then
+    TK.init()
+    
+    TestBaseUI_runAll()
+    
+    TK.showResult("BaseUI / BaseDD Tests")
+end

@@ -18,7 +18,13 @@ require "SFUtils_LoadLanguage"
 require "SFUtils_Logger"
 local SF = LibSFUtils
 
+-- Set this so that the individual test files don't try to run
+-- immediately on loading and instead wait until called from here.
+Suite=true
+
+
 require "AutoCategory_Global"
+require "lang.strings"
 require "AutoCategory_Defaults"
 require "Plugin_API"
 require "Hooks_Keyboard"
@@ -28,10 +34,16 @@ require "classes.RuleApi"
 require "classes.BagRuleApi"
 require "classes.BaseUI"
 require "AutoCategory"
+require "settings.UI_Utilities"
+require "settings.BagSet"
+require "settings.CategorySettings"
+require "AddonMenu"
+
 local AC = AutoCategory
 
 local mn = "AutoCategory"
 
+--[[
 AC.compiledRules = {}
 AutoCategory.saved= { 
     rules = {},             -- [#] rule {name, tag, description, rule, damaged}
@@ -50,11 +62,11 @@ AutoCategory.cache = {
 AutoCategory.cache.bags.showNames = {}
 AutoCategory.cache.bags.values = {}
 AutoCategory.cache.bags.tooltips = {}
-
-AutoCategory.Environment = {}
---
-require "AddonMenu"
 --]]
+--AutoCategory.Environment = {}
+
+require "AddonMenu"
+
 local saved = AutoCategory.saved
 local cache = AutoCategory.cache
 
@@ -81,7 +93,9 @@ function TR.printTable(tbl)
 end
 
 
-
+AutoCategory.acctRules = {
+  rules = {},
+}
 
 
 
@@ -163,99 +177,46 @@ function testCheckRule()
 end
 
 
-local spmap = {
-    ["entry1"] = true,
-    ["entry2"] = 2,
-}
-local function isKnown(arg, typekey, fn, map)
-    if type( arg ) == "number" then
-        if arg == typekey then
-            return true
-        end
-        
-    elseif map and type( arg ) == "string" then
-        local val = map[string.lower( arg )]
-        if type ( val ) == "table" then
-            if val[typekey] then
-                return true
-            end
-        else
-            if val and val == typekey then
-                return true
-            end
-        end
-    else
-        error( string.format("error: %s(): argument is error." , fn ) )
-    end
-    
-    -- no match
-    return false
-end
 
-
-function testKnown()
-    local tn = "testKnown"
-    TK.printSuite(mn,tn)
-
-  TK.assertTrue(isKnown(15,15,"fifteen",nil),"isKnown 15 == 15")
-  TK.assertFalse(isKnown(15,16,"fifteen-sixteen",nil),"isKnown 15 ~= 16")
-  TK.assertTrue(isKnown("entry1", true, "entry1",spmap),"isKnown entry1 is true")
-  TK.assertTrue(isKnown("entry2", 2, "entry2",spmap),"isKnown entry2 is 2")
-  TK.assertFalse(isKnown("entry3", 3, "entry3",spmap),"isKnown entry3 does not exist")
-end
-
-function testRuleSpecItemType()
-    local tn = "testRuleSpecItemType"
-    TK.printSuite(mn,tn)
-
-  function AutoCategory.RuleFunc.SpecializedItemType( ... )
-    local fn = "type"
-    local ac = select( '#', ... )
-      if ac == 0 then
-      error( string.format("error: %s(): require arguments." , fn))
-    end
-    
-    for ax = 1, ac do
-      local arg = select( ax, ... )
-      
-      if not arg then
-        error( string.format("error: %s():  argument is nil." , fn))
-      end
-          local rslt = isKnown(arg, spmap[arg], fn, spmap)
-          if rslt then return rslt end
-    end
-    
-    return false
-    
-  end
-
-
-  TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry1","entry2"),"sit matches first")
-  TK.assertTrue(AC.RuleFunc.SpecializedItemType("entry3","entry2"),"sit matches second")
-end
-
-
-
-require "test.loggerTest"
-require "test.PluginsAPI_test"
+require "test.ACCache_test"
+require "test.AutoCat_Test"
+require "test.BagRuleApi_Test"
+require "test.BagSet_Test"
+require "test.BaseUI_Test"
+require "test.CVT_Test"
 require "test.FCOIS_test"
 require "test.Iakoni_test"
-require "test.ACCache_test"
---require "test.Misc_test"
 require "test.misc"
+require "test.Misc_test"
+require "test.PluginAPI_test"
+require "test.PluginsAPI_test"
+require "test.RuleApi_Test"
+require "test.RuleList_Test"
 
 -- --------------------------------------------------------------------------
-logger_testNew()
-PluginsAPI_runTests()
-FCOIS_runTests()
-Iakoni_runTests()
---Cache_runTests()
---Misc_runTests()
---misc_runTests()
+function TestAC_runAll()
+    testAutoCat_runAll()
+    BagRuleApi_runTests()
+    --testBagSet_runAll()
+    TestBaseUI_runAll()
+    TestCVT_runAll()
+    Cache_runTests()
+    FCOIS_runTests()
+    Iakoni_runTests()
+    
+    PluginsAPI_runTests()
+    runPluginAPITests()
+    
+    test_RuleApi_runAll()
+    TestRuleList_runAll()
+    misc_runTests()
 
-testCheckRule()
-testKnown()
-testRuleSpecItemType()
+    testCheckRule()
+    --Misc_runTests()
+end
 
-TK.showResult()
- 
+TK.init()
+
+TestAC_runAll()
+
+TK.showResult("AC Tests")

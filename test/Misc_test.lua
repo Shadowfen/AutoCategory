@@ -52,11 +52,13 @@ local function Misc_testgetPriceTTC()
 end
 
 function Misc_runTests()
-  --Misc_testgetPriceTTC()
+  Misc_testgetPriceTTC()
 end
 
-TK.init()
-  
-Misc_testgetPriceTTC()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    Misc_testgetPriceTTC()
+    
+    TK.showResult("Misc TTC Tests")
+end

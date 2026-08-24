@@ -66,8 +66,10 @@ function Iakoni_runTests()
 end
 
 
-TK.init()
-
-Iakoni_runTests()
-
-TK.showResult(mn)
+if not Suite then
+    TK.init()
+    
+    Iakoni_runTests()
+    
+    TK.showResult("Iakoni Tests")
+end
