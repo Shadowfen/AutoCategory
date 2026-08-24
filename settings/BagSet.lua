@@ -5,6 +5,7 @@ local L = GetString
 local CVT = AutoCategory.CVT
 
 local logDebug = AutoCategory.logDebug
+local logWouldDebug = AutoCategory.logWouldDebug
 
 --cache data for dropdown: 
 AutoCategory.cache.bags_cvt.choices = {
@@ -701,7 +702,10 @@ function AC_UI.AddCat_SelectRule_LAM.filterRules(bagId, tag)
 	end
 
 	local rbyt = AutoCategory.RulesW.tagGroups[tag]
-    logDebug("[BagSet] # entries for tag ", rbyt:size())
+	if logWouldDebug() then
+		-- protect :size execution
+    	logDebug("[BagSet] # entries for tag ", rbyt:size())
+	end
 	for i = 1, rbyt:size() do
 		local value = rbyt.choices[i]
 		if value and cache.entriesByName[bagId][value] == nil then

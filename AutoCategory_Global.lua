@@ -29,36 +29,15 @@ AutoCategory = {
     BulkMode = false,
 }
 
-AutoCat_Logger = SF.SafeLoggerFunction(AutoCategory, "logger", "AutoCategory")
+-- Create the delayed instantiation logger functor and utility functions for AutoCategory.
+AutoCat_Logger, AutoCategory.logDebug, AutoCategory.logWouldDebug = 
+            SF.InitSafeLogger(AutoCategory, "logger", "AutoCategory")
 
---[[
-    The following SetDebug() call is commented out because it severely slows down 
+--[[ The following SetDebug() call is commented out because it severely slows down 
     addon operation. Turning it on does however provide lots and lots of debug logging.
     Never leave this uncommented when releasing!!
 --]]
 --AutoCat_Logger():SetDebug(true)
-
---[[ convenience function for a call to AutoCat_Logger():Debug(SF.str(...))
-    only done for Debug() because there is no special handling for the other message levels
-    always returns nil
---]]
-function AutoCategory.logDebug(...)
-    local n = select("#", ...)
-    if n == 0 then return end
-
-    local logger = AutoCat_Logger()
-
-    -- skip parameter processing if they are not going to be used.
-    if not logger.enabled or not logger.SFenableDebug then return end
-
-    if n == 1 then
-        logger:Debug(...)
-
-    else
-        logger:Debug(SF.str(...))
-   end
-end
-
 
 -- Namespace for the AutoCategory user interface elements
 AC_UI = {}

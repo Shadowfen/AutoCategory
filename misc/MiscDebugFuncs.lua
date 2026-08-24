@@ -7,6 +7,7 @@ local cache = AutoCat.cache
 local AddCat_SelectTag_LAM = AC_UI.AddCat_SelectTag_LAM
 
 local logDebug = AutoCategory.logDebug
+local logWouldDebug = AutoCategory.logWouldDebug
 
 -- restore a version of d() that is not captured by libDebugLogger
 local sysd = function(msg)
@@ -350,5 +351,7 @@ function AutoCategory.displayItem(bagId, slotIndex)
     local itemType, specializedItemType = GetItemLinkItemType(link)
     local equipType = GetItemLinkEquipType(link) 
 	local filterType = GetItemLinkFilterTypeInfo(link)
-    logDebug("[AC-Debug] ", "type() = ", itemType, " ", getType(itemType), "  sptype() = ",specializedItemType, " ", getsptype(specializedItemType))
+	if logWouldDebug() then
+    	logDebug("[AC-Debug] ", "type() = ", itemType, " ", getType(itemType), "  sptype() = ",specializedItemType, " ", getsptype(specializedItemType))
+	end
 end

@@ -46,6 +46,7 @@ local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
 -- only done for Debug() because there is no special handling for the other message levels
 -- always returns nil
 local logDebug = AutoCategory.logDebug
+local logWouldDebug = AutoCategory.logWouldDebug
 
 
 -- ------------------------ RulesW defined in Globals  -------------------------------
@@ -635,7 +636,10 @@ local function addTableRules(tbl, tblname, ispredef)
 		local n = ac_rules.ruleNames[rl.name]
 		if not n then
 			ac_rules.ruleList[#ac_rules.ruleList+1] = rl
-			logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", #ac_rules.ruleList)
+			if logWouldDebug() then
+				-- protect the table # execution
+				logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", #ac_rules.ruleList)
+			end
 			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
 			return true
 			
@@ -852,7 +856,10 @@ function AutoCat.onPlayerActivated()
 	addTableRules(AutoCat.charSaved, ".charSaved", false)
 	AutoCat.charSaved.rules = nil	-- no longer used
 
-	logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
+	if logWouldDebug() then
+		-- protects SF.GetSize execution
+		logDebug("[AutoCategory] 2.5 predefined ", SF.GetSize(AutoCat.predefinedRules))
+	end
 
     AutoCat.UpdateCurrentSavedVars()
 	AutoCat.initializePlugins()
