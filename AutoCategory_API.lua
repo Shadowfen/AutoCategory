@@ -32,24 +32,24 @@ end
 		are supposed to be treated the same by us.
 --]]
 local BagTypeConversion = {
-	[BAG_BACKPACK]         = AC_BAG_TYPE_BACKPACK,
-	[BAG_WORN]             = AC_BAG_TYPE_BACKPACK,
-	[BAG_BANK]             = AC_BAG_TYPE_BANK,
-	[BAG_SUBSCRIBER_BANK]  = AC_BAG_TYPE_BANK,
-	[BAG_VIRTUAL]          = AC_BAG_TYPE_CRAFTBAG,
-	[BAG_GUILDBANK]        = AC_BAG_TYPE_GUILDBANK,
-	[BAG_HOUSE_BANK_ONE]   = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_TWO]   = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_THREE] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_FOUR]  = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_FIVE]  = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_SIX]   = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_SEVEN] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_EIGHT] = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_NINE]  = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_HOUSE_BANK_TEN]   = AC_BAG_TYPE_HOUSEBANK,
-	[BAG_FURNITURE_VAULT]  = AC_BAG_TYPE_FURNVAULT,
-    [BAG_VENGEANCE]        = AC_BAG_TYPE_VENGEANCE,
+    [BAG_BACKPACK or 1]         = AC_BAG_TYPE_BACKPACK,
+    [BAG_WORN or 2]             = AC_BAG_TYPE_BACKPACK,
+    [BAG_BANK or 3]             = AC_BAG_TYPE_BANK,
+    [BAG_SUBSCRIBER_BANK or 4]  = AC_BAG_TYPE_BANK,
+    [BAG_VIRTUAL or 5]          = AC_BAG_TYPE_CRAFTBAG,
+    [BAG_GUILDBANK or 6]        = AC_BAG_TYPE_GUILDBANK,
+    [BAG_HOUSE_BANK_ONE or 7]   = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_TWO or 8]   = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_THREE or 9] = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_FOUR or 10]  = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_FIVE or 11]  = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_SIX or 12]   = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_SEVEN or 13] = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_EIGHT or 14] = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_NINE or 15]  = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_HOUSE_BANK_TEN or 16]   = AC_BAG_TYPE_HOUSEBANK,
+    [BAG_FURNITURE_VAULT or 17]  = AC_BAG_TYPE_FURNVAULT,
+    [BAG_VENGEANCE or 18]        = AC_BAG_TYPE_VENGEANCE,
 
 }
 
@@ -132,7 +132,6 @@ local function adjustName(selfie, name, enhancement)
 	return name .. " (" .. enhancement .. ")"
 end
 
-
 --[[ see if we find a category rule match for the item passed in.
 	    i.e. execute the rule on the specific inventory item
 	runs all the rules assigned to the specific bag type against
@@ -153,10 +152,7 @@ function AutoCategory:MatchCategoryRules( bagId, slotIndex, specialType )
 	end
 
 	-- set up bagId and slotIndex to "pass in" to the rule functions
-    self.checking = SF.safeClearTable(self.checking)
-    self.checking.BagId = bagId
-    self.checking.SlotIndex = slotIndex
-    self.checking.ItemLink = GetItemLink(bagId, slotIndex)
+	self:setChecking(bagId, slotIndex)
 
 	local bag = AutoCategory.saved.bags[bag_type_id]
 	if not bag or not bag.rules then
