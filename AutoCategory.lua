@@ -40,7 +40,7 @@ AutoCat.BagRuleEntry = {}
 local saved = AutoCat.saved
 local cache = AutoCat.cache
 
-local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG)
+local AC_EMPTY_TAG_NAME = L(SI_AC_DEFAULT_NAME_EMPTY_TAG) or "<Empty>"
 
 -- convenience function for a call to AutoCat_Logger():Debug(SF.str(...))
 -- only done for Debug() because there is no special handling for the other message levels
@@ -51,48 +51,48 @@ local logWouldDebug = AutoCategory.logWouldDebug
 
 -- ------------------------ RulesW defined in Globals  -------------------------------
 
--- Add a tag if it is not already in the list(s)
+-- Add a tag if it is not already present.
 function AutoCat.RulesW.AddTag(name)
-	local RulesW = AutoCat.RulesW
-	if not name then return end
+    local RulesW = AutoCat.RulesW
+    if not name or name == "" then name = AC_EMPTY_TAG_NAME end
 
-    local tagGroup = RulesW.tagGroups
-    if not tagGroup then
-        RulesW.tagGroups = {}
-        tagGroup = RulesW.tagGroups
+    RulesW.tags = RulesW.tags or {}
+    RulesW.tagGroups = RulesW.tagGroups or {}
+
+    if not RulesW.tagGroups[name] then
+        RulesW.tags[#RulesW.tags + 1] = name
+        RulesW.tagGroups[name] = CVT:New(nil, nil, CVT.USE_TOOLTIPS)
     end
-	if not tagGroup[name] then
-		RulesW.tags[#RulesW.tags+1] = name
-		tagGroup[name] = CVT:New(nil,nil,CVT.USE_TOOLTIPS) -- uses choicesTooltips
-	end
 end
 
 -- Compile all of the rules that we know (if necessary)
 -- Mark those that failed to compile as damaged
---
 function AutoCat.RulesW:CompileAll()
-	-- reset AutoCat.compiledRules to empty, creating only if necessary
+	-- Reset the compiled-rule lookup, creating it if necessary.
 	self.compiled = SF.safeClearTable(self.compiled)
 
     if not self.ruleList or #self.ruleList == 0 then
 		-- there are no rules to compile
-		return
+		return 0, 0
     end
 	-- compile and store each of the rules in the ruleset
     local compiled  = 0
+	local damaged = 0
     local safeCall = SF.safeCall    -- alias
     for _, rule in ipairs(self.ruleList) do
-        -- Guard against a nil entry (shouldn’t happen with ipairs, but be safe)
         local ok, err = safeCall(rule.compile, rule)
         if ok then
             compiled = compiled + 1
+			rule:clearError()
+
         else
             -- Mark the rule as damaged so UI can highlight it
-            rule.damaged = true
-            rule.err     = err
+			damaged = damaged + 1
+			rule:setError(true, err)
             logDebug("[AutoCategory] Rule compile error for '%s': %s", rule.name, err)
         end
     end
+	return compiled, damaged
 end
 
 
@@ -109,32 +109,34 @@ end
 -- override AddRule from RuleList to add in lookup table updates
 function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
 	if not newRule or not newRule.name then return end	-- bad rule
+
+    local ruleNames = self.ruleNames
+    local name = newRule.name
+
+	-- Ignore an existing rule unless overwrite was requested.
+	local ndx = ruleNames[name]
+	if ndx and not overwriteFlag then
+		return
+	end
 	AutoCat.attachRuleMixin(newRule)
 
 	if not newRule.tag or newRule.tag == "" then
         newRule.tag = AC_EMPTY_TAG_NAME
     end
+
     if not self.tagGroups[newRule.tag] then
 	    self.AddTag(newRule.tag)
     end
 
     local ruleList = self.ruleList
-    local ruleNames = self.ruleNames
-    local name = newRule.name
-
-	local ndx = ruleNames[name]
 	if ndx then
-		-- rule by name already in list
-		if not overwriteFlag then
-            return      -- nothing to do
-		end
         -- Overwrite path – keep a reference to the old rule for tag cleanup
         local oldRule = ruleList[ndx]
 
         -- If the tag changed, purge the old name from the old tag’s CVT
         if oldRule.tag ~= newRule.tag then
             local oldCvt = self.tagGroups[oldRule.tag]
-            if oldCvt then oldCvt:remove(oldRule.name) end
+            if oldCvt then oldCvt:removeItemChoice(oldRule.name) end
         end
 
         ruleList[ndx] = newRule
@@ -148,12 +150,13 @@ function AutoCat.RulesW:AddRule(newRule, overwriteFlag)
 		ruleNames[name] = #ruleList
         logDebug("[AutoCategory] Rule '%s' added.", name)
 	end
-    local tagCvt = self.tagGroups[newRule.tag]
-    if tagCvt then
-        tagCvt:remove(name)   -- no‑op if not present
-        tagCvt:append(name, nil, newRule:getDesc())
-    end
 
+  local tagCvt = self.tagGroups[newRule.tag]
+  if tagCvt then 
+    tagCvt:removeItemChoice(name)   -- no‑op if not present
+    tagCvt:append(name, nil, newRule:getDesc())
+  end
+    
 	newRule:compile()
 end
 -- ---------------------end RulesW  -------------------------------
@@ -163,7 +166,7 @@ end
 -- for sorting rules by name
 -- returns true if the a should come before b
 local function RuleSortingFunction(a, b)
-    --alphabetical sort, cannot have same name rules
+    --alphabetical sort, will not have same name rules
     if not (a and b and a.name and b.name) then
         return false
     end
@@ -179,16 +182,17 @@ local function BagRuleShowSortingFunction(a, b)
     local aPriority = a.showpriority or a.runpriority
     local bPriority = b.showpriority or b.runpriority
 
-    if not aPriority or not bPriority then
-        return false
-    end
+    if not aPriority then
+        if bPriority then
+            return false
+        end
 
-    if aPriority ~= bPriority then
+	-- both have no priority; sort by name
+    elseif not bPriority then
+        return true
+
+    elseif aPriority ~= bPriority then
         return aPriority > bPriority
-    end
-
-    if type(a.name) ~= "string" or type(b.name) ~= "string" then
-        return false
     end
 
     return a.name < b.name
@@ -198,18 +202,30 @@ AutoCat_Internal.BagRuleShowSortingFunction = BagRuleShowSortingFunction
 -- for sorting bagged rules by runpriority and name
 -- returns true if the a should come before b
 local function BagRuleRunSortingFunction(a, b)
-    if not (a and b and a.name and b.name
-            and a.runpriority and b.runpriority) then
+    if not (a and b and a.name and b.name) then
         return false
     end
 
-    if a.runpriority ~= b.runpriority then
-        return a.runpriority > b.runpriority
+    local aPriority = a.runpriority
+    local bPriority = b.runpriority
+
+    if not aPriority then
+        if bPriority then
+            return false
+        end
+
+	-- both have no priority; sort by name
+    elseif not bPriority then
+        return true
+		
+    elseif aPriority ~= bPriority then
+        return aPriority > bPriority
     end
 
-    if type(a.name) ~= "string" or type(b.name) ~= "string" then
+    --[[if type(a.name) ~= "string" or type(b.name) ~= "string" then
         return false
     end
+	--]]
 
     return a.name < b.name
 end
@@ -239,8 +255,11 @@ function AutoCat.UpdateCurrentSavedVars()
 	-- RulesW.ruleList will have acctRules plus the predefined rules
 	table.sort(ac_rules.ruleList, RuleSortingFunction)
 
-    ac_rules:CompileAll()
+    local compiled, damaged = ac_rules:CompileAll()
+	logDebug("[AutoCategory] Compiled rules: ", compiled, " damaged rules: ", damaged)
 
+	AutoCat.PruneCollapse(charSaved)
+	AutoCat.PruneCollapse(acctSaved)
 	-- bags/collapses might or might not be acct wide
     if not charSaved.accountWide then
         saved.bags = charSaved.bags
@@ -250,7 +269,6 @@ function AutoCat.UpdateCurrentSavedVars()
         saved.bags = acctSaved.bags
         saved.collapses = acctSaved.collapses
     end
-	
     AutoCat.cacheInitialize()
 end
 
@@ -258,35 +276,62 @@ end
 -- Manage collapses
 -- -----------------------------------------------------------
 function AutoCat.LoadCollapse()
-    if not AutoCat.acctSaved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
+	if not saved.general["SAVE_CATEGORY_COLLAPSE_STATUS"] then
         --init
-        return AutoCat.ResetCollapse(AutoCat.saved)
+        return AutoCat.ResetCollapse(saved)
+    end
+end
+
+function AutoCat.PruneCollapse(vars)
+    if not vars or not vars.collapses then return end
+
+    for _, bagcol in pairs(vars.collapses) do
+        if bagcol then
+            for k in pairs(bagcol) do
+                if bagcol[k] == false then bagcol[k] = nil end
+            end
+        end
     end
 end
 
 function AutoCat.ResetCollapse(vars)
-    for j = 1, #cache.bags_cvt do
-		local bagcol = vars.collapses[j]
-		for k,_ in pairs(bagcol) do
-			bagcol[k] = nil
-		end
-	end
+    if not vars or not vars.collapses then return end
+
+    for _, bagcol in pairs(vars.collapses) do
+        if bagcol then
+            for k in pairs(bagcol) do
+                bagcol[k] = nil
+            end
+        end
+    end
 end
 
 -- Determine if the specified category of the particular bag is collapsed or not
 function AutoCat.IsCategoryCollapsed(bagTypeId, categoryName)
-	if bagTypeId == nil or categoryName == nil then return false end
-
-	local collapsetbl = SF.safeTable(AutoCat.saved.collapses[bagTypeId])
-    return collapsetbl[categoryName] or false
+    if bagTypeId == nil or categoryName == nil then
+        return false
+    end
+    local saved = AutoCat.saved
+    
+    local collapsetbl = saved.collapses[bagTypeId]
+    return collapsetbl and collapsetbl[categoryName] or false
 end
-
 
 function AutoCat.SetCategoryCollapsed(bagTypeId, categoryName, collapsed)
-	if not bagTypeId or not categoryName then return end
-	if not saved.collapses[bagTypeId] then saved.collapses[bagTypeId] = {} end
-	saved.collapses[bagTypeId][categoryName] = collapsed
+    if bagTypeId == nil or categoryName == nil then
+        return
+    end
+    if collapsed == false then collapsed = nil end
+    local saved = AutoCat.saved
+
+    saved.collapses[bagTypeId] = SF.safeTable(saved.collapses[bagTypeId])
+    local collapsetbl = saved.collapses[bagTypeId]
+
+    collapsetbl[categoryName] = collapsed
 end
+-- create local alias for references in this function
+local setCategoryCollapsed = AutoCat.SetCategoryCollapsed
+
 -- -----------------------------------------------------------
 
 -- will need to rebuild RulesW.ruleList after this
@@ -325,21 +370,18 @@ function AutoCat.ResetToDefaults()
 	charSaved.accountWide = AutoCat.defaultSettings.accountWide
 end
 
--- create local alias for references in this function
-local setCategoryCollapsed = AutoCat.SetCategoryCollapsed
 
 -- rename a rule, updates the cache lookups and bagsets too
 function AutoCat.renameRule(oldName, newName)
-	if oldName == newName then return oldname end
+	if oldName == newName then return oldName end
 
 	local rule = AutoCat.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
 
-	local oldrndx = ac_rules.ruleNames[oldName]
-	ac_rules.ruleNames[oldName] = nil
-
 	newName = AutoCat.GetUsableRuleName(newName)
 
+	local oldrndx = ac_rules.ruleNames[oldName]
+	ac_rules.ruleNames[oldName] = nil
 	rule.name = newName
 	ac_rules.ruleNames[rule.name] = oldrndx
 
@@ -350,13 +392,14 @@ end
 -- When a rule changes names, referencees to in the bag rules also need to change
 function AutoCat.renameBagRule(oldName, newName)
 	if oldName == newName then return end
+	local bags = saved.bags
 
 	--Update bags so that every entry has the same name, should be changed to new name.
 	local function func(bagId)
-		local bag = saved.bags[bagId]
+		local bag = bags[bagId]
 		if not bag then 
 			bag = { rules = {}, }
-			saved.bags[bagId] = bag
+			bags[bagId] = bag
 		end
 		local rules = bag.rules
 		for j = 1, #rules do   -- for all bagrules in the bag
@@ -386,10 +429,10 @@ function AutoCat.cacheRuleInitialize()
         ac_rules.ruleNames[name] = ndx
 
 		-- ensure tag value is valid
-        local tag = rule.tag
-        if tag == "" then
-            tag = AC_EMPTY_TAG_NAME
-        end
+		if not rule.tag or rule.tag == "" then
+			rule.tag = AC_EMPTY_TAG_NAME
+		end
+		local tag = rule.tag
 
         --update tag grouping lookups
 		ac_rules.AddTag(tag)
@@ -397,6 +440,31 @@ function AutoCat.cacheRuleInitialize()
     end
 end
 
+function AutoCat.InitScrollBag(bagId)
+	logDebug("[InitScrollBag]  bagId ", bagId)
+	if bagId == nil or bagId < AC_BAG_TYPE_MIN or bagId > AC_BAG_TYPE_MAX then 
+		return
+	end
+
+	local svdbag = AutoCat.saved.bags[bagId]		-- alias
+	if not svdbag or not svdbag.rules then return end
+	
+	table.sort(svdbag.rules, BagRuleShowSortingFunction)
+
+	-- Populate the display list in show order.
+	local win = AutoCat.dspWin
+	win:ClearList()
+	logDebug("[InitScrollBag] #svdbag.rules ", #svdbag.rules)
+
+	for entry = 1, #svdbag.rules do
+		local bagrule = svdbag.rules[entry] 	-- BagRule {name, runpriority, showpriority, isHidden}
+		if not bagrule then break end
+
+		logDebug("[InitScrollBag] sbag ", entry, " bagrule.name ", bagrule.name)
+		win:AddItem(bagrule)
+	end
+	win:UpdateScrollList()
+end
 
 -- populate the entriesByName and entriesByBag lists in the cache from the saved.bags table
 -- bagId needs to be between AC_BAG_TYPE_MIN and AC_BAG_TYPE_MAX (inclusive)
@@ -404,6 +472,7 @@ function AutoCat.cacheInitBag(bagId)
 	if bagId == nil or bagId < AC_BAG_TYPE_MIN or bagId > AC_BAG_TYPE_MAX then 
 		return
 	end
+  local saved = AutoCat.saved
 
 	-- initialize the bag-based lookups for this bag
     cache.entriesByName[bagId] = SF.safeClearTable(cache.entriesByName[bagId])
@@ -412,80 +481,65 @@ function AutoCat.cacheInitBag(bagId)
 	cache.entriesByShowBag[bagId] = CVT:New(nil, nil, CVT.USE_VALUES)
 	cache.entriesByShowBag[bagId].bagrules = {}
 
+	if saved.bags[bagId] == nil then
+		saved.bags[bagId] = {rules={}}
+
+	elseif not saved.bags[bagId].rules then
+		saved.bags[bagId].rules={}
+	end
+
 	-- aliases
 	local ename = cache.entriesByName[bagId]	-- { [name] BagRule{ name, runpriority, showpriority, isHidden } }
 	local ebag = cache.entriesByBag[bagId]		-- CVT
 	local sbag = cache.entriesByShowBag[bagId]		-- CVT
 
-	-- fill the bag-based lookups
-    -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
-	if saved.bags[bagId] == nil then
-		saved.bags[bagId] = {rules={}}
-	elseif not saved.bags[bagId].rules then
-		saved.bags[bagId].rules={}
-	end
-
-	logDebug("[AutoCategory] Initializing sbag ", bagId, " with bagrules")
 	local svdbag = saved.bags[bagId]		-- alias
 
-	if svdbag ~= nil then
-		table.sort(svdbag.rules, BagRuleShowSortingFunction)
+	-- Normalize the bag rules (order is not important)
+	logDebug("[cacheInitBag] Normalize bag rules for ", bagId)
+	local savedrules = svdbag.rules
+	local countrules = #savedrules
+	for ndx = countrules, 1, -1 do
+		local bagrule = savedrules[ndx] -- BagRule {name, runpriority, showpriority, isHidden}
+		if not bagrule then break end
+		if not bagrule.formatValue then 
+			setmetatable(bagrule,{__index = AutoCategory.BagRuleApiMixin})
+		end
+		bagrule:convertPriority()
 	end
-	local win = AutoCat.dspWin
-	win:ClearList()
-	do
-		local sn
-        if svdbag then
-            for entry = 1, #svdbag.rules do
-                local bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-                if not bagrule then break end
-                if not bagrule.formatValue then 
-                    setmetatable(bagrule,{__index = AutoCategory.BagRuleApiMixin})
-                end
 
-                logDebug("[AutoCategory] sbag ", entry, " bagrule.name ", bagrule.name)
+    -- load in the bagged rules (sorted by showpriority high-to-low) into the dropdown
+	logDebug("[cacheInitBag] Initializing sbag ", bagId, " with bagrules")
 
-                sn = bagrule:formatShow()
-                sbag.choices[#sbag.choices+1] = sn
-                sbag.choicesValues[#sbag.choicesValues+1] = bagrule:formatValue()
-                sbag.bagrules[#sbag.bagrules+1] = bagrule
-                win:AddItem(bagrule)
-            end
-        end
+	-- initialize dspWin with bag rules sorted by showpriority high-to-low order
+	AutoCat.InitScrollBag(bagId)
+	
+	--table.sort(svdbag.rules, BagRuleShowSortingFunction)		-- already sorted by InitScrollBag
+	for entry = 1, countrules do
+		local bagrule = savedrules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
+		if not bagrule then break end
+
+		logDebug("[cacheInitBag] sbag ", entry, " bagrule.name ", bagrule.name)
+
+		sbag:append(bagrule:formatShow(),  bagrule:formatValue())
+		sbag.bagrules[#sbag.bagrules+1] = bagrule
 	end
-	win:UpdateScrollList()
 		
-		
-	if svdbag ~= nil then
-		table.sort(svdbag.rules, BagRuleRunSortingFunction)
-	end
+    -- load in the bagged rules (sorted by runpriority high-to-low) into the dropdown
+	table.sort(svdbag.rules, BagRuleRunSortingFunction)
+	
+	logDebug("[cacheInitBag] Initializing ebag ", bagId, " with bagrules")
+	local bagrule
+	for entry = 1, countrules do
+		bagrule = savedrules[entry] 		-- BagRule {name, runpriority, showpriority, isHidden}
+		if not bagrule then break end
 
-	logDebug("[AutoCategory] Initializing bag ", bagId, " with bagrules")
-	do
-		local sn
-		local tt
-		local bagrule
-        if svdbag then
-            for entry = 1, #svdbag.rules do
-                bagrule = svdbag.rules[entry] -- BagRule {name, runpriority, showpriority, isHidden}
-                if not bagrule then break end
-
-                local ruleName = bagrule.name
-                bagrule:convertPriority()
-                logDebug("[AutoCategory] bag ", entry, " bagrule.name ", bagrule.name)
-                if not ename[ruleName] then
-                    ename[ruleName] = bagrule
-                    ebag.choicesValues[#ebag.choicesValues+1] = bagrule:formatValue()
-
-                    sn = bagrule:formatShow()
-                    tt = bagrule:formatTooltip()
-                    ebag.choices[#ebag.choices+1] = sn
-                    ebag.choicesTooltips[#ebag.choicesTooltips+1] = tt
-                else
-                    ename[ruleName] = bagrule
-                end
-            end
-        end
+		local ruleName = bagrule.name
+		logDebug("[cacheInitBag] ebag ", entry, " bagrule.name ", bagrule.name)
+		if not ename[ruleName] then
+			ebag:append(bagrule:formatShow(),  bagrule:formatValue(), bagrule:formatTooltip())
+		end
+		ename[ruleName] = bagrule
 	end
 
 end
@@ -510,21 +564,16 @@ end
 function AutoCat.cacheInitialize()
     -- initialize the rules-based lookups
     AutoCat.cacheRuleInitialize()
-	AutoCat.cacheBagInitialize()
-
+    AutoCat.cacheBagInitialize()
 end
 
 
 -- find and return the rule referenced by name
 function AutoCat.GetRuleByName(name)
-    if not name then
-        return nil
-    end
+    if not name then return nil end
 
 	local ndx = ac_rules.ruleNames[name]
-    if not ndx then
-        return nil
-    end
+    if not ndx then return nil end
 
     return ac_rules.ruleList[ndx]
 end
@@ -532,7 +581,7 @@ end
 function AutoCat.GetBagRuleByName(bagId, name)
     if not name then return nil, nil end
     local bagrules = cache.entriesByShowBag[bagId]
-    if not bagrules then return nil end
+    if not bagrules then return nil, nil end
     
     -- Check if rule still exists in main list
     if not ac_rules.ruleNames[name] then
@@ -606,13 +655,12 @@ local function setupContextMenu()
 end
 
 function AutoCat.initializePlugins()
-	-- initialize plugins
-	for n, v in pairs(AutoCat.Plugins) do
-		if v and v.init then
-			v.init()
+	-- Initialize registered plugins.
+	for _, plugin in pairs(AutoCat.Plugins) do
+		if plugin and plugin.init then
+			SF.safeCall10(plugin.init)
 		end
 	end
-
 end	
 
 --[[ Add the rules in a table of rules to the combined, acctRules, and predefinedRules lists
@@ -629,22 +677,22 @@ local function addTableRules(tbl, tblname, ispredef)
 	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
 	local newName
+	ac_rules.ruleList = ac_rules.ruleList or {}
+	ac_rules.ruleNames = ac_rules.ruleNames or {}
 
 	-- add a rule to the combined rules list and the name-lookup
 	local function addCombinedRule(rl)
-		ac_rules.ruleList = SF.safeTable(ac_rules.ruleList)
 		local n = ac_rules.ruleNames[rl.name]
+		local ruleList = ac_rules.ruleList
+		local newListLen = #ruleList + 1
 		if not n then
-			ac_rules.ruleList[#ac_rules.ruleList+1] = rl
-			if logWouldDebug() then
-				-- protect the table # execution
-				logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", #ac_rules.ruleList)
-			end
-			ac_rules.ruleNames[rl.name] = #ac_rules.ruleList
+			ruleList[newListLen] = rl
+			logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", newListLen)
+			ac_rules.ruleNames[rl.name] = newListLen
 			return true
 			
 		else
-			ac_rules.ruleList[n] = rl
+			ruleList[n] = rl
 			logDebug("[AutoCategory] Overwriting rule ", rl.name, " in ac_rules.ruleList ndx=", n)
 			ac_rules.ruleNames[rl.name] = n
 		end
@@ -666,9 +714,10 @@ local function addTableRules(tbl, tblname, ispredef)
 		end
 	end
 
-	-- process all of the rules in the table
+	--- aliases
 	local getRuleByName = AutoCat.GetRuleByName
 	local getUsableRuleName = AutoCat.GetUsableRuleName
+	-- process all of the rules in the table
 	local v, r
 	for k=#tbl.rules, 1, -1 do
 		v = tbl.rules[k]
@@ -728,11 +777,12 @@ AutoCategory._addTableRules = addTableRules
 -- cannot use this until after addons are finally loaded!!
 local function loadPluginPredefines()
 	logDebug ("[AutoCategory] Executing loadPluginPredefines ")
-	-- add plugin predefined rules to the base predefined rules
+	-- Add each plugin's predefined rules to AutoCat.predefinedRules.
 	for name, plugin in pairs(AutoCat.Plugins) do
-		if plugin.predef then
+		if plugin.predef and #plugin.predef > 0 then
 			-- process all of the rules in the table
 			addTableRules( { rules=plugin.predef}, name..".predefinedRules", true)
+
         else
             AutoCat_Logger():Info("No predefinedRules to add from "..name)
 		end
@@ -755,6 +805,15 @@ local function assertBagRuleMixins()
 
     AutoCategory.foreachBag(func)
 end
+
+function AutoCategory:setChecking(bagId, slotIndex)
+	-- set up bagId and slotIndex to "pass in" to the rule functions
+    self.checking = SF.safeClearTable(self.checking)
+    self.checking.BagId = bagId
+    self.checking.SlotIndex = slotIndex
+    self.checking.ItemLink = GetItemLink(bagId, slotIndex)
+end
+
 
 -- Load the saved variables and rules tables
 local function loadSavedVars()

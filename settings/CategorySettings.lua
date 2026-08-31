@@ -310,10 +310,10 @@ function catSet_CopyCat_LAM:execute()
 	CatSet_SelectRule_LAM:updateControl()
 	AC_UI.checkCurrentRule()
 
-
+	local SelectRule_LAM = AC_UI.AddCat_SelectRule_LAM
     AutoCategory.RulesW:CompileAll()
 	-- Add the rule to the bagSet Add Category dropdown and perform appropriate updates
-	AC_UI.AddCat_SelectRule_LAM:assign(AC_UI.AddCat_SelectRule_LAM.filterRules(getCurrentBagId(),currentRule.tag))
+	SelectRule_LAM:assign(SelectRule_LAM.filterRules(getCurrentBagId(), currentRule.tag))
 	AC_UI.BagSet.updateControls()
 end
 
