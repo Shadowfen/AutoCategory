@@ -69,14 +69,9 @@ local function NilOrLessThan(value1, value2)
         return false
 
 	elseif type(value1) == "boolean" then
-		if value1 == false then 
-			return true 
-		end
-		return false
-
-    else
-        return value1 < value2
+		return not value1
     end
+	return value1 < value2
 end
 
 -- ---------------------------------------------------
@@ -85,13 +80,11 @@ end
 -- currently fetched fontface
 local header_face = nil
 
--- Reset header_face to nil to force it to be
--- fetched from LMP again. (Probably user changed
--- desired fontface in settings.)
+-- Invalidate the cached header font face.
 --
--- Provides a function to clear the current fetched font face
--- for AddonMenu.lua to use when the user changes the header
--- text font.
+-- The next request for the header font face will fetch it again
+-- from LMP. This is needed when the user changes the desired
+-- header font face in the settings.
 function AutoCategory.resetface()
 	header_face = nil
 end
@@ -108,7 +101,7 @@ local function getHeaderFace()
     end
 
     local appearance = AutoCategory.acctSaved.appearance
-    header_face = LMP:Fetch("font", appearance["CATEGORY_FONT_NAME"])
+    header_face = LMP:Fetch("font", appearance.CATEGORY_FONT_NAME)
     return header_face
 end
 
@@ -117,7 +110,8 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 	--aliases
 	local acctSaved = AutoCategory.acctSaved
 	local saved = AutoCategory.saved
-	--set header
+
+	-- Set header font and alignment.
 	local appearance = acctSaved.appearance
 	local headerLabel = rowControl:GetNamedChild("HeaderName")
 	headerLabel:SetHorizontalAlignment(appearance["CATEGORY_FONT_ALIGNMENT"])
@@ -126,36 +120,47 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			appearance["CATEGORY_FONT_SIZE"],
 			appearance["CATEGORY_FONT_STYLE"]))
 
+	-- Protect against missing header data.
 	slot.dataEntry.data = SF.safeTable(slot.dataEntry.data) -- protect against nil
-	local data = slot.dataEntry.data
-	data.AC_categoryName = SF.nilDefault(data.AC_categoryName, appearance["CATEGORY_OTHER_TEXT"])
-	local cateName = data.AC_categoryName
-	data.AC_bagTypeId = SF.nilDefault(data.AC_bagTypeId, 1)
-	local bagTypeId = data.AC_bagTypeId
-	data.AC_catCount = SF.nilDefault(data.AC_catCount, 0)
-	local num = data.AC_catCount
 
+	local nilDefault = SF.nilDefault
+	local data = slot.dataEntry.data
+
+	data.AC_categoryName = nilDefault(data.AC_categoryName, appearance["CATEGORY_OTHER_TEXT"])
+	data.AC_bagTypeId = nilDefault(data.AC_bagTypeId, 1)
+	data.AC_catCount = nilDefault(data.AC_catCount, 0)
+
+	local cateName = data.AC_categoryName
+	local bagTypeId = data.AC_bagTypeId
+	local num = data.AC_catCount
+	
+
+	-- Determine header color.
 	local cache = AutoCategory.cache
 	local headerColor = "CATEGORY_FONT_COLOR"
-	if cateName and cache.entriesByName[bagTypeId][cateName] then
-		if cache.entriesByName[bagTypeId][cateName].isHidden then
+	local entriesByName = cache.entriesByName[bagTypeId]
+	local categoryEntry = entriesByName and entriesByName[cateName]
+	
+	if categoryEntry then
+		if categoryEntry.isHidden then
 			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
 		end
 
-	elseif saved.bags[bagTypeId].isUngroupedHidden and
-			cateName == saved.appearance["CATEGORY_OTHER_TEXT"] then
-		headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
+	else
+		local bagSettings = saved.bags[bagTypeId]
+		if bagSettings and bagSettings.isUngroupedHidden and
+				cateName == saved.appearance["CATEGORY_OTHER_TEXT"] then
+			headerColor = "HIDDEN_CATEGORY_FONT_COLOR"
+		end
 	end
-	local r,g,b,a = appearance[headerColor][1],
-					appearance[headerColor][2],
-					appearance[headerColor][3],
-					appearance[headerColor][4]
+
+	local colorArr = appearance[headerColor]
+	local r,g,b,a = colorArr[1], colorArr[2], colorArr[3], colorArr[4]
 	headerLabel:SetColor(r,g,b,a)
 
-	-- Add count to category name if selected in options
+	-- Add count to category name when enabled
     if acctSaved.general["SHOW_CATEGORY_ITEM_COUNT"] then
         headerLabel:SetText(string.format('%s |[%d]|r', cateName, num))
-        headerLabel:SetColor(r,g,b,a)
 
     else
         headerLabel:SetText(cateName)
@@ -174,7 +179,6 @@ local function setup_InventoryItemRowHeader(rowControl, slot, overrideOptions)
 			-- is not collapsed so (-)
 			marker:SetTexture("EsoUI/Art/Buttons/minus_up.dds")
 		end
-		AutoCategory.SetCategoryCollapsed(bagTypeId, cateName, collapsed)
 
 	else
 		marker:SetHidden(true)
@@ -192,10 +196,10 @@ local function AddTypeToList(rowHeight, datalist, inven_ndx, headerType)
 	local templateName = "AC_InventoryItemRowHeader"
 	local setupFunc = setup_InventoryItemRowHeader
 	local resetCB = ZO_InventorySlot_OnPoolReset
-	local hiddenCB = nil
-	if inven_ndx then
-		hiddenCB = PLAYER_INVENTORY.inventories[inven_ndx].listHiddenCallback
-	end
+
+	local inventory = inven_ndx and PLAYER_INVENTORY.inventories[inven_ndx]
+	local hiddenCB = inventory and inventory.listHiddenCallback
+
 	return ZO_ScrollList_AddDataType(datalist, headerType, templateName, 
 	    rowHeight, setupFunc, hiddenCB, nil, resetCB)
 end
@@ -203,7 +207,7 @@ end
 -- create a list entry for a category header.
 -- will return nil, if catInfo is nil
 local function createHeaderEntry(catInfo)
-	if not catInfo then return {} end
+	if not catInfo then return end
 
 	return ZO_ScrollList_CreateDataEntry(CATEGORY_HEADER, { 
 			AC_categoryName = catInfo.AC_categoryName,
@@ -211,33 +215,68 @@ local function createHeaderEntry(catInfo)
 			AC_bagTypeId = catInfo.AC_bagTypeId,
 			AC_isHeader = true,
 			AC_catCount = catInfo.AC_catCount,
-			stackLaunderPrice = 0})
+			stackLaunderPrice = 0,
+
+			statusSortOrder = 0,
+			age = 0,
+			name = catInfo.AC_categoryName or "",
+			stackCount = 0,
+			slotIndex = 0,
+			quality = 0,
+			displayQuality = 0,
+			stackSellPrice = 0,
+			statValue = 0,
+			traitInformationSortOrder = 0,
+			sellInformationSortOrder = 0,
+			ptValue = 0
+		})
 end
+
 -- ---------------------------------------------------
 
 local function isUngroupedHidden(bagTypeId)
-	return bagTypeId == nil or AutoCategory.saved.bags[bagTypeId].isUngroupedHidden
+    if bagTypeId == nil then return true end
+
+    local bagSettings = AutoCategory.saved.bags[bagTypeId]
+    return bagSettings and bagSettings.isUngroupedHidden
 end
 
 local function isHiddenEntry(itemEntry)
-	if not itemEntry or not itemEntry.data then return false end
+    if not itemEntry or not itemEntry.data then
+        return false
+    end
 
-	local data = itemEntry.data
-	if data.AC_isHidden or data.AC_bagTypeId == nil then return true end
-	if not data.AC_matched and isUngroupedHidden(data.AC_bagTypeId) then
-		return true
-	end
-	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
+    local data = itemEntry.data
 
+    if data.AC_isHidden then
+        return true
+    end
+
+    local bagTypeId = data.AC_bagTypeId
+    if bagTypeId == nil then
+        return true
+    end
+
+    if not data.AC_matched and isUngroupedHidden(bagTypeId) then
+        return true
+    end
+
+    return AutoCategory.IsCategoryCollapsed(bagTypeId, data.AC_categoryName)
 end
 
 local function isCollapsed(itemEntry)
-	if not itemEntry or not itemEntry.data then return false end
+    if not itemEntry or not itemEntry.data then
+        return false
+    end
 
-	local data = itemEntry.data
-	if data.AC_bagTypeId == nil then return true end
+    local data = itemEntry.data
+    local bagTypeId = data.AC_bagTypeId
 
-	return AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, data.AC_categoryName)
+    if bagTypeId == nil then
+        return true
+    end
+
+    return AutoCategory.IsCategoryCollapsed(bagTypeId, data.AC_categoryName)
 end
 
 -- Note that an item will always match either a defined rule or "OTHER" (when it does not match a defined rule)
@@ -252,27 +291,25 @@ local function runRulesOnEntry(itemEntry, specialType)
 	local bagId = data.bagId
 	local slotIndex = data.slotIndex
 
-	local function matchRules(data)
-		local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
-					= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
-		data.AC_matched = matched
-		data.AC_bagTypeId = bagTypeId
-		data.AC_isHeader = false
-		data.AC_categoryPriority = categoryPriority
+	local matched, categoryName, categoryPriority, showPriority, bagTypeId, isHidden 
+				= AutoCategory:MatchCategoryRules(bagId, slotIndex, specialType)
+	data.AC_matched = matched
+	data.AC_bagTypeId = bagTypeId
+	data.AC_isHeader = false
+	data.AC_categoryPriority = categoryPriority
 
-		if matched then
-			data.AC_categoryName = categoryName
-			data.AC_sortPriorityName = string.format("%04d%s", 1000-showPriority , categoryName)
-			data.AC_isHidden = isHidden
+	if matched then
+		data.AC_categoryName = categoryName
+		-- use string.format for the zero-padding ability to maintain a fixed-width numeric prefix.
+		data.AC_sortPriorityName = string.format("%04d%s", 1000 - showPriority , categoryName)
+		data.AC_isHidden = isHidden
 
-		else
-			data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
-			data.AC_sortPriorityName = string.format("%04d%s", 9999 , data.AC_categoryName)
-			-- if was not matched, then the isHidden value that was returned is not valid
-			data.AC_isHidden = isUngroupedHidden(bagTypeId)
-		end
+	else
+		data.AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
+		data.AC_sortPriorityName = "9999" .. data.AC_categoryName
+		-- if was not matched, then the isHidden value that was returned is not valid
+		data.AC_isHidden = isUngroupedHidden(bagTypeId)
 	end
-	return matchRules(data)
 end
 
 local function sortInventoryFn(inven, left, right, key, order) 
@@ -296,17 +333,19 @@ local function sortInventoryFn(inven, left, right, key, order)
 			return NilOrLessThan(ldata.AC_sortPriorityName, rdata.AC_sortPriorityName)
 		end
 		if rdata.AC_isHeader ~= ldata.AC_isHeader then
+			-- we'ved deliberately reversing the arguments so headers sort before non-headers
 			return NilOrLessThan(rdata.AC_isHeader, ldata.AC_isHeader)
 		end
 	end
 
 	--compatible with quality sort
-	if type(inven.sortKey) == "function" then 
+	local sortKey = inven.sortKey
+	if type(sortKey) == "function" then 
 		if inven.sortOrder == ZO_SORT_ORDER_UP then
-			return inven.sortKey(left.data, right.data)
+			return sortKey(left.data, right.data)
 
 		else
-			return inven.sortKey(right.data, left.data)
+			return sortKey(right.data, left.data)
 		end
 	end
 
@@ -319,10 +358,10 @@ local function sortInventoryFn(inven, left, right, key, order)
 			key, sortKeys, order)
 end
 
-local fcoisAvailable = (FCOIS and FCOIS.IsMarked)
+local fcoisAvailable = FCOIS ~= nil and FCOIS.IsMarked ~= nil
+local fcoisIsMarked = fcoisAvailable and FCOIS.IsMarked
 local function constructEntryHash(itemEntry)
     local data = itemEntry.data
- 
 
     -- Early exit if FCOIS not available - skip the table allocation
     if not fcoisAvailable then
@@ -332,68 +371,57 @@ local function constructEntryHash(itemEntry)
             data.locked, data.isJunk)
     end
     
-    -- Only check FCOIS if we actually need it (has marks)
-    local hashFCOIS = ""
- 
+    -- Include FCOIS marks in the hash when present.
     local bagId = data.bagId
     local slotIndex = data.slotIndex
 
-    if bagId and slotIndex then
-        local _, markedIconsArray = FCOIS.IsMarked(bagId, slotIndex, -1)
+    if bagId ~= nil and slotIndex ~= nil then
+		-- returns itemIsMarked, markedIconsArray - both can be nil
+        local _, markedIconsArray = fcoisIsMarked(bagId, slotIndex, -1)
 
-    if markedIconsArray and #markedIconsArray > 0 then
-            local t = {}
-            for i = 1, #markedIconsArray do
-                t[#t + 1] = tostring(markedIconsArray[i])
-            end
-            hashFCOIS = table.concat(t)
-        end
+    	if markedIconsArray and #markedIconsArray > 0 then
+			-- add the FCOIS mark names to the hash
+			return SF.dstr(":", data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory,
+				data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex, data.meetsUsageRequirement,
+				data.locked, data.isJunk, unpack(markedIconsArray))
+		end
     end
- 
+	-- No FCOIS marks; use only the standard item fields.
     return SF.dstr(":", data.isPlayerLocked, data.isGemmable, data.stolen, data.isBoPTradeable, data.isInArmory,
         data.brandNew, data.bagId, data.stackCount, data.uniqueId, data.slotIndex, data.meetsUsageRequirement,
-        data.locked, data.isJunk, hashFCOIS
-    )
+        data.locked, data.isJunk)
 end
 
-local function detectItemChanges(itemEntry, newEntryHash, needReload)
+local function detectItemChanges(itemEntry, needReload)
 	local data = itemEntry.data
-	local changeDetected = false
 	local currentTime = os.clock()
 
-	local function setChange(val)
-		if val == false then return false end
-
+	if needReload then
 		data.AC_lastUpdateTime = currentTime
-		changeDetected = true
 		return true
 	end
 
-	if needReload == true then
-		return setChange(true)
+	if forceRuleReloadByUniqueIDs[data.uniqueID] then
+		forceRuleReloadByUniqueIDs[data.uniqueID] = nil
+		data.AC_lastUpdateTime = currentTime
+		return true
 	end
 
-	--- Test if uniqueID tagged for update
-    if forceRuleReloadByUniqueIDs[data.uniqueID] then
-        forceRuleReloadByUniqueIDs[data.uniqueID] = nil
-        return setChange(true)
-    end
+	local newHash = constructEntryHash(itemEntry)
 
-	--- Update hash and test if changed
-	if data.AC_hash == nil or data.AC_hash ~= newEntryHash then
-		data.AC_hash = newEntryHash
-		return setChange(true)
+	if data.AC_hash == nil or data.AC_hash ~= newHash then
+		data.AC_hash = newHash
+		data.AC_lastUpdateTime = currentTime
+		return true
 	end
 
-	--- Test last update time, triggers update if more than 20s
-	if data.AC_lastUpdateTime == nil then
-		return setChange(true)
-
-	elseif currentTime - tonumber(data.AC_lastUpdateTime) > 20 then
-		return setChange(true)
+	if data.AC_lastUpdateTime == nil
+		or currentTime - data.AC_lastUpdateTime > 20 then
+		data.AC_lastUpdateTime = currentTime
+		return true
 	end
 
-	return changeDetected
+	return false
 end
 
 -- Execute rules and store results in itemEntry.data, if needed. 
@@ -401,26 +429,19 @@ end
 --
 -- The needsReload parameter allows the caller to force a re-evaluation
 -- of rule on all of the (non-header) contents of the scrollData.
--- Defaults to false.
 local function handleRules(scrollData, needsReload, specialType)
-	-- keep track of if any changes to rule results occurred
-	local updateCount = 0 
-
-	-- at craft stations scrollData seems to be reset every time, 
-	-- so need to always reload
-	local reloadAll = needsReload or false 
+	local updateCount = 0
 
 	for _, itemEntry in ipairs(scrollData) do
-		if itemEntry.typeId ~= CATEGORY_HEADER then 
-			local newHash = constructEntryHash(itemEntry)
-			if detectItemChanges(itemEntry, newHash, reloadAll) then 
-				-- reload rules if full reload triggered, or changes detected
-				updateCount = updateCount + 1
-				runRulesOnEntry(itemEntry, specialType)
-			end
+		if itemEntry.typeId ~= CATEGORY_HEADER
+			and detectItemChanges(itemEntry, needsReload) then
+
+			updateCount = updateCount + 1
+			runRulesOnEntry(itemEntry, specialType)
 		end
 	end
-	SF.safeClearTable(forceRuleReloadByUniqueIDs) --- reset update buffer
+
+	SF.safeClearTable(forceRuleReloadByUniqueIDs)
 	return updateCount
 end
 
@@ -430,103 +451,68 @@ local cnsd_categoryList = {} -- [name] {AC_catCount, AC_sortPriorityName,
                         	 --         AC_categoryName, AC_bagTypeId }
 --- Create list with visible items and headers (performs category count).
 local function createNewScrollData(scrollData)
-	local newScrollData = {} --- output, entries sorted with category headers
+    local newScrollData = {}
 
-	-- --------------------
-	-- The cnsd_categoryList info is collected and then each entry is passed
-	-- to createHeaderEntry() to make a header row
     cnsd_categoryList = SF.safeClearTable(cnsd_categoryList)
-	local safeTable = SF.safeTable
-	
-	local function addCount(name)
-		cnsd_categoryList[name] = safeTable(cnsd_categoryList[name])
-		cnsd_categoryList[name].AC_catCount = SF.nilDefault(cnsd_categoryList[name].AC_catCount, 0) + 1
-	end
 
-	local function setCount(name, count)
-		cnsd_categoryList[name] = safeTable(cnsd_categoryList[name])
-		cnsd_categoryList[name].AC_catCount = count
-	end
-	-- --------------------
-	-- create newScrollData with headers and only non hidden items. No sorting here!
-	for _, itemEntry in pairs(scrollData) do 
-		-- add visible non-header rows to the new scrollData table
-		if not isHiddenEntry(itemEntry) then
-			if itemEntry.typeId ~= CATEGORY_HEADER and not isCollapsed(itemEntry) then 
-				-- add item if visible
-				newScrollData[#newScrollData + 1] = itemEntry
-			end
-		end
+    local otherCategory = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
 
-		-- look up the owning category in our list, update entry count
-		-- or else create an entry with count = 1
-		local data = itemEntry.data
-		local AC_categoryName = data.AC_categoryName
-		if not AC_categoryName then
-			AC_categoryName = AutoCategory.acctSaved.appearance["CATEGORY_OTHER_TEXT"]
-			data.AC_categoryName = AC_categoryName
-		end
-		if not cnsd_categoryList[AC_categoryName] then
-			-- keep track of categories and required data
-			cnsd_categoryList[AC_categoryName] =  {
-				AC_sortPriorityName = data.AC_sortPriorityName,
-				AC_categoryName 	= AC_categoryName,
-				AC_bagTypeId 		= data.AC_bagTypeId,
-				AC_catCount 		= 0,
-			}
-		end
+    -- Create newScrollData with visible items and without headers.
+    -- At the same time, collect category counts.
+    for _, itemEntry in ipairs(scrollData) do
+        local data = itemEntry.data
 
-		if itemEntry.typeId ~= CATEGORY_HEADER then
-			-- this is an item, start new count
-			addCount(AC_categoryName)
+        if not isHiddenEntry(itemEntry) then
+            if itemEntry.typeId ~= CATEGORY_HEADER
+                and not isCollapsed(itemEntry)
 
-		elseif AutoCategory.IsCategoryCollapsed(data.AC_bagTypeId, AC_categoryName) then
-			-- this is a collapsed category --> reuse previous count, since
-			--   the content is not available in scrollData
-			setCount(AC_categoryName, data.AC_catCount)
-		end	
-	end
+            then
+                newScrollData[#newScrollData + 1] = itemEntry
+            end
+        end
 
-	-- Create headers and append to newScrollData
-	for _, catInfo in pairs(cnsd_categoryList) do ---> add tracked categories
-		if catInfo.AC_catCount ~= nil then
-			logDebug("[Keyboard] catinfo: ", ". ", catInfo.AC_sortPriorityName)
-			local headerEntry = createHeaderEntry(catInfo)
-			logDebug("[Keyboard] hdr: ", ". ", headerEntry.data.AC_sortPriorityName)
-			if headerEntry then
-				newScrollData[#newScrollData + 1] = headerEntry
-			end
-		end
-	end
-	
-	-- Ensure all entries have required sort fields to prevent nil errors
-	for _, entry in ipairs(newScrollData) do
-		if entry.data then
-			local edata = entry.data
-			if edata.AC_isHeader then
-				-- Headers need all sort fields since any could be used as primary sort or tiebreaker
-				if edata.statusSortOrder == nil 			then edata.statusSortOrder = 0 end
-				if edata.age == nil 						then edata.age = 0 end
-				if edata.name == nil 						then edata.name = edata.AC_categoryName or "" end
-				if edata.stackCount == nil 					then edata.stackCount = 0 end
-				if edata.slotIndex == nil 					then edata.slotIndex = 0 end
-				if edata.quality == nil 					then edata.quality = 0 end
-				if edata.displayQuality == nil 				then edata.displayQuality = 0 end
-				if edata.stackSellPrice == nil 				then edata.stackSellPrice = 0 end
-				if edata.statValue == nil 					then edata.statValue = 0 end
-				if edata.traitInformationSortOrder == nil 	then edata.traitInformationSortOrder = 0 end
-				if edata.sellInformationSortOrder == nil 	then edata.sellInformationSortOrder = 0 end
-				if edata.ptValue == nil 					then edata.ptValue = 0 end
+        local categoryName = data.AC_categoryName
+        if not categoryName then
+            categoryName = otherCategory
+            data.AC_categoryName = categoryName
+        end
 
-			else
-				-- Ensure regular items also have these fields if missing
-				if edata.statusSortOrder == nil 			then edata.statusSortOrder = 0 end
-				if edata.age == nil 						then edata.age = 0 end
-			end
-		end
-	end
-	
-	return newScrollData
+        local catInfo = cnsd_categoryList[categoryName]
+
+        if not catInfo then
+            catInfo = {
+                AC_sortPriorityName = data.AC_sortPriorityName,
+                AC_categoryName     = categoryName,
+                AC_bagTypeId        = data.AC_bagTypeId,
+                AC_catCount         = 0,
+            }
+
+            cnsd_categoryList[categoryName] = catInfo
+        end
+
+        if itemEntry.typeId ~= CATEGORY_HEADER then
+            catInfo.AC_catCount = catInfo.AC_catCount + 1
+
+        elseif AutoCategory.IsCategoryCollapsed(
+            data.AC_bagTypeId,
+            categoryName
+        ) then
+            -- Content isn't present in scrollData, so reuse
+            -- the count stored on the header.
+            catInfo.AC_catCount = data.AC_catCount
+        end
+    end
+
+    -- Append category headers.
+    for _, catInfo in pairs(cnsd_categoryList) do
+        local headerEntry = createHeaderEntry(catInfo)
+
+        if headerEntry then
+            newScrollData[#newScrollData + 1] = headerEntry
+        end
+    end
+
+    return newScrollData
 end
 
 local function rebuildScrollData(zo_inventory)
@@ -536,7 +522,7 @@ local function rebuildScrollData(zo_inventory)
 	local scrollData = ZO_ScrollList_GetDataList(list)
 
     if not scrollData or #scrollData == 0 then 
-        if zo_inventory.altFreeSlotType and zo_inventory.altFreeSlotType == INVENTORY_GUILD_BANK then
+        if zo_inventory.altFreeSlotType == INVENTORY_GUILD_BANK then
             zo_callLater(function()
                 local freshData = ZO_ScrollList_GetDataList(list)
                 if freshData and #freshData > 0 then
@@ -546,10 +532,9 @@ local function rebuildScrollData(zo_inventory)
         end
         return false 
     end
-	if scrollData then
-		handleRules(scrollData, true) -- needsReload) --> update rules' results if necessary
-		list.data = createNewScrollData(scrollData) --, zo_inventory.sortFn) 
-	end
+	handleRules(scrollData, true)
+	list.data = createNewScrollData(scrollData)
+	return true
 end
 
 local sceneMap = {
@@ -569,17 +554,18 @@ local sceneMap = {
 	["trade"] = true,
 }
 local function readyToUpdate()
-    local currentScene
-	if SCENE_MANAGER then
-		currentScene = SCENE_MANAGER:GetCurrentScene()
-		if currentScene then
-			local sceneName = currentScene:GetName()
-            if sceneMap[sceneName] == true then
-                return true, sceneName
-            end
-		end
-	end
-    return false, currentScene
+    if not SCENE_MANAGER then
+        return false
+    end
+
+    local currentScene = SCENE_MANAGER:GetCurrentScene()
+    if not currentScene then
+        return false
+    end
+
+    local sceneName = currentScene:GetName()
+
+    return sceneMap[sceneName] == true, sceneName
 end
 
 -- prehook
@@ -592,9 +578,17 @@ local function prehookSort(self, inventoryType)
 	-- revert to default behaviour if safety conditions not met
 	if inventoryType == INVENTORY_QUEST_ITEM then return false end
 
+	if AutoCategory.BulkMode then
+		if sceneName == "guildBank"
+			or (XLGearBanker and sceneName == "bank") then
+			return false
+		end
+	end
+
 	-- inventory info from esoui/ingame/inventory/inventory.lua
 	local zo_inventory = self.inventories[inventoryType]
 					or self.inventories[self.selectedTabType]
+	if not zo_inventory then return false end
 
 	--change sort function
 	zo_inventory.sortFn =  function(left, right) 
@@ -602,30 +596,6 @@ local function prehookSort(self, inventoryType)
 									zo_inventory.currentSortKey, 
 									zo_inventory.currentSortOrder)
 		end
-
-	--[[
-	local ldata = left.data
-	local rdata = right.data
-	
-	-- Ensure headers have required sort fields to prevent nil errors
-	if ldata.AC_isHeader then
-		if ldata.statusSortOrder == nil then ldata.statusSortOrder = 0 end
-		if ldata.age == nil then ldata.age = 0 end
-	end
-	if rdata.AC_isHeader then
-		if rdata.statusSortOrder == nil then rdata.statusSortOrder = 0 end
-		if rdata.age == nil then rdata.age = 0 end
-	end
-	--]]
-
-    if sceneName then
-		if AutoCategory.BulkMode then
-			if sceneName == "guildBank" or (XLGearBanker and sceneName == "bank") then
-				return false	-- skip out early
-			end
-		end
-	end
-	-- end nogetrandom recommend 
 
 	if sceneName == "bank" or sceneName == "guildBank" then
 		needsReload = false
@@ -641,8 +611,7 @@ local function prehookCraftSort(self)
 	-- revert to default behaviour if safety conditions not met
 	if not AutoCategory.Enabled then return false end
 
-    local isReady = readyToUpdate()
-    if not isReady then return false end
+    if not readyToUpdate() then return false end
 
     --change sort function
 	self.sortFunction = function(left, right) 
@@ -650,8 +619,8 @@ local function prehookCraftSort(self)
 		end
 
 	local scrollData = ZO_ScrollList_GetDataList(self.list)
-	if #scrollData > 0 then
-		-- rerun rules for all items (always for craftstations)
+	if scrollData and #scrollData > 0 then
+		-- Craft stations always require rules to be reevaluated.
 		handleRules(scrollData, true, AC_BAG_TYPE_CRAFTSTATION)
 
 		-- add header rows
@@ -661,11 +630,13 @@ local function prehookCraftSort(self)
 	return false
 end
 
+--[[ this only works if pendingUpdates uses os.clock() instead of true in updateHook()
 local updateCounter = 0
 local CLEANUP_THRESHOLD = 50
 local callLater         -- the calllater object for controlling single-shot start/stop/destroy
 
 -- clear out pending entries that are older than 15 seconds - they are hung
+--
 local function cleanupPendingUpdates()
     updateCounter = updateCounter + 1
     if updateCounter < CLEANUP_THRESHOLD then return end
@@ -683,12 +654,12 @@ local function cleanupPendingUpdates()
         end
     end
 end
+--]]
 
 
 local function updateHook(zo_inventory)
     for uid in pairs(pendingUpdates) do
         forceRuleReloadByUniqueIDs[uid] = true
-        pendingUpdates[uid] = nil
     end
     pendingUpdates = SF.safeClearTable(pendingUpdates)
 
@@ -703,7 +674,7 @@ local function onInventorySlotUpdated(self, bagId, slotIndex)
 	
     local uid = GetItemUniqueId(bagId, slotIndex)
     if uid then
-        pendingUpdates[uid] = os.clock()
+        pendingUpdates[uid] = true 		-- os.clock()
     end
 end
 
@@ -763,53 +734,4 @@ function AutoCategory.UnHookKeyboardMode()
     end
 end
 
---[[
--------- HINTS FOR REFERENCE -----------
 
-In sharedInventory.lua we can see a breakdown of how slotData is build, under is a truncated summary:
-
-slot.rawName = GetItemName(bagId, slotIndex)
-slot.name = zo_strformat(SI_TOOLTIP_ITEM_NAME, slot.rawName)
-slot.requiredLevel = GetItemRequiredLevel(bagId, slotIndex)
-slot.requiredChampionPoints = GetItemRequiredChampionPoints(bagId, slotIndex)
-slot.itemType, slot.specializedItemType = GetItemType(bagId, slotIndex)
-slot.uniqueId = GetItemUniqueId(bagId, slotIndex)
-slot.iconFile = icon
-slot.stackCount = stackCount
-slot.sellPrice = sellPrice
-slot.launderPrice = launderPrice
-slot.stackSellPrice = stackCount * sellPrice
-slot.stackLaunderPrice = stackCount * launderPrice
-slot.bagId = bagId
-slot.slotIndex = slotIndex
-slot.meetsUsageRequirement = meetsUsageRequirement or (bagId == BAG_WORN)
-slot.locked = locked
-slot.functionalQuality = functionalQuality
-slot.displayQuality = displayQuality
-slot.quality = displayQuality
-slot.equipType = equipType
-slot.isPlayerLocked = IsItemPlayerLocked(bagId, slotIndex)
-slot.isBoPTradeable = IsItemBoPAndTradeable(bagId, slotIndex)
-slot.isJunk = IsItemJunk(bagId, slotIndex)
-slot.statValue = GetItemStatValue(bagId, slotIndex) or 0
-slot.itemInstanceId = GetItemInstanceId(bagId, slotIndex) or nil
-slot.brandNew = isNewItem
-slot.stolen = IsItemStolen(bagId, slotIndex)
-slot.filterData = { GetItemFilterTypeInfo(bagId, slotIndex) }
-slot.condition = GetItemCondition(bagId, slotIndex)
-slot.isPlaceableFurniture = IsItemPlaceableFurniture(bagId, slotIndex)
-slot.traitInformation = GetItemTraitInformation(bagId, slotIndex)
-slot.traitInformationSortOrder = ZO_GetItemTraitInformation_SortOrder(slot.traitInformation)
-slot.sellInformation = GetItemSellInformation(bagId, slotIndex)
-slot.sellInformationSortOrder = ZO_GetItemSellInformationCustomSortOrder(slot.sellInformation)
-slot.actorCategory = GetItemActorCategory(bagId, slotIndex)
-slot.isInArmory = IsItemInArmory(bagId, slotIndex)
-slot.isGemmable = false
-slot.requiredPerGemConversion = nil
-slot.gemsAwardedPerConversion = nil
-slot.isFromCrownStore = IsItemFromCrownStore(bagId, slotIndex)
-slot.age = GetFrameTimeSeconds()
-
-slotData.statusSortOrder = self:ComputeDynamicStatusMask(slotData.isPlayerLocked, slotData.isGemmable, slotData.stolen, slotData.isBoPTradeable, slotData.isInArmory, slotData.brandNew, slotData.bagId == BAG_WORN)
-
---]]
