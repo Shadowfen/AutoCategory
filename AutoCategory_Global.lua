@@ -6,6 +6,7 @@ AC_BAG_TYPE_CRAFTSTATION = 5
 AC_BAG_TYPE_HOUSEBANK = 6
 AC_BAG_TYPE_FURNVAULT = 7
 AC_BAG_TYPE_VENGEANCE = 8
+
 AC_BAG_TYPE_MIN =  AC_BAG_TYPE_BACKPACK
 AC_BAG_TYPE_MAX = AC_BAG_TYPE_VENGEANCE
 
@@ -13,15 +14,15 @@ local SF = LibSFUtils
  
 AutoCategory = {
     name = "AutoCategory",
-    version = SF.colors.gold:Colorize("4.6.13"),
+    version = SF.colors.gold("4.6.14"),
     settingName = "AutoCategory",
     settingDisplayName = SF.colors.gold("AutoCategory - Revised"),
     author = SF.colors.purple("Shadowfen, crafty35, RockingDice, Friday_the13_rus"),
 
-    RuleFunc = {},  -- internal and plugin rule functions
+    RuleFunc = {},  -- collection of internal and plugin rule functions
     Plugins = {},   -- registered plugins
 
-    Inited = false, -- provided for the API so that external users can tell when initialization is completed
+    Inited = false, -- provided for the API so that external users (such as BetterUI) can tell when initialization is completed
     Enabled = true, -- flag to tell if AutoCategory is turned on or off
     compiledRules = {},
     rules = {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
@@ -43,8 +44,7 @@ AutoCat_Logger, AutoCategory.logDebug, AutoCategory.logWouldDebug =
 AC_UI = {}
 
 --[[ AutoCategory.RulesW - Working rule data and lookup tables.
-
-    Contains the active rule definitions and supporting lookup structures.
+    Singleton. Contains the active rule definitions and supporting lookup structures.
 
     Fields:
         ruleList - table - Numerically indexed list of rule definitions.
@@ -75,11 +75,15 @@ AC_UI = {}
 --]]
 AutoCategory.RulesW = {
 	ruleList= {},	--  [#] rule {rkey, name, tag, description, rule, pred, damaged, err}
-	ruleNames={},	-- [name] rule#
-	compiled = AutoCategory.compiledRules,	-- [name] function
+	ruleNames={},	-- [name] index into ruleList
+                    -- For every valid entry:  ruleList[ruleNames[name]].name == name
+	compiled = AutoCategory.compiledRules,	-- [rule key] compiled function
 
-	tags = {},		-- [#] tagname
-	tagGroups={},	-- [tag] CVT{choices{rule.name}, choicesTooltips{rule.desc/name}}
+	tags = {},		-- [#] tagname  -- tags contains each tag exactly once
+	tagGroups={},	-- [tag] CVT containing rule names and descriptions
+                    --      choices         = rule names
+                    --      choicesTooltips = rule descriptions
+                    -- tagGroups[tag] exists for every tag in tags
 }
 
 
