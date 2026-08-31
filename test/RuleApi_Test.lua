@@ -2,15 +2,12 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 
 require "zos"
 require "tk"
-local TK = TestKit
 
 local d = print
 
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
-
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -34,9 +31,52 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
+
+
+local mn, moduleName, class
+
+local function RuleApi_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "RuleApi"
+    mn = "RuleApi"
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+    AutoCategory.Environment = {}
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function RuleApi_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+    AutoCategory.Environment = nil
+end
 
 local TK = TestKit
 --========================================================
@@ -60,14 +100,12 @@ end
 
 -- -------------------------------------------------------
 function test_RuleApi_isValid()
-    TK.printSuite("RuleApi", "isValid")
+    TK.printSuite(mn, "isValid")
 
     local rule = newRule("TestRule", "true", "Test description")
 
-    TK.assertTrue(
-        rule:isValid(),
-        "valid rule is valid"
-    )
+    TK.assertTrue(rule:isValid(),
+        "valid rule is valid")
 
     rule.name = nil
     local valid, err = rule:isValid()
@@ -87,21 +125,15 @@ function test_RuleApi_isValid()
     rule.description = 123
     valid, err = rule:isValid()
     TK.assertFalse(valid, "non-string description is invalid")
-    TK.assertEquals(
-        "non-nil description must be a string",
-        err,
-        "invalid description returns correct error"
-    )
+    TK.assertEquals("non-nil description must be a string", err,
+        "invalid description returns correct error")
 
     rule.description = ""
     rule.tag = 123
     valid, err = rule:isValid()
     TK.assertFalse(valid, "non-string tag is invalid")
-    TK.assertEquals(
-        "non-nil tag must be a string",
-        err,
-        "invalid tag returns correct error"
-    )
+    TK.assertEquals("non-nil tag must be a string", err,
+        "invalid tag returns correct error")
 
     rule.tag = nil
     TK.assertTrue(rule:isValid(), "nil optional tag is valid")
@@ -109,64 +141,47 @@ end
 
 -- -------------------------------------------------------
 function test_RuleApi_isPredefined()
-    TK.printSuite("RuleApi", "isPredefined")
+    TK.printSuite(mn, "isPredefined")
 
     rule = newRule("TestRule")
 
-    TK.assertFalse(
-        rule:isPredefined(),
-        "rule without pred is not predefined"
-    )
+    TK.assertFalse(rule:isPredefined(),
+        "rule without pred is not predefined")
 
     rule.pred = 0
-    TK.assertFalse(
-        rule:isPredefined(),
-        "pred zero is not predefined"
-    )
+    TK.assertFalse(rule:isPredefined(),
+        "pred zero is not predefined")
 
     rule.pred = 1
-    TK.assertTrue(
-        rule:isPredefined(),
-        "pred one is predefined"
-    )
+    TK.assertTrue(rule:isPredefined(),
+        "pred one is predefined")
 
     rule.pred = 2
-    TK.assertFalse(
-        rule:isPredefined(),
-        "pred other than one is not predefined"
-    )
+    TK.assertFalse(rule:isPredefined(),
+        "pred other than one is not predefined")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_GetDesc()
-    TK.printSuite("RuleApi", "getDesc")
+    TK.printSuite(mn, "getDesc")
 
     rule = newRule("TestRule", "true", "Test description")
 
-    TK.assertEquals(
-        "Test description",
-        rule:getDesc(),
-        "getDesc returns description"
-    )
+    TK.assertEquals("Test description", rule:getDesc(),
+        "getDesc returns description")
 
     rule.description = ""
-    TK.assertEquals(
-        "TestRule",
-        rule:getDesc(),
-        "getDesc falls back to name for empty description"
-    )
+    TK.assertEquals("TestRule", rule:getDesc(),
+        "getDesc falls back to name for empty description")
 
     rule.description = nil
-    TK.assertEquals(
-        "TestRule",
-        rule:getDesc(),
-        "getDesc falls back to name for nil description"
-    )
+    TK.assertEquals("TestRule", rule:getDesc(),
+        "getDesc falls back to name for nil description")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_Errors()
-    TK.printSuite("RuleApi", "setError / clearError")
+    TK.printSuite(mn, "setError / clearError")
 
     rule = newRule("TestRule")
 
@@ -175,85 +190,59 @@ function test_RuleApi_Errors()
 
     rule:setError(true, "test error")
 
-    TK.assertTrue(
-        rule.damaged,
-        "setError sets damaged flag"
-    )
+    TK.assertTrue(rule.damaged,
+        "setError sets damaged flag")
 
-    TK.assertEquals(
-        "test error",
-        rule.err,
-        "setError stores error message"
-    )
+    TK.assertEquals("test error", rule.err,
+        "setError stores error message")
 
     rule:clearError()
 
-    TK.assertNil(
-        rule.damaged,
-        "clearError clears damaged flag"
-    )
+    TK.assertNil(rule.damaged,
+        "clearError clears damaged flag")
 
-    TK.assertNil(
-        rule.err,
-        "clearError clears error message"
-    )
+    TK.assertNil(rule.err,
+        "clearError clears error message")
 
     rule:setError(false, "warning")
 
-    TK.assertFalse(
-        rule.damaged,
-        "setError accepts false damaged state"
-    )
+    TK.assertFalse(rule.damaged,
+        "setError accepts false damaged state")
 
-    TK.assertEquals(
-        "warning",
-        rule.err,
-        "setError stores error when damaged is false"
-    )
+    TK.assertEquals("warning", rule.err,
+        "setError stores error when damaged is false")
 
     rule:clearError()
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_Key()
-    TK.printSuite("RuleApi", "key")
+    TK.printSuite(mn, "key")
 
     rule = newRule("TestRule")
 
-    TK.assertEquals(
-        "TestRule",
-        rule:key(),
-        "key defaults to rule name"
-    )
+    TK.assertEquals("TestRule", rule:key(),
+        "key defaults to rule name")
 
     rule.rkey = "CustomKey"
 
-    TK.assertEquals(
-        "CustomKey",
-        rule:key(),
-        "key returns assigned rkey"
-    )
+    TK.assertEquals("CustomKey", rule:key(),
+        "key returns assigned rkey")
 
     rule.rkey = ""
 
-    TK.assertEquals(
-        "",
-        rule:key(),
-        "key returns empty rkey when explicitly assigned"
-    )
+    TK.assertEquals("", rule:key(),
+        "key returns empty rkey when explicitly assigned")
 
     rule.rkey = nil
 
-    TK.assertEquals(
-        "TestRule",
-        rule:key(),
-        "key returns name after rkey is cleared"
-    )
+    TK.assertEquals("TestRule", rule:key(),
+        "key returns name after rkey is cleared")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_isEquiv()
-    TK.printSuite("RuleApi", "isequiv")
+    TK.printSuite(mn, "isequiv")
 
     local ruleA = newRule("RuleA", "itemType == 1")
     local ruleB = newRule("RuleA", "itemType == 1")
@@ -280,199 +269,137 @@ end
 
 -- -------------------------------------------------------
 function test_RuleApi_compile()
-    TK.printSuite("RuleApi", "isCompiled / compile")
+    TK.printSuite(mn, "isCompiled / compile")
 
     -- Make sure the test key starts clean.
     AutoCategory.compiledRules = AutoCategory.compiledRules or {}
 
-    rule = newRule(
-        "CompileTestRule",
-        "true"
-    )
+    rule = newRule("CompileTestRule",
+        "true")
 
     AutoCategory.compiledRules[rule:key()] = nil
 
-    TK.assertNil(
-        rule:isCompiled(),
-        "new rule is not compiled"
-    )
+    TK.assertNil(rule:isCompiled(),
+        "new rule is not compiled")
 
     local compileResult = rule:compile()
 
-    TK.assertEquals(
-        "",
-        compileResult,
-        "valid rule compiles successfully"
-    )
+    TK.assertEquals("", compileResult,
+        "valid rule compiles successfully")
 
-    TK.assertNotNil(
-        rule:isCompiled(),
-        "compiled rule is returned by isCompiled"
-    )
+    TK.assertNotNil(rule:isCompiled(),
+        "compiled rule is returned by isCompiled")
 
-    TK.assertEquals(
-        "function",
-        type(rule:isCompiled()),
-        "isCompiled returns compiled function"
-    )
+    TK.assertEquals("function", type(rule:isCompiled()),
+        "isCompiled returns compiled function")
 
-    TK.assertNil(
-        rule.damaged,
-        "successful compile clears damaged state"
-    )
+    TK.assertNil(rule.damaged,
+        "successful compile clears damaged state")
 
-    TK.assertNil(
-        rule.err,
-        "successful compile clears error state"
-    )
+    TK.assertNil(rule.err,
+        "successful compile clears error state")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_compileInvalid()
-    TK.printSuite("RuleApi", "compile invalid rule")
+    TK.printSuite(mn, "compile invalid rule")
 
-    rule = newRule(
-        "BadCompileRule",
-        "this is not valid Lua !!!"
-    )
+    rule = newRule("BadCompileRule",
+        "this is not valid Lua !!!")
 
     AutoCategory.compiledRules[rule:key()] = nil
 
     compileResult = rule:compile()
 
-    TK.assertNotEquals(
-        "",
-        compileResult,
-        "invalid rule returns compile error"
-    )
+    TK.assertNotEquals("", compileResult,
+        "invalid rule returns compile error")
 
-    TK.assertTrue(
-        rule.damaged,
-        "invalid compile marks rule damaged"
-    )
+    TK.assertTrue(rule.damaged,
+        "invalid compile marks rule damaged")
 
-    TK.assertNotNil(
-        rule.err,
-        "invalid compile stores error"
-    )
+    TK.assertNotNil(rule.err,
+        "invalid compile stores error")
 
-    TK.assertNil(
-        AutoCategory.compiledRules[rule:key()],
-        "invalid rule is not stored as compiled"
-    )
+    TK.assertNil(AutoCategory.compiledRules[rule:key()],
+        "invalid rule is not stored as compiled")
 
-    TK.assertNil(
-        rule:isCompiled(),
-        "invalid rule is not compiled"
-    )
+    TK.assertNil(rule:isCompiled(),
+        "invalid rule is not compiled")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_missingRule()
-    TK.printSuite("RuleApi", "compile missing rule")
+    TK.printSuite(mn, "compile missing rule")
 
-    rule = newRule(
-        "MissingDefinitionRule",
-        ""
-    )
+    rule = newRule("MissingDefinitionRule",
+        "")
 
     AutoCategory.compiledRules[rule:key()] = nil
 
     compileResult = rule:compile()
 
-    TK.assertEquals(
-        "Missing rule definition",
-        compileResult,
-        "missing rule definition returns expected error"
-    )
+    TK.assertEquals("Missing rule definition", compileResult,
+        "missing rule definition returns expected error")
 
-    TK.assertTrue(
-        rule.damaged,
-        "missing rule definition marks rule damaged"
-    )
+    TK.assertTrue(rule.damaged,
+        "missing rule definition marks rule damaged")
 
-    TK.assertEquals(
-        "Missing rule definition",
-        rule.err,
-        "missing rule definition stores error"
-    )
+    TK.assertEquals("Missing rule definition", rule.err,
+        "missing rule definition stores error")
 
-    TK.assertNil(
-        rule:isCompiled(),
-        "missing rule definition is not compiled"
-    )
+    TK.assertNil(rule:isCompiled(),
+        "missing rule definition is not compiled")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_missingName()
-    TK.printSuite("RuleApi", "compile missing name")
+    TK.printSuite(mn, "compile missing name")
 
-    rule = newRule(
-        nil,
-        "true"
-    )
+    rule = newRule(nil,
+        "true")
 
     compileResult = rule:compile()
 
-    TK.assertEquals(
-        "Rule missing name",
-        compileResult,
-        "missing name returns expected compile error"
-    )
+    TK.assertEquals("Rule missing name", compileResult,
+        "missing name returns expected compile error")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_compileClears()
-    TK.printSuite("RuleApi", "compile clears previous error")
+    TK.printSuite(mn, "compile clears previous error")
 
-    rule = newRule(
-        "RecoverableRule",
-        "true"
-    )
+    rule = newRule("RecoverableRule", "true")
 
     rule:setError(true, "old error")
 
     compileResult = rule:compile()
 
-    TK.assertEquals(
-        "",
-        compileResult,
-        "previously damaged rule can compile successfully"
-    )
+    TK.assertEquals("", compileResult,
+        "previously damaged rule can compile successfully")
 
-    TK.assertNil(
-        rule.damaged,
-        "successful compile clears previous damaged state"
-    )
+    TK.assertNil(rule.damaged,
+        "successful compile clears previous damaged state")
 
-    TK.assertNil(
-        rule.err,
-        "successful compile clears previous error"
-    )
+    TK.assertNil(rule.err,
+        "successful compile clears previous error")
 
-    TK.assertNotNil(
-        rule:isCompiled(),
-        "successfully recovered rule is compiled"
-    )
+    TK.assertNotNil(rule:isCompiled(),
+        "successfully recovered rule is compiled")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_compileReplaces()
-    TK.printSuite("RuleApi", "compile replaces previous compiled rule")
+    TK.printSuite(mn, "compile replaces previous compiled rule")
 
-    rule = newRule(
-        "ReplaceCompileRule",
-        "true"
-    )
+    rule = newRule("ReplaceCompileRule",
+        "true")
 
     rule:compile()
 
     local firstCompiled = rule:isCompiled()
 
-    TK.assertNotNil(
-        firstCompiled,
-        "first compilation creates compiled function"
-    )
+    TK.assertNotNil(firstCompiled,
+        "first compilation creates compiled function")
 
     rule.rule = "false"
 
@@ -480,32 +407,21 @@ function test_RuleApi_compileReplaces()
 
     local secondCompiled = rule:isCompiled()
 
-    TK.assertEquals(
-        "",
-        compileResult,
-        "rule recompiles successfully"
-    )
+    TK.assertEquals("", compileResult,
+        "rule recompiles successfully")
 
-    TK.assertNotNil(
-        secondCompiled,
-        "second compilation creates compiled function"
-    )
+    TK.assertNotNil(secondCompiled,
+        "second compilation creates compiled function")
 
-    TK.assertNotEquals(
-        firstCompiled,
-        secondCompiled,
-        "recompile replaces previous compiled function"
-    )
+    TK.assertNotEquals(firstCompiled, secondCompiled,
+        "recompile replaces previous compiled function")
 end
 
 -- -------------------------------------------------------
 function test_RuleApi_compiledExec()
-    TK.printSuite("RuleApi", "compiled rule execution")
+    TK.printSuite(mn, "compiled rule execution")
 
-    rule = newRule(
-        "ExecutionTrueRule",
-        "true"
-    )
+    rule = newRule("ExecutionTrueRule", "true")
 
     rule:compile()
 
@@ -513,21 +429,14 @@ function test_RuleApi_compiledExec()
 
     local ok, result = SF.safeCall(compiled)
 
-    TK.assertTrue(
-        ok,
-        "compiled true rule executes successfully"
-    )
+    TK.assertTrue(ok,
+        "compiled true rule executes successfully")
 
-    TK.assertTrue(
-        result,
-        "compiled true rule returns true"
-    )
+    TK.assertTrue(result,
+        "compiled true rule returns true")
 
-
-    rule = newRule(
-        "ExecutionFalseRule",
-        "false"
-    )
+    rule = newRule("ExecutionFalseRule",
+        "false")
 
     rule:compile()
 
@@ -535,18 +444,15 @@ function test_RuleApi_compiledExec()
 
     ok, result = SF.safeCall(compiled)
 
-    TK.assertTrue(
-        ok,
-        "compiled false rule executes successfully"
-    )
+    TK.assertTrue(ok,
+        "compiled false rule executes successfully")
 
-    TK.assertFalse(
-        result,
-        "compiled false rule returns false"
-    )
+    TK.assertFalse(result,
+        "compiled false rule returns false")
 end
 
 function test_RuleApi_runAll()
+    RuleApi_testInit()
     test_RuleApi_isValid()
     test_RuleApi_isPredefined()
     test_RuleApi_GetDesc()
@@ -560,6 +466,7 @@ function test_RuleApi_runAll()
     test_RuleApi_compileClears()
     test_RuleApi_compileReplaces()
     test_RuleApi_compiledExec()
+    RuleApi_testReset()
 end
 
 if not Suite then

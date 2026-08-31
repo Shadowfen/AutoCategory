@@ -10,8 +10,6 @@ local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
 
-local ZO_PlayerInventory = {}
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
@@ -34,11 +32,44 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
-local TK = TestKit
+local moduleName = "BaseUI"
+local mn, class
+
+local function TestBaseUI_Init()
+    ZO_PlayerInventory = {}
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function TestBaseUI_Reset()
+    ZO_PlayerInventory = {}
+end
 
 --===========================================================
 -- BaseUI / BaseDD Tests
@@ -640,6 +671,8 @@ end
 --===========================================================
 
 function TestBaseUI_runAll()
+    TestBaseUI_Init()
+    
     TestBaseUI_New()
     TestBaseUI_NoControlName()
     TestBaseUI_UpdateValue_NoControl()
@@ -664,6 +697,8 @@ function TestBaseUI_runAll()
     TestBaseDD_UpdateControl_Choices()
     TestBaseDD_UpdateControl_Value()
     TestBaseDD_UpdateControl_NotDirty()
+    
+    TestBaseUI_Reset()
 end
 
 if not Suite then

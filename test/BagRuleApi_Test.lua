@@ -10,8 +10,6 @@ local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
 
-local ZO_PlayerInventory = {}
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
@@ -31,15 +29,47 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
+
+local moduleName = "BagRuleApi"
+local mn, class
+
+local function Test_BagRuleApi_Init()
+    ZO_PlayerInventory = {}
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function Test_BagRuleApi_Reset()
+    ZO_PlayerInventory = {}
+
+    AC.saved = {}
+end
 
 -- ============================================================
 -- BagRuleApiMixin tests
 -- ============================================================
-
-local TK = TestKit
 
 -- ============================================================
 -- BagRuleApi tests
@@ -285,6 +315,8 @@ function Test_BagRuleApi_setHidden_sameValue()
 end
 
 function BagRuleApi_runTests()
+    Test_BagRuleApi_Init()
+    
     Test_BagRuleApi_convertPriority()
     Test_BagRuleApi_convertPriority_preservesShow()
     Test_BagRuleApi_convertPriority_alreadyConverted()
@@ -301,6 +333,8 @@ function BagRuleApi_runTests()
     Test_BagRuleApi_setHidden_false()
     Test_BagRuleApi_setHidden_falseAlreadyNil()
     Test_BagRuleApi_setHidden_sameValue()
+    
+    Test_BagRuleApi_Reset()
 end
 
 if not Suite then

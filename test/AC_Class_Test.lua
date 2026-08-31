@@ -10,7 +10,6 @@ local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
 
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -29,11 +28,31 @@ require "classes.BaseUI"
 
 local AC = AutoCategory
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
 
-local mn = "CVT"
+local mn, moduleName
+
+local function CVT_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "CVT"
+    mn = moduleName
+
+    saved = {} --AutoCategory.saved
+    cache = {} --AutoCategory.cache
+    AC.saved = {}
+    AC.saved.collapses = {}
+end
+
+local function CVT_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {} --AutoCategory.cache
+    AC.saved = {}
+end
 
 local function CVT_testNew()
     local tn = "testCVTNew"
@@ -89,7 +108,7 @@ local function CVT_testAssign3()
     local cvt = AC.CVT:New("myControl2", "two",AC.CVT.USE_VALUES)
     TK.assertTrue(cvt.controlName == "myControl2", "cvt.controlName == myControl2")
     cvt:select( "four" )
-    TK.assertNotNil(cvt.indexValue,"indexValue = "..tostring(cvt.indexValue))
+    TK.assertNil(cvt.indexValue,"indexValue = "..tostring(cvt.indexValue))
     local newvals = {
       choices = { 1, 2, 4 },
       choicesValues = {"one","two","four"},
@@ -318,6 +337,8 @@ local function Cache_testUpdateSavedVars()
 end
 
 function ACClass_runTests()
+    CVT_testInit()
+    
     CVT_testNew()
     CVT_testAssign()
     CVT_testAssign2()
@@ -329,6 +350,8 @@ function ACClass_runTests()
     CVT_testRemoveLst()
     CVT_testClear()
     CVT_testSelect()
+    
+    CVT_testReset()
 end
 
 if not Suite then

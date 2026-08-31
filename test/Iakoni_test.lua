@@ -25,11 +25,53 @@ require "classes.RuleList"
 require "classes.RuleApi"
 require "AutoCategory"
 require "Plugin_API"
-local AC = AutoCategory
 require "plugins.Iakoni_GearChanger_Plugin"
+local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local moduleName = "Iakoni"
-local mn = moduleName
+local ZO_PlayerInventory
+local saved, cache
+
+
+local mn, moduleName, class
+
+local function Iakoni_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "Iakoni"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function Iakoni_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+end
 
 local function Iakoni_testLoadLanguage()
     local fn = "testLoadLanguage"
@@ -61,8 +103,10 @@ local function Iakoni_testPredefines()
 end
 
 function Iakoni_runTests()
+    Iakoni_testInit()
     Iakoni_testLoadLanguage()
     Iakoni_testPredefines()
+    Iakoni_testReset()
 end
 
 

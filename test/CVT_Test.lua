@@ -1,8 +1,5 @@
 package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
 
-local moduleName = "CVT"
-local mn = moduleName
-
 require "zos"
 require "tk"
 local TK = TestKit
@@ -12,8 +9,6 @@ local d = print
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
-
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -37,11 +32,51 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
-local TK = TestKit
+
+local mn, moduleName, class
+
+local function TestCVT_Init()
+    ZO_PlayerInventory = {}
+    moduleName = "CVT"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function TestCVT_Reset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+end
 
 
 -- =========================================================
@@ -860,6 +895,7 @@ local function TestCVT_SetControlName()
 end
 
 function TestCVT_runAll()
+    TestCVT_Init()
     TestCVT_New()
     TestCVT_Initialize()
     TestCVT_BasicAccessors()
@@ -877,6 +913,7 @@ function TestCVT_runAll()
     TestCVT_RemoveMid()
     TestCVT_UpdateControl()
     TestCVT_CorruptChoices()
+    TestCVT_Reset()
 end
 
 if not Suite then

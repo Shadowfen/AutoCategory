@@ -39,31 +39,12 @@ require "settings.BagSet"
 require "settings.CategorySettings"
 require "AddonMenu"
 
+local envir = AutoCategory.Environment
+
 local AC = AutoCategory
 
 local mn = "AutoCategory"
 
---[[
-AC.compiledRules = {}
-AutoCategory.saved= { 
-    rules = {},             -- [#] rule {name, tag, description, rule, damaged}
-    bags = {},              -- [bagId] {rules{name, priority}, isHidden}
-}
-AutoCategory.cache = {
-    rulesByName = {},       -- [name] rule#
-    rulesByTag = {},        -- [tag] {showNames{rule.name}, tooltips{rule.desc/name}}
-    compiledRules = AutoCategory.compiledRules, -- [name] function
-    tags = {},              -- [#] tagname
-    
-    bags = {},              -- {showNames{bagname}, values{bagid}, tooltips{bagname}} -- for the bags themselves
-    entriesByBag = {},      -- [bagId] {showNames{ico pri rule.name}, values{rule.name}, tooltips{rule.desc/name or missing}} --
-    entriesByName = {},     -- [bagId][rulename] {priority, isHidden}
-}
-AutoCategory.cache.bags.showNames = {}
-AutoCategory.cache.bags.values = {}
-AutoCategory.cache.bags.tooltips = {}
---]]
---AutoCategory.Environment = {}
 
 require "AddonMenu"
 
@@ -114,30 +95,35 @@ AutoCategory.dictionary = {
     { type = true, traitstyle = true, isset = true, ismonsterset = true, },
 }
 
+
+local function testInit()
+    AutoCategory.Environment = envir
+end
+local function testReset()
+end
 function testCheckRule()
     local tn = "testCheckRule"
     TK.printSuite(mn,tn)
 
-  
   local function checkKeywords(str)
-     local result = {}
-      for w in string.gmatch(str, "%a+") do
-          local found = false
-          if AC.Environment[w] then
-              found = true
-          else
-              for i=1, #AC.dictionary do
-                  if AC.dictionary[i][w] then
-                      found = true
-                      break;
-                  end
-              end
-          end
-          if found == false then
-              table.insert(result, "Unrecognized: "..w)
-          end
-      end
-     return result
+    local result = {}
+    for w in string.gmatch(str, "%a+") do
+        local found = false
+        if AC.Environment[w] then
+            found = true
+        else
+            for i=1, #AC.dictionary do
+                if AC.dictionary[i][w] then
+                    found = true
+                    break;
+                end
+            end
+        end
+        if found == false then
+            table.insert(result, "Unrecognized: "..w)
+        end
+    end
+    return result
   end
 
   local function checkCurrentRule(rule)
@@ -178,6 +164,7 @@ end
 
 
 
+
 require "test.ACCache_test"
 require "test.AutoCat_Test"
 require "test.BagRuleApi_Test"
@@ -192,6 +179,7 @@ require "test.PluginAPI_test"
 require "test.PluginsAPI_test"
 require "test.RuleApi_Test"
 require "test.RuleList_Test"
+require "test.Collapse_Test"
 
 -- --------------------------------------------------------------------------
 function TestAC_runAll()
@@ -210,9 +198,12 @@ function TestAC_runAll()
     test_RuleApi_runAll()
     TestRuleList_runAll()
     misc_runTests()
-
-    testCheckRule()
     --Misc_runTests()
+    --testCollapse_runAll()
+
+    testInit()
+    --testCheckRule()
+    testReset()
 end
 
 TK.init()

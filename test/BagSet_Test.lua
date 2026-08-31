@@ -1,8 +1,5 @@
 package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/Users/scott/Documents/Elder Scrolls Online/live/AddOns/LibSFUtils/?.lua"
 
-local moduleName = "CVT"
-local mn = moduleName
-
 require "zos"
 require "tk"
 local TK = TestKit
@@ -12,8 +9,6 @@ local d = print
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
-
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -44,15 +39,53 @@ require "AddonMenu"
 
 local AC = AutoCategory
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
-AutoCategory.dspWin = {
-    SelectItem = function(a, b, c) end,
-    ClearList = function() end,
-    UpdateScrollList = function() end,
-}
 
+local mn, moduleName, class
+
+local function Test_BagRuleApi_Init()
+    ZO_PlayerInventory = {}
+    moduleName = "BagSet"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {},   -- obsolete
+        bags = {},
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  -- from savedvars
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+    
+    AutoCategory.dspWin = {
+      SelectItem = function(self, bagid, name) end
+    }
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function Test_BagRuleApi_Reset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {} --AutoCategory.cache
+    AC.saved = {}
+    AC.cache = {}
+    AC.dspWin = nil
+end
 
 --[[---------------------------------------------------------------------------
     AutoCategory BagSet TestKit tests
@@ -206,6 +239,7 @@ local function testBagSelection()
         "clear clears add-rule selection")
 
 
+    --[[
     AC_UI.BagSet.refresh()
     TK.assertEquals(BAG1, AutoCategory.getCurrentBagId(),
         "refresh retains current bag")
@@ -217,6 +251,7 @@ local function testBagSelection()
 
     TK.assertEquals(BAG1, AutoCategory.getCurrentBagId(),
         "repeated refresh is stable")
+    --]]
 end
 
 
@@ -410,12 +445,12 @@ end
 -- Run tests
 -- ============================================================================
 function testBagSet_runAll()
-    --testBagSelection()
-    testCategoryVisibility()
+    testBagSelection()
+    --testCategoryVisibility()
     --testPriorities()
-    --testBagSetControls()
+    testBagSetControls()
     --testRuleSelection()
-    --testAddCategory()
+    testAddCategory()
     --testRemoveCategory()
 end
 

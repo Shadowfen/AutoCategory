@@ -10,8 +10,6 @@ local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
 
-local ZO_PlayerInventory = {}
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
@@ -34,71 +32,175 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache    -- aliases of the corresponding AutoCategory. vars
 
-local TK = TestKit
+local moduleName = "BagRule"
+local mn, class
+
+local function testBagRuleInit()
+    ZO_PlayerInventory = {}
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function testBagRuleReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {} --AutoCategory.cache
+    AC.saved = {}
+end
 
 -- ===========================================================
 local function testBagRuleShowSortingFunction()
+    TK.printSuite(mn,"BagRule_ShowSortingFunction")
 
-    TK.assertTrue(AutoCat_Internal.BagRuleShowSortingFunction(
+    local sort = AutoCat_Internal.BagRuleShowSortingFunction
+
+    -- showpriority
+    TK.assertTrue(sort(
             {name = "Alpha", showpriority = 200},
             {name = "Beta", showpriority = 100}),
-        "BagRuleShowSortingFunction higher priority first")
+        "higher showpriority first")
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction(
+    TK.assertFalse(sort(
             {name = "Alpha", showpriority = 100},
             {name = "Beta", showpriority = 200}),
-        "BagRuleShowSortingFunction lower priority second")
+        "lower showpriority second")
 
-    TK.assertTrue(AutoCat_Internal.BagRuleShowSortingFunction(
+    -- equal showpriority: name tiebreaker
+    TK.assertTrue(sort(
             {name = "Alpha", showpriority = 100},
             {name = "Beta", showpriority = 100}),
-        "BagRuleShowSortingFunction alphabetical on equal priority")
+        "alphabetical on equal priority")
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction(
+    TK.assertFalse(sort(
             {name = "Beta", showpriority = 100},
             {name = "Alpha", showpriority = 100}),
-        "BagRuleShowSortingFunction reverse alphabetical on equal priority")
+        "reverse alphabetical on equal priority")
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction(
+    TK.assertFalse(sort(
             {name = "Alpha", showpriority = 100},
             {name = "Alpha", showpriority = 100}),
-        "BagRuleShowSortingFunction equal rules return false")
+        "equal rules return false")
+end
 
-    -- showpriority fallback
-    TK.assertTrue(AutoCat_Internal.BagRuleShowSortingFunction(
+local function testBagRuleRunSorting_fallback()
+    TK.printSuite(mn, "BagRule_RunSorting_fallback")
+
+    local sort = AutoCat_Internal.BagRuleShowSortingFunction
+
+    -- runpriority fallback
+    TK.assertTrue(sort(
             {name = "Alpha", runpriority = 200},
             {name = "Beta", runpriority = 100}),
-        "BagRuleShowSortingFunction falls back to runpriority")
+        "falls back to runpriority")
+
+    TK.assertFalse(sort(
+            {name = "Alpha", runpriority = 100},
+            {name = "Beta", runpriority = 200}),
+        "lower runpriority sorts second")
+
+    -- showpriority takes precedence over runpriority
+    TK.assertTrue(sort(
+            {name = "Alpha", showpriority = 200, runpriority = 1},
+            {name = "Beta", showpriority = 100, runpriority = 999}),
+        "showpriority takes precedence over runpriority")
 
     -- mixed explicit/fallback
-    TK.assertTrue(AutoCat_Internal.BagRuleShowSortingFunction(
+    TK.assertTrue(sort(
             {name = "Alpha", showpriority = 200},
             {name = "Beta", runpriority = 100}),
-        "BagRuleShowSortingFunction mixes showpriority and runpriority")
+        "showpriority sorts against runpriority fallback")
 
-    -- invalid inputs
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction(nil, {name = "Beta", showpriority = 100}),
-        "BagRuleShowSortingFunction rejects nil left rule")
+    TK.assertFalse(sort(
+            {name = "Alpha", runpriority = 100},
+            {name = "Beta", showpriority = 200}),
+        "runpriority fallback sorts below showpriority")
+end
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction({name = "Alpha", showpriority = 100}, nil),
-        "BagRuleShowSortingFunction rejects nil right rule")
+local function testBagRuleRunSorting_missingPriority()
+    TK.printSuite(mn, "BagRule_RunSorting_missingPriority")
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction({}, {name = "Beta", showpriority = 100}),
-        "BagRuleShowSortingFunction rejects nameless left rule")
+    local sort = AutoCat_Internal.BagRuleShowSortingFunction
 
-    TK.assertFalse(AutoCat_Internal.BagRuleShowSortingFunction(
+    -- priority vs no priority
+    TK.assertTrue(sort(
             {name = "Alpha", showpriority = 100},
             {name = "Beta"}),
-        "BagRuleShowSortingFunction rejects missing priority"
-    )
+        "prioritized rule sorts before unprioritized rule")
+
+    TK.assertFalse(sort(
+            {name = "Alpha"},
+            {name = "Beta", showpriority = 100}),
+        "unprioritized rule sorts after prioritized rule")
+end
+
+local function testBagRule_ShowSorting_tiebreaker()
+    TK.printSuite(mn,"BagRule_ShowSorting_tiebreaker")
+
+    local sort = AutoCat_Internal.BagRuleShowSortingFunction
+
+    -- neither rule has priority: name tiebreaker
+    TK.assertTrue(sort(
+            {name = "Alpha"},
+            {name = "Beta"}),
+        "both unprioritized rules sort alphabetically")
+
+    TK.assertFalse(sort(
+            {name = "Beta"},
+            {name = "Alpha"}),
+        "both unprioritized rules sort reverse alphabetically")
+
+    TK.assertFalse(sort(
+            {name = "Alpha"},
+            {name = "Alpha"}),
+        "both unprioritized identical names return false")
+end
+
+local function testBagRule_ShowSorting_invalid()
+    TK.printSuite(mn,"BagRule_ShowSorting_invalid")
+
+    local sort = AutoCat_Internal.BagRuleShowSortingFunction
+
+    -- invalid inputs
+    TK.assertFalse(sort(nil, {name = "Beta", showpriority = 100}),
+        "rejects nil left rule")
+
+    TK.assertFalse(sort( {name = "Alpha", showpriority = 100}, nil),
+        "rejects nil right rule")
+
+    TK.assertFalse(sort({}, {name = "Beta", showpriority = 100}),
+        "rejects nameless left rule")
+
+    TK.assertFalse(sort({name = "Alpha", showpriority = 100}, {}),
+        "rejects nameless right rule")
 end
 
 local function testBagRuleRunSortingFunction()
-    TK.printSuite("AutoCategory", "BagRuleRunSortingFunction")
+    TK.printSuite(mn, "BagRule_RunSortingFunction")
 
     local sortFn = AutoCat_Internal.BagRuleRunSortingFunction
 
@@ -111,6 +213,12 @@ local function testBagRuleRunSortingFunction()
 
     TK.assertFalse(sortFn(low, high),
         "Lower runpriority does not sort before higher")
+end
+
+local function testBagRuleRunSorting_identical()
+    TK.printSuite(mn, "BagRule_RunSorting_identical")
+
+    local sortFn = AutoCat_Internal.BagRuleRunSortingFunction
 
     -- Same priority: alphabetical name determines order
     local alpha = { name = "Alpha", runpriority = 100 }
@@ -131,6 +239,15 @@ local function testBagRuleRunSortingFunction()
 
     TK.assertFalse(sortFn(same2, same1),
         "Identical rules reverse comparison is also false")
+end
+
+local function testBagRuleRunSorting_missing()
+    TK.printSuite(mn, "BagRule_RunSorting_missing")
+
+    local sortFn = AutoCat_Internal.BagRuleRunSortingFunction
+
+    local low = { name = "Low", runpriority = 100 }
+    local high = { name = "High", runpriority = 500 }
 
     -- Missing arguments
     TK.assertFalse(sortFn(nil, low),
@@ -149,13 +266,33 @@ local function testBagRuleRunSortingFunction()
     TK.assertFalse(sortFn(high, { runpriority = 100 }),
         "Missing right name returns false")
 
-    -- Missing priority
+    -- Missing priority: unprioritized rules sort after prioritized rules
     TK.assertFalse(sortFn({ name = "A" }, low),
-        "Missing left runpriority returns false")
+        "Unprioritized left rule sorts after prioritized rule")
 
-    TK.assertFalse(sortFn(high, { name = "B" }),
-        "Missing right runpriority returns false")
+    TK.assertTrue(sortFn(high, { name = "B" }),
+        "Prioritized left rule sorts before unprioritized rule")
 
+    -- Both missing priority: alphabetical ordering
+    TK.assertTrue(sortFn(
+            { name = "Alpha" },
+            { name = "Beta" }),
+        "Two unprioritized rules sort alphabetically")
+end
+
+local function testBagRuleRunSorting_zero()
+    TK.printSuite(mn, "BagRule_RunSorting_zero")
+
+    local sortFn = AutoCat_Internal.BagRuleRunSortingFunction
+
+    local low = { name = "Low", runpriority = 100 }
+    local high = { name = "High", runpriority = 500 }
+
+    TK.assertFalse(sortFn(
+            { name = "Beta" },
+            { name = "Alpha" }),
+        "Two unprioritized rules sort reverse alphabetically")
+      
     -- Zero is valid in Lua and should be sortable
     local zero = { name = "Zero", runpriority = 0 }
 
@@ -164,11 +301,31 @@ local function testBagRuleRunSortingFunction()
 
     TK.assertFalse(sortFn(zero, low),
         "Zero priority sorts after positive priority")
+      
+    local none = { name = "None" }
+
+    TK.assertTrue(sortFn(zero, none),
+        "Zero priority sorts before missing priority")
+
+    TK.assertFalse(sortFn(none, zero),
+        "Missing priority sorts after zero priority")
 end
 
 function testAutoCat_runAll()
+    testBagRuleInit()
+    
     testBagRuleShowSortingFunction()
+    testBagRuleRunSorting_fallback()
+    testBagRuleRunSorting_missingPriority()
+    testBagRule_ShowSorting_tiebreaker()
+    testBagRule_ShowSorting_invalid()
+    
     testBagRuleRunSortingFunction()
+    testBagRuleRunSorting_identical()
+    testBagRuleRunSorting_missing()
+    testBagRuleRunSorting_zero()
+    
+    testBagRuleReset()
 end
 
 if not Suite then

@@ -26,10 +26,54 @@ require "classes.RuleApi"
 require "AutoCategory"
 require "Plugin_API"
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 require "plugins.FCOIS_Plugin"
 
-local moduleName = "FCOIS"
-local mn = moduleName
+local ZO_PlayerInventory
+local saved, cache
+
+
+local mn, moduleName, class
+
+local function FCOIS_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "FCOIS"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function FCOIS_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+end
+
+
 
 local function FCOIS_testLoadLanguage()
     local fn = "testLoadLanguage"
@@ -61,8 +105,10 @@ local function FCOIS_testPredefines()
 end
 
 function FCOIS_runTests()
+  FCOIS_testInit()
   FCOIS_testLoadLanguage()
   FCOIS_testPredefines()
+  FCOIS_testReset()
 end
 
 if not Suite then

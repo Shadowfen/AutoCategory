@@ -2,15 +2,12 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 
 require "zos"
 require "tk"
-local TK = TestKit
 
 local d = print
 
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
-
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -34,9 +31,52 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
+
+
+local mn, moduleName, class
+
+local function RuleList_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "RuleList"
+    mn = "RuleList"
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+    AutoCategory.Environment = {}
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function RuleList_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+    AutoCategory.Environment = nil
+end
 
 local TK = TestKit
 
@@ -542,6 +582,7 @@ local function TestRuleList_MixinAssign()
 end
 
 function TestRuleList_runAll()
+    RuleList_testInit()
     TestRuleList_Init()
     TestRuleList_size()
     TestRuleList_getRuleByName()
@@ -554,6 +595,7 @@ function TestRuleList_runAll()
     TestRuleList_sort()
     TestRuleList_duplicateName()
     TestRuleList_MixinAssign()
+    RuleList_testReset()
 end
 
 if not Suite then

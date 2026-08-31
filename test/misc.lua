@@ -10,8 +10,6 @@ local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
 
-local ZO_PlayerInventory = {}
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
@@ -32,13 +30,50 @@ require "AutoCategory"
 local AC = AutoCategory
 local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
 
-local mn = "Misctest"
+local mn, moduleName, class
 
-AC_UI = {}
+local function Misc_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "Misc Test"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function Misc_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+end
+
 local BagSet_EditRule_LAM = AC_UI.BagSet_EditRule_LAM
 
 AC_UI.BagSet_EditBag_LAM = {
@@ -93,12 +128,16 @@ end
 
 local function Cache_testGetRuleByName()
     TK.printSuite(mn, "testGetRuleByName")
+    local ac_rules = AutoCategory.RulesW
+    AutoCategory.cacheRuleInitialize()
+    AutoCategory.cache.AddRule({name="rule1", tag="group1", description="nah", rule="true",})
+    AutoCategory.cache.AddRule({name="Deconstruct", tag="Gears", description="Gears that I want to deconstruct", rule="traitstring(\"intricate\")",})
     
-    local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
+    local  decon = AC.GetRuleByName("Deconstruct")
     TK.assertNotNil(decon, "decon rule in saved.rules")
-    TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is correct")
-    TK.assertTrue(decon.tag == GetString(SI_AC_DEFAULT_TAG_GEARS), "decon rule tag is correct")
-    TK.assertTrue(decon.description == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT_DESC), 
+    TK.assertTrue(decon.name == "Deconstruct", "decon rule name is correct")
+    TK.assertTrue(decon.tag == "Gears", "decon rule tag is correct")
+    TK.assertTrue(decon.description == "Gears that I want to deconstruct", 
         "decon rule description is correct")
     TK.assertTrue(decon.rule == "traitstring(\"intricate\")", "decon rule text is correct")
     
@@ -108,24 +147,31 @@ end
 
 local function Cache_testResetToDefaults()
     TK.printSuite(mn,"testResetToDefaults")
-    local  decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
+    local ac_rules = AutoCategory.RulesW
+    AutoCategory.cacheRuleInitialize()
+    AutoCategory.cache.AddRule({name="rule1", tag="group1", description="nah", rule="true",})
+    AutoCategory.cache.AddRule({name="Deconstruct", tag="Gears", description="Gears that I want to deconstruct", rule="traitstring(\"intricate\")",})
+    
+    local  decon = AC.GetRuleByName("Deconstruct")
     decon.name = "Destroy"
-    decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    --printRule(decon)
-    TK.assertTrue(decon.name ~= GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "reassigned decon rule name")
+    decon = AC.GetRuleByName("Deconstruct")
+    TK.assertTrue(decon.name ~= "Deconstruct", "reassigned decon rule name")
 
     AutoCategory.ResetToDefaults()
     AC.cacheInitialize()    -- required because index in table changed
-    decon = AC.GetRuleByName(GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT))
-    --printRule(decon)
-    TK.assertTrue(decon.name == GetString(SI_AC_DEFAULT_CATEGORY_DECONSTRUCT), "decon rule name is reverted")
+    decon = AC.GetRuleByName("Deconstruct")
+    TK.assertTrue(decon.name == "Deconstruct", "decon rule name is reverted")
 end
 
 local function Cache_testAddRule()
     TK.printSuite(mn,"testAddRule")
+    local ac_rules = AutoCategory.RulesW
+    AutoCategory.cacheRuleInitialize()
+    AutoCategory.cache.AddRule({name="Low Level", tag="group1", description="nah", rule="true",})
+    AutoCategory.cache.AddRule({name="Deconstruct", tag="Gears", description="Gears that I want to deconstruct", rule="traitstring(\"intricate\")",})
+
     local orgr = AC.GetRuleByName("Low Level")
     TK.assertNotNil(orgr,"Low Level is there")
-    --printTable(orgr)
 
     local err = AC.cache.AddRule({name="Low Level", rule="false"})
     TK.assertNotNil(err, "AddRule returned error")
@@ -162,6 +208,7 @@ end
 
 
 function misc_runTests()
+  Misc_testInit()
   Cache_testIsValidRule()
   --Cache_testGetRuleByName()
   --Cache_testResetToDefaults()
@@ -169,6 +216,7 @@ function misc_runTests()
   --Cache_testUpdateSavedVars()
   
   EditBag_testSize()
+  Misc_testReset()
 end
 
 if not Suite then

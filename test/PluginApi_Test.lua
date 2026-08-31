@@ -2,15 +2,12 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 
 require "zos"
 require "tk"
-local TK = TestKit
 
 local d = print
 
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
-
-local ZO_PlayerInventory = {}
 
 require "LibSFUtils_Global"
 require "SFUtils_Color"
@@ -34,11 +31,54 @@ require "classes.BaseUI"
 require "AutoCategory"
 
 local AC = AutoCategory
+local CVT = AutoCategory.CVT
 
-local saved = {} --AutoCategory.saved
-local cache = {} --AutoCategory.cache
+local ZO_PlayerInventory
+local saved, cache
 
-AutoCategory.Environment = {}
+
+local mn, moduleName, class
+
+local function PluginApi_testInit()
+    ZO_PlayerInventory = {}
+    moduleName = "PluginApi"
+    mn = moduleName
+    class = moduleName
+
+    AutoCategory.saved = {
+        rules = {}, -- obsolete
+        bags = {}, 
+        general = {},   -- from savedvars
+        appearance = {}, -- from savedvars
+        collapses = {},  
+    }
+
+    AutoCategory.cache = {
+        bags_cvt = CVT:New(nil, nil, CVT.USE_VALUES + CVT.USE_TOOLTIPS),
+        entriesByBag = {},
+        entriesByShowBag = {},
+        entriesByName = {},
+    }
+
+    AutoCategory.BagRuleEntry = {}
+    AutoCategory.Environment = {}
+
+    saved = AutoCategory.saved
+    cache = AutoCategory.cache
+end
+
+local function PluginApi_testReset()
+    ZO_PlayerInventory = {}
+    moduleName = ""
+
+    saved = {}
+    cache = {}
+    AC.saved = {}
+    AC.cache = {}
+    AutoCategory.Environment = nil
+end
+
+
 
 local TK = TestKit
 -- ============================================================
@@ -266,10 +306,14 @@ end
 -- ------------------------------------------------------------
 
 function runPluginAPITests()
+    PluginApi_testInit()
+    
     testDummyRuleFunc()
     testAddRuleFunc()
     testLoadLanguage()
     testRegisterPlugin()
+    
+    PluginApi_testReset()
 end
 
 if not Suite then
