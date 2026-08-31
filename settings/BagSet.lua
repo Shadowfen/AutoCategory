@@ -312,7 +312,7 @@ function BagSet_SelectRule_LAM:setValue(val)
 		BagSet_ShowPriority_LAM:setValue(bagrule.showpriority)
 
 		AC_UI.RefreshControls()
-		AutoCategory.dspWin.SelectItem(AutoCategory.dspWin,getCurrentBagId(), bagrule.name)
+		AutoCategory.dspWin:SelectItem(AutoCategory.dspWin, getCurrentBagId(), bagrule.name)
 	end
 end
 
@@ -1079,11 +1079,13 @@ function AC_UI.BagSet_RefreshOrder()
 	local sbag = AutoCategory.cache.entriesByShowBag[bag]		-- CVT
 	if sbag and sbag.choices then
 		local win = AutoCategory.dspWin
-		win:ClearList()
-		for i = 1, #sbag.bagrules do
-			win:AddItem(sbag.bagrules[i])
-		end
-		win:UpdateScrollList()
+    if win and win.AddItem then
+      win:ClearList()
+      for i = 1, #sbag.bagrules do
+        win:AddItem(sbag.bagrules[i])
+      end
+      win:UpdateScrollList()
+    end
 	end
 end
 
