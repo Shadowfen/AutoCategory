@@ -1,3 +1,13 @@
+[COLOR="DeepSkyBlue"] 4.6.14 (154)[/COLOR]:
+[LIST]
+[*] Reduced saved variable file size by only saving true values for Collapsed Status values of categories.
+[*] Revised/optimized Collapse status processing
+[*] Implementation of logDebug and logWouldDebug have been moved to LibSFUtils, ver 77.
+[*] Improved performance of logDebug().
+[*] Make logDebug() support zo_strformat arguments.
+[*] Added a logWouldDebug() to be able to test if logDebug() would emit messages to the logger before having to invoke debug-data-generation code purely to provide info for the Debug message.
+[/LIST]
+
 [COLOR="DeepSkyBlue"] 4.6.13 (153)[/COLOR]:
 [LIST]
 [*] Performance improvements.
