@@ -4,8 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
-local d = print
-
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
@@ -97,9 +95,20 @@ end
 -- =========================================================
 -- Initialize / construction
 -- =========================================================
+local function TestCVT_New()
+    TK.printSuite(mn,"CVTNew")
+    local cvt = {}
+    TK.assertFalse(cvt.choices, "cvt has no choices" )
+     
+    cvt = AC.CVT:New("myControl", nil, AC.CVT.USE_ALL)
+    TK.assertTrue(cvt.choices and SF.GetSize(cvt.choices) == 0, "has empty choices")
+    TK.assertTrue(cvt.choicesValues and SF.GetSize(cvt.choicesValues) == 0, "has empty values")
+    TK.assertTrue(cvt.choicesTooltips and SF.GetSize(cvt.choicesTooltips) == 0, "has empty tooltips")
+    TK.assertTrue(cvt.controlName == "myControl", "control name "..cvt.controlName)
+end
 
 local function TestCVT_Initialize()
-    TK.printSuite("AutoCategory", "CVT Initialize")
+    TK.printSuite(mn, "CVT Initialize")
 
     do
         local cvt = AutoCategory.CVT:New()
@@ -137,12 +146,41 @@ local function TestCVT_Initialize()
 end
 
 
+
+local function TestCVT_GetUses()
+    TK.printSuite(mn, "CVT GetUses")
+
+    do
+        local cvt = CVT:New()
+        TK.assertEquals(CVT.USE_NONE, cvt:GetUses(),
+            "choices only returns USE_NONE")
+    end
+
+    do
+        local cvt = CVT:New(nil, nil, CVT.USE_VALUES)
+        TK.assertEquals(CVT.USE_VALUES, cvt:GetUses(),
+            "values returns USE_VALUES")
+    end
+
+    do
+        local cvt = CVT:New(nil, nil, CVT.USE_TOOLTIPS)
+        TK.assertEquals(CVT.USE_TOOLTIPS, cvt:GetUses(),
+            "tooltips returns USE_TOOLTIPS")
+    end
+
+    do
+        local cvt = CVT:New(nil, nil, CVT.USE_ALL)
+        TK.assertEquals(CVT.USE_ALL, cvt:GetUses(),
+            "values and tooltips returns USE_ALL")
+    end
+end
+
 -- =========================================================
 -- size / control name
 -- =========================================================
 
 local function TestCVT_BasicAccessors()
-    TK.printSuite("AutoCategory", "CVT Basic Accessors")
+    TK.printSuite(mn, "CVT Basic Accessors")
 
     local cvt = AutoCategory.CVT:New()
 
@@ -164,87 +202,71 @@ end
 -- =========================================================
 
 local function TestCVT_Append()
-    TK.printSuite("AutoCategory", "CVT append")
+    TK.printSuite(mn, "CVT append")
 
     do
         local cvt = AutoCategory.CVT:New()
 
-        TK.assertTrue(cvt:append("One"),
-            "append accepts choice")
-
-        TK.assertEquals(1, #cvt.choices,
-            "choice appended")
-
-        TK.assertEquals("One", cvt.choices[1],
-            "choice stored at index 1")
-
-        TK.assertTrue(cvt.dirty,
-            "append marks CVT dirty")
+        TK.assertTrue(cvt:append("One"), "[choice only] append accepts choice")
+        TK.assertEquals(1, #cvt.choices, "[choice only] choice appended")
+        TK.assertEquals("One", cvt.choices[1], "[choice only] choice stored at index 1")
+        TK.assertTrue(cvt.dirty, "[choice only] append marks CVT dirty")
     end
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_VALUES)
 
-        TK.assertFalse(cvt:append("One"),
-            "value required when choicesValues enabled")
-
-        TK.assertEquals(0, cvt:size(),
-            "failed append does not add choice")
-
-        TK.assertTrue(cvt:append("One", 101),
-            "choice and value accepted")
-
-        TK.assertEquals("One", cvt.choices[1],
-            "choice stored")
-
-        TK.assertEquals(101, cvt.choicesValues[1],
-            "value stored")
+        TK.assertFalse(cvt:append("One"), "[values] value required when choicesValues enabled")
+        TK.assertEquals(0, cvt:size(), "[values] failed append does not add choice")
+        TK.assertTrue(cvt:append("One", 101), "[values] choice and value accepted")
+        TK.assertEquals("One", cvt.choices[1], "[values] choice stored")
+        TK.assertEquals(101, cvt.choicesValues[1], "[values] value stored")
     end
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_TOOLTIPS)
 
-        TK.assertFalse(cvt:append("One"),
-            "tooltip required when tooltips enabled")
-
-        TK.assertTrue(cvt:append("One", nil, "Tooltip"),
-            "choice and tooltip accepted")
-
-        TK.assertEquals("One", cvt.choices[1],
-            "tooltip CVT stores choice")
-
-        TK.assertEquals("Tooltip", cvt.choicesTooltips[1],
-            "tooltip stored")
+        TK.assertFalse(cvt:append("One"), "[tooltips] tooltip required when tooltips enabled")
+        TK.assertTrue(cvt:append("One", nil, "Tooltip"), "[tooltips] choice and tooltip accepted")
+        TK.assertEquals("One", cvt.choices[1], "[tooltips] tooltip CVT stores choice")
+        TK.assertEquals("Tooltip", cvt.choicesTooltips[1], "[tooltips] tooltip stored")
     end
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_ALL)
 
-        TK.assertFalse(cvt:append(nil, 1, "tip"),
-            "nil choice rejected")
-
-        TK.assertFalse(cvt:append("One", nil, "tip"),
-            "nil value rejected")
-
-        TK.assertFalse(cvt:append("One", 1, nil),
-            "nil tooltip rejected")
-
-        TK.assertTrue(cvt:append("One", 1, "tip"),
-            "complete USE_ALL row accepted")
+        TK.assertFalse(cvt:append(nil, 1, "tip"), "[all] nil choice rejected")
+        TK.assertFalse(cvt:append("One", nil, "tip"), "[all] nil value rejected")
+        TK.assertFalse(cvt:append("One", 1, nil), "[all] nil tooltip rejected")
+        TK.assertTrue(cvt:append("One", 1, "tip"), "[all] complete USE_ALL row accepted")
     end
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_ALL)
 
-        TK.assertTrue(cvt:append("Empty", "", ""),
-            "empty strings are valid append values")
-
-        TK.assertEquals("", cvt.choicesValues[1],
-            "empty value preserved")
-
-        TK.assertEquals("", cvt.choicesTooltips[1],
-            "empty tooltip preserved")
+        TK.assertTrue(cvt:append("Empty", "", ""), "[all] empty strings are valid append values")
+        TK.assertEquals("", cvt.choicesValues[1], "[all] empty value preserved")
+        TK.assertEquals("", cvt.choicesTooltips[1], "[all] empty tooltip preserved")
     end
+end
+
+local function CVT_testAppend()
+    TK.printSuite(mn, "testCVTAppend")
+    local cvt = AC.CVT:New("myControl3",nil,AC.CVT.USE_VALUES)
+    TK.assertTrue(cvt.controlName == "myControl3", "cvt.controlName == myControl3")
+    cvt.indexValue = "four"
+    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
+    local newvals = AC.CVT:New(nil,nil,AC.CVT.USE_VALUES)
+    fillCVT(newvals, { 1, 2, 4 },{"one","two","four"})
+    newvals.indexValue = "two"
+    cvt:assign(newvals)
+    cvt:append( 3, "three", "")
+    cvt.indexValue = "two"
+    TK.assertTrue(cvt.choices[4] == 3, "choices[4] == three")
+    TK.assertTrue(cvt.choicesValues[4] == "three", "choicesValues[4] == three")
+    TK.assertNil(cvt.choicesTooltips,"no choicesTooltips")
+    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
+    TK.assertTrue(cvt.controlName == "myControl3", "cvt.controlName = "..cvt.controlName)
 end
 
 
@@ -253,7 +275,7 @@ end
 -- =========================================================
 
 local function TestCVT_Clear()
-    TK.printSuite("AutoCategory", "CVT clear")
+    TK.printSuite(mn, "CVT clear")
 
     local cvt = AutoCategory.CVT:New(nil, "selected", AutoCategory.CVT.USE_ALL)
 
@@ -297,7 +319,7 @@ end
 -- =========================================================
 
 local function TestCVT_Select()
-    TK.printSuite("AutoCategory", "CVT select")
+    TK.printSuite(mn, "CVT select")
 
     do
         local cvt = AutoCategory.CVT:New()
@@ -305,17 +327,10 @@ local function TestCVT_Select()
         cvt:append("One")
         cvt:append("Two")
 
-        TK.assertEquals("One", cvt:select(),
-            "select with no value chooses first choice")
-
-        TK.assertEquals("Two", cvt:select("Two"),
-            "valid choice selected")
-
-        TK.assertEquals("Two", cvt:select("NotPresent"),
-            "invalid value retains current valid selection")
-
-        TK.assertEquals("Two", cvt:select(""),
-            "empty string retains current valid selection")
+        TK.assertEquals("One", cvt:select(), "select with no value chooses first choice")
+        TK.assertEquals("Two", cvt:select("Two"), "valid choice selected")
+        TK.assertEquals("Two", cvt:select("NotPresent"), "invalid value retains current valid selection")
+        TK.assertEquals("Two", cvt:select(""), "empty string retains current valid selection")
     end
 
     do
@@ -328,7 +343,6 @@ local function TestCVT_Select()
 
         TK.assertEquals("NotPresent", result,
             "table selection accepts supplied value without validation")
-
         TK.assertEquals("NotPresent", cvt.indexValue,
             "table selection does not validate supplied value")
     end
@@ -339,11 +353,8 @@ local function TestCVT_Select()
         cvt:append("One")
         cvt:append("Two")
 
-        TK.assertEquals("One", cvt:select({}),
-            "empty table selects first choice")
-
-        TK.assertEquals("One", cvt:select({nil}),
-            "table with nil first value selects first choice")
+        TK.assertEquals("One", cvt:select({}), "empty table selects first choice")
+        TK.assertEquals("One", cvt:select({nil}), "table with nil first value selects first choice")
     end
 
     do
@@ -352,24 +363,16 @@ local function TestCVT_Select()
         cvt:append("One", 101)
         cvt:append("Two", 102)
 
-        TK.assertEquals(101, cvt:select(),
-            "values list controls default selection")
-
-        TK.assertEquals(102, cvt:select(102),
-            "valid choice value selected")
-
-        TK.assertEquals(102, cvt:select(999),
-            "invalid choice value retains current selection")
+        TK.assertEquals(101, cvt:select(), "values list controls default selection")
+        TK.assertEquals(102, cvt:select(102), "valid choice value selected")
+        TK.assertEquals(102, cvt:select(999), "invalid choice value retains current selection")
     end
 
     do
         local cvt = AutoCategory.CVT:New()
 
-        TK.assertNil(cvt:select(),
-            "empty CVT has no selection")
-
-        TK.assertNil(cvt:select("anything"),
-            "selection remains nil when CVT is empty")
+        TK.assertNil(cvt:select(), "empty CVT has no selection")
+        TK.assertNil(cvt:select("anything"), "selection remains nil when CVT is empty")
     end
 end
 
@@ -379,7 +382,7 @@ end
 -- =========================================================
 
 local function TestCVT_ClearIndex()
-    TK.printSuite("AutoCategory", "CVT clearIndex")
+    TK.printSuite(mn, "CVT clearIndex")
 
     local cvt = AutoCategory.CVT:New(nil, "selected")
 
@@ -397,8 +400,26 @@ end
 -- assign
 -- =========================================================
 
+local function TestCVT_Assign_Incompatible()
+    TK.printSuite(mn,"CVT Assign Incompatibles")
+    local src = AutoCategory.CVT:New(nil, 2, AutoCategory.CVT.USE_VALUES)
+    src:append(1, "one")
+    src:append(2, "two")
+    src:append(4, "four")
+    
+    local cvt = AutoCategory.CVT:New("myControl", nil, AutoCategory.CVT.USE_ALL)
+    TK.assertFalse(cvt:assign(src), "assignment failed - incompatible VALUES with ALL")
+    
+    local cvt1 = AutoCategory.CVT:New("myControl", nil, AutoCategory.CVT.USE_TOOLTIPS)
+    TK.assertFalse(cvt1:assign(src), "assignment failed - incompatible VALUES with TOOLTIPS")
+    
+    local cvt2 = AutoCategory.CVT:New("myControl", nil)
+    TK.assertFalse(cvt2:assign(src), "assignment failed - incompatible VALUES with CHOICES")
+end
+
+
 local function TestCVT_Assign()
-    TK.printSuite("AutoCategory", "CVT assign")
+    TK.printSuite(mn, "CVT assign")
 
     do
         local src = AutoCategory.CVT:New(nil, 2, AutoCategory.CVT.USE_ALL)
@@ -414,35 +435,19 @@ local function TestCVT_Assign()
 
         dst:assign(src)
 
-        TK.assertEquals(2, #dst.choices,
-            "assign copies choices")
+        TK.assertEquals(2, #dst.choices, "assign copies choices")
+        TK.assertEquals(2, #dst.choicesValues, "assign copies values")
+        TK.assertEquals(2, #dst.choicesTooltips, "assign copies tooltips")
 
-        TK.assertEquals(2, #dst.choicesValues,
-            "assign copies values")
+        TK.assertEquals("Two", dst.choices[2], "assigned choice is correct")
+        TK.assertEquals(2, dst.choicesValues[2], "assigned value is correct")
 
-        TK.assertEquals(2, #dst.choicesTooltips,
-            "assign copies tooltips")
+        TK.assertEquals("Tip2", dst.choicesTooltips[2], "assigned tooltip is correct")
+        TK.assertEquals(2, dst.indexValue, "source selection copied")
 
-        TK.assertEquals("Two", dst.choices[2],
-            "assigned choice is correct")
-
-        TK.assertEquals(2, dst.choicesValues[2],
-            "assigned value is correct")
-
-        TK.assertEquals("Tip2", dst.choicesTooltips[2],
-            "assigned tooltip is correct")
-
-        TK.assertEquals(2, dst.indexValue,
-            "source selection copied")
-
-        TK.assertTrue(choicesRef == dst.choices,
-            "assign preserves choices table")
-
-        TK.assertTrue(valuesRef == dst.choicesValues,
-            "assign preserves values table")
-
-        TK.assertTrue(tooltipsRef == dst.choicesTooltips,
-            "assign preserves tooltips table")
+        TK.assertTrue(choicesRef == dst.choices, "assign preserves choices table")
+        TK.assertTrue(valuesRef == dst.choicesValues, "assign preserves values table")
+        TK.assertTrue(tooltipsRef == dst.choicesTooltips, "assign preserves tooltips table")
     end
 
     do
@@ -486,71 +491,80 @@ local function TestCVT_Assign()
 end
 
 
+
+local function TestCVT_Assign3()
+    TK.printSuite(mn, "CVTAssign3")
+    local cvt = AC.CVT:New("myControl2", "two", AC.CVT.USE_VALUES)
+    
+    cvt:select( "four" )
+    TK.assertNil(cvt.indexValue,"indexValue = nil for 'four'")
+    local newvals = AC.CVT:New(nil,nil,AC.CVT.USE_VALUES)
+    fillCVT(newvals, { 1, 2, 4 },{"one","two","four"})
+    newvals.indexValue = "two"
+    cvt:assign(newvals)
+    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
+    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
+    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
+    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..(cvt.indexValue or ""))
+    cvt:select( "four" )
+    TK.assertTrue(cvt.indexValue == "four", "indexValue == "..(cvt.indexValue or ""))
+    TK.assertTrue(cvt.controlName == "myControl2", "cvt.controlName = "..cvt.controlName)
+end
+
 -- =========================================================
 -- removeItemChoice
 -- =========================================================
 
 local function TestCVT_RemoveItemChoice()
-    TK.printSuite("AutoCategory", "CVT removeItemChoice")
+    TK.printSuite(mn, "CVT removeItemChoice")
 
-    local cvt = AutoCategory.CVT:New(
-        nil,
-        nil,
-        AutoCategory.CVT.USE_ALL
-    )
+    local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_ALL)
 
-    TK.assertNotNil(cvt.choicesValues,
-        "USE_ALL creates choicesValues")
+    TK.assertNotNil(cvt.choicesValues, "USE_ALL creates choicesValues")
 
     cvt:append("One", 1, "Tip1")
     cvt:append("Two", 2, "Tip2")
     cvt:append("Three", 3, "Tip3")
 
-    TK.assertEquals(3, #cvt.choices,
-        "three choices before removal")
-
-    TK.assertEquals(3, #cvt.choicesValues,
-        "three values before removal")
-
-    TK.assertEquals(1, cvt.choicesValues[1],
-        "first value is 1")
-
-    TK.assertEquals(2, cvt.choicesValues[2],
-        "second value is 2")
-
-    TK.assertEquals(3, cvt.choicesValues[3],
-        "third value is 3")
+    TK.assertEquals(3, #cvt.choices, "three choices before removal")
+    TK.assertEquals(3, #cvt.choicesValues, "three values before removal")
+    TK.assertEquals(1, cvt.choicesValues[1], "first value is 1")
+    TK.assertEquals(2, cvt.choicesValues[2], "second value is 2")
+    TK.assertEquals(3, cvt.choicesValues[3], "third value is 3")
 
     cvt:select(1)
 
-    TK.assertEquals(1, cvt.indexValue,
-        "first value initially selected")
+    TK.assertEquals(1, cvt.indexValue, "first value initially selected")
 
     local result = cvt:removeItemChoice("One")
 
-    TK.assertEquals(2, result,
-        "removing first item selects next item")
+    TK.assertEquals(2, result, "removing first item selects next item")
+    TK.assertEquals(2, cvt.indexValue, "next value becomes current selection")
+    TK.assertEquals(2, #cvt.choices, "one choice removed")
+    TK.assertEquals(2, #cvt.choicesValues, "one value removed")
 
-    TK.assertEquals(2, cvt.indexValue,
-        "next value becomes current selection")
+    TK.assertEquals("Two", cvt.choices[1], "second choice moves to first position")
+    TK.assertEquals(2, cvt.choicesValues[1], "second value moves to first position")
+    TK.assertEquals("Tip2", cvt.choicesTooltips[1], "second tooltip moves to first position")
 
-    TK.assertEquals(2, #cvt.choices,
-        "one choice removed")
+    TK.assertTrue(cvt.dirty, "removal marks CVT dirty")
+    
+    do
+      local cvt = CVT:New(nil, 2, CVT.USE_ALL)
 
-    TK.assertEquals(2, #cvt.choicesValues,
-        "one value removed")
+      cvt:append("One", 1, "Tip1")
+      cvt:append("Two", 2, "Tip2")
+      local ndx = cvt.indexValue
+      cvt.dirty = false
+      local result = cvt:removeItemChoice("Missing")
 
-    TK.assertEquals("Two", cvt.choices[1],
-        "second choice moves to first position")
+      TK.assertTrue(result == ndx, "removing missing choice returns prev index")
 
-    TK.assertEquals(2, cvt.choicesValues[1],
-        "second value moves to first position")
+      TK.assertEquals(2, #cvt.choices, "removing missing choice leaves choices unchanged")
+      TK.assertEquals(2, cvt.indexValue, "removing missing choice preserves selection")
 
-    TK.assertEquals("Tip2", cvt.choicesTooltips[1],
-        "second tooltip moves to first position")
-
-    TK.assertTrue(cvt.dirty,
-        "removal marks CVT dirty")
+      TK.assertFalse(cvt.dirty, "removing missing choice does not dirty CVT")
+  end
 end
 
 -- =========================================================
@@ -558,7 +572,7 @@ end
 -- =========================================================
 
 local function TestCVT_RemoveItemChoiceValue()
-    TK.printSuite("AutoCategory", "CVT removeItemChoiceValue")
+    TK.printSuite(mn, "CVT removeItemChoiceValue")
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_ALL)
@@ -569,17 +583,10 @@ local function TestCVT_RemoveItemChoiceValue()
 
         cvt:select(1)
 
-        TK.assertEquals(2, cvt:removeItemChoiceValue(1),
-            "removing first value selects next value")
-
-        TK.assertEquals("Two", cvt.choices[1],
-            "choice removed with value")
-
-        TK.assertEquals(2, cvt.choicesValues[1],
-            "value list shifted")
-
-        TK.assertEquals("Tip2", cvt.choicesTooltips[1],
-            "tooltip list shifted")
+        TK.assertEquals(2, cvt:removeItemChoiceValue(1), "removing first value selects next value")
+        TK.assertEquals("Two", cvt.choices[1], "choice removed with value")
+        TK.assertEquals(2, cvt.choicesValues[1], "value list shifted")
+        TK.assertEquals("Tip2", cvt.choicesTooltips[1], "tooltip list shifted")
     end
 
     do
@@ -591,8 +598,7 @@ local function TestCVT_RemoveItemChoiceValue()
 
         cvt:select(2)
 
-        TK.assertEquals(3, cvt:removeItemChoiceValue(2),
-            "removing middle value selects following value")
+        TK.assertEquals(3, cvt:removeItemChoiceValue(2), "removing middle value selects following value")
     end
 
     do
@@ -610,14 +616,11 @@ local function TestCVT_RemoveItemChoiceValue()
 
     do
         local cvt = AutoCategory.CVT:New(nil, nil, AutoCategory.CVT.USE_VALUES)
-
         cvt:append("Only", 1)
-
         cvt:select(1)
 
         TK.assertNil(cvt:removeItemChoiceValue(1),
             "removing only value clears selection")
-
         TK.assertEquals(0, cvt:size(),
             "removing only value leaves empty CVT")
     end
@@ -639,7 +642,6 @@ local function TestCVT_RemoveItemChoiceValue()
 
         TK.assertNil(cvt:removeItemChoiceValue("One"),
             "remove by value returns nil without values list")
-
         TK.assertEquals(1, cvt:size(),
             "remove by value does nothing without values list")
     end
@@ -651,7 +653,7 @@ end
 -- =========================================================
 
 local function TestCVT_UpdateControl()
-    TK.printSuite("AutoCategory", "CVT updateControl")
+    TK.printSuite(mn, "CVT updateControl")
 
     local oldWindowManager = WINDOW_MANAGER
 
@@ -695,21 +697,14 @@ local function TestCVT_UpdateControl()
 
         TK.assertEquals("TestDropdown", requestedName,
             "updateControl requests correct control")
-
         TK.assertEquals(1, updateCount,
             "updateControl calls UpdateChoices once")
-
         TK.assertTrue(receivedChoices == cvt.choices,
             "UpdateChoices receives choices list")
 
-        TK.assertNil(receivedValues,
-            "UpdateChoices receives nil values")
-
-        TK.assertNil(receivedTooltips,
-            "UpdateChoices receives nil tooltips")
-
-        TK.assertNil(cvt.dirty,
-            "updateControl clears dirty flag")
+        TK.assertNil(receivedValues, "UpdateChoices receives nil values")
+        TK.assertNil(receivedTooltips, "UpdateChoices receives nil tooltips")
+        TK.assertNil(cvt.dirty, "updateControl clears dirty flag")
     end
 
     -- ---------------------------------------------------
@@ -724,11 +719,8 @@ local function TestCVT_UpdateControl()
 
         cvt:updateControl()
 
-        TK.assertNil(requestedName,
-            "clean CVT does not request control")
-
-        TK.assertEquals(0, updateCount,
-            "clean CVT does not update control")
+        TK.assertNil(requestedName, "clean CVT does not request control")
+        TK.assertEquals(0, updateCount, "clean CVT does not update control")
     end
 
     -- ---------------------------------------------------
@@ -749,14 +741,31 @@ local function TestCVT_UpdateControl()
         cvt:append("One")
         cvt:updateControl()
 
-        TK.assertEquals("MissingControl", requestedName,
-            "missing control is requested")
+        TK.assertEquals("MissingControl", requestedName, "missing control is requested")
+        TK.assertEquals(0, updateCount, "missing control is not updated")
+        TK.assertTrue(cvt.dirty, "dirty remains set when control is missing")
+    end
+    
+    do
+        requestedName = nil
+        updateCount = 0
+        
+        WINDOW_MANAGER = {
+            GetControlByName = function(self, name)
+                requestedName = name
+                return fakeControl
+            end,
+        }
+        
+        local cvt = CVT:New("TestDropdown")
 
-        TK.assertEquals(0, updateCount,
-            "missing control is not updated")
+        cvt:append("One")
+        cvt:append("Two")
+        cvt:append("Three")
 
-        TK.assertTrue(cvt.dirty,
-            "dirty remains set when control is missing")
+        cvt:updateControl()
+
+        TK.assertEquals(1, updateCount, "multiple changes before update produce one control update")
     end
 
     WINDOW_MANAGER = oldWindowManager
@@ -768,7 +777,7 @@ end
 -- =========================================================
 
 local function TestCVT_CorruptChoices()
-    TK.printSuite("AutoCategory", "CVT corrupt choices")
+    TK.printSuite(mn, "CVT corrupt choices")
 
     local cvt = AutoCategory.CVT:New()
 
@@ -795,122 +804,34 @@ end
 -- =========================================================
 -- Run CVT tests
 -- =========================================================
-local function TestCVT_New()
-    local tn = "CVTNew"
-    TK.printSuite(mn,tn)
-    local cvt = {}
-    TK.assertFalse(cvt.choices, "cvt has no choices" )
-     
-    cvt = AC.CVT:New("myControl", nil, AC.CVT.USE_ALL)
-    TK.assertTrue(cvt.choices and SF.GetSize(cvt.choices) == 0, "has empty choices")
-    TK.assertTrue(cvt.choicesValues and SF.GetSize(cvt.choicesValues) == 0, "has empty values")
-    TK.assertTrue(cvt.choicesTooltips and SF.GetSize(cvt.choicesTooltips) == 0, "has empty tooltips")
-    TK.assertTrue(cvt.controlName == "myControl", "control name "..cvt.controlName)
-end
-
-local function TestCVT_Assign2()
-    local tn = "CVTAssign2"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl",nil,AC.CVT.USE_VALUES)
-    TK.assertNil(cvt.indexValue,"no such indexValue")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-      indexValue = "two",
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
-    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..tostring(cvt.indexValue))
-end
-
-local function TestCVT_Assign3()
-    local tn = "CVTAssign3"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl2", "two", AC.CVT.USE_VALUES)
-    
-    cvt:select( "four" )
-    TK.assertNil(cvt.indexValue,"indexValue = nil for 'four'")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-      indexValue = "two",
-    }
-    cvt:assign(newvals)
-    TK.assertTrue(cvt.choices[2] == 2, "choices[2] == 2")
-    TK.assertTrue(cvt.choicesValues[2] == "two", "choicesValues[2] == two")
-    TK.assertNil(cvt.choicesTooltips,"no such choicesTooltips")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
-    cvt:select( "four" )
-    TK.assertTrue(cvt.indexValue == "four", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl2", "cvt.controlName = "..cvt.controlName)
-end
-
-local function TestCVT_RemoveMid()
-    local tn = "testCVTRemoveMid"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "four"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    cvt:removeItemChoiceValue("four")
-    TK.assertTrue(cvt.choices[3] == 3, "choices[3] == three")
-    TK.assertTrue(cvt.choicesValues[3] == "three", "choicesValues[3] == three")
-    TK.assertTrue(cvt.indexValue == "three", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
-
-local function TestCVT_RemoveFst()
-    local tn = "testCVTRemoveFst"
-    TK.printSuite(mn,tn)
-    local cvt = AC.CVT:New("myControl4",nil,AC.CVT.USE_VALUES)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName == myControl4")
-    cvt.indexValue = "one"
-    TK.assertNotNil(cvt.indexValue,"indexValue ~= nil")
-    local newvals = {
-      choices = { 1, 2, 4, 3 },
-      choicesValues = {"one","two","four", "three"},
-    }
-    cvt:assign(newvals)
-    cvt:removeItemChoiceValue("one")
-    TK.assertTrue(cvt.choices[1] == 2, "choices[3] == two")
-    TK.assertTrue(cvt.choicesValues[1] == "two", "choicesValues[1] == two")
-    TK.assertTrue(cvt.indexValue == "two", "indexValue == "..cvt.indexValue)
-    TK.assertTrue(cvt.controlName == "myControl4", "cvt.controlName = "..cvt.controlName)
-end
 
 local function TestCVT_SetControlName()
-    local tn = "testCVTAppend"
-    TK.printSuite(mn,tn)
+    TK.printSuite(mn, "SetControlName")
     local cvt = AC.CVT:New()
     TK.assertNil(cvt.controlName, "cvt.controlName == nil")
     cvt:setControlName("myNewControl")
     TK.assertTrue(cvt.controlName == "myNewControl", "cvt.controlName = "..cvt.controlName)
 end
 
+
 function TestCVT_runAll()
     TestCVT_Init()
+    
     TestCVT_New()
     TestCVT_Initialize()
+    TestCVT_GetUses()
     TestCVT_BasicAccessors()
     TestCVT_SetControlName()
     TestCVT_Append()
+    CVT_testAppend()
     TestCVT_Clear()
     TestCVT_Select()
     TestCVT_ClearIndex()
+    TestCVT_Assign_Incompatible()
     TestCVT_Assign()
-    TestCVT_Assign2()
     TestCVT_Assign3()
     TestCVT_RemoveItemChoice()
     TestCVT_RemoveItemChoiceValue()
-    TestCVT_RemoveFst()
-    TestCVT_RemoveMid()
     TestCVT_UpdateControl()
     TestCVT_CorruptChoices()
     TestCVT_Reset()

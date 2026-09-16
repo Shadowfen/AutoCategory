@@ -64,6 +64,20 @@ function AutoCategory.CVT:Initialize(ctlname, ndx, usesFlags)
 	self.indexValue = ndx
 end
 
+function AutoCategory.CVT:GetUses()
+    local uses = USE_NONE
+
+    if self.choicesValues then
+        uses = uses + USE_VALUES
+    end
+
+    if self.choicesTooltips then
+        uses = uses + USE_TOOLTIPS
+    end
+
+    return uses
+end
+
 -- clear all of the tables in the CVT while preserving the references to the tables themselves
 function AutoCategory.CVT:clear()
 	self.dirty = true
@@ -79,15 +93,29 @@ function AutoCategory.CVT:getControlName()
 	return self.controlName
 end
 
---[[ `CVT:assign(tblB)`
+-- 1-based and contiguous, remember?
+-- may return empty table
+-- dest may not be nil - check BEFORE calling this
+local function shallowcpy(src, dest)
+	--dest = dest or {}
+	if not src then return dest end
+	for k=1, #src do
+		dest[k] = src[k]
+	end
+	return dest
+end
 
-	Copies the dropdown choice lists and current selection from another CVT into this CVT.
+--[[ Copies the dropdown choice lists and current selection from another CVT into this CVT.
 
 	The destination CVT retains its existing table structure and table references. The contents 
 	of the source lists are shallow-copied into the destination lists.
 
 	### Parameters
 		`tblB` - `CVT` - Source CVT from which the choices, values, tooltips, and current selection are copied.
+
+	### Returns
+		nil if error or
+		true if assignment happened
 
 	Behavior
 		If `tblB` is `nil`, or if `tblB` is the same CVT as the destination, no action is taken.
@@ -125,33 +153,16 @@ end
 --]]
 function AutoCategory.CVT:assign(tblB)
 	if not tblB then return end
+  if not tblB.GetUses then return end
 	if tblB == self then return end
 
-	if self.choicesValues and not tblB.choicesValues then
-		logDebug("[AC_Classes] don't have choicesValues for src tables in assign ", self.controlName)
-		return
-	end
-	if self.choicesTooltips and not tblB.choicesTooltips then
-		logDebug("[AC_Classes] don't have choicesTooltips for dest tables in assign ", self.controlName)
-		return
-	end
-
+  if self:GetUses() ~= tblB:GetUses() then return end
+  
 	local ndx = self.indexValue
 	self:clear()	-- also marks as dirty
 
-	-- 1-based and contiguous, remember?
-	-- may return empty table
-	local function shallowcpy(src, dest)
-        dest = dest or {}
-		if not src then return dest end
-		for k=1, #src do
-			dest[k] = src[k]
-		end
-		return dest
-	end
-
 	self.choices = shallowcpy(tblB.choices, self.choices)
-    if self.choicesValues then self.choicesValues = shallowcpy(tblB.choicesValues, self.choicesValues) end
+  if self.choicesValues then self.choicesValues = shallowcpy(tblB.choicesValues, self.choicesValues) end
 	if self.choicesTooltips then self.choicesTooltips = shallowcpy(tblB.choicesTooltips, self.choicesTooltips) end
 
 	-- select the first value as the "current" value
@@ -164,11 +175,10 @@ function AutoCategory.CVT:assign(tblB)
 	else --if #self.choicesValues > 0 then
 		self:select()
 	end
+	return true
 end
 
---[[ `CVT:select(value)`
-
-	Sets the current `indexValue` for the CVT using the supplied value or, when no valid value is 
+--[[ Sets the current `indexValue` for the CVT using the supplied value or, when no valid value is 
 	supplied, an appropriate value from the CVT's active selection list.
 
 	The active selection list is:
@@ -250,8 +260,7 @@ function AutoCategory.CVT:clearIndex()
 	self.indexValue = nil
 end
 
---[[ `CVT:append(choice, value, tooltip)`
-	Appends one dropdown row to the CVT's `choices` list and, when enabled, its corresponding `choicesValues` and `choicesTooltips` lists.
+--[[ Appends one dropdown row to the CVT's `choices` list and, when enabled, its corresponding `choicesValues` and `choicesTooltips` lists.
 
 	All three lists remain 1-based and contiguous, with corresponding entries at the same index representing a single dropdown row.
 
@@ -340,8 +349,7 @@ function AutoCategory.CVT:updateControl()
 	)
 end
 
---[[ `CVT:removeItemChoice(removeItem)`
-	Removes a dropdown row from the CVT by its display choice and updates all associated parallel lists.
+--[[ Removes a dropdown row from the CVT by its display choice and updates all associated parallel lists.
 
 	The associated dropdown control is **not** updated by this method. The CVT is marked dirty so that 
 	a later `updateControl()` can refresh the control.
@@ -406,14 +414,17 @@ function AutoCategory.CVT:removeItemChoice(removeItem)
 	local num = #self.choices		-- value BEFORE removal
 
 	-- remove it from lists
+	local choicesValues = self.choicesValues
+	local choicesTooltips = self.choicesTooltips
+
 	table.remove(self.choices, removeIndex)
 
-	if self.choicesValues ~= nil and #self.choicesValues > 0 then
-		table.remove(self.choicesValues, removeIndex)
+	if choicesValues then
+		table.remove(choicesValues, removeIndex)
 	end
 
-	if self.choicesTooltips ~= nil and #self.choicesTooltips > 0 then
-		table.remove(self.choicesTooltips, removeIndex)
+	if choicesTooltips then
+		table.remove(choicesTooltips, removeIndex)
 	end
 
 	-- choose what the new indexValue (selection) will be
@@ -434,8 +445,7 @@ function AutoCategory.CVT:removeItemChoice(removeItem)
 	return self.indexValue
 end
 
---[[ `CVT:removeItemChoiceValue(removeItem)`
-Removes a dropdown row from the CVT by its underlying `choiceValue` and updates all associated parallel lists.
+--[[ Removes a dropdown row from the CVT by its underlying `choiceValue` and updates all associated parallel lists.
 
 The associated dropdown control is **not** updated by this method. The CVT is marked dirty so 
 that a later `updateControl()` can refresh the control.
@@ -480,8 +490,7 @@ Return Value
 	refreshing the associated dropdown control.
 --]]
 function AutoCategory.CVT:removeItemChoiceValue(removeItem)
-	local removeIndex
-    if self.choicesValues == nil then return nil end
+	if self.choicesValues == nil then return nil end
 
 	-- find the choiceValue to remove
 	local removeIndex = ZO_IndexOfElementInNumericallyIndexedTable(self.choicesValues, removeItem)
@@ -491,10 +500,12 @@ function AutoCategory.CVT:removeItemChoiceValue(removeItem)
 	local num = #self.choicesValues		-- value BEFORE removal
 
 	-- remove it
-	table.remove(self.choicesValues, removeIndex) -- not optional here
-	table.remove(self.choices, removeIndex)		-- not optional
-	if self.choicesTooltips and #self.choicesTooltips > 0 then
-		table.remove(self.choicesTooltips, removeIndex)
+	local choicesValues = self.choicesValues
+	local choicesTooltips = self.choicesTooltips
+	table.remove(choicesValues, removeIndex) -- not optional here
+	table.remove(self.choices, removeIndex)		-- never optional
+	if choicesTooltips then
+		table.remove(choicesTooltips, removeIndex)
 	end
 
 	-- find the choice to remove
