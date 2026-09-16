@@ -4,8 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
-local d = print
-
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
@@ -35,6 +33,16 @@ local saved, cache
 
 
 local mn, moduleName, class
+
+local function fillCVT(cvt, choices, values, tooltips)
+    for i = 1, #choices do
+        cvt:append(
+            choices[i],
+            values and values[i] or nil,
+            tooltips and tooltips[i] or nil
+        )
+    end
+end
 
 local function Misc_testInit()
     ZO_PlayerInventory = {}
@@ -77,7 +85,7 @@ end
 local BagSet_EditRule_LAM = AC_UI.BagSet_EditRule_LAM
 
 AC_UI.BagSet_EditBag_LAM = {
-	editBag_cvt = CVT:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK),
+	editBag_cvt = CVT:New("AC_DROPDOWN_EDITBAG_BAG", AC_BAG_TYPE_BACKPACK, AutoCategory.CVT.USE_VALUES),
 	
 	select = function(self, val)
 			self.editBag_cvt:select(val)
@@ -102,10 +110,8 @@ local function EditBag_testSize()
     TK.printSuite(mn, "testEditBagSize")
     
     TK.assertTrue(BagSet_EditBag_LAM:size() == 0, "has no choices")
-    local newvals = {
-      choices = { 1, 2, 4 },
-      choicesValues = {"one","two","four"},
-    }
+    local newvals = AC.CVT:New(nil, nil, AC.CVT.USE_VALUES)
+    fillCVT(newvals, { 1, 2, 4 }, {"one","two","four"})
     BagSet_EditBag_LAM:assign(newvals)
     TK.assertTrue(BagSet_EditBag_LAM:size() == 3, "has 3 choices")
 end
@@ -187,17 +193,11 @@ local function Cache_testUpdateSavedVars()
     local happy = AC.GetRuleByName("happy")
     TK.assertNotNil(happy,"still have rule happy defined")
     
-    --AC.charSaved.accountWide = false
-    --TK.assertFalse(AC.charSaved.accountWide,"Settings are toon-only")
-
     AutoCategory.UpdateCurrentSavedVars()
     TK.assertNotNil(AutoCategory.saved.rules, "saved.rules has entries")
     TK.assertNotNil(AutoCategory.compiledRules, "compiled rules has entries")
     TK.assertTrue(AC.listcount(saved.rules) > 0, "saved.rules has "..AC.listcount(saved.rules).." entries")
     TK.assertTrue(AC.listcount(saved.rules) == AC.listcount(AC.compiledRules), "#saved.rules == #compiledRules")
-
-    --AC.charSaved.accountWide = true
-    --TK.assertTrue(AC.charSaved.accountWide,"Settings are account-wide")
 
     AutoCategory.UpdateCurrentSavedVars()
     TK.assertNotNil(AutoCategory.saved.rules, "saved.rules has entries")

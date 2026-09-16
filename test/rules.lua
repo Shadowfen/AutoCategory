@@ -3,9 +3,6 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 require "zos"
 require "tk"
 
-local TR = test_run
-local d = print
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"

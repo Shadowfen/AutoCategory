@@ -4,8 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
-local d = print
-
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882

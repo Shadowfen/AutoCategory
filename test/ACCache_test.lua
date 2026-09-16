@@ -4,8 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
-local d = print
-
 local AC_DECON = 6
 local AC_IMPROV = 7
 local UV_DECON = 8
@@ -43,6 +41,18 @@ local saved, cache
 
 local moduleName = "ACCache"
 local mn, class
+
+
+local function fillCVT(cvt, choices, values, tooltips)
+    for i = 1, #choices do
+        cvt:append(
+            choices[i],
+            values and values[i] or nil,
+            tooltips and tooltips[i] or nil
+        )
+    end
+end
+
 
 local function Cache_testInit()
     ZO_PlayerInventory = {}

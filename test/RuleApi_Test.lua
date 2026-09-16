@@ -3,8 +3,6 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 require "zos"
 require "tk"
 
-local d = print
-
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882

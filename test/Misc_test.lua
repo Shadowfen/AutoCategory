@@ -4,9 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
---local TR = test_run
-local d = print
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"

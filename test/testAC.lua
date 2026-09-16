@@ -4,10 +4,6 @@ require "zos"
 require "tk"
 local TK = TestKit
 
-TK.init()
-
-local d = print
-
 require "LibSFUtils_Global"
 require "SFUtils_Color"
 require "LibSFUtils"
@@ -39,6 +35,7 @@ require "settings.BagSet"
 require "settings.CategorySettings"
 require "AddonMenu"
 
+AutoCategory.Environment = AutoCategory.Environment or {}
 local envir = AutoCategory.Environment
 
 local AC = AutoCategory
@@ -52,27 +49,6 @@ local saved = AutoCategory.saved
 local cache = AutoCategory.cache
 
 local AC_EMPTY_TAG_NAME = "unknown"
-
-local TR = {}
-function TR.printRule(r)
-    d(SF.str("name = ",r.name))
-    d(SF.str("tag = ",r.tag))
-    d(SF.str("rule = ",r.rule))
-end
-
-  
-function TR.printTable(tbl)
-    for k,v in pairs(tbl) do
-        if type(v) == table then
-            for kk, vv in pairs(v) do
-                d("k="..k.." kk="..kk.." vv="..vv)
-            end
-        else
-            d("k="..k.." v="..v)
-        end
-    end
-end
-
 
 AutoCategory.acctRules = {
   rules = {},
@@ -99,8 +75,10 @@ AutoCategory.dictionary = {
 local function testInit()
     AutoCategory.Environment = envir
 end
+
 local function testReset()
 end
+
 function testCheckRule()
     local tn = "testCheckRule"
     TK.printSuite(mn,tn)
@@ -167,6 +145,7 @@ end
 
 require "test.ACCache_test"
 require "test.AutoCat_Test"
+require "test.AC_LoadLanguage_Test"
 require "test.BagRuleApi_Test"
 require "test.BagSet_Test"
 require "test.BaseUI_Test"
@@ -176,7 +155,6 @@ require "test.Iakoni_test"
 require "test.misc"
 require "test.Misc_test"
 require "test.PluginAPI_test"
-require "test.PluginsAPI_test"
 require "test.RuleApi_Test"
 require "test.RuleList_Test"
 require "test.Collapse_Test"
@@ -185,24 +163,24 @@ require "test.Collapse_Test"
 function TestAC_runAll()
     testAutoCat_runAll()
     BagRuleApi_runTests()
-    --testBagSet_runAll()
+    testBagSet_runAll()
     TestBaseUI_runAll()
     TestCVT_runAll()
     Cache_runTests()
     FCOIS_runTests()
     Iakoni_runTests()
     
-    PluginsAPI_runTests()
+    ACLoadLang_runTests()
     runPluginAPITests()
     
     test_RuleApi_runAll()
     TestRuleList_runAll()
     misc_runTests()
-    --Misc_runTests()
-    --testCollapse_runAll()
+    Misc_runTests()
+    testCollapse_runAll()
 
     testInit()
-    --testCheckRule()
+    testCheckRule()
     testReset()
 end
 

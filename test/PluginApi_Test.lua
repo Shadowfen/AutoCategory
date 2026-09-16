@@ -3,8 +3,6 @@ package.path = package.path .. ";C:/Users/scott/Documents/SFAddons/TK/?.lua;C:/U
 require "zos"
 require "tk"
 
-local d = print
-
 local AC_DECON = 880
 local AC_IMPROV = 881
 local UV_DECON = 882
@@ -62,6 +60,7 @@ local function PluginApi_testInit()
 
     AutoCategory.BagRuleEntry = {}
     AutoCategory.Environment = {}
+    AutoCategory.Plugins = {}
 
     saved = AutoCategory.saved
     cache = AutoCategory.cache
@@ -75,7 +74,10 @@ local function PluginApi_testReset()
     cache = {}
     AC.saved = {}
     AC.cache = {}
+    AutoCategory.Plugins = {}
     AutoCategory.Environment = nil
+    -- cleanup
+    testZO_ResetStringTables() -- set the string tables back to a pre-loaded state (mostly)
 end
 
 
@@ -91,12 +93,8 @@ local TK = TestKit
 
 local function testDummyRuleFunc()
     TK.printSuite("PluginAPI", "DummyRuleFunc")
-
-    TK.assertNotNil(AutoCategory.dummyRuleFunc,
-        "dummyRuleFunc exists")
-
-    TK.assertFalse(AutoCategory.dummyRuleFunc(),
-        "dummyRuleFunc returns false")
+    TK.assertNotNil(AutoCategory.dummyRuleFunc, "dummyRuleFunc exists")
+    TK.assertFalse(AutoCategory.dummyRuleFunc(), "dummyRuleFunc returns false")
 end
 
 
@@ -117,8 +115,7 @@ local function testAddRuleFunc()
 
         AutoCategory.AddRuleFunc("TestRuleFunc", testFunc)
 
-        TK.assertEquals(testFunc,
-            AutoCategory.Environment.TestRuleFunc,
+        TK.assertEquals(testFunc, AutoCategory.Environment.TestRuleFunc,
             "AddRuleFunc installs supplied function")
 
         TK.assertTrue(AutoCategory.Environment.TestRuleFunc(),
@@ -134,8 +131,7 @@ local function testAddRuleFunc()
 
         AutoCategory.AddRuleFunc("TestDummyRuleFunc")
 
-        TK.assertEquals(AutoCategory.dummyRuleFunc,
-            AutoCategory.Environment.TestDummyRuleFunc,
+        TK.assertEquals(AutoCategory.dummyRuleFunc, AutoCategory.Environment.TestDummyRuleFunc,
             "AddRuleFunc uses dummyRuleFunc when omitted")
 
         TK.assertFalse(AutoCategory.Environment.TestDummyRuleFunc(),
@@ -151,82 +147,43 @@ local function testAddRuleFunc()
 
         AutoCategory.AddRuleFunc("TestNilRuleFunc", nil)
 
-        TK.assertEquals(AutoCategory.dummyRuleFunc,
-            AutoCategory.Environment.TestNilRuleFunc,
+        TK.assertEquals(AutoCategory.dummyRuleFunc, AutoCategory.Environment.TestNilRuleFunc,
             "AddRuleFunc uses dummyRuleFunc for nil function")
 
         AutoCategory.Environment.TestNilRuleFunc = oldFunc
     end
 end
 
+local function testOverWriteAddRuleFunc()
+    TK.printSuite("PluginsApi", "testOverWriteAddRuleFunc")
 
--- ------------------------------------------------------------
--- LoadLanguage tests
--- ------------------------------------------------------------
+    AutoCategory.Environment["testfunc"] = AutoCategory.dummyRuleFunc
 
-local function testLoadLanguage()
-    TK.printSuite("PluginAPI", "LoadLanguage")
+    TK.assertNotNil(AutoCategory.Environment["testfunc"],
+        "testfunc exists before overwrite")
+    TK.assertTrue(AutoCategory.Environment["testfunc"] == AutoCategory.dummyRuleFunc,
+        "Starting with dummy testfunc")
+    TK.assertFalse(AutoCategory.Environment["testfunc"](),
+        "dummy testfunc() runs correctly")
 
-    -- explicit default language
-    do
-        local oldLoadLanguage = SF.LoadLanguage
-        local receivedTable
-        local receivedDefault
-
-        SF.LoadLanguage = function(stringtable, default_language)
-            receivedTable = stringtable
-            receivedDefault = default_language
-            return "TEST_RESULT"
-        end
-
-        local strings = {
-            en = {
-                TEST_STRING = "English",
-            },
-        }
-
-        local result = AutoCategory.LoadLanguage(strings, "fr")
-
-        TK.assertEquals("TEST_RESULT", result,
-            "LoadLanguage returns SF.LoadLanguage result")
-
-        TK.assertEquals(strings, receivedTable,
-            "LoadLanguage passes string table")
-
-        TK.assertEquals("fr", receivedDefault,
-            "LoadLanguage passes explicit default language")
-
-        SF.LoadLanguage = oldLoadLanguage
+    local function fn()
+        return true
     end
 
+    AutoCategory.AddRuleFunc("testfunc", fn)
 
-    -- default language
-    do
-        local oldLoadLanguage = SF.LoadLanguage
-        local receivedDefault
+    TK.assertFalse(AutoCategory.Environment["testfunc"] == AutoCategory.dummyRuleFunc,
+        "Success overwriting testfunc")
+    TK.assertTrue(AutoCategory.Environment["testfunc"](),
+        "testfunc() runs correctly")
 
-        SF.LoadLanguage = function(stringtable, default_language)
-            receivedDefault = default_language
-            return true
-        end
-
-        AutoCategory.LoadLanguage({
-            en = {
-                TEST_STRING = "English",
-            },
-        })
-
-        TK.assertEquals("en", receivedDefault, "LoadLanguage defaults language to en")
-
-        SF.LoadLanguage = oldLoadLanguage
-    end
+    AutoCategory.Environment["testfunc"] = nil
 end
 
 
 -- ------------------------------------------------------------
 -- RegisterPlugin tests
 -- ------------------------------------------------------------
-
 local function testRegisterPlugin()
     TK.printSuite("PluginAPI", "RegisterPlugin")
 
@@ -245,18 +202,54 @@ local function testRegisterPlugin()
 
         local result = AutoCategory.RegisterPlugin("TestPlugin", initFunc, predefined)
 
-        TK.assertTrue(result, "RegisterPlugin accepts valid plugin")
+        TK.assertTrue(result, "[Valid] RegisterPlugin accepts valid plugin")
 
         local entry = AutoCategory.Plugins.TestPlugin
 
-        TK.assertNotNil(entry, "RegisterPlugin creates plugin entry")
-        TK.assertEquals(initFunc, entry.init, "RegisterPlugin stores init function")
-        TK.assertEquals(predefined, entry.predef, "RegisterPlugin stores predefined rules")
-        TK.assertEquals(1, predefined[1].pred, "RegisterPlugin marks first predefined rule")
-        TK.assertEquals(1, predefined[2].pred, "RegisterPlugin marks second predefined rule")
+        TK.assertNotNil(entry, "[Valid] RegisterPlugin creates plugin entry")
+        TK.assertEquals(initFunc, entry.init, "[Valid] RegisterPlugin stores init function")
+        TK.assertEquals(predefined, entry.predef, "[Valid] RegisterPlugin stores predefined rules")
+        TK.assertEquals(1, predefined[1].pred, "[Valid] RegisterPlugin marks first predefined rule")
+        TK.assertEquals(1, predefined[2].pred, "[Valid] RegisterPlugin marks second predefined rule")
 
         AutoCategory.Plugins.TestPlugin = oldPlugin
     end
+
+    -- valid plugin with predefined rules
+    do
+        local oldPlugin = AutoCategory.Plugins.TestPlugin
+
+        local initFunc = function()
+            return true
+        end
+
+        local predefined = {
+            { name = "RuleOne" },
+            { name = "RuleTwo" },
+        }
+
+        local result = AutoCategory.RegisterPlugin("TestPlugin", initFunc, predefined)
+
+        TK.assertTrue(result, "[Valid] RegisterPlugin accepts valid plugin")
+
+        local entry = AutoCategory.Plugins.TestPlugin
+
+        TK.assertNotNil(entry, "[Valid] RegisterPlugin creates plugin entry")
+        TK.assertEquals(initFunc, entry.init, "[Valid] RegisterPlugin stores init function")
+        TK.assertEquals(predefined, entry.predef, "[Valid] RegisterPlugin stores predefined rules")
+        TK.assertEquals(1, predefined[1].pred, "[Valid] RegisterPlugin marks first predefined rule")
+        TK.assertEquals(1, predefined[2].pred, "[Valid] RegisterPlugin marks second predefined rule")
+
+        AutoCategory.Plugins.TestPlugin = oldPlugin
+    end
+
+
+
+    AutoCategory.Plugins.TestPlugin = oldPlugin
+end
+
+local function testRegisterPlugin_invalid()
+    TK.printSuite("PluginAPI", "RegisterPlugin Invalid")
 
 
     -- missing init function
@@ -264,9 +257,9 @@ local function testRegisterPlugin()
         local oldPlugin = AutoCategory.Plugins.TestInvalidPlugin
 
         local result = AutoCategory.RegisterPlugin("TestInvalidPlugin", nil)
-        TK.assertFalse(result, "RegisterPlugin rejects missing init function")
+        TK.assertFalse(result, "[Invalid-missing] RegisterPlugin rejects missing init function")
         TK.assertNil(AutoCategory.Plugins.TestInvalidPlugin,
-            "RegisterPlugin creates no entry without init function")
+            "[Invalid-missing] RegisterPlugin creates no entry without init function")
 
         AutoCategory.Plugins.TestInvalidPlugin = oldPlugin
     end
@@ -276,11 +269,10 @@ local function testRegisterPlugin()
         local oldPlugin = AutoCategory.Plugins.TestNonFunctionPlugin
 
         local result = AutoCategory.RegisterPlugin("TestNonFunctionPlugin", "not a function")
-        TK.assertFalse(result, "RegisterPlugin rejects non-function init")
+        TK.assertFalse(result, "[Invalid-nonfunc] RegisterPlugin rejects non-function init")
         
-        local entry = AutoCategory.Plugins.TestNonFunctionPlugin
         TK.assertNil(AutoCategory.Plugins.TestNonFunctionPlugin, 
-          "RegisterPlugin creates no entry for non-function init")
+          "[Invalid-nonfunc] RegisterPlugin creates no entry for non-function init")
 
         AutoCategory.Plugins.TestNonFunctionPlugin = oldPlugin
     end
@@ -289,17 +281,47 @@ local function testRegisterPlugin()
     do
         local result = AutoCategory.RegisterPlugin(nil, function() end)
 
-        TK.assertFalse(result, "RegisterPlugin rejects missing name")
+        TK.assertFalse(result, "[Invalid-noname] RegisterPlugin rejects missing name")
     end
     
     -- empty name
     do
         local result = AutoCategory.RegisterPlugin("", function() end)
 
-        TK.assertFalse(result, "RegisterPlugin rejects empty name")
+        TK.assertFalse(result, "[Invalid-noname] RegisterPlugin rejects empty name")
     end
 end
 
+local function testRegisterPluginInit()
+    TK.printSuite(mn, "RegisterPluginInit")
+
+    local oldEnvironment = AC.Environment
+    AC.Environment = {}
+
+    local tempFunc = function()
+        return true
+    end
+
+    AC.RegisterPlugin("TestPluginNoFunc", function()
+            AC.AddRuleFunc("testPluginRule")
+        end)
+
+    AC.Plugins.TestPluginNoFunc.init()
+
+    TK.assertNotNil(AC.Environment.testPluginRule,
+        "plugin init registers default rule function")
+
+    AC.RegisterPlugin("TestPluginFunc", function()
+            AC.AddRuleFunc("testPluginRuleFunc", tempFunc)
+        end)
+
+    AC.Plugins.TestPluginFunc.init()
+
+    TK.assertEquals(tempFunc, AC.Environment.testPluginRuleFunc,
+        "plugin init registers supplied rule function")
+
+    AC.Environment = oldEnvironment
+end
 
 -- ------------------------------------------------------------
 -- Run complete AutoCategory API test suite
@@ -310,8 +332,11 @@ function runPluginAPITests()
     
     testDummyRuleFunc()
     testAddRuleFunc()
-    testLoadLanguage()
+    testOverWriteAddRuleFunc()
+
     testRegisterPlugin()
+    testRegisterPlugin_invalid()
+    testRegisterPluginInit()
     
     PluginApi_testReset()
 end
