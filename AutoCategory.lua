@@ -5,7 +5,6 @@ local SF = LibSFUtils
 local AutoCat = AutoCategory
 
 local CVT = AutoCategory.CVT
-local ac_rules = AutoCategory.RulesW
 
 -- restore a version of d() that is not captured by libDebugLogger
 local sysd = function(msg)
@@ -175,12 +174,20 @@ end
 
 -- for sorting bagged rules by showpriority and name
 -- returns true if the a should come before b
+-- priorities are always either numeric or nil
 local function BagRuleShowSortingFunction(a, b)
     if not a or not b then return false end
     if not a.name or not b.name then return false end
 
-    local aPriority = a.showpriority or a.runpriority
-    local bPriority = b.showpriority or b.runpriority
+    local aPriority = a.showpriority
+	if aPriority == nil then
+		aPriority = a.runpriority
+	end
+
+	local bPriority = b.showpriority
+	if bPriority == nil then
+		bPriority = b.runpriority
+	end
 
     if not aPriority then
         if bPriority then
@@ -221,19 +228,13 @@ local function BagRuleRunSortingFunction(a, b)
     elseif aPriority ~= bPriority then
         return aPriority > bPriority
     end
-
-    --[[if type(a.name) ~= "string" or type(b.name) ~= "string" then
-        return false
-    end
-	--]]
-
     return a.name < b.name
 end
 AutoCat_Internal.BagRuleRunSortingFunction = BagRuleRunSortingFunction
 
 -- swap between account-wide and char-wide settings
 function AutoCat.UpdateCurrentSavedVars()
-	--local RulesW = AutoCategory.RulesW
+	local RulesW = AutoCategory.RulesW
     local acctSaved = AutoCat.acctSaved
     local charSaved = AutoCat.charSaved
 
@@ -241,7 +242,6 @@ function AutoCat.UpdateCurrentSavedVars()
     saved.general = acctSaved.general
     saved.appearance = acctSaved.appearance
 
-	--AutoCategory.saved.displayOrder = acctSaved.displayOrder
 	acctSaved.displayOrder = nil
 	acctSaved.displayName = nil
 
@@ -253,9 +253,9 @@ function AutoCat.UpdateCurrentSavedVars()
 	-- rule definitions are always account-wide
 	-- AutoCategory.acctRules only has user-defined rules
 	-- RulesW.ruleList will have acctRules plus the predefined rules
-	table.sort(ac_rules.ruleList, RuleSortingFunction)
+	table.sort(RulesW.ruleList, RuleSortingFunction)
 
-    local compiled, damaged = ac_rules:CompileAll()
+    local compiled, damaged = RulesW:CompileAll()
 	logDebug("[AutoCategory] Compiled rules: ", compiled, " damaged rules: ", damaged)
 
 	AutoCat.PruneCollapse(charSaved)
@@ -375,15 +375,17 @@ end
 function AutoCat.renameRule(oldName, newName)
 	if oldName == newName then return oldName end
 
+	local rulesW = AutoCat.RulesW
+
 	local rule = AutoCat.GetRuleByName(oldName)
 	if rule == nil then return end		-- no such rule to rename
 
 	newName = AutoCat.GetUsableRuleName(newName)
 
-	local oldrndx = ac_rules.ruleNames[oldName]
-	ac_rules.ruleNames[oldName] = nil
+	local oldrndx = rulesW.ruleNames[oldName]
+	rulesW.ruleNames[oldName] = nil
 	rule.name = newName
-	ac_rules.ruleNames[rule.name] = oldrndx
+	rulesW.ruleNames[rule.name] = oldrndx
 
 	AutoCat.renameBagRule(oldName, newName)
 	return newName
@@ -415,18 +417,19 @@ end
 
 -- initialize the RulesW.ruleNames, RulesW.tagGroups, and the RulesW.tags tables from RulesW.ruleList
 function AutoCat.cacheRuleInitialize()
+	local RulesW = AutoCat.RulesW
 	-- initialize the rules-based lookups
-    ac_rules.ruleNames = SF.safeClearTable(ac_rules.ruleNames)
-    ac_rules.tagGroups = SF.safeClearTable(ac_rules.tagGroups)
-    ac_rules.tags = SF.safeClearTable(ac_rules.tags)
+    RulesW.ruleNames = SF.safeClearTable(RulesW.ruleNames)
+    RulesW.tagGroups = SF.safeClearTable(RulesW.tagGroups)
+    RulesW.tags = SF.safeClearTable(RulesW.tags)
 
 	-- refill the rules-based lookups
-	local ruletbl = ac_rules.ruleList
+	local ruletbl = RulesW.ruleList
     for ndx = 1, #ruletbl do
-		-- add rule to ac_rules.ruleNames lookup
+		-- add rule to RulesW.ruleNames lookup
         local rule = ruletbl[ndx]
         local name = rule.name
-        ac_rules.ruleNames[name] = ndx
+        RulesW.ruleNames[name] = ndx
 
 		-- ensure tag value is valid
 		if not rule.tag or rule.tag == "" then
@@ -435,8 +438,8 @@ function AutoCat.cacheRuleInitialize()
 		local tag = rule.tag
 
         --update tag grouping lookups
-		ac_rules.AddTag(tag)
-        ac_rules.tagGroups[tag]:append(name, nil, rule:getDesc())
+		RulesW.AddTag(tag)
+        RulesW.tagGroups[tag]:append(name, nil, rule:getDesc())
     end
 end
 
@@ -572,10 +575,11 @@ end
 function AutoCat.GetRuleByName(name)
     if not name then return nil end
 
-	local ndx = ac_rules.ruleNames[name]
+	local rulesW = AutoCat.RulesW
+	local ndx = rulesW.ruleNames[name]
     if not ndx then return nil end
 
-    return ac_rules.ruleList[ndx]
+    return rulesW.ruleList[ndx]
 end
 
 function AutoCat.GetBagRuleByName(bagId, name)
@@ -584,7 +588,8 @@ function AutoCat.GetBagRuleByName(bagId, name)
     if not bagrules then return nil, nil end
     
     -- Check if rule still exists in main list
-    if not ac_rules.ruleNames[name] then
+	local rulesW = AutoCat.RulesW
+    if not rulesW.ruleNames[name] then
         -- Stale entry detected - trigger cleanup for this bag
 		AutoCat.cacheInitBag(bagId)
         return nil, nil
@@ -611,22 +616,23 @@ function AutoCat.cache.AddRule(rule)
         rule.tag = AC_EMPTY_TAG_NAME
     end
 
-    if ac_rules.tagGroups[rule.tag] == nil then
-        ac_rules.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
+	local rulesW = AutoCat.RulesW
+    if rulesW.tagGroups[rule.tag] == nil then
+        rulesW.tagGroups[rule.tag] = CVT:New(nil, nil, CVT.USE_TOOLTIPS) -- uses choicesTooltips
     end
 
-	local rule_ndx = ac_rules.ruleNames[rule.name]
+	local rule_ndx = rulesW.ruleNames[rule.name]
     if rule_ndx then
 		-- rule already exists
 		-- overwrite rule with new one
-		ac_rules.ruleList[rule_ndx] = rule
+		rulesW.ruleList[rule_ndx] = rule
 
 	else
 		-- add the new rule
-		ac_rules.ruleList[#ac_rules.ruleList+1] = rule
-		rule_ndx = #ac_rules.ruleList
-		ac_rules.ruleNames[rule.name] = rule_ndx
-		ac_rules.tagGroups[rule.tag]:append(rule.name, nil, rule:getDesc())
+		rulesW.ruleList[#rulesW.ruleList+1] = rule
+		rule_ndx = #rulesW.ruleList
+		rulesW.ruleNames[rule.name] = rule_ndx
+		rulesW.tagGroups[rule.tag]:append(rule.name, nil, rule:getDesc())
     end
 
 	rule:compile()
@@ -672,29 +678,30 @@ end
 	The ispredef flag signals that ALL of the rules in the source table are predefines if true.
 --]]
 local function addTableRules(tbl, tblname, ispredef)
-	if not tbl or not tbl.rules or tbl.rules == ac_rules.ruleList then return end
+	local rulesW = AutoCat.RulesW
+	if not tbl or not tbl.rules or tbl.rules == rulesW.ruleList then return end
 
 	AutoCat_Logger():Info("Adding rules from table "..(tblname or "unknown").."  count = "..#tbl.rules)
 
 	local newName
-	ac_rules.ruleList = ac_rules.ruleList or {}
-	ac_rules.ruleNames = ac_rules.ruleNames or {}
+	rulesW.ruleList = rulesW.ruleList or {}
+	rulesW.ruleNames = rulesW.ruleNames or {}
 
 	-- add a rule to the combined rules list and the name-lookup
 	local function addCombinedRule(rl)
-		local n = ac_rules.ruleNames[rl.name]
-		local ruleList = ac_rules.ruleList
+		local n = rulesW.ruleNames[rl.name]
+		local ruleList = rulesW.ruleList
 		local newListLen = #ruleList + 1
 		if not n then
 			ruleList[newListLen] = rl
-			logDebug("[AutoCategory] Adding rule ", rl.name, " to ac_rules.ruleList ndx=", newListLen)
-			ac_rules.ruleNames[rl.name] = newListLen
+			logDebug("[AutoCategory] Adding rule ", rl.name, " to rulesW.ruleList ndx=", newListLen)
+			rulesW.ruleNames[rl.name] = newListLen
 			return true
 			
 		else
 			ruleList[n] = rl
-			logDebug("[AutoCategory] Overwriting rule ", rl.name, " in ac_rules.ruleList ndx=", n)
-			ac_rules.ruleNames[rl.name] = n
+			logDebug("[AutoCategory] Overwriting rule ", rl.name, " in rulesW.ruleList ndx=", n)
+			rulesW.ruleNames[rl.name] = n
 		end
 		return false
 	end
